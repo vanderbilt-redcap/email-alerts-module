@@ -1,0 +1,81 @@
+{
+	"name": "Email Trigger Module",
+	
+	"permissions": [
+		"hook_every_page_top",
+		"hook_save_record",
+		"select_data",
+		"update_data",
+		"delete_data",
+		"update_user_permissions"
+	],
+
+	"links": {
+		"control-center": [
+			{
+				"name": "My Control Center Menu Link",
+				"icon": "user",
+				"url": "system_level_homepage.php"
+			}
+		],
+		"project": [
+			{
+				"name": "My Project Menu Link",
+				"icon": "report",
+				"url": "project_homepage.php"
+			}
+		]
+	},
+
+	"global-settings": [
+		{
+			"key": "project-menu-background-css",
+			"name": "Project Menu Background CSS",
+			"required": false,
+			"allow-project-overrides": true,
+			"type": "text",
+			"default": "#e2ca9c"
+		},
+		{
+			"key": "preferred-transportation",
+			"name": "Preferred Method of Transportation",
+			"required": true,
+			"allow-project-overrides": false,
+			"type": "radio",
+			"default": "car",
+			"choices": [
+				{ "value": "car", "name": "Car" },
+				{ "value": "bus", "name": "Bus" },
+				{ "value": "bike", "name": "Bicycle" }
+			]
+		}
+	],
+	
+	"project-settings": [
+		{
+			"key": "email-form",
+			"name": "Email form",
+			"required": true,
+			"type": "form-list",
+			"repeatable":true
+		},
+		{
+			"key": "email",
+			"name": "Email Address",
+			"required": true,
+			"type": "text"
+		},
+		{
+			"key": "email-subject",
+			"name": "Email Subject",
+			"required": true,
+			"type": "text"
+		},
+		{
+			"key": "email-text",
+			"name": "Email Text",
+			"required": true,
+			"type": "textarea"
+		}
+	]
+}
