@@ -53,29 +53,38 @@
 	
 	"project-settings": [
 		{
-			"key": "email-form",
-			"name": "Email form",
+
+			"key": "form",
+			"name": "Email forms",
 			"required": true,
-			"type": "form-list",
-			"repeatable":true
-		},
-		{
-			"key": "email",
-			"name": "Email Address",
-			"required": true,
-			"type": "text"
-		},
-		{
-			"key": "email-subject",
-			"name": "Email Subject",
-			"required": true,
-			"type": "text"
-		},
-		{
-			"key": "email-text",
-			"name": "Email Text",
-			"required": true,
-			"type": "textarea"
+			"type": "sub_settings",
+			"repeatable":true,
+			"sub_settings":[
+				{
+					"key": "form-name",
+					"name": "Form name",
+					"required": true,
+					"type": "form-list"
+				},
+				{
+					"key": "email",
+					"name": "Email Address",
+					"required": true,
+					"type": "text"
+				},
+				{
+					"key": "email-subject",
+					"name": "Email Subject",
+					"required": true,
+					"type": "text"
+				},
+				{
+					"key": "email-text",
+					"name": "Email Text",
+					"required": true,
+					"type": "textarea"
+				}
+			]
 		}
 	]
 }
