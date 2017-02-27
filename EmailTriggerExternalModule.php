@@ -12,9 +12,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		$data = \REDCap::getData($project_id);
 		if(isset($project_id)){
 			#Form Complete
-			if($data[$record][$event_id]['my_first_instrument_complete'] == '2'){
-				$forms_name = $this->getProjectSetting("form-name",$project_id) ;
-				if(!empty($forms_name)){
+			$forms_name = $this->getProjectSetting("form-name",$project_id) ;
+			if(!empty($forms_name)){
+				if($data[$record][$event_id][$forms_name.'_complete'] == '2'){
 					$email = $this->getProjectSetting("email",$project_id) ;
 					$subject = $this->getProjectSetting("email-subject",$project_id) ;
 					$email_text = $this->getProjectSetting("email-text",$project_id) ;
