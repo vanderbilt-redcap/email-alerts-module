@@ -1,61 +1,30 @@
 {
-	"name": "Email Trigger Module",
+	"name": "Selective Email",
+
+	"description": "Send emails to different groups based on DAG, users, and User Role",
 	
 	"permissions": [
-		"hook_every_page_top",
-		"hook_save_record",
-		"select_data",
-		"update_data",
-		"delete_data",
-		"update_user_permissions"
+		"hook_save_record"
 	],
 
 	"links": {
-		"control-center": [
-			{
-				"name": "My Control Center Menu Link",
-				"icon": "user",
-				"url": "system_level_homepage.php"
-			}
-		],
-		"project": [
-			{
-				"name": "My Project Menu Link",
-				"icon": "report",
-				"url": "project_homepage.php"
-			}
-		]
+                "project": [
+                        {
+                                "name": "Configure Selective Emails",
+                                "icon": "report",
+                                "url": "configure.php"
+                        }
+                ]
 	},
 
 	"global-settings": [
-		{
-			"key": "project-menu-background-css",
-			"name": "Project Menu Background CSS",
-			"required": false,
-			"allow-project-overrides": true,
-			"type": "text",
-			"default": "#e2ca9c"
-		},
-		{
-			"key": "preferred-transportation",
-			"name": "Preferred Method of Transportation",
-			"required": true,
-			"allow-project-overrides": false,
-			"type": "radio",
-			"default": "car",
-			"choices": [
-				{ "value": "car", "name": "Car" },
-				{ "value": "bus", "name": "Bus" },
-				{ "value": "bike", "name": "Bicycle" }
-			]
-		}
 	],
 	
 	"project-settings": [
 		{
 
 			"key": "form",
-			"name": "Email forms",
+			"name": "Email Forms",
 			"required": true,
 			"type": "sub_settings",
 			"repeatable":true,
@@ -67,10 +36,11 @@
 					"type": "form-list"
 				},
 				{
-					"key": "email",
-					"name": "Email Address",
-					"required": true,
-					"type": "text"
+					"key": "logic",
+					"name": "What Conditions Must Be True?",
+					"required": false,
+					"type": "text",
+					"repeatable": false
 				},
 				{
 					"key": "email-subject",
@@ -83,6 +53,216 @@
 					"name": "Email Text",
 					"required": true,
 					"type": "textarea"
+				},
+				{
+					"key": "dag-1",
+					"name": "1. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-2",
+					"name": "2. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-3",
+			    	"name": "3. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-4",
+					"name": "4. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-5",
+					"name": "5. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-6",
+					"name": "6. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-7",
+					"name": "7. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-8",
+					"name": "8. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-9",
+					"name": "9. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-10",
+					"name": "10. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-1",
+					"name": "1. Users (optional)",
+					"required": false,
+					"type": "user-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-2",
+					"name": "2. Users (optional)",
+					"required": false,
+					"type": "user-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-3",
+					"name": "3. Users (optional)",
+					"required": false,
+					"type": "user-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-4",
+					"name": "4. Users (optional)",
+					"required": false,
+					"type": "user-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-5",
+					"name": "5. Users (optional)",
+					"required": false,
+					"type": "user-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-6",
+					"name": "6. Users (optional)",
+					"required": false,
+					"type": "user-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-7",
+					"name": "7. Users (optional)",
+					"required": false,
+					"type": "user-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-8",
+					"name": "8. Users (optional)",
+					"required": false,
+					"type": "user-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-9",
+					"name": "9. Users (optional)",
+					"required": false,
+					"type": "user-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-10",
+					"name": "10. Users (optional)",
+					"required": false,
+					"type": "user-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-1",
+					"name": "1. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-2",
+					"name": "2. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-3",
+					"name": "3. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-4",
+					"name": "4. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-5",
+					"name": "5. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-6",
+					"name": "6. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-7",
+					"name": "7. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-8",
+					"name": "8. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-9",
+					"name": "9. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-10",
+					"name": "10. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
 				}
 			]
 		}
