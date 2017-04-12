@@ -1,7 +1,12 @@
 {
 	"name": "Email Trigger Module",
 
-	"authors": "Eva Bascompte Moragas",
+	"authors": [
+		{
+			"name": "Eva Bascompte Moragas",
+			"email": "eva.bascompte.moragas@vanderbilt.edu"
+		}
+	],
 
 	"description": "This module makes it possible to send customized automatic emails after a form is completed to one or several recipients.",
 	
