@@ -292,8 +292,8 @@
                         $choices[$subrow['type']]['keys'][] = $key;
 					} else {
 						echo "<tr>";
-						echo "<td><b>".$subrow['name']."</b></td>";
-						echo "<td>";
+						echo "<td style='border-color: black; border-width: 1px 0px 1px 1px; border-style: dotted;'><b>".$subrow['name']."</b></td>";
+						echo "<td style='border-color: black; border-width: 1px 1px 1px 0px; border-style: dotted;'>";
 						$currValue = "";
 						if (isset($settings[$subrow['key']]['value'][$currFormNumber])) {
 							$currValue = $settings[$subrow['key']]['value'][$currFormNumber];
@@ -306,7 +306,10 @@
 							} else {
 								echo "<input type='text' name='".$key."' value=\"".htmlspecialchars($currValue)."\">";
 							}
-						} else if ($subrow['type'] == 'user-list') {
+						} else if (($subrow['type'] == 'dropdown') || ($subrow['type'] == 'user-list')) {
+                            if (($subrow['type'] == 'dropdown') && ($currValue === "")) {
+                                    $currValue = '0';
+                            }
                             echo "<select name='".$key."'><option value=''></option>";
 							foreach($subrow['choices'] as $choice) {
 								$selected = "";
@@ -329,7 +332,7 @@
                                 );
             foreach ($choices as $type => $info) {
                 echo "<tr>";
-                echo "<td colspan='2'><span class='header'>".$typeNames[$type]."</span><br>";
+                echo "<td style='border: 1px dotted black;' colspan='2'><span class='header'>".$typeNames[$type]."</span><br>";
                 foreach ($info['checkboxes'] as $checkbox) {
                     $attr = "";
                     if ($checkbox['checked']) {

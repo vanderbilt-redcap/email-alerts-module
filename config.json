@@ -2,6 +2,13 @@
 	"name": "Selective Email",
 
 	"description": "Send emails to different groups based on DAG, users, and User Role",
+
+    "authors": [
+        {
+            "name": "Scott J. Pearson",
+            "email": "scott.j.pearson@vanderbilt.edu"
+        }
+    ],
 	
 	"permissions": [
 		"hook_save_record"
@@ -53,6 +60,16 @@
 					"name": "Email Text",
 					"required": true,
 					"type": "textarea"
+				},
+				{
+					"key": "any-or-all",
+					"name": "In ANY of the Below DAGs and User Roles<br>or In ALL of the Below DAGs and User Roles",
+					"required": true,
+					"type": "dropdown",
+                    "choices": [
+                        { "value": "0", "name": "Any" },
+                        { "value": "1", "name": "All" }
+                    ]
 				},
 				{
 					"key": "dag-1",
@@ -120,6 +137,111 @@
 				{
 					"key": "dag-10",
 					"name": "10. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-11",
+					"name": "11. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-12",
+					"name": "12. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-13",
+					"name": "13. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-14",
+					"name": "14. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-15",
+					"name": "15. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-16",
+					"name": "16. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-17",
+					"name": "17. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-18",
+					"name": "18. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-19",
+					"name": "19. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-20",
+					"name": "20. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-21",
+					"name": "21. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-22",
+					"name": "22. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-23",
+					"name": "23. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-24",
+					"name": "24. Data Access Group (optional)",
+					"required": false,
+					"type": "dag-list",
+					"repeatable": false
+				},
+				{
+					"key": "dag-25",
+					"name": "25. Data Access Group (optional)",
 					"required": false,
 					"type": "dag-list",
 					"repeatable": false
@@ -260,6 +382,41 @@
 				{
 					"key": "user-role-10",
 					"name": "10. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-11",
+					"name": "11. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-12",
+					"name": "12. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-13",
+					"name": "13. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-14",
+					"name": "14. User Role (optional)",
+					"required": false,
+					"type": "user-role-list",
+					"repeatable": false
+				},
+				{
+					"key": "user-role-15",
+					"name": "15. User Role (optional)",
 					"required": false,
 					"type": "user-role-list",
 					"repeatable": false

@@ -51,12 +51,21 @@ class SelectiveEmailsExternalModule extends AbstractExternalModule
                 $user = array();
                 $userRole = array();
 
-				$logic = $this->getProjectSetting("logic",$project_id);
-                for ($i=0; $i < 10; $i++) {
+                $numDAGs = 25;
+                $numUsers = 10;
+                $numRoles = 15;
+                for ($i=0; $i < $numDAGs; $i++) {
 				    $dag[] = $this->getProjectSetting("dag-".($i+1),$project_id);
+                }
+                for ($i=0; $i < $numUsers; $i++) {
 				    $user[] = $this->getProjectSetting("user-".($i+1),$project_id);
+                }
+                for ($i=0; $i < $numRoles; $i++) {
 				    $userRole[] = $this->getProjectSetting("user-role-".($i+1),$project_id);
                 }
+
+				$logic = $this->getProjectSetting("logic",$project_id);
+                $isAll = $this->getProjectSetting("any-or-all",$project_id);
 				$subject = $this->getProjectSetting("email-subject",$project_id);
 				$email_text = $this->getProjectSetting("email-text",$project_id);
 				$num_forms = count($forms_name);
@@ -75,7 +84,18 @@ class SelectiveEmailsExternalModule extends AbstractExternalModule
 					    $userEmails = getUserEmails($user[$i], $project_id);
 					    $roleEmails = getRoleEmails($userRole[$i], $project_id);
 
-					    $emailsOrig = array_unique(array_merge($dagEmails, $userEmails, $roleEmails));
+                        if ($isAll[$i] == "1") {
+                            # all - in both DAG and role
+					        $emailsOrig = array_unique($userEmails);
+                            foreach ($dagEmails as $e) {
+                                if (in_array($e, $roleEmails) && !in_array($e, $emailsOrig)) {
+                                    $emailsOrig[] = $e;
+                                }
+                            }
+                        } else {
+                            #any
+					        $emailsOrig = array_unique(array_merge($dagEmails, $userEmails, $roleEmails));
+                        }
                         $emails = array();
                         foreach ($emailsOrig as $email) {
                             if ($email) {
