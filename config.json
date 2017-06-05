@@ -1,99 +1,119 @@
 {
-	"name": "Email Trigger Module",
+	"name": "Email Alerts",
 
 	"authors": [
 		{
 			"name": "Eva Bascompte Moragas",
 			"email": "eva.bascompte.moragas@vanderbilt.edu"
+		},
+		{
+			"name": "Scott J. Pearson",
+			"email": "scott.j.pearson@vanderbilt.edu"
 		}
 	],
 
-	"description": "This module makes it possible to send customized automatic emails after a form is completed to one or several recipients.",
-	
+	"description": "This module makes it possible to send customized emails alerts after a form is completed to one or several recipients.",
+
 	"permissions": [
-		"hook_every_page_top",
 		"hook_save_record",
-		"select_data",
-		"update_data",
-		"delete_data",
-		"update_user_permissions"
+		"select_data"
 	],
 
 	"links": {
-		"control-center": [
-			{
-				"name": "My Control Center Menu Link",
-				"icon": "user",
-				"url": "system_level_homepage.php"
-			}
-		],
 		"project": [
 			{
-				"name": "My Project Menu Link",
+				"name": "Configure Email Alerts",
 				"icon": "report",
-				"url": "project_homepage.php"
+				"url": "configure.php"
 			}
 		]
 	},
 
 	"global-settings": [
+	],
+
+	"email-dashboard-settings": [
+        {
+          "key": "form-name",
+          "name": "Email Form",
+          "required": true,
+          "type": "form-list"
+        },
 		{
-			"key": "project-menu-background-css",
-			"name": "Project Menu Background CSS",
-			"required": false,
-			"allow-project-overrides": true,
-			"type": "text",
-			"default": "#e2ca9c"
+			"key": "email-to",
+			"name": "Email To",
+			"required": true,
+			"type": "text"
 		},
 		{
-			"key": "preferred-transportation",
-			"name": "Preferred Method of Transportation",
+			"key": "email-cc",
+			"name": "Email CC",
 			"required": true,
-			"allow-project-overrides": false,
-			"type": "radio",
-			"default": "car",
-			"choices": [
-				{ "value": "car", "name": "Car" },
-				{ "value": "bus", "name": "Bus" },
-				{ "value": "bike", "name": "Bicycle" }
-			]
-		}
-	],
-	
-	"project-settings": [
+			"type": "text"
+		},
 		{
-
-			"key": "form",
-			"name": "Email forms",
+			"key": "email-subject",
+			"name": "Email Subject",
 			"required": true,
-			"type": "sub_settings",
-			"repeatable":true,
-			"sub_settings":[
-				{
-					"key": "form-name",
-					"name": "Form name",
-					"required": true,
-					"type": "form-list"
-				},
-				{
-					"key": "email",
-					"name": "Email Address",
-					"required": true,
-					"type": "text"
-				},
-				{
-					"key": "email-subject",
-					"name": "Email Subject",
-					"required": true,
-					"type": "text"
-				},
-				{
-					"key": "email-text",
-					"name": "Email Text",
-					"required": true,
-					"type": "textarea"
-				}
-			]
+			"type": "text"
+		},
+		{
+			"key": "email-text",
+			"name": "Email Text",
+			"required": true,
+			"type": "rich-text"
+		},
+		{
+			"key": "email-attachment1",
+			"name": "Email Attachment 1",
+			"required": false,
+			"type": "file"
+		},
+		{
+			"key": "email-attachment2",
+			"name": "Email Attachment 2",
+			"required": false,
+			"type": "file"
+		},
+		{
+			"key": "email-attachment3",
+			"name": "Email Attachment 3",
+			"required": false,
+			"type": "file"
+		},
+		{
+			"key": "email-attachment4",
+			"name": "Email Attachment 4",
+			"required": false,
+			"type": "file"
+		},
+		{
+			"key": "email-attachment5",
+			"name": "Email Attachment 5",
+			"required": false,
+			"type": "file"
+		},
+		{
+			"key": "email-repetitive",
+			"name": "Email more than one time per instrument?",
+			"required": false,
+			"type":"checkbox"
+		},
+		{
+			"key": "email-timestamp",
+			"name": "Leave Timestamp of Email?",
+			"required": false,
+			"type": "checkbox"
+		},
+		{
+			"key": "email-condition",
+			"name": "Email Condition (REDCap logic; Send when ' ')",
+			"required": false,
+			"type":"text"
 		}
+
+	],
+
+	"project-settings": [
 	]
 }
