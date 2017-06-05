@@ -240,7 +240,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     }
 
                     var data = $('#mainForm').serialize();
-//                    ajaxLoadOptionAndMessage(data,'<?//=$emailTriggerModule->getUrl('configureAJAX.php')?>//',"C");
+                    ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('configureAJAX.php')?>',"C");
                 }
                 return false;
             });
