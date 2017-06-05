@@ -5,6 +5,9 @@
     font-size: 13px;
     text-align: center;
 }
+.table_header th{
+    border-bottom: 1px solid #ccc;
+}
 .table_header th:not(.table_header_options){
    cursor: pointer !important;
 }
