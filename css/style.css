@@ -6,11 +6,14 @@
     text-align: center;
 }
 .table_header th{
-    border-bottom: 1px solid #ccc;
+    border: 1px solid #ccc !important;
 }
-.table_header th:not(.table_header_options){
+.table_header_options{
+    cursor: none !important;
+}
+/*.table_header th:not(.table_header_options){
    cursor: pointer !important;
-}
+}*/
 .table_header th span{
     color:red;
 }
