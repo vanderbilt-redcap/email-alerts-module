@@ -151,7 +151,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     return inputHtml;
                 }else if(setting.type == 'text' && (setting.key == 'email-to' || setting.key == 'email-to-update' || setting.key == 'email-cc' || setting.key == 'email-cc-update')){
                     //We add the datalist for the emails
-                    inputHtml += "<tr class='"+customClass+"'><td><span class='external-modules-instance-label'>" + (instance+1) + ". </span><label>" + setting.name + ":</label></td>";
+                    inputHtml += "<tr class='"+customClass+"'><td><span class='external-modules-instance-label'></span><label>" + setting.name + ":</label></td>";
                     var datalistname = "json-datalist-"+setting.key;
                     var inputProperties = {'list':datalistname,'class':'flexdatalist','multiple':'multiple','data-min-length':'1','id':setting.key};
                     inputHtml += "<td class='external-modules-input-td'>"+this.getInputElement(setting.type, setting.key, setting.value, inputProperties);
