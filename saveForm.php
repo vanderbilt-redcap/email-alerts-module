@@ -21,12 +21,14 @@ if(empty($_REQUEST['email-repetitive'])){
 }else{
     $repetitive = "1";
 }
+ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive', $email_repetitive);
 
 if(empty($_REQUEST['email-timestamp'])){
     $timestamp = "0";
 }else{
     $timestamp = "1";
 }
+ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp', $email_timestamp);
 
 #Add new data with old
 array_push($form_name,$_REQUEST['form-name']);
@@ -39,14 +41,12 @@ array_push($email_timestamp,$timestamp);
 array_push($email_condition,$_REQUEST['email-condition']);
 
 #Save data
-ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive', $email_repetitive);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp', $email_timestamp);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condition);
 ExternalModules::setProjectSetting($prefix,$pid, 'form-name', $form_name);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-to', $email_to);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-cc', $email_cc);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-subject', $email_subject);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-text', $email_text);
+ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condition);
 
 
 //Extra Data
