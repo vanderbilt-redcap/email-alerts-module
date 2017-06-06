@@ -39,7 +39,6 @@ array_push($email_timestamp,$timestamp);
 array_push($email_condition,$_REQUEST['email-condition']);
 
 #Save data
-
 ExternalModules::setProjectSetting($prefix,$pid, 'form-name', $form_name);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-to', $email_to);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-cc', $email_cc);

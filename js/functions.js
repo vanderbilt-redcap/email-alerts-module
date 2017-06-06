@@ -181,21 +181,30 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
 }
 
 function ajaxLoadOptionAndMessage(data, url, message){
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: data
-        ,
-        error: function (xhr, status, error) {
-            alert(xhr.responseText);
-        },
-        success: function (result) {
-            // console.log(result)
+    // $.ajax({
+    //     type: "POST",
+    //     url: url,
+    //     data: data
+    //     ,
+    //     error: function (xhr, status, error) {
+    //         alert(xhr.responseText);
+    //     },
+    //     success: function (result) {
+    //         // console.log(result)
+    //         //refresh page to show changes
+    //         window.location.href = gerUtlMessageParam(message);
+    //     }
+    // });
+
+    $.post(url, data, function(returnData){
+        if(returnData.status != 'success'){
             //refresh page to show changes
             window.location.href = gerUtlMessageParam(message);
         }
     });
 }
+
+
 
 function loadAjax(parameters, url, id){
     var loadAJAX = 'json-datalist-'+id;

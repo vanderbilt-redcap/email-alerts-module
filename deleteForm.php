@@ -76,6 +76,8 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condi
 ExternalModules::setProjectSetting($prefix,$pid, 'email-sent', $email_sent);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp-sent', $email_timestamp_sent);
 
-echo "";
+echo json_encode(array(
+    'status' => 'success'
+));
 
 ?>
