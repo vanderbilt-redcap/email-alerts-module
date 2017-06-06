@@ -270,6 +270,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                  }else{
                      return false;
                  }
+				return false;
             });
 
             $('#deleteForm').submit(function () {

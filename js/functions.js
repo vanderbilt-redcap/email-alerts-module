@@ -201,6 +201,9 @@ function ajaxLoadOptionAndMessage(data, url, message){
             //refresh page to show changes
             window.location.href = gerUtlMessageParam(message);
         }
+        else {
+	        window.location.href = getUtlMessageParam(message);
+        }
     });
 }
 

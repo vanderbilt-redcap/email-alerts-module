@@ -35,7 +35,7 @@ $emailTriggerModule = new EmailTriggerExternalModule();
             }else{
                 return false;
             }
-
+			return false;
         });
     });
 </script>
