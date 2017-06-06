@@ -31,7 +31,7 @@ function editEmailAlert(modal, index){
     $('#external-modules-configure-modal-update input[name="email-condition-update"]').val(modal['email-condition']);
 
     //Add Files
-    for(i=1; i<5 ; i++){
+    for(i=1; i<6 ; i++){
         getFileFieldElement(modal['email-attachment'+i], i);
     }
 
@@ -119,6 +119,11 @@ function insertAtCursorTinyMCE(myValue) {
     }
 }
 
+function randomString() {
+    var length = 7;
+    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
+}
+
 function gerUtlMessageParam(letter){
     var url = window.location.href;
     if(window.location.href.match(/(&message=)([A-Z]{1})/)){
@@ -126,6 +131,7 @@ function gerUtlMessageParam(letter){
     }else{
         url = window.location.href + "&message="+letter;
     }
+    // url = url + "&rand=" + randomString();
     return url;
 }
 
