@@ -17,15 +17,15 @@ $email_condition =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'ema
 
 #checkboxes
 if(empty($_REQUEST['email-repetitive'])){
-    $repetitive = 0;
+    $repetitive = "0";
 }else{
-    $repetitive = 1;
+    $repetitive = "1";
 }
 
 if(empty($_REQUEST['email-timestamp'])){
-    $timestamp = 0;
+    $timestamp = "0";
 }else{
-    $timestamp = 1;
+    $timestamp = "1";
 }
 
 #Add new data with old
@@ -52,8 +52,8 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condi
 //Extra Data
 $email_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-sent');
 $email_timestamp_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp-sent');
-array_push($email_sent,0);
-array_push($email_timestamp_sent,0);
+array_push($email_sent,"0");
+array_push($email_timestamp_sent,"0");
 ExternalModules::setProjectSetting($prefix,$pid, 'email-sent', $email_sent);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp-sent', $email_timestamp_sent);
 

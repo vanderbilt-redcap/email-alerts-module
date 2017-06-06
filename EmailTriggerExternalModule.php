@@ -24,7 +24,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $email_timestamp = $this->getProjectSetting("email-timestamp",$project_id)[$id];
 
                         if ($_REQUEST['page'] == $form) {
-                            if(($email_repetitive == '1') || ($email_repetitive == '0' && $email_sent[$id] == '0')){
+                            if(($email_repetitive == "1") || ($email_repetitive == '0' && $email_sent[$id] == "0")){
                                 $email_condition = $this->getProjectSetting("email-condition",$project_id)[$id];
                                 //If the condition is met or if we don't have any, we send the email
                                 if((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)){
@@ -95,8 +95,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     if (!$mail->send()) {
                                         \REDCap::email('datacore@vanderbilt.edu', 'noreply@vanderbilt.edu', "Mailer Error", "Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
                                     } else {
-                                        $email_sent[$id] = 1;
-                                        if($email_timestamp == '1'){
+                                        $email_sent[$id] = "1";
+                                        if($email_timestamp == "1"){
                                             $email_timestamp_sent[$id] = date('Y-m-d H:i:s');
                                         }
                                     }
