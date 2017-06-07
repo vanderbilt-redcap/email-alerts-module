@@ -63,19 +63,26 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     }
 
                                     $mail->Subject = $email_subject;
-                                    $mail->msgHTML = $email_text;
+                                    $mail->IsHTML(true);
+                                    $mail->Body = $email_text;
 
                                     //Attachments
-                                    for($i=1; $i<5 ; $i++){
-                                        if(!empty($this->getProjectSetting("email-attachment".$i,$project_id)[$id])){
-                                            $file_content = \Files::getEdocContentsAttributes($this->getProjectSetting("email-attachment".$i,$project_id)[$id]);
+                                    for($i=1; $i<6 ; $i++){
+                                        $edoc = $this->getProjectSetting("email-attachment".$i,$project_id)[$id];
+                                        if(!empty($edoc)){
+                                            $sql="SELECT stored_name FROM redcap_edocs_metadata WHERE doc_id=".$edoc;
+                                            $q = db_query($sql);
 
-                                            $attachfile = $file_content[2];
-                                            $attachname = $file_content[1];
+                                            if($error = db_error()){
+                                                die($sql.': '.$error);
+                                            }
 
-                                            $mail->addAttachment($attachfile, $attachname);
+                                            while($row = db_fetch_assoc($q)){
+                                                $mail->AddAttachment(EDOC_PATH.$row['stored_name']);
+                                            }
                                         }
                                     }
+
 
                                     //DKIM to make sure the email does not go into spam folder
                                     $privatekeyfile = 'dkim_private.key';
