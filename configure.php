@@ -267,8 +267,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                  if(checkRequiredFieldsAndLoadOption('-update','Update')){
                      deleteFile($('#index_modal_update').val());
                      ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('updateForm.php')?>',"U");
-                 }else{
-                     return false;
                  }
 				return false;
             });
@@ -276,6 +274,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             $('#deleteForm').submit(function () {
                 var data = $('#deleteForm').serialize();
                 ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('deleteForm.php')?>',"D");
+                return false;
             });
 
         });

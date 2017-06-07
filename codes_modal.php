@@ -32,8 +32,6 @@ $emailTriggerModule = new EmailTriggerExternalModule();
             if(checkRequiredFieldsAndLoadOption('','')){
                 saveFilesIfTheyExist('<?=$emailTriggerModule->getUrl('save-file.php')?>', files);
                 ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('saveForm.php')?>',"A");
-            }else{
-                return false;
             }
 			return false;
         });
