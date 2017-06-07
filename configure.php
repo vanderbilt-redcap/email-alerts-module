@@ -264,6 +264,22 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 var editor_text = tinymce.activeEditor.getContent();
                 data += "&email-text-update-editor="+encodeURIComponent(editor_text);
 
+                var files = {};
+                $('#updateForm').find('input, select, textarea').each(function(index, element){
+                    var element = $(element);
+                    var name = element.attr('name');
+                    var type = element[0].type;
+
+                    if (type == 'file') {
+                        // only store one file per variable - the first file
+                        jQuery.each(element[0].files, function(i, file) {
+                            if (typeof files[name] == "undefined") {
+                                files[name] = file;
+                            }
+                        });
+                    }
+                });
+
                  if(checkRequiredFieldsAndLoadOption('-update','Update')){
                      deleteFile($('#index_modal_update').val());
                      ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('updateForm.php')?>',"U");
