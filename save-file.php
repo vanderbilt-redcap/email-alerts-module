@@ -5,7 +5,7 @@ require_once APP_PATH_DOCROOT.'Classes/Files.php';
 
 $pid = @$_GET['pid'];
 $moduleDirectoryPrefix = ExternalModules::getPrefixForID($_GET['id']);
-
+$index = $_GET['index'];
 
 $edoc = null;
 $myfiles = array();
@@ -14,10 +14,14 @@ foreach($_FILES as $key=>$value){
     if ($value) {
         # use REDCap's uploadFile
         $edoc = \Files::uploadFile($_FILES[$key]);
-
         if ($edoc) {
             $email_attachment =  empty(ExternalModules::getProjectSetting($moduleDirectoryPrefix, $pid, $key))?array():ExternalModules::getProjectSetting($moduleDirectoryPrefix, $pid, $key);
-            array_push($email_attachment,$edoc);
+
+            if(!isset($index)){
+                array_push($email_attachment,$edoc);
+            }else{
+                $email_attachment[$index] = $edoc;
+            }
             ExternalModules::setProjectSetting($moduleDirectoryPrefix,$pid, $key, $email_attachment);
         } else {
             header('Content-type: application/json');

@@ -271,6 +271,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     var type = element[0].type;
 
                     if (type == 'file') {
+                        name = name.replace("-update", "");
                         // only store one file per variable - the first file
                         jQuery.each(element[0].files, function(i, file) {
                             if (typeof files[name] == "undefined") {
@@ -281,7 +282,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 });
 
                  if(checkRequiredFieldsAndLoadOption('-update','Update')){
-                     deleteFile($('#index_modal_update').val());
+                     var index = $('#index_modal_update').val();
+                     deleteFile(index);
+                     saveFilesIfTheyExist('<?=$emailTriggerModule->getUrl('save-file.php')?>&index='+index, files);
                      ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('updateForm.php')?>',"U");
                  }
 				return false;
@@ -311,7 +314,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     async: false,
                     type: 'POST',
                     success: function(returnData) {
-                        console.log("returnData: "+JSON.stringify(returnData));
+//                        console.log("returnData: "+JSON.stringify(returnData));
                         if (returnData.status != 'success') {
                             alert(returnData.status+" One or more of the files could not be saved."+JSON.stringify(returnData));
                         }
