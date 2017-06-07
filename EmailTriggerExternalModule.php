@@ -69,8 +69,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         preg_match_all('/(?<=file=)\\s*([0-9]+)\\s*/',$img_src, $result_img);
                                         $edoc = array_unique($result_img[1]);
 
-                                        if(!empty($edoc)){
-                                            $sql="SELECT stored_name FROM redcap_edocs_metadata WHERE doc_id=".$edoc;
+                                        if(!empty($edoc[0])){
+                                            $sql="SELECT stored_name FROM redcap_edocs_metadata WHERE doc_id=".$edoc[0];
                                             $q = db_query($sql);
 
                                             if($error = db_error()){
