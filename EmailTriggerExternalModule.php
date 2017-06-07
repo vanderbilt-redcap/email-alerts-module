@@ -141,7 +141,7 @@ function check_email($emails, $project_id){
     }
     if(!empty($email_list_error)){
         //if error send email to datacore@vanderbilt.edu
-        \REDCap::email('datacore@vanderbilt.edu', 'noreply@vanderbilt.edu', "Wrong recipient", "The email/s "+implode(",",$email_list_error)+" in the project ".$project_id.", do not exist");
+        \REDCap::email('datacore@vanderbilt.edu', 'noreply@vanderbilt.edu', "Wrong recipient", "The email/s ".implode(",",$email_list_error)." in the project ".$project_id.", do not exist");
     }
 //    $email_list = implode(",",$email_list);
     return $email_list;
