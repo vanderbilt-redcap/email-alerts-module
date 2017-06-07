@@ -46,6 +46,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         }
                                     }
 
+
                                     $mail = new \PHPMailer;
 
                                     $email_to_ok = check_email ($email_to,$project_id);
@@ -60,6 +61,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         foreach ($email_cc_ok as $email) {
                                             $mail->AddCC($email);
                                         }
+                                    }
+
+                                    preg_match_all('/src=("[^"]*")/i',$email_text, $result);
+                                    $result = array_unique($result[1]);
+                                    $index_img = 0;
+                                    foreach ($result as $img_src){
+                                        $index_img++;
+                                        $email_text = str_replace($img_src,"img_emailTriger_".$index_img,$email_text);
+                                        $mail->AddEmbeddedImage($img_src, "img_emailTriger_".$index_img);
                                     }
 
                                     $mail->Subject = $email_subject;
@@ -153,3 +163,4 @@ function check_email($emails, $project_id){
 //    $email_list = implode(",",$email_list);
     return $email_list;
 }
+

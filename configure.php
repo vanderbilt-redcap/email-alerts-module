@@ -51,8 +51,6 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'D'){
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
-
-
 //printf("<pre>%s</pre>",print_r($config['email-dashboard-settings'],TRUE));
 
 ?>
