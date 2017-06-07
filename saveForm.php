@@ -16,13 +16,13 @@ $email_timestamp =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'ema
 $email_condition =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-condition'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-condition');
 
 #checkboxes
-if(empty($_REQUEST['email-repetitive'])){
+if(!isset($_REQUEST['email-repetitive'])){
     $repetitive = "0";
 }else{
     $repetitive = "1";
 }
 
-if(empty($_REQUEST['email-timestamp'])){
+if(!isset($_REQUEST['email-timestamp'])){
     $timestamp = "0";
 }else{
     $timestamp = "1";
