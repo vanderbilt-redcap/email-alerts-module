@@ -412,8 +412,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 }
                 $fileAttachments = ($fileAttachments == 0) ? "None" : $fileAttachments;
                 $alerts .= "<td><span style='text-align: center'>" . $fileAttachments . "</span></td>";
-                $alerts .= "<td><strong><a onclick='editEmailAlert(".json_encode($info_modal[$index]).",".$index.")' style='cursor:pointer' ><img src='" . APP_PATH_WEBROOT_FULL . APP_PATH_WEBROOT . "Resources/images/pencil.png'/></a></strong>";
-                $alerts .= "<strong><a onclick='deleteEmailAlert(".$index.")' style='cursor:pointer' >Delete</a></strong></td>";
+                $alerts .= "<td style='text-align: center'><strong><a onclick='editEmailAlert(".json_encode($info_modal[$index]).",".$index.")' style='cursor:pointer' ><img src='" . APP_PATH_WEBROOT_FULL . APP_PATH_WEBROOT . "Resources/images/pencil.png'/></a></strong>";
+                $alerts .= "<br/><br/><strong><a onclick='deleteEmailAlert(".$index.")' style='cursor:pointer' >Delete</a></strong></td>";
                 $alerts .= "</tr>";
             }
             echo $alerts;
