@@ -63,14 +63,26 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         }
                                     }
 
-                                    preg_match_all('/src=("[^"]*")/i',$email_text, $result);
+                                    preg_match_all('/src=[\"\'](.+?)[\"\'].*?/i',$email_text, $result);
                                     $result = array_unique($result[1]);
-                                    $index_img = 0;
                                     foreach ($result as $img_src){
-                                        $index_img++;
-                                        $email_text = str_replace($img_src,"img_emailTriger_".$index_img,$email_text);
-                                        $mail->AddEmbeddedImage($img_src, "img_emailTriger_".$index_img);
+                                        preg_match_all('/(?<=file=)\\s*([0-9]+)\\s*/',$img_src, $result_img);
+                                        $edoc = array_unique($result_img[1]);
+
+                                        if(!empty($edoc)){
+                                            $sql="SELECT stored_name FROM redcap_edocs_metadata WHERE doc_id=".$edoc;
+                                            $q = db_query($sql);
+
+                                            if($error = db_error()){
+                                                die($sql.': '.$error);
+                                            }
+
+                                            while($row = db_fetch_assoc($q)){
+                                                $mail->AddEmbeddedImage(EDOC_PATH.$row['stored_name']);
+                                            }
+                                        }
                                     }
+
 
                                     $mail->Subject = $email_subject;
                                     $mail->IsHTML(true);
