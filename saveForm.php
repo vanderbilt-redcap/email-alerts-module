@@ -66,6 +66,8 @@ for($i=1; $i<6; $i++){
 }
 
 
-//echo $_REQUEST['email-attachment1'];
+echo json_encode(array(
+    'status' => 'success'
+));
 
 ?>
