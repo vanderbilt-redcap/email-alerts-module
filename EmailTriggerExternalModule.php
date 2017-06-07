@@ -114,7 +114,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
                 //we makr the messages as sent
                 $this->setProjectSetting('email-sent', $email_sent, $project_id) ;
-                $this->setProjectSetting('email-timestamp-sent', $email_timestamp, $project_id) ;
+                $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id) ;
 			}
 		}
 	}
