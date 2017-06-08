@@ -63,6 +63,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         }
                                     }
 
+                                    //Embedded images
                                     preg_match_all('/src=[\"\'](.+?)[\"\'].*?/i',$email_text, $result);
                                     $result = array_unique($result[1]);
                                     foreach ($result as $img_src){
@@ -78,8 +79,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             }
 
                                             while($row = db_fetch_assoc($q)){
-                                                $email_text = str_replace($img_src,EDOC_PATH.$row['stored_name'],$email_text);
-                                                $mail->AddEmbeddedImage(EDOC_PATH.$row['stored_name']);
+                                                $path = EDOC_PATH.$row['stored_name'];
+                                                $src = "cid:".$edoc;
+
+                                                $email_text = str_replace($img_src,$src,$email_text);
+                                                $mail->AddEmbeddedImage($path,$edoc);
                                             }
                                         }
                                     }
@@ -123,7 +127,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     $mail->DKIM_selector = 'PHPMailer';
                                     $mail->DKIM_passphrase = ''; //key is not encrypted
                                     if (!$mail->send()) {
-                                        \REDCap::email('va.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Mailer Error", "Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
+                                        \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Mailer Error", "Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
                                     } else {
                                         $email_sent[$id] = "1";
                                         if($email_timestamp == "1"){

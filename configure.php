@@ -51,8 +51,7 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'D'){
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
-
-//printf("<pre>%s</pre>",print_r($result,TRUE));
+//printf("<pre>%s</pre>",print_r($projectData['settings']['email-sent'],TRUE));
 
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
@@ -398,7 +397,14 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             <?php
             $alerts = "";
             for ($index = 0; $index < $indexSubSet; $index++) {
-                $alerts .= '<tr>';
+                $email_sent = $projectData['settings']['email-sent']['value'][$index];
+                $class_sent = "";
+                $message_sent = "";
+                if($email_sent == "1"){
+                    $class_sent = "email_sent";
+                    $message_sent = "<span style='display:block;font-style:italic'>(Email Sent)</span>";
+                }
+                $alerts .= '<tr class="'.$class_sent.'">';
                 $fileAttachments = 0;
                 foreach ($config['email-dashboard-settings'] as $configKey => $configRow) {
 
@@ -421,7 +427,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             }else{
                                 $alerts .= '<em>' . $configRow['name'] . '</em><span>' . str_replace (',',', ',$value) . '</span></td>';
                             }
-                        } else {
+                        } else if($configRow['key'] == 'form-name') {
+                            $alerts .= '<td style="width: 350px;"><span>' . $value . '</span>'.$message_sent.'</td>';
+                        }else{
                             $alerts .= '<td style="width: 350px;"><span>' . $value . '</span></td>';
                         }
                     }
