@@ -8,9 +8,6 @@ require_once 'vendor/autoload.php';
 class EmailTriggerExternalModule extends AbstractExternalModule
 {
 
-	function redcap_survey_complete ($project_id,$record = NULL,$instrument,$event_id){
-
-    }
 	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id)
 	{
 		$data = \REDCap::getData($project_id);
