@@ -135,7 +135,7 @@ function sendEmailAlert($project_id,$record = NULL,$instrument,$event_id){
                                 $mail->DKIM_selector = 'PHPMailer';
                                 $mail->DKIM_passphrase = ''; //key is not encrypted
                                 if (!$mail->send()) {
-                                    \REDCap::email('datacore@vanderbilt.edu', 'noreply@vanderbilt.edu', "Mailer Error", "Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
+                                    \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Mailer Error", "Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
                                 } else {
                                     $email_sent[$id] = "1";
                                     if($email_timestamp == "1"){
