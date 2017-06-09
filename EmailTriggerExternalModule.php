@@ -8,7 +8,7 @@ require_once 'vendor/autoload.php';
 class EmailTriggerExternalModule extends AbstractExternalModule
 {
 
-	function redcap_survey_complete ($project_id,$record = NULL,$instrument,$event_id){
+	function hook_survey_complete ($project_id,$record = NULL,$instrument,$event_id){
         $data = \REDCap::getData($project_id);
         if(isset($project_id)){
             #Form Complete
@@ -18,7 +18,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
 
                 foreach ($forms_name as $id => $form){
-                    if($data[$record][$event_id][$form.'_complete'] == '2'){
+//                    if($data[$record][$event_id][$form.'_complete'] == '2'){
                         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
                         $email_timestamp = $this->getProjectSetting("email-timestamp",$project_id)[$id];
 
@@ -148,7 +148,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 //we makr the messages as sent
                 $this->setProjectSetting('email-sent', $email_sent, $project_id) ;
                 $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id) ;
-            }
+//            }
         }
     }
 	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id)

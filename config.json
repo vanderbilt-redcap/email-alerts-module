@@ -16,6 +16,7 @@
 
 	"permissions": [
 		"hook_save_record",
+		"hook_survey_complete",
 		"select_data"
 	],
 
