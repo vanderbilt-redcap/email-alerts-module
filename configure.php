@@ -376,6 +376,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         <td>Variable name<br/><span class="table_example">Example: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
                         <td>Enables the option to preload email addresses from form variables. Activating this option also allows to the form variable as 'To' or 'CC' options. </td>
                     </tr>
+
                 </table>
             </div>
         </div>

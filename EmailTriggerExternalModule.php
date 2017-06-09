@@ -21,27 +21,27 @@ function sendEmailAlert($project_id,$record = NULL,$instrument,$event_id){
     $data = \REDCap::getData($project_id);
     if(isset($project_id)){
         #Form Complete
-        $forms_name = $this->getProjectSetting("form-name",$project_id);
+        $forms_name = ExternalModules::getProjectSetting("form-name",$project_id);
         if(!empty($forms_name) && $record != NULL){
-            $email_sent = $this->getProjectSetting("email-sent",$project_id);
-            $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
+            $email_sent = ExternalModules::getProjectSetting("email-sent",$project_id);
+            $email_timestamp_sent = ExternalModules::getProjectSetting("email-timestamp-sent",$project_id);
 
             foreach ($forms_name as $id => $form){
                 if($data[$record][$event_id][$form.'_complete'] == '2'){
-                    $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
-                    $email_timestamp = $this->getProjectSetting("email-timestamp",$project_id)[$id];
+                    $email_repetitive = ExternalModules::getProjectSetting("email-repetitive",$project_id)[$id];
+                    $email_timestamp = ExternalModules::getProjectSetting("email-timestamp",$project_id)[$id];
 
                     if ($_REQUEST['page'] == $form) {
                         if(($email_repetitive == "1") || ($email_repetitive == '0' && $email_sent[$id] == "0")){
-                            $email_condition = $this->getProjectSetting("email-condition",$project_id)[$id];
+                            $email_condition = ExternalModules::getProjectSetting("email-condition",$project_id)[$id];
                             //If the condition is met or if we don't have any, we send the email
                             if((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)){
-                                $email_to = $this->getProjectSetting("email-to",$project_id)[$id];
-                                $email_cc = $this->getProjectSetting("email-cc",$project_id)[$id];
-                                $email_subject = $this->getProjectSetting("email-subject",$project_id)[$id];
-                                $email_text = $this->getProjectSetting("email-text",$project_id)[$id];
-                                $datapipe_var = $this->getProjectSetting("datapipe_var",$project_id);
-                                $datapipe_enable = $this->getProjectSetting("datapipe_enable",$project_id);
+                                $email_to = ExternalModules::getProjectSetting("email-to",$project_id)[$id];
+                                $email_cc = ExternalModules::getProjectSetting("email-cc",$project_id)[$id];
+                                $email_subject = ExternalModules::getProjectSetting("email-subject",$project_id)[$id];
+                                $email_text = ExternalModules::getProjectSetting("email-text",$project_id)[$id];
+                                $datapipe_var = ExternalModules::getProjectSetting("datapipe_var",$project_id);
+                                $datapipe_enable = ExternalModules::getProjectSetting("datapipe_enable",$project_id);
 
                                 //Data piping
                                 if(!empty($datapipe_var) && $datapipe_enable == 'on'){
@@ -103,7 +103,7 @@ function sendEmailAlert($project_id,$record = NULL,$instrument,$event_id){
 
                                 //Attachments
                                 for($i=1; $i<6 ; $i++){
-                                    $edoc = $this->getProjectSetting("email-attachment".$i,$project_id)[$id];
+                                    $edoc = ExternalModules::getProjectSetting("email-attachment".$i,$project_id)[$id];
                                     if(!empty($edoc)){
                                         $sql="SELECT stored_name FROM redcap_edocs_metadata WHERE doc_id=".$edoc;
                                         $q = db_query($sql);
@@ -155,8 +155,8 @@ function sendEmailAlert($project_id,$record = NULL,$instrument,$event_id){
                 }
             }
             //we makr the messages as sent
-            $this->setProjectSetting('email-sent', $email_sent, $project_id) ;
-            $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id) ;
+            ExternalModules::setProjectSetting('email-sent', $email_sent, $project_id) ;
+            ExternalModules::setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id) ;
         }
     }
 }
