@@ -18,11 +18,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
 
                 foreach ($forms_name as $id => $form){
-//                    if($data[$record][$event_id][$form.'_complete'] == '2'){
-                        $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
-                        $email_timestamp = $this->getProjectSetting("email-timestamp",$project_id)[$id];
+                    $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
+                    $email_timestamp = $this->getProjectSetting("email-timestamp",$project_id)[$id];
+                    $sql="SELECT s.form_name FROM redcap_surveys_participants as sp LEFT JOIN redcap_surveys s ON (sp.survey_id = s.survey_id ) where s.project_id =".$project_id." AND sp.hash=".$_REQUEST['s'];
+                    $q = db_query($sql);
 
-                        if ($_REQUEST['page'] == $form) {
+                    if($error = db_error()){
+                        die($sql.': '.$error);
+                    }
+
+                    while($row = db_fetch_assoc($q)){
+                        if ($row['form_name'] == $form) {
                             if(($email_repetitive == "1") || ($email_repetitive == '0' && $email_sent[$id] == "0")){
                                 $email_condition = $this->getProjectSetting("email-condition",$project_id)[$id];
                                 //If the condition is met or if we don't have any, we send the email
@@ -44,7 +50,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             }
                                         }
                                     }
-
 
                                     $mail = new \PHPMailer;
 
@@ -142,13 +147,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             }
 
                         }
-
                     }
+
                 }
-                //we makr the messages as sent
-                $this->setProjectSetting('email-sent', $email_sent, $project_id) ;
-                $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id) ;
-//            }
+            }
+            //we makr the messages as sent
+            $this->setProjectSetting('email-sent', $email_sent, $project_id) ;
+            $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id) ;
         }
     }
 	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id)
