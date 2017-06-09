@@ -358,11 +358,23 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         <td>Variable name<br/><span class="table_example">Example: [name_var], [surname_var], ...</span><br/><input type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"></td>
                         <td>Enables the option to create workflow messages that allow to pipe data from the form.</td>
                     </tr>
+<?php /*?>
+                    <tr class="table_header">
+                        <td>Enable</td>
+                        <td>Field</td>
+                        <td>Description</td>
+                    </tr>
+                    <tr>
+                        <td><input type="checkbox" name="datapipe_enable" id="datapipe_enable" <?=($emailTriggerModule->getProjectSetting('datapipe_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping<span></td>
+                        <td>Variable name<br/><span class="table_example">Example: [name_var], [surname_var], ...</span><br/><textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;" placeholder="[name_var], name ..." value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipe_var');?></textarea></td>
+                        <td>Enables the option to create workflow messages that allow to pipe data from the form.</td>
+                    </tr>
+ <?php */?>
                     <tr>
                         <td><input type="checkbox" name="emailFromForm_enable" id="emailFromForm_enable" <?=($emailTriggerModule->getProjectSetting('emailFromForm_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Email Addresses<span></td>
                         <td></td>
                         <td>Variable name<br/><span class="table_example">Example: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
-                        <td>Enables the option to preload some email addresses from form variables.</td>
+                        <td>Enables the option to preload email addresses from form variables. Activating this option also allows to the form variable as 'To' or 'CC' options. </td>
                     </tr>
                 </table>
             </div>
@@ -403,9 +415,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 if($email_sent == "1"){
                     $class_sent = "email_sent";
                     if($projectData['settings']['email-timestamp']['value'][$index] == "1" && !empty($projectData['settings']['email-timestamp-sent']['value'][$index])){
-                        $message_sent = "<span style='display:block;font-style:italic'>Email Sent on: ".$projectData['settings']['email-timestamp-sent']['value'][$index]."</span>";
+                        $message_sent = "<span style='display:block;font-style:italic'>Most recently activated on: ".$projectData['settings']['email-timestamp-sent']['value'][$index]."</span>";
                     }else{
-                        $message_sent = "<span style='display:block;font-style:italic'>Email Sent</span>";
+                        $message_sent = "<span style='display:block;font-style:italic'>Email activated</span>";
                     }
 
                 }
