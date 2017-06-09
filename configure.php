@@ -402,7 +402,12 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 $message_sent = "";
                 if($email_sent == "1"){
                     $class_sent = "email_sent";
-                    $message_sent = "<span style='display:block;font-style:italic'>(Email Sent)</span>";
+                    if($projectData['settings']['email-timestamp']['value'][$index] == "1" && !empty($projectData['settings']['email-timestamp-sent']['value'][$index])){
+                        $message_sent = "<span style='display:block;font-style:italic'>Email Sent on: ".$projectData['settings']['email-timestamp-sent']['value'][$index]."</span>";
+                    }else{
+                        $message_sent = "<span style='display:block;font-style:italic'>Email Sent</span>";
+                    }
+
                 }
                 $alerts .= '<tr class="'.$class_sent.'">';
                 $fileAttachments = 0;
