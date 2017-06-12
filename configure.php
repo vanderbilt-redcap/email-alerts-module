@@ -384,13 +384,14 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 </form>
 <div>
     <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Submit</button>
-<!--    <a href="#external-modules-configure-modal" id='btnViewCodes' type="button" class="btn btn-info pull-right email_forms_button_color email_forms_button open-codesModal" style="font-size:14px;color:#fff" data-toggle="modal" data-target="#external-modules-configure-modal">Add New Email</a>-->
-    <a href="" id='btnViewCodes' type="button" class="btn btn-info pull-right email_forms_button_color email_forms_button open-codesModal" style="font-size:14px;color:#fff">Add New Email</a>
 </div>
 <?PHP require('codes_modal.php');?>
 
-<div style="padding-top:100px">
-    <div class="col-md-12">
+<div style="padding-top:50px" class="col-md-12">
+    <div>
+        <a href="" id='btnViewCodes' type="button" class="btn btn-info pull-left email_forms_button_color email_forms_button open-codesModal" style="font-size:14px;color:#fff;margin-top: 0;margin-bottom: 10px;">Add New Email</a>
+    </div
+    <div style="padding-left:15px">
         <?php  if($indexSubSet>0) { ?>
         <table class="table table-bordered table-hover email_preview_forms_table" id="customizedAlertsPreview">
             <thead>
