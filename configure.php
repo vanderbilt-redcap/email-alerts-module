@@ -345,7 +345,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             <div class="alert alert-success fade in col-md-12" style="border-color: #b2dba1 !important;display: none;" id="succMsgContainer"></div>
 
             <div class="col-md-12">
-                <table class="table table-bordered table-hover">
+                <table class="table table-bordered table-hover" style="margin-bottom: 0">
                     <tr class="table_header">
                         <td>Enable</td>
                         <td>Field 1</td>
