@@ -71,6 +71,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         var datapipe_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_var'))?>;
         var emailFromForm_enable = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_enable'))?>;
         var emailFromForm_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_var'))?>;
+        var datapipeEmail_enable = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_enable'))?>;
 
         //Url
         var pid = '<?=$pid?>';
@@ -304,10 +305,17 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 var id = $(this).attr("id");
                 if(id == undefined){
                     var name = '[name="'+$(this).attr("name")+'"]';
+                    var id = $(this).attr("name");
                 }else{
                     var name = '#'+$(this).attr("id");
                 }
-                lastClick = name;
+
+                if(datapipeEmail_enable != 'on' && (id == "email-to-flexdatalist" || id == "email-to-update-flexdatalist" || id == "email-cc-flexdatalist" || id == "email-cc-update-flexdatalist")){
+                    lastClick = '';
+                }else{
+                    lastClick = name;
+                }
+
             });
 
             $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"]').on('keyup click', function(e){
@@ -373,15 +381,19 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     </tr>
 
                     <tr>
-                        <td><input type="checkbox" name="datapipe_enable" id="datapipe_enable" <?=($emailTriggerModule->getProjectSetting('datapipe_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping<span></td>
+                        <td style="width: 15%;"><input type="checkbox" name="datapipe_enable" id="datapipe_enable" <?=($emailTriggerModule->getProjectSetting('datapipe_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping<span></td>
                         <td style="width: 25%;">Variable name<br/><span class="table_example">Example: [name_var], name ...</span><br/><textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="[variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipe_var');?></textarea></td>
                         <td>Enables the option to create workflow messages that allow to pipe data from the form.<br/>The format of the data must be "[variable], label". This will create a button with the label that, on click, will insert the variable.</td>
                     </tr>
-
                     <tr>
-                        <td><input type="checkbox" name="emailFromForm_enable" id="emailFromForm_enable" <?=($emailTriggerModule->getProjectSetting('emailFromForm_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Email Addresses<span></td>
-                        <td>Variable name<br/><span class="table_example">Example: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
+                        <td style="width: 15%;"><input type="checkbox" name="emailFromForm_enable" id="emailFromForm_enable" <?=($emailTriggerModule->getProjectSetting('emailFromForm_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Preload Email Addresses<span></td>
+                        <td style="width: 25%;">Variable name<br/><span class="table_example">Example: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
                         <td>Enables the option to preload email addresses from form variables. Activating this option also allows to the form variable as 'To' or 'CC' options. </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 15%;"><input type="checkbox" name="datapipeEmail_enable" id="datapipeEmail_enable" <?=($emailTriggerModule->getProjectSetting('datapipeEmail_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping Email<span></td>
+                        <td style="width: 25%;">NONE</td>
+                        <td>Enables the option to use Redcap variables as data piping in the email fields. </td>
                     </tr>
 
                 </table>
