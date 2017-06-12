@@ -68,7 +68,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         var project_id = <?=json_encode($_GET['pid'])?>;
         //Dashboard info
         var datapipe_enable = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_enable'))?>;
-        var datapipe_label = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_label'))?>;
         var datapipe_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_var'))?>;
         var emailFromForm_enable = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_enable'))?>;
         var emailFromForm_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_var'))?>;
@@ -78,6 +77,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         var _preview_url = '<?=$emailTriggerModule->getUrl('previewForm.php')?>';
         var _edoc_name_url = '<?=$emailTriggerModule->getUrl('get-edoc-name.php')?>';
         var _path_external_modules_ajax = <?=json_encode(_path_external_modules_ajax)?>;
+        var lastClick = null;
+        var startPos = 0;
+        var endPos = 0;
 
         $(function(){
             //to use rich text with the modal
@@ -139,10 +141,10 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     var inputHtml = EMparent.getSettingColumns.call(this, setting, instance, header);
                     var buttonsHtml = "";
                     if(datapipe_enable == 'on'){
-                        var pipeVar = datapipe_var.split(",");
-                        var pipeName = datapipe_label.split(",");
+                        var pipeVar = datapipe_var.split("\n");
                         for (var i = 0; i < pipeVar.length; i++) {
-                            buttonsHtml += "<a class='btn btn_datapining' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + pipeVar[i] + "\");'>" + pipeName[i] + "</a>";
+                            var pipeName = pipeVar[i].split(",");
+                            buttonsHtml += "<a class='btn btn_datapining' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
                         }
                         inputHtml = inputHtml.replace("<td class='external-modules-input-td'>","<td class='external-modules-input-td'><div>"+buttonsHtml+"<div>");
                     }
@@ -183,6 +185,13 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             $('#btnViewCodes').on('click', function(e){
                 EMparent.configureSettings(configSettings, configSettings);
 
+                for(var i=0; i<tinymce.editors.length; i++){
+                    var editor = tinymce.editors[i];
+                    editor.on('focus', function(e) {
+                        lastClick = null;
+                    })
+                }
+
                 $('#external-modules-configure-modal').modal('show');
                 e.preventDefault();
 
@@ -191,20 +200,16 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             $('#mainForm').submit(function () {
                 $('#errMsgContainer').hide();
                 $('#succMsgContainer').hide();
-
                 var errMsg = [];
                 if ($("#datapipe_enable").is(":checked") == true) {
-                    if ($('#datapipe_label').val() === "" || $('#datapipe_label').val() === "0") {
-                        errMsg.push('Please insert at least one <strong>Custom Label</strong>.');
-                    }
                     if ($('#datapipe_var').val() === "" || $('#datapipe_var').val() === "0") {
                         errMsg.push('Please insert at least one <strong>Variable Name</strong>.');
                     }else{
-                        var result = $('#datapipe_var').val().split(",");
-//                        console.log("[37][email]".match(/\[\w*\]+/))
-                        for(var i=0;i<result.length;i++){
-                            if(!(trim(result[i]).startsWith("[")) || !(trim(result[i]).endsWith("]"))){
-                                errMsg.push('<strong>Data Piping Variable Name</strong> must be follow the format: [variable_name].');
+                        var pipeVar = $('#datapipe_var').val().split("\n");
+                        for (var i = 0; i < pipeVar.length; i++) {
+                            var pipeName = pipeVar[i].split(",");
+                            if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
+                                errMsg.push('<strong>Data Piping Variable Name</strong> must be follow the format: <i>[variable_name],label</i> .');
                             }
                         }
                     }
@@ -217,7 +222,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         var result = $('#emailFromForm_var').val().split(",");
                         for(var i=0;i<result.length;i++){
                             if(!(trim(result[i]).startsWith("[")) || !(trim(result[i]).endsWith("]"))){
-                                errMsg.push('<strong>Email Addresses Variable Name</strong> must be follow the format: [variable_name].');
+                                errMsg.push('<strong>Email Addresses Variable Name</strong> must be follow the format: <i>[variable_name]</i>.');
                             }
                         }
                     }
@@ -294,6 +299,21 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 return false;
             });
 
+
+            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"]').on('focus', function(e){
+                var id = $(this).attr("id");
+                if(id == undefined){
+                    var name = '[name="'+$(this).attr("name")+'"]';
+                }else{
+                    var name = '#'+$(this).attr("id");
+                }
+                lastClick = name;
+            });
+
+            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"]').on('keyup click', function(e){
+                startPos = this.selectionStart;
+                endPos = this.selectionEnd;
+            });
         });
 
         function saveFilesIfTheyExist(url, files) {
@@ -348,31 +368,18 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 <table class="table table-bordered table-hover" style="margin-bottom: 0">
                     <tr class="table_header">
                         <td>Enable</td>
-                        <td>Field 1</td>
-                        <td>Field 2</td>
+                        <td>Field </td>
                         <td>Description</td>
                     </tr>
+
                     <tr>
                         <td><input type="checkbox" name="datapipe_enable" id="datapipe_enable" <?=($emailTriggerModule->getProjectSetting('datapipe_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping<span></td>
-                        <td>Custom label<br/><span class="table_example">Example: name, surname, ...</span><br/><input type="text" name="datapipe_label" id="datapipe_label" style="width: 100%;" placeholder="name, surname, ..." value="<?=$emailTriggerModule->getProjectSetting('datapipe_label');?>"></td>
-                        <td>Variable name<br/><span class="table_example">Example: [name_var], [surname_var], ...</span><br/><input type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"></td>
-                        <td>Enables the option to create workflow messages that allow to pipe data from the form.</td>
+                        <td style="width: 25%;">Variable name<br/><span class="table_example">Example: [name_var], name ...</span><br/><textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="[variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipe_var');?></textarea></td>
+                        <td>Enables the option to create workflow messages that allow to pipe data from the form.<br/>The format of the data must be "[variable], label". This will create a button with the label that, on click, will insert the variable.</td>
                     </tr>
-<?php /*?>
-                    <tr class="table_header">
-                        <td>Enable</td>
-                        <td>Field</td>
-                        <td>Description</td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox" name="datapipe_enable" id="datapipe_enable" <?=($emailTriggerModule->getProjectSetting('datapipe_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping<span></td>
-                        <td>Variable name<br/><span class="table_example">Example: [name_var], [surname_var], ...</span><br/><textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;" placeholder="[name_var], name ..." value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipe_var');?></textarea></td>
-                        <td>Enables the option to create workflow messages that allow to pipe data from the form.</td>
-                    </tr>
- <?php */?>
+
                     <tr>
                         <td><input type="checkbox" name="emailFromForm_enable" id="emailFromForm_enable" <?=($emailTriggerModule->getProjectSetting('emailFromForm_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Email Addresses<span></td>
-                        <td></td>
                         <td>Variable name<br/><span class="table_example">Example: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
                         <td>Enables the option to preload email addresses from form variables. Activating this option also allows to the form variable as 'To' or 'CC' options. </td>
                     </tr>

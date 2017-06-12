@@ -18,6 +18,13 @@ function previewEmailAlert(index){
 function editEmailAlert(modal, index){
     tinymce.remove();
     EMparentAux.configureSettings(configSettingsUpdate, configSettingsUpdate);
+
+    for(var i=0; i<tinymce.editors.length; i++){
+        var editor = tinymce.editors[i];
+        editor.on('focus', function(e) {
+            lastClick = null;
+        })
+    }
     $("#index_modal_update").val(index);
 
     //Add values
@@ -110,12 +117,31 @@ function deleteEmailAlert(index){
 
 //Same as insertAtCursor but for tinyMCE element
 function insertAtCursorTinyMCE(myValue) {
-    if (tinymce.isIE) {
-        tinyMCE.activeEditor.selection.moveToBookmark(actualCaretPositionBookmark);
-        tinyMCE.execCommand('mceInsertContent',false, myValue);
+    if(lastClick != null){
+        var  myField = $(lastClick);
+        // console.log(lastClick+': '+myValue+'...'+myField.val());
 
+        //IE support
+        if (document.selection) {
+            myField.focus();
+            sel = document.selection.createRange();
+            sel.text = myValue;
+        }
+        //MOZILLA and others
+        else if (startPos ||startPos == '0') {
+            myField.val(myField.val().substring(0, startPos) + myValue+ myField.val().substring(endPos, myField.val().length));
+            myField.selectionStart = startPos + myValue.length;
+            myField.selectionEnd = startPos + myValue.length;
+        } else {
+            myField.val(myField.val()+myValue);
+        }
     }else {
-        tinyMCE.execCommand('insertHTML',false, myValue);
+        if (tinymce.isIE) {
+            tinyMCE.activeEditor.selection.moveToBookmark(actualCaretPositionBookmark);
+            tinyMCE.execCommand('mceInsertContent', false, myValue);
+        } else {
+            tinyMCE.execCommand('insertHTML', false, myValue);
+        }
     }
 }
 
