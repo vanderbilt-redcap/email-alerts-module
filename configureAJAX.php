@@ -10,5 +10,6 @@ $emailTriggerModule->setProjectSetting('datapipe_var',$_POST['datapipe_var']);
 $emailTriggerModule->setProjectSetting('emailFromForm_enable',$_POST['emailFromForm_enable']);
 $emailTriggerModule->setProjectSetting('emailFromForm_var',$_POST['emailFromForm_var']);
 $emailTriggerModule->setProjectSetting('datapipeEmail_enable',$_POST['datapipeEmail_enable']);
+$emailTriggerModule->setProjectSetting('datapipeEmail_var',$_POST['datapipeEmail_var']);
 
 ?>

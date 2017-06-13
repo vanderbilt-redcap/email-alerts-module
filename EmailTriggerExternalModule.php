@@ -3,6 +3,11 @@ namespace ExternalModules;
 require_once dirname(__FILE__) . '/../../external_modules/classes/ExternalModules.php';
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 require_once 'vendor/autoload.php';
+//require_once(dirname(dirname(__DIR__))."/plugins/Core/bootstrap.php");
+//global $Core;
+//
+//$Core->Libraries(array('Passthru'));
+
 
 
 class EmailTriggerExternalModule extends AbstractExternalModule
@@ -67,6 +72,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $email_text = $this->getProjectSetting("email-text", $project_id)[$id];
                 $datapipe_var = $this->getProjectSetting("datapipe_var", $project_id);
                 $datapipe_enable = $this->getProjectSetting("datapipe_enable", $project_id);
+                $datapipeEmail_enable = $this->getProjectSetting("datapipeEmail_enable", $project_id);
+                $datapipeEmail_var = $this->getProjectSetting("datapipeEmail_var", $project_id);
+
+
 
                 //Data piping
                 if (!empty($datapipe_var) && $datapipe_enable == 'on') {
@@ -81,17 +90,29 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 $mail = new \PHPMailer;
 
-                $email_to_ok = check_email ($email_to,$project_id);
-                if(!empty($email_to_ok)) {
-                    foreach ($email_to_ok as $email) {
-                        $mail->addAddress($email);
-                    }
-                }
+                //Email Addresses
+                if ($datapipeEmail_enable == 'on') {
+                    $email_form_var = explode("\n", $datapipeEmail_var);
 
-                $email_cc_ok = check_email ($email_cc,$project_id);
-                if(!empty($email_cc_ok)){
-                    foreach ($email_cc_ok as $email) {
-                        $mail->AddCC($email);
+                    $emailsTo = preg_split("/[;,]+/", $email_to);
+                    $emailsCC = preg_split("/[;,]+/", $email_cc);
+                    $mail = $this->fill_emails($mail,$emailsTo, $email_form_var, $data[$record], 'to',$project_id);
+                    $mail = $this->fill_emails($mail,$emailsCC, $email_form_var, $data[$record], 'cc',$project_id);
+
+                }else{
+                    $email_to_ok = $this->check_email ($email_to,$project_id);
+                    $email_cc_ok = $this->check_email ($email_cc,$project_id);
+
+                    if(!empty($email_to_ok)) {
+                        foreach ($email_to_ok as $email) {
+                            $mail->addAddress($email);
+                        }
+                    }
+
+                    if(!empty($email_cc_ok)){
+                        foreach ($email_cc_ok as $email) {
+                            $mail->AddCC($email);
+                        }
                     }
                 }
 
@@ -176,32 +197,69 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
     }
-}
 
-/**
- * Function that checks if the emails are valid and sends an error email in case there's an error
- * @param $emails
- * @param $project_id
- * @return array|string
- */
-function check_email($emails, $project_id){
-    $email_list = array();
-    $email_list_error = array();
-    $emails = preg_split("/[;,]+/", $emails);
-    foreach ($emails as $email){
-        if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            //VALID
-            array_push($email_list,$email);
-        }else{
-            array_push($email_list_error,$email);
-
+    function fill_emails($mail, $emailsTo, $email_form_var, $data, $option, $project_id){
+        foreach ($emailsTo as $email){
+            foreach ($email_form_var as $email_var) {
+                $var = preg_split("/[;,]+/", $email_var);
+                if(!empty($email)) {
+                    if (\LogicTester::isValid($var[0])) {
+                        $email_redcap = \LogicTester::apply($var[0], $data, null, true);
+                        if (!empty($email_redcap) && strpos($email, $var[0]) !== false) {
+                            $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
+                        } else {
+                            $mail = $this->check_single_email($mail,$email,$option,$project_id);
+                        }
+                    } else {
+                        $mail = $this->check_single_email($mail,$email,$option,$project_id);
+                    }
+                }
+            }
         }
+        return $mail;
     }
-    if(!empty($email_list_error)){
-        //if error send email to datacore@vanderbilt.edu
-        \REDCap::email('datacore@vanderbilt.edu', 'noreply@vanderbilt.edu', "Wrong recipient", "The email/s ".implode(",",$email_list_error)." in the project ".$project_id.", do not exist");
+
+    function check_single_email($mail,$email, $option, $project_id){
+        if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if($option == "to"){
+                $mail->addAddress($email);
+            }else if($option == "cc"){
+                $mail->addCC($email);
+            }
+        }else{
+            \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Wrong recipient", "The email ".$email." in the project ".$project_id.", do not exist");
+        }
+        return $mail;
     }
-//    $email_list = implode(",",$email_list);
-    return $email_list;
+
+    /**
+     * Function that checks if the emails are valid and sends an error email in case there's an error
+     * @param $emails
+     * @param $project_id
+     * @return array|string
+     */
+    function check_email($emails, $project_id){
+        $email_list = array();
+        $email_list_error = array();
+        $emails = preg_split("/[;,]+/", $emails);
+        foreach ($emails as $email){
+            if(!empty($email)){
+                if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    //VALID
+                    array_push($email_list,$email);
+                }else{
+                    array_push($email_list_error,$email);
+
+                }
+            }
+        }
+        if(!empty($email_list_error)){
+            //if error send email to datacore@vanderbilt.edu
+            \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Wrong recipient", "The email/s ".implode(",",$email_list_error)." in the project ".$project_id.", do not exist");
+        }
+        return $email_list;
+    }
 }
+
+
 

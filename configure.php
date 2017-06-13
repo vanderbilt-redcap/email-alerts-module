@@ -5,7 +5,6 @@ require_once ExternalModules::getProjectHeaderPath();
 require_once 'EmailTriggerExternalModule.php';
 require_once __DIR__ . '/../../external_modules/manager/templates/globals.php';
 
-define('_path_external_modules_ajax','/../../external_modules/manager/ajax');
 
 $emailTriggerModule = new EmailTriggerExternalModule();
 $config = $emailTriggerModule->getConfig();
@@ -53,6 +52,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
 //printf("<pre>%s</pre>",print_r($projectData['settings']['email-sent'],TRUE));
 
+
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
@@ -72,12 +72,12 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         var emailFromForm_enable = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_enable'))?>;
         var emailFromForm_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_var'))?>;
         var datapipeEmail_enable = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_enable'))?>;
+        var datapipeEmail_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_var'))?>;
 
         //Url
         var pid = '<?=$pid?>';
         var _preview_url = '<?=$emailTriggerModule->getUrl('previewForm.php')?>';
         var _edoc_name_url = '<?=$emailTriggerModule->getUrl('get-edoc-name.php')?>';
-        var _path_external_modules_ajax = <?=json_encode(_path_external_modules_ajax)?>;
         var lastClick = null;
         var startPos = 0;
         var endPos = 0;
@@ -141,13 +141,23 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     //We add the Data Pipping buttons
                     var inputHtml = EMparent.getSettingColumns.call(this, setting, instance, header);
                     var buttonsHtml = "";
-                    if(datapipe_enable == 'on'){
-                        var pipeVar = datapipe_var.split("\n");
-                        for (var i = 0; i < pipeVar.length; i++) {
-                            var pipeName = pipeVar[i].split(",");
-                            buttonsHtml += "<a class='btn btn_datapining' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                    if(datapipeEmail_enable == 'on' || datapipe_enable == 'on') {
+                        if (datapipe_enable == 'on') {
+                            var pipeVar = datapipe_var.split("\n");
+                            for (var i = 0; i < pipeVar.length; i++) {
+                                var pipeName = pipeVar[i].split(",");
+                                buttonsHtml += "<a class='btn btn_datapining' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                            }
+
                         }
-                        inputHtml = inputHtml.replace("<td class='external-modules-input-td'>","<td class='external-modules-input-td'><div>"+buttonsHtml+"<div>");
+                        if (datapipeEmail_enable == 'on') {
+                            var pipeVar = datapipeEmail_var.split("\n");
+                            for (var i = 0; i < pipeVar.length; i++) {
+                                var pipeName = pipeVar[i].split(",");
+                                buttonsHtml += "<a class='btn btn_datapining' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                            }
+                        }
+                        inputHtml = inputHtml.replace("<td class='external-modules-input-td'>", "<td class='external-modules-input-td'><div>" + buttonsHtml + "<div>");
                     }
                     return inputHtml;
                 }else if(setting.type == 'text' && (setting.key == 'email-to' || setting.key == 'email-to-update' || setting.key == 'email-cc' || setting.key == 'email-cc-update')){
@@ -210,7 +220,21 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         for (var i = 0; i < pipeVar.length; i++) {
                             var pipeName = pipeVar[i].split(",");
                             if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
-                                errMsg.push('<strong>Data Piping Variable Name</strong> must be follow the format: <i>[variable_name],label</i> .');
+                                errMsg.push('<strong>Data Piping field</strong> must be follow the format: <i>[variable_name],label</i> .');
+                            }
+                        }
+                    }
+                }
+
+                if ($("#datapipeEmail_enable").is(":checked") == true) {
+                    if ($('#datapipeEmail_var').val() === "" || $('#datapipeEmail_var').val() === "0") {
+                        errMsg.push('Please insert at least one <strong>Variable Name</strong>.');
+                    }else{
+                        var pipeVar = $('#datapipeEmail_var').val().split("\n");
+                        for (var i = 0; i < pipeVar.length; i++) {
+                            var pipeName = pipeVar[i].split(",");
+                            if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
+                                errMsg.push('<strong>Data Piping Email field</strong> must be follow the format: <i>[variable_name],label</i> .');
                             }
                         }
                     }
@@ -223,7 +247,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         var result = $('#emailFromForm_var').val().split(",");
                         for(var i=0;i<result.length;i++){
                             if(!(trim(result[i]).startsWith("[")) || !(trim(result[i]).endsWith("]"))){
-                                errMsg.push('<strong>Email Addresses Variable Name</strong> must be follow the format: <i>[variable_name]</i>.');
+                                errMsg.push('<strong>Email Addresses field</strong> must be follow the format: <i>[variable_name]</i>.');
                             }
                         }
                     }
@@ -239,8 +263,11 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     return false;
                 }else{
                     if ($("#datapipe_enable").is(":checked") == false) {
-                        $('#datapipe_label').val("");
                         $('#datapipe_var').val("");
+                    }
+
+                    if ($("#datapipeEmail_enable").is(":checked") == false) {
+                        $('#datapipeEmail_var').val("");
                     }
 
                     var data = $('#mainForm').serialize();
@@ -392,7 +419,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     </tr>
                     <tr>
                         <td style="width: 15%;"><input type="checkbox" name="datapipeEmail_enable" id="datapipeEmail_enable" <?=($emailTriggerModule->getProjectSetting('datapipeEmail_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping Email<span></td>
-                        <td style="width: 25%;">NONE</td>
+                        <td style="width: 25%;">Variable name<br/><span class="table_example">Example: [name_var], name ...</span><br/><textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?></textarea></td>
                         <td>Enables the option to use Redcap variables as data piping in the email fields. </td>
                     </tr>
 
