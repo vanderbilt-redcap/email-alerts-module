@@ -40,7 +40,7 @@ $emailTriggerModule = new EmailTriggerExternalModule();
 <!-- Modal -->
 <form class="form-horizontal" action="" method="post"id='AddNewForm'>
     <div class="modal fade" id="external-modules-configure-modal" tabindex="-1" role="dialog" aria-labelledby="Codes">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog" role="document" style="width: 800px">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>

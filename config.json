@@ -114,7 +114,7 @@
 		},
 		{
 			"key": "email-condition",
-			"name": "Email Condition (REDCap logic; Send when ' ')",
+			"name": "Email Condition (REDCap logic)",
 			"required": false,
 			"type":"text"
 		}
