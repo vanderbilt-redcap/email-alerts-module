@@ -11,5 +11,7 @@ $emailTriggerModule->setProjectSetting('emailFromForm_enable',$_POST['emailFromF
 $emailTriggerModule->setProjectSetting('emailFromForm_var',$_POST['emailFromForm_var']);
 $emailTriggerModule->setProjectSetting('datapipeEmail_enable',$_POST['datapipeEmail_enable']);
 $emailTriggerModule->setProjectSetting('datapipeEmail_var',$_POST['datapipeEmail_var']);
+$emailTriggerModule->setProjectSetting('surveyLink_enable',$_POST['surveyLink_enable']);
+$emailTriggerModule->setProjectSetting('surveyLink_var',$_POST['surveyLink_var']);
 
 ?>

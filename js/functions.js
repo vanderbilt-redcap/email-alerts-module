@@ -23,9 +23,14 @@ function editEmailAlert(modal, index){
         var editor = tinymce.editors[i];
         editor.on('focus', function(e) {
             lastClick = null;
-        })
+        });
+        editor.on('init', function () {
+            editor.setContent(modal['email-text'])
+        });
     }
     $("#index_modal_update").val(index);
+
+    $('[name="email-attachment-variable-update"]').attr('placeholder','[variable1], [variable2], ...')
 
     //Add values
     $('#external-modules-configure-modal-update select[name="form-name-update"]').val(modal['form-name']);
@@ -33,6 +38,7 @@ function editEmailAlert(modal, index){
     $('#external-modules-configure-modal-update input[name="email-cc-update"]').val(modal['email-c']);
     $('#external-modules-configure-modal-update input[name="email-subject-update"]').val(modal['email-subject']);
     $('#external-modules-configure-modal-update textarea[name="email-text-update"]').val(modal['email-text']);
+    $('#external-modules-configure-modal-update input[name="email-attachment-variable-update"]').val(modal['email-attachment-variable']);
     $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').val(modal['email-repetitive']);
     $('#external-modules-configure-modal-update input[name="email-timestamp-update"]').val(modal['email-timestamp']);
     $('#external-modules-configure-modal-update input[name="email-condition-update"]').val(modal['email-condition']);
@@ -63,15 +69,6 @@ function editEmailAlert(modal, index){
     //Show modal
     $('#external-modules-configure-modal-update').modal('show');
 
-//            tinymce.activeEditor.setContent(modal['email-text'])
-    $(function() {
-        for(var i=0; i<tinymce.editors.length; i++){
-            var editor = tinymce.editors[i];
-            editor.on('init', function () {
-                editor.setContent(modal['email-text'])
-            });
-        }
-    });
 }
 
 function getAttributeValueHtml(s){
@@ -187,6 +184,23 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
         errMsg.push('Please select a <strong>Form</strong>.');
         $('#external-modules-configure-modal'+suffix+' select[name=form-name'+suffix+']').addClass('alert');
     }else{ $('#external-modules-configure-modal'+suffix+' select[name=form-name'+suffix+']').removeClass('alert');}
+
+    if ($('#external-modules-configure-modal'+suffix+' input[name=email-attachment-variable'+suffix+']').val() != "") {
+        var result = $('#external-modules-configure-modal'+suffix+' input[name=email-attachment-variable'+suffix+']').val().split(",");
+        var errorInField = false;
+        for(var i=0;i<result.length;i++){
+            if(!(trim(result[i]).startsWith("[")) || !(trim(result[i]).endsWith("]"))){
+                errorInField = true;
+                break;
+            }
+        }
+        if(errorInField == true) {
+            errMsg.push('<strong>Email Attachment as variables</strong> must follow the format: <i>[variable1],[variable2],...</i>.');
+            $('#external-modules-configure-modal'+suffix+' input[name=email-attachment-variable'+suffix+']').addClass('alert');
+        }else{
+            $('#external-modules-configure-modal'+suffix+' input[name=email-attachment-variable'+suffix+']').removeClass('alert');
+        }
+    }
 
     var editor_text = tinymce.activeEditor.getContent();
     if(editor_text == ""){

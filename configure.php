@@ -50,7 +50,7 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'D'){
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
-//printf("<pre>%s</pre>",print_r($projectData['settings']['email-sent'],TRUE));
+//printf("<pre>%s</pre>",print_r($config['email-dashboard-settings'],TRUE));
 
 
 ?>
@@ -73,6 +73,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         var emailFromForm_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_var'))?>;
         var datapipeEmail_enable = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_enable'))?>;
         var datapipeEmail_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_var'))?>;
+        var surveyLink_enable = <?=json_encode($emailTriggerModule->getProjectSetting('surveyLink_enable'))?>;
+        var surveyLink_var = <?=json_encode($emailTriggerModule->getProjectSetting('surveyLink_var'))?>;
 
         //Url
         var pid = '<?=$pid?>';
@@ -146,7 +148,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             var pipeVar = datapipe_var.split("\n");
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapining' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
                             }
 
                         }
@@ -154,9 +156,17 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             var pipeVar = datapipeEmail_var.split("\n");
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapining' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_datapipeEmail' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
                             }
                         }
+
+//                        if (surveyLink_enable == 'on') {
+//                            var pipeVar = surveyLink_var.split("\n");
+//                            for (var i = 0; i < pipeVar.length; i++) {
+//                                var pipeName = pipeVar[i].split(",");
+//                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_surveyLink' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+//                            }
+//                        }
                         inputHtml = inputHtml.replace("<td class='external-modules-input-td'>", "<td class='external-modules-input-td'><div>" + buttonsHtml + "<div>");
                     }
                     return inputHtml;
@@ -167,7 +177,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     var inputProperties = {'list':datalistname,'class':'flexdatalist','multiple':'multiple','data-min-length':'1','id':setting.key};
                     inputHtml += "<td class='external-modules-input-td'>"+this.getInputElement(setting.type, setting.key, setting.value, inputProperties);
                     inputHtml += "<datalist id='"+datalistname+"'></datalist></td><td></td><tr>";
-
                     return inputHtml;
                 } else{
                     return EMparent.getSettingColumns.call(this, setting, instance, header);
@@ -203,6 +212,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     })
                 }
 
+                $('[name="email-attachment-variable"]').attr('placeholder','[variable1], [variable2], ...')
+
                 $('#external-modules-configure-modal').modal('show');
                 e.preventDefault();
 
@@ -228,7 +239,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                 if ($("#datapipeEmail_enable").is(":checked") == true) {
                     if ($('#datapipeEmail_var').val() === "" || $('#datapipeEmail_var').val() === "0") {
-                        errMsg.push('Please insert at least one <strong>Variable Name</strong>.');
+                        errMsg.push('Please insert at least one <strong>Email variable</strong>.');
                     }else{
                         var pipeVar = $('#datapipeEmail_var').val().split("\n");
                         for (var i = 0; i < pipeVar.length; i++) {
@@ -242,7 +253,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                 if ($("#emailFromForm_enable").is(":checked") == true) {
                     if ($('#emailFromForm_var').val() === "" || $('#emailFromForm_var').val() === "0") {
-                        errMsg.push('Please insert at least one <strong>Variable Name</strong>.');
+                        errMsg.push('Please insert at least one <strong>Email variable</strong>.');
                     }else{
                         var result = $('#emailFromForm_var').val().split(",");
                         for(var i=0;i<result.length;i++){
@@ -252,6 +263,20 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         }
                     }
                 }
+
+//                if ($("#surbeyLink_enable").is(":checked") == true) {
+//                    if ($('#surbeyLink_var').val() === "" || $('#surbeyLink_var').val() === "0") {
+//                        errMsg.push('Please insert at least one <strong>Survey variable</strong>.');
+//                    }else{
+//                        var pipeVar = $('#surbeyLink_var').val().split("\n");
+//                        for (var i = 0; i < pipeVar.length; i++) {
+//                            var pipeName = pipeVar[i].split(",");
+//                            if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
+//                                errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>Y/N,[variable_name],label</i> .');
+//                            }
+//                        }
+//                    }
+//                }
 
                 if (errMsg.length > 0) {
                     $('#errMsgContainer').empty();
@@ -268,6 +293,10 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                     if ($("#datapipeEmail_enable").is(":checked") == false) {
                         $('#datapipeEmail_var').val("");
+                    }
+
+                    if ($("#surbeyLink_enable").is(":checked") == false) {
+                        $('#surbeyLink_var').val("");
                     }
 
                     var data = $('#mainForm').serialize();
@@ -409,20 +438,26 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                     <tr>
                         <td style="width: 15%;"><input type="checkbox" name="datapipe_enable" id="datapipe_enable" <?=($emailTriggerModule->getProjectSetting('datapipe_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping<span></td>
-                        <td style="width: 25%;">Variable name<br/><span class="table_example">Example: [name_var], name ...</span><br/><textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="[variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipe_var');?></textarea></td>
+                        <td style="width: 25%;"><div class="btn_color_square btn_color_datapipe"></div>Variable name<br/><span class="table_example">Example: [name_var], name ...</span><br/><textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="[variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipe_var');?></textarea></td>
                         <td>Enables the option to create workflow messages that allow to pipe data from the form.<br/>The format of the data must be "[variable], label". This will create a button with the label that, on click, will insert the variable.</td>
                     </tr>
                     <tr>
                         <td style="width: 15%;"><input type="checkbox" name="emailFromForm_enable" id="emailFromForm_enable" <?=($emailTriggerModule->getProjectSetting('emailFromForm_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Preload Email Addresses<span></td>
-                        <td style="width: 25%;">Variable name<br/><span class="table_example">Example: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
+                        <td style="width: 25%;">Email variable<br/><span class="table_example">Example: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
                         <td>Enables the option to preload email addresses from form variables. Activating this option also allows to the form variable as 'To' or 'CC' options. </td>
                     </tr>
                     <tr>
                         <td style="width: 15%;"><input type="checkbox" name="datapipeEmail_enable" id="datapipeEmail_enable" <?=($emailTriggerModule->getProjectSetting('datapipeEmail_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping Email<span></td>
-                        <td style="width: 25%;">Variable name<br/><span class="table_example">Example: [name_var], name ...</span><br/><textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?></textarea></td>
+                        <td style="width: 25%;"><div class="btn_color_square btn_color_datapipeEmail"></div>Email variable<br/><span class="table_example">Example: [name_var], name ...</span><br/><textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?></textarea></td>
                         <td>Enables the option to use Redcap variables as data piping in the email fields. </td>
                     </tr>
-
+                    <?php /*
+                    <tr>
+                        <td style="width: 15%;" class="btn_color_surveyLink"><input type="checkbox" name="surveyLink_enable" id="surveyLink_enable" <?=($emailTriggerModule->getProjectSetting('surveyLink_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Surey Link<span></td>
+                        <td style="width: 25%;"><div class="btn_color_square btn_color_surveyLink">Survey variable<br/><span class="table_example">Example: [form_name], name ...</span><br/><textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="Y/N, [variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('surveyLink_var');?>"><?=$emailTriggerModule->getProjectSetting('surveyLink_var');?></textarea></td>
+                        <td>Enables the option to use add Survey Links in the text field.</td>
+                    </tr>
+                    */ ?>
                 </table>
             </div>
         </div>
@@ -449,6 +484,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 <th>More than one time/instrument? <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
                 <th>Leave Timestamp? <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
                 <th>REDCap logic <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
+                <th>Attachments by variables <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
                 <th>#Attachments <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
                 <th class="table_header_options">Options</th>
             </tr>
@@ -493,14 +529,17 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                                 $alerts .= '<em>' . $configRow['name'] . '</em><span>' . str_replace (',',', ',$value) . '</span></td>';
                             }
                         } else if($configRow['key'] == 'form-name') {
-                            $alerts .= '<td style="width: 350px;"><span>' . $value . '</span>'.$message_sent.'</td>';
+                            $alerts .= '<td style="width: 350px;"><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                        }else if($configRow['key'] == 'email-attachment-variable'){
+                            $attachmentVar = '<td style="width: 350px;"><span>'.$configRow['value'][$index] . '</span></td>';
                         }else{
-                            $alerts .= '<td style="width: 350px;"><span>' . $value . '</span></td>';
+                            $alerts .= '<td style="width: 350px;"><span>'.$configRow['value'][$index] . '</span></td>';
                         }
                     }
                     $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
                 }
                 $fileAttachments = ($fileAttachments == 0) ? "None" : $fileAttachments;
+                $alerts .= $attachmentVar;
                 $alerts .= "<td><span style='text-align: center'>" . $fileAttachments . "</span></td>";
                 $alerts .= "<td style='text-align: center'><strong><a onclick='editEmailAlert(".json_encode($info_modal[$index]).",".$index.")' style='cursor:pointer' ><img src='" . APP_PATH_WEBROOT_FULL . APP_PATH_WEBROOT . "Resources/images/pencil.png'/></a></strong>";
                 $alerts .= "<br/><br/><strong><a onclick='deleteEmailAlert(".$index.")' style='cursor:pointer' >Delete</a></strong></td>";

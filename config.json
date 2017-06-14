@@ -65,6 +65,12 @@
 			"type": "rich-text"
 		},
 		{
+			"key": "email-attachment-variable",
+			"name": "Email Attachment as variables",
+			"required": false,
+			"type": "text"
+		},
+		{
 			"key": "email-attachment1",
 			"name": "Email Attachment 1",
 			"required": false,

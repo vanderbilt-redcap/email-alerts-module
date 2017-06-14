@@ -47,6 +47,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 			$forms_name = $this->getProjectSetting("form-name",$project_id);
 			if(!empty($forms_name) && $record != NULL){
                 foreach ($forms_name as $id => $form){
+//                    echo "Survey: ".$form."<br/>";
+//                    echo "Record: ".$record."<br/>";
+//                    $surveylink = \Plugin\Passthru::PassthruToSurvey($record,$form);
+
                     if($data[$record][$event_id][$form.'_complete'] == '2'){
                         if ($_REQUEST['page'] == $form) {
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
@@ -70,6 +74,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $email_cc = $this->getProjectSetting("email-cc", $project_id)[$id];
                 $email_subject = $this->getProjectSetting("email-subject", $project_id)[$id];
                 $email_text = $this->getProjectSetting("email-text", $project_id)[$id];
+                $email_attachment_variable = $this->getProjectSetting("email-attachment-variable", $project_id)[$id];
                 $datapipe_var = $this->getProjectSetting("datapipe_var", $project_id);
                 $datapipe_enable = $this->getProjectSetting("datapipe_enable", $project_id);
                 $datapipeEmail_enable = $this->getProjectSetting("datapipeEmail_enable", $project_id);
@@ -158,6 +163,25 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                         while($row = db_fetch_assoc($q)){
                             $mail->AddAttachment(EDOC_PATH.$row['stored_name']);
+                        }
+                    }
+                }
+                //Attchment from RedCap variable
+                if(!empty($email_attachment_variable)){
+                    $var = preg_split("/[;,]+/", $email_attachment_variable);
+                    foreach ($var as $attachment) {
+                        if(\LogicTester::isValid(trim($attachment))) {
+                            $edoc = \LogicTester::apply(trim($attachment), $data[$record], null, true);
+                            $sql = "SELECT stored_name FROM redcap_edocs_metadata WHERE doc_id=" . $edoc;
+                            $q = db_query($sql);
+
+                            if ($error = db_error()) {
+                                die($sql . ': ' . $error);
+                            }
+
+                            while ($row = db_fetch_assoc($q)) {
+                                $mail->AddAttachment(EDOC_PATH . $row['stored_name']);
+                            }
                         }
                     }
                 }
