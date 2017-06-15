@@ -9,7 +9,6 @@ require_once 'vendor/autoload.php';
 //$Core->Libraries(array('Passthru'));
 
 
-
 class EmailTriggerExternalModule extends AbstractExternalModule
 {
 
@@ -154,7 +153,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 for($i=1; $i<6 ; $i++){
                     $edoc = $this->getProjectSetting("email-attachment".$i,$project_id)[$id];
                     if(!empty($edoc)){
-                        $sql="SELECT stored_name FROM redcap_edocs_metadata WHERE doc_id=".$edoc;
+                        $sql="SELECT stored_name,doc_name FROM redcap_edocs_metadata WHERE doc_id=".$edoc;
                         $q = db_query($sql);
 
                         if($error = db_error()){
@@ -162,7 +161,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
 
                         while($row = db_fetch_assoc($q)){
-                            $mail->AddAttachment(EDOC_PATH.$row['stored_name']);
+                            //attach file with a different name
+                            $mail->AddAttachment(EDOC_PATH . $row['stored_name'],$row['doc_name']);
                         }
                     }
                 }
@@ -172,7 +172,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     foreach ($var as $attachment) {
                         if(\LogicTester::isValid(trim($attachment))) {
                             $edoc = \LogicTester::apply(trim($attachment), $data[$record], null, true);
-                            $sql = "SELECT stored_name FROM redcap_edocs_metadata WHERE doc_id=" . $edoc;
+                            $sql = "SELECT stored_name,doc_name FROM redcap_edocs_metadata WHERE doc_id=" . $edoc;
                             $q = db_query($sql);
 
                             if ($error = db_error()) {
@@ -180,7 +180,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             }
 
                             while ($row = db_fetch_assoc($q)) {
-                                $mail->AddAttachment(EDOC_PATH . $row['stored_name']);
+                                //attach file with a different name
+                                $mail->AddAttachment(EDOC_PATH . $row['stored_name'],$row['doc_name']);
                             }
                         }
                     }
