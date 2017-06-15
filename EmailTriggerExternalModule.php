@@ -79,8 +79,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $datapipeEmail_enable = $this->getProjectSetting("datapipeEmail_enable", $project_id);
                 $datapipeEmail_var = $this->getProjectSetting("datapipeEmail_var", $project_id);
 
-
-
                 //Data piping
                 if (!empty($datapipe_var) && $datapipe_enable == 'on') {
                     $email_form_var = preg_split("/[;,]+/", $datapipe_var);
@@ -205,6 +203,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $mail->DKIM_passphrase = ''; //key is not encrypted
                 if (!$mail->send()) {
                     \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Mailer Error", "Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
+
+                    $emailFailed_enable = $this->getProjectSetting("emailFailed_enable", $project_id);
+                    $emailFailed_var = $this->getProjectSetting("emailFailed_var", $project_id);
+                    if($emailFailed_enable == 'on'){
+                        $emailsFailed = preg_split("/[;,]+/", $emailFailed_var);
+                        foreach ($emailsFailed as $failed){
+                            \REDCap::email($failed, 'noreply@vanderbilt.edu', "Wrong recipient", "Mailer Error", "Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
+                        }
+                    }
+
                 } else {
                     $email_sent[$id] = "1";
                     if($email_timestamp == "1"){
@@ -253,6 +261,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }else{
             \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Wrong recipient", "The email ".$email." in the project ".$project_id.", do not exist");
+
+            $emailFailed_enable = $this->getProjectSetting("emailFailed_enable", $project_id);
+            $emailFailed_var = $this->getProjectSetting("emailFailed_var", $project_id);
+            if($emailFailed_enable == 'on'){
+                $emailsFailed = preg_split("/[;,]+/", $emailFailed_var);
+                foreach ($emailsFailed as $failed){
+                    \REDCap::email($failed, 'noreply@vanderbilt.edu', "Wrong recipient", "The email ".$email." in the project ".$project_id.", do not exist");
+                }
+            }
         }
         return $mail;
     }
@@ -281,6 +298,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if(!empty($email_list_error)){
             //if error send email to datacore@vanderbilt.edu
             \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Wrong recipient", "The email/s ".implode(",",$email_list_error)." in the project ".$project_id.", do not exist");
+
+            $emailFailed_enable = $this->getProjectSetting("emailFailed_enable", $project_id);
+            $emailFailed_var = $this->getProjectSetting("emailFailed_var", $project_id);
+            if($emailFailed_enable == 'on'){
+                $emailsFailed = preg_split("/[;,]+/", $emailFailed_var);
+                foreach ($emailsFailed as $failed){
+                    \REDCap::email($failed, 'noreply@vanderbilt.edu', "Wrong recipient", "The email ".$email." in the project ".$project_id.", do not exist");
+                }
+            }
         }
         return $email_list;
     }

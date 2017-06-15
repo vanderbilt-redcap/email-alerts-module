@@ -278,6 +278,20 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 //                    }
 //                }
 
+                if ($("#emailFailed_enable").is(":checked") == true) {
+                    if ($('#emailFailed_var').val() === "" || $('#emailFailed_var').val() === "0") {
+                        errMsg.push('Please insert at least one <strong>Email address</strong>.');
+                    }else{
+                        var result = $('#emailFailed_var').val().split(/[;,]+/);
+                        for(var i=0;i<result.length;i++){
+                            if(!validateEmail(result[i])){
+                                errMsg.push('<strong>Email '+result[i]+'</strong> is not a valid email.');
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 if (errMsg.length > 0) {
                     $('#errMsgContainer').empty();
                     $.each(errMsg, function (i, e) {
@@ -295,8 +309,12 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         $('#datapipeEmail_var').val("");
                     }
 
-                    if ($("#surbeyLink_enable").is(":checked") == false) {
-                        $('#surbeyLink_var').val("");
+//                    if ($("#surbeyLink_enable").is(":checked") == false) {
+//                        $('#surbeyLink_var').val("");
+//                    }
+
+                    if ($("#emailFailed_enable").is(":checked") == false) {
+                        $('#emailFailed_var').val("");
                     }
 
                     var data = $('#mainForm').serialize();
@@ -458,6 +476,11 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         <td>Enables the option to use add Survey Links in the text field.</td>
                     </tr>
                     */ ?>
+                    <tr>
+                        <td style="width: 15%;"><input type="checkbox" name="emailFailed_enable" id="emailFailed_enable" <?=($emailTriggerModule->getProjectSetting('emailFailed_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Send Failed Emails To<span></td>
+                        <td style="width: 25%;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="<?=$emailTriggerModule->getProjectSetting('emailFailed_var');?>"/></td>
+                        <td>Enables the option to send failed emails to one or more email addresses.</td>
+                    </tr>
                 </table>
             </div>
         </div>
