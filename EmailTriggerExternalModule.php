@@ -30,7 +30,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         if ($row['form_name'] == $form) {
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
                             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent);
+                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id);
                         }
                     }
 
@@ -54,7 +54,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         if ($_REQUEST['page'] == $form) {
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
                             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent);
+                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id);
                         }
                     }
                 }
@@ -62,7 +62,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		}
 	}
 
-    function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent){
+    function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id){
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_timestamp = $this->getProjectSetting("email-timestamp",$project_id)[$id];
         if(($email_repetitive == "1") || ($email_repetitive == '0' && $email_sent[$id] == "0")) {
@@ -81,14 +81,22 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 //Data piping
                 if (!empty($datapipe_var) && $datapipe_enable == 'on') {
-                    $email_form_var = preg_split("/[;,]+/", $datapipe_var);
-                    foreach ($email_form_var as $var) {
+                    $email_form_var = explode("\n", $datapipe_var);
+                    foreach ($email_form_var as $emailvar) {
+                        $var = preg_split("/[;,]+/", $emailvar)[0];
                         if (\LogicTester::isValid($var)) {
-                            $email_text = str_replace($var, \LogicTester::apply($var, $data[$record], null, true), $email_text);
-                            $email_subject = str_replace($var, \LogicTester::apply($var, $data[$record], null, true), $email_subject);
+                            $logic = \LogicTester::apply($var, $data[$record], null, true);
+                            $label = $this->getLogicLabel($var, $logic,$data[$record][$event_id]);
+                            if(!empty($label)){
+                                $logic = $label;
+                            }
+                            $email_text = str_replace($var, $logic, $email_text);
+                            $email_subject = str_replace($var, $logic, $email_subject);
+
                         }
                     }
                 }
+
 
                 $mail = new \PHPMailer;
 
@@ -170,21 +178,22 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     foreach ($var as $attachment) {
                         if(\LogicTester::isValid(trim($attachment))) {
                             $edoc = \LogicTester::apply(trim($attachment), $data[$record], null, true);
-                            $sql = "SELECT stored_name,doc_name FROM redcap_edocs_metadata WHERE doc_id=" . $edoc;
-                            $q = db_query($sql);
+                            if(!empty($edoc)) {
+                                $sql = "SELECT stored_name,doc_name FROM redcap_edocs_metadata WHERE doc_id=" . $edoc;
+                                $q = db_query($sql);
 
-                            if ($error = db_error()) {
-                                die($sql . ': ' . $error);
-                            }
+                                if ($error = db_error()) {
+                                    die($sql . ': ' . $error);
+                                }
 
-                            while ($row = db_fetch_assoc($q)) {
-                                //attach file with a different name
-                                $mail->AddAttachment(EDOC_PATH . $row['stored_name'],$row['doc_name']);
+                                while ($row = db_fetch_assoc($q)) {
+                                    //attach file with a different name
+                                    $mail->AddAttachment(EDOC_PATH . $row['stored_name'], $row['doc_name']);
+                                }
                             }
                         }
                     }
                 }
-
 
                 //DKIM to make sure the email does not go into spam folder
                 $privatekeyfile = 'dkim_private.key';
