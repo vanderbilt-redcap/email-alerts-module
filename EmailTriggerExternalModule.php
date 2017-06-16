@@ -131,23 +131,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $result = array_unique($result[1]);
                 foreach ($result as $img_src){
                     preg_match_all('/(?<=file=)\\s*([0-9]+)\\s*/',$img_src, $result_img);
-                    $edoc = array_unique($result_img[1]);
+                    $edoc = array_unique($result_img[1])[0];
+                    $this->addNewAttachment($mail,$edoc,$project_id,'images');
 
-                    if(!empty($edoc[0])){
-                        $sql="SELECT stored_name FROM redcap_edocs_metadata WHERE doc_id=".$edoc[0];
-                        $q = db_query($sql);
-
-                        if($error = db_error()){
-                            die($sql.': '.$error);
-                        }
-
-                        while($row = db_fetch_assoc($q)){
-                            $path = EDOC_PATH.$row['stored_name'];
-                            $src = "cid:".$edoc;
-
-                            $email_text = str_replace($img_src,$src,$email_text);
-                            $mail->AddEmbeddedImage($path,$edoc);
-                        }
+                    if(!empty($edoc)) {
+                        $src = "cid:" . $edoc;
+                        $email_text = str_replace($img_src, $src, $email_text);
                     }
                 }
 
@@ -158,19 +147,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 //Attachments
                 for($i=1; $i<6 ; $i++){
                     $edoc = $this->getProjectSetting("email-attachment".$i,$project_id)[$id];
-                    if(!empty($edoc)){
-                        $sql="SELECT stored_name,doc_name FROM redcap_edocs_metadata WHERE doc_id=".$edoc;
-                        $q = db_query($sql);
-
-                        if($error = db_error()){
-                            die($sql.': '.$error);
-                        }
-
-                        while($row = db_fetch_assoc($q)){
-                            //attach file with a different name
-                            $mail->AddAttachment(EDOC_PATH . $row['stored_name'],$row['doc_name']);
-                        }
-                    }
+                    $this->addNewAttachment($mail,$edoc,$project_id,'files');
                 }
                 //Attchment from RedCap variable
                 if(!empty($email_attachment_variable)){
@@ -178,19 +155,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     foreach ($var as $attachment) {
                         if(\LogicTester::isValid(trim($attachment))) {
                             $edoc = \LogicTester::apply(trim($attachment), $data[$record], null, true);
-                            if(!empty($edoc)) {
-                                $sql = "SELECT stored_name,doc_name FROM redcap_edocs_metadata WHERE doc_id=" . $edoc;
-                                $q = db_query($sql);
-
-                                if ($error = db_error()) {
-                                    die($sql . ': ' . $error);
-                                }
-
-                                while ($row = db_fetch_assoc($q)) {
-                                    //attach file with a different name
-                                    $mail->AddAttachment(EDOC_PATH . $row['stored_name'], $row['doc_name']);
-                                }
-                            }
+                            $this->addNewAttachment($mail,$edoc,$project_id,'files');
                         }
                     }
                 }
@@ -240,6 +205,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     }
 
+    /**
+     * Function that replaces the logic variables for email values and checks if they are valid
+     * @param $mail
+     * @param $emailsTo, liest of emaisl to send as CC or To
+     * @param $email_form_var, list of redcap email variables
+     * @param $data, redcap data
+     * @param $option, if they are To or CC emails
+     * @param $project_id
+     * @return mixed
+     */
     function fill_emails($mail, $emailsTo, $email_form_var, $data, $option, $project_id){
         foreach ($emailsTo as $email){
             foreach ($email_form_var as $email_var) {
@@ -261,6 +236,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $mail;
     }
 
+    /**
+     * Function that if valid adds an email address to the mail
+     * @param $mail
+     * @param $email
+     * @param $option, if they are To or CC emails
+     * @param $project_id
+     * @return mixed
+     */
     function check_single_email($mail,$email, $option, $project_id){
         if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
             if($option == "to"){
@@ -319,6 +302,48 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
         return $email_list;
     }
+
+    /**
+     * Function that adds a ne attachment (file or image type) to the mail if the file exists in the DB and if it's no bigger than 3MB to send. Otherwise it sends an error email
+     * @param $mail
+     * @param $edoc
+     * @param $project_id
+     * @return mixed
+     */
+    function addNewAttachment($mail,$edoc,$project_id, $type){
+        if(!empty($edoc)) {
+            $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=" . $edoc;
+            $q = db_query($sql);
+
+            if ($error = db_error()) {
+                die($sql . ': ' . $error);
+            }
+
+            while ($row = db_fetch_assoc($q)) {
+                if($row['doc_size'] > 3145728 ){
+                    \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "File Size too big", "One or more ".$type."  in the project ".$project_id.", are too big to be sent.");
+
+                    $emailFailed_enable = $this->getProjectSetting("emailFailed_enable", $project_id);
+                    $emailFailed_var = $this->getProjectSetting("emailFailed_var", $project_id);
+                    if($emailFailed_enable == 'on'){
+                        $emailsFailed = preg_split("/[;,]+/", $emailFailed_var);
+                        foreach ($emailsFailed as $failed){
+                            \REDCap::email($failed, 'noreply@vanderbilt.edu', "File Size too big", "One or more ".$type." in the project ".$project_id.", are too big to be sent.");
+                        }
+                    }
+                }else{
+                    if($type == 'files'){
+                        //attach file with a different name
+                        $mail->AddAttachment(EDOC_PATH . $row['stored_name'], $row['doc_name']);
+                    }else if($type == 'images'){
+                        $mail->AddEmbeddedImage(EDOC_PATH . $row['stored_name'],$edoc);
+                    }
+                }
+            }
+        }
+        return $mail;
+    }
+
 }
 
 
