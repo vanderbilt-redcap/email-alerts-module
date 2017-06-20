@@ -560,13 +560,16 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         }
                     }
                     $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
+
+
                 }
                 $fileAttachments = ($fileAttachments == 0) ? "None" : $fileAttachments;
                 $alerts .= $attachmentVar;
                 $alerts .= "<td><span style='text-align: center'>" . $fileAttachments . "</span></td>";
-                $alerts .= "<td style='text-align: center'><strong><a onclick='editEmailAlert(".json_encode($info_modal[$index]).",".$index.")' style='cursor:pointer' ><img src='" . APP_PATH_WEBROOT_FULL . APP_PATH_WEBROOT . "Resources/images/pencil.png'/></a></strong>";
+                $alerts .= "<td style='text-align: center'><strong><a id='emailRow$index' style='cursor:pointer' ><img src='" . APP_PATH_WEBROOT_FULL . APP_PATH_WEBROOT . "Resources/images/pencil.png'/></a></strong>";
                 $alerts .= "<br/><br/><strong><a onclick='deleteEmailAlert(".$index.")' style='cursor:pointer' >Delete</a></strong></td>";
                 $alerts .= "</tr>";
+                $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";
             }
             echo $alerts;
         }
