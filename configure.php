@@ -374,8 +374,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 return false;
             });
 
-
-            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"]').on('focus', function(e){
+            /***PIPPING BUTTONS INTERACTION***/
+            //Saves the field id/name in which field we are
+            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('focus', function(e){
                 var id = $(this).attr("id");
                 if(id == undefined){
                     var name = '[name="'+$(this).attr("name")+'"]';
@@ -391,8 +392,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 }
 
             });
-
-            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"]').on('keyup click', function(e){
+            //save the cursor position
+            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('keyup click', function(e){
                 startPos = this.selectionStart;
                 endPos = this.selectionEnd;
             });

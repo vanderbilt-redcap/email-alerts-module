@@ -112,7 +112,7 @@ function deleteEmailAlert(index){
     $('#external-modules-configure-modal-delete-confirmation').modal('show');
 }
 
-//Same as insertAtCursor but for tinyMCE element
+//We insert the button text depending on which field we are
 function insertAtCursorTinyMCE(myValue) {
     if(lastClick != '') {
         if (lastClick != null) {
@@ -133,6 +133,10 @@ function insertAtCursorTinyMCE(myValue) {
             } else {
                 myField.val(myField.val() + myValue);
             }
+
+            //We update positions to add next text after the new one
+            startPos = startPos + myValue.length;
+            endPos = startPos + myValue.length;
         } else {
             if (tinymce.isIE) {
                 tinyMCE.activeEditor.selection.moveToBookmark(actualCaretPositionBookmark);
