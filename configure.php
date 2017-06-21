@@ -539,9 +539,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         }
                     } else if ($configRow['type'] == 'checkbox') {
                         $value = ($configRow['value'][$index] == 0) ? "No" : "Yes";
-                        $alerts .= '<td  style="width: 150px;text-align: center"><span>' . $value . '</span></td>';
+                        $alerts .= '<td  style="text-align: center"><span>' . $value . '</span></td>';
                     } else if ($configRow['type'] == 'rich-text') {
-                       $alerts .= '<td  style="width: 150px;text-align: center"><span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview</a></span></td>';
+                       $alerts .= '<td  style="text-align: center"><span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview</a></span></td>';
                     } else {
                         $value = preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', $configRow['value'][$index]);
                         if ($configRow['key'] == 'email-to') {
@@ -553,11 +553,11 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                                 $alerts .= '<em>' . $configRow['name'] . '</em><span>' . str_replace (',',', ',$value) . '</span></td>';
                             }
                         } else if($configRow['key'] == 'form-name') {
-                            $alerts .= '<td style="width: 350px;"><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                            $alerts .= '<td><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
                         }else if($configRow['key'] == 'email-attachment-variable'){
-                            $attachmentVar = '<td style="width: 350px;"><span>'.$configRow['value'][$index] . '</span></td>';
+                            $attachmentVar = '<td><span>'.$configRow['value'][$index] . '</span></td>';
                         }else{
-                            $alerts .= '<td style="width: 350px;"><span>'.$configRow['value'][$index] . '</span></td>';
+                            $alerts .= '<td><span>'.$configRow['value'][$index] . '</span></td>';
                         }
                     }
                     $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
