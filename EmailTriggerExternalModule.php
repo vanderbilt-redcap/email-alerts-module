@@ -81,8 +81,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 //Data piping
                 if (!empty($datapipe_var) && $datapipe_enable == 'on') {
-                    $email_form_var = explode("\n", $datapipe_var);
-                    foreach ($email_form_var as $emailvar) {
+                    $datapipe = explode("\n", $datapipe_var);
+                    foreach ($datapipe as $emailvar) {
                         $var = preg_split("/[;,]+/", $emailvar)[0];
                         if (\LogicTester::isValid($var)) {
                             $logic = \LogicTester::apply($var, $data[$record], null, true);
