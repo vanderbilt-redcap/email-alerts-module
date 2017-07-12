@@ -93,22 +93,24 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
 
+                //Survey Link
                 if(!empty($surveyLink_var) && $surveyLink_enable =='on') {
                     $emailTriggerModule = new EmailTriggerExternalModule();
-                    $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument, $event_id);
-                    $returnCode = $passthruData['return_code'];
-                    $hash = $passthruData['hash'];
 
                     $datasurvey = explode("\n", $surveyLink_var);
                     foreach ($datasurvey as $surveylink) {
                         $var = preg_split("/[;,]+/", $surveylink)[0];
+                        $instrument_form =  str_replace('[', '', $var);
+                        $instrument_form =  str_replace(']', '', $instrument_form);
+                        $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $event_id);
+                        $returnCode = $passthruData['return_code'];
+                        $hash = $passthruData['hash'];
+
                         $url= $emailTriggerModule->getUrl('surveyPassthru.php') . "&hash=" . $hash . "&returnCode=" . $returnCode;
                         $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
                         $email_text = str_replace($var, $link, $email_text);
                     }
                 }
-
-
                 $mail = new \PHPMailer;
 
                 //Email Addresses
