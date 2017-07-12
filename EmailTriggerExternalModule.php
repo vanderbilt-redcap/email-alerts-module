@@ -3,10 +3,7 @@ namespace ExternalModules;
 require_once dirname(__FILE__) . '/../../external_modules/classes/ExternalModules.php';
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 require_once 'vendor/autoload.php';
-//require_once(dirname(dirname(__DIR__))."/plugins/Core/bootstrap.php");
-//global $Core;
-//
-//$Core->Libraries(array('Passthru'));
+require_once 'EmailTriggerExternalModule.php';
 
 
 class EmailTriggerExternalModule extends AbstractExternalModule
@@ -30,7 +27,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         if ($row['form_name'] == $form) {
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
                             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id);
+                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id,$instrument);
                         }
                     }
 
@@ -41,20 +38,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
 	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id){
 		$data = \REDCap::getData($project_id);
+
 		if(isset($project_id)){
 			#Form Complete
 			$forms_name = $this->getProjectSetting("form-name",$project_id);
 			if(!empty($forms_name) && $record != NULL){
                 foreach ($forms_name as $id => $form){
-//                    echo "Survey: ".$form."<br/>";
-//                    echo "Record: ".$record."<br/>";
-//                    $surveylink = \Plugin\Passthru::PassthruToSurvey($record,$form);
-
                     if($data[$record][$event_id][$form.'_complete'] == '2'){
                         if ($_REQUEST['page'] == $form) {
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
                             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id);
+                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id,$instrument);
                         }
                     }
                 }
@@ -62,7 +56,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		}
 	}
 
-    function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id){
+    function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id,$instrument){
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_timestamp = $this->getProjectSetting("email-timestamp",$project_id)[$id];
         if(($email_repetitive == "1") || ($email_repetitive == '0' && $email_sent[$id] == "0")) {
@@ -78,6 +72,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $datapipe_enable = $this->getProjectSetting("datapipe_enable", $project_id);
                 $datapipeEmail_enable = $this->getProjectSetting("datapipeEmail_enable", $project_id);
                 $datapipeEmail_var = $this->getProjectSetting("datapipeEmail_var", $project_id);
+                $surveyLink_enable = $this->getProjectSetting("surveyLink_enable", $project_id);
+                $surveyLink_var = $this->getProjectSetting("surveyLink_var", $project_id);
 
                 //Data piping
                 if (!empty($datapipe_var) && $datapipe_enable == 'on') {
@@ -94,6 +90,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $email_subject = str_replace($var, $logic, $email_subject);
 
                         }
+                    }
+                }
+
+                if(!empty($surveyLink_var) && $surveyLink_enable =='on') {
+                    $emailTriggerModule = new EmailTriggerExternalModule();
+                    $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument, $event_id);
+                    $returnCode = $passthruData['return_code'];
+                    $hash = $passthruData['hash'];
+
+                    $datasurvey = explode("\n", $surveyLink_var);
+                    foreach ($datasurvey as $surveylink) {
+                        $var = preg_split("/[;,]+/", $surveylink)[0];
+                        $url= $emailTriggerModule->getUrl('surveyPassthru.php') . "&hash=" . $hash . "&returnCode=" . $returnCode;
+                        $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
+                        $email_text = str_replace($var, $link, $email_text);
                     }
                 }
 

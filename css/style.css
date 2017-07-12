@@ -33,6 +33,7 @@
 .email_forms_button_color{
     background-color: #a6a6a6;
     border-color: #808080;
+    color: #fff;
 }
 /***EMAIL PREVIEW***/
 .email_forms_button_color:hover{
@@ -125,6 +126,7 @@
 }
 .form-control-custom td{
     padding-bottom: 12px;
+    padding-right: 5px;
 }
 .form-control-custom input, .form-control-custom select, .form-control-custom textarea{
     display: block;
@@ -194,7 +196,7 @@
 .btn_color_datapipeEmail{border:1px solid #cce7ff !important;}
 .btn_color_datapipeEmail:hover{background-color: #99cfff !important;}
 
-.btn_color_surveyLink{background-color: #fff2e6 !important;}
+.btn_color_surveyLink{background-color: #fff2e6 !important;color: #000000;}
 .btn_color_surveyLink{border:1px solid #ffd7b3 !important;}
 .btn_color_surveyLink:hover{background-color: #ffd7b3 !important;}
 

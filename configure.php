@@ -50,7 +50,7 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'D'){
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
-//printf("<pre>%s</pre>",print_r($config['email-dashboard-settings'],TRUE));
+//printf("<pre>%s</pre>",print_r($simple_config['email-dashboard-settings'][0]['choices'],TRUE));
 
 
 ?>
@@ -160,13 +160,13 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             }
                         }
 
-//                        if (surveyLink_enable == 'on') {
-//                            var pipeVar = surveyLink_var.split("\n");
-//                            for (var i = 0; i < pipeVar.length; i++) {
-//                                var pipeName = pipeVar[i].split(",");
-//                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_surveyLink' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
-//                            }
-//                        }
+                        if (surveyLink_enable == 'on') {
+                            var pipeVar = surveyLink_var.split("\n");
+                            for (var i = 0; i < pipeVar.length; i++) {
+                                var pipeName = pipeVar[i].split(",");
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_surveyLink' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                            }
+                        }
                         inputHtml = inputHtml.replace("<td class='external-modules-input-td'>", "<td class='external-modules-input-td'><div>" + buttonsHtml + "<div>");
                     }
                     return inputHtml;
@@ -264,19 +264,19 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     }
                 }
 
-//                if ($("#surbeyLink_enable").is(":checked") == true) {
-//                    if ($('#surbeyLink_var').val() === "" || $('#surbeyLink_var').val() === "0") {
-//                        errMsg.push('Please insert at least one <strong>Survey variable</strong>.');
-//                    }else{
-//                        var pipeVar = $('#surbeyLink_var').val().split("\n");
-//                        for (var i = 0; i < pipeVar.length; i++) {
-//                            var pipeName = pipeVar[i].split(",");
-//                            if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
-//                                errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>Y/N,[variable_name],label</i> .');
-//                            }
-//                        }
-//                    }
-//                }
+                if ($("#surbeyLink_enable").is(":checked") == true) {
+                    if ($('#surbeyLink_var').val() === "" || $('#surbeyLink_var').val() === "0") {
+                        errMsg.push('Please insert at least one <strong>Survey variable</strong>.');
+                    }else{
+                        var pipeVar = $('#surbeyLink_var').val().split("\n");
+                        for (var i = 0; i < pipeVar.length; i++) {
+                            var pipeName = pipeVar[i].split(",");
+                            if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
+                                errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>Y/N,[variable_name],label</i> .');
+                            }
+                        }
+                    }
+                }
 
                 if ($("#emailFailed_enable").is(":checked") == true) {
                     if ($('#emailFailed_var').val() === "" || $('#emailFailed_var').val() === "0") {
@@ -309,9 +309,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         $('#datapipeEmail_var').val("");
                     }
 
-//                    if ($("#surbeyLink_enable").is(":checked") == false) {
-//                        $('#surbeyLink_var').val("");
-//                    }
+                    if ($("#surbeyLink_enable").is(":checked") == false) {
+                        $('#surbeyLink_var').val("");
+                    }
 
                     if ($("#emailFailed_enable").is(":checked") == false) {
                         $('#emailFailed_var').val("");
@@ -371,6 +371,46 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             $('#deleteForm').submit(function () {
                 var data = $('#deleteForm').serialize();
                 ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('deleteForm.php')?>',"D");
+                return false;
+            });
+
+            $('#AddSurveyForm').submit(function () {
+                $('#errMsgModalContainer').hide();
+                var errMsg = [];
+
+                if($('#survey_form_name').val() == '') {
+                    errMsg.push('Please insert a form name.');
+                    $('#survey_form_name').addClass('alert');
+                }else{
+                    $('#survey_form_name').removeClass('alert');
+                }
+
+                if($('#survey_label').val() == ''){
+                    errMsg.push('Please insert a label name.');
+                    $('#survey_label').addClass('alert');
+                }else{
+                    $('#survey_label').removeClass('alert');
+                }
+
+                if (errMsg.length > 0) {
+                    $('#errMsgModalContainer').empty();
+                    $.each(errMsg, function (i, e) {
+                        $('#errMsgModalContainer').append('<div>' + e + '</div>');
+                    });
+                    $('#errMsgModalContainer').show();
+                    $('html,body').scrollTop(0);
+                    return false;
+                }else{
+                    var form_alert = '['+$('#survey_form_name').val()+'],'+$('#survey_label').val();
+                    if($('#surveyLink_var').val() == ''){
+                        $('#surveyLink_var').val(form_alert);
+                    }else{
+                        $('#surveyLink_var').val($('#surveyLink_var').val()+'\n'+form_alert);
+                        $('#survey_form_name').val('');
+                        $('#survey_label').val('');
+                        $('#addLink').modal('toggle');
+                    }
+                }
                 return false;
             });
 
@@ -470,13 +510,13 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         <td style="width: 25%;"><div class="btn_color_square btn_color_datapipeEmail"></div>Email variable<br/><span class="table_example">Example: [name_var], name ...</span><br/><textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?></textarea></td>
                         <td>Enables the option to use Redcap variables as data piping in the email fields. </td>
                     </tr>
-                    <?php /*
                     <tr>
-                        <td style="width: 15%;" class="btn_color_surveyLink"><input type="checkbox" name="surveyLink_enable" id="surveyLink_enable" <?=($emailTriggerModule->getProjectSetting('surveyLink_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Surey Link<span></td>
-                        <td style="width: 25%;"><div class="btn_color_square btn_color_surveyLink">Survey variable<br/><span class="table_example">Example: [form_name], name ...</span><br/><textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="Y/N, [variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('surveyLink_var');?>"><?=$emailTriggerModule->getProjectSetting('surveyLink_var');?></textarea></td>
+                        <td style="width: 15%;"><input type="checkbox" name="surveyLink_enable" id="surveyLink_enable" <?=($emailTriggerModule->getProjectSetting('surveyLink_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Surey Link<span></td>
+                        <td style="width: 25%;"><div class="btn_color_square btn_color_surveyLink"></div>Survey variable<br/><span class="table_example">Example: [form_name], name ...</span><br/>
+                            <a id="addLinkBtn" onclick="javascript:$('#addLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
+                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[form_name], name ..." value="<?=$emailTriggerModule->getProjectSetting('surveyLink_var');?>"><?=$emailTriggerModule->getProjectSetting('surveyLink_var');?></textarea></td>
                         <td>Enables the option to use add Survey Links in the text field.</td>
                     </tr>
-                    */ ?>
                     <tr>
                         <td style="width: 15%;"><input type="checkbox" name="emailFailed_enable" id="emailFailed_enable" <?=($emailTriggerModule->getProjectSetting('emailFailed_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Send Failed Emails To<span></td>
                         <td style="width: 25%;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="<?=$emailTriggerModule->getProjectSetting('emailFailed_var');?>"/></td>
@@ -577,6 +617,46 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         ?>
             <tbody>
         </table>
+    </div>
+
+    <div class="modal fade" id="addLink" tabindex="-1" role="dialog" aria-labelledby="Codes">
+        <form class="form-horizontal" action="" method="post" id='AddSurveyForm'>
+            <div class="modal-dialog" role="document" style="width: 500px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Add a survey link</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id='errMsgModalContainer' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>
+                        <table class="code_modal_table">
+                            <tr class="form-control-custom">
+                                <td>Form name:</td>
+                                <td>
+                                    <select class="external-modules-input-element" name="survey_form_name" id="survey_form_name">
+                                        <option value=""></option>
+                                        <?php
+                                        foreach ($simple_config['email-dashboard-settings'][0]['choices'] as $choice){
+                                            echo '<option value="'.$choice['value'].'">'.$choice['name'].'</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr class="form-control-custom">
+                                <td>Label:</td>
+                                <td><input type="text" name="survey_label" id="survey_label" placeholder="Name"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
+                        <button type="submit" form="AddSurveyForm" class="btn btn-default btn_color_surveyLink" id='btnModalAddSurveyForm'>Add survey link</button>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 
     <div class="col-md-12">
