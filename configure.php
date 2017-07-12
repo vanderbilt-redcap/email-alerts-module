@@ -200,6 +200,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             //We add the HTML code to the respective modal windows
             $('#code_modal_table').html('<tr>'+rowsHtml+'</tr>');
             $('#code_modal_table_update').html('<tr>'+rowsHtmlUpdate+'</tr>');
+            //Email repetitive by default checked
+            $('#external-modules-configure-modal input[name="email-repetitive"]').prop('checked',true);
 
             //Show Add New Email modal
             $('#btnViewCodes').on('click', function(e){
