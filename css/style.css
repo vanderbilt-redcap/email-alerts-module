@@ -205,16 +205,25 @@
     margin-right: 5px;
 }
 
+.btn_piping{
+    margin: 0px 10px 10px 0px;
+}
+
+.btn_legend{
+    display:inline-block;
+    padding-right:10px;
+}
+
 .btn_color_datapipe{background-color: #ddd  !important;}
-.btn_color_datapipe:hover{background-color: #a6a6a6  !important;}
+a.btn_color_datapipe:hover{background-color: #a6a6a6  !important;}
 
 .btn_color_datapipeEmail{background-color: #cce7ff !important;}
 .btn_color_datapipeEmail{border:1px solid #cce7ff !important;}
-.btn_color_datapipeEmail:hover{background-color: #99cfff !important;}
+a.btn_color_datapipeEmail:hover{background-color: #99cfff !important;}
 
 .btn_color_surveyLink{background-color: #fff2e6 !important;color: #000000;}
 .btn_color_surveyLink{border:1px solid #ffd7b3 !important;}
-.btn_color_surveyLink:hover{background-color: #ffd7b3 !important;}
+a.btn_color_surveyLink:hover{background-color: #ffd7b3 !important;}
 
 /***FILTER***/
 

@@ -143,12 +143,13 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     //We add the Data Pipping buttons
                     var inputHtml = EMparent.getSettingColumns.call(this, setting, instance, header);
                     var buttonsHtml = "";
-                    if(datapipeEmail_enable == 'on' || datapipe_enable == 'on') {
+                    if(datapipeEmail_enable == 'on' || datapipe_enable == 'on' || surveyLink_enable == 'on') {
                         if (datapipe_enable == 'on') {
                             var pipeVar = datapipe_var.split("\n");
+                            buttonsHtml += "<div style='padding-top:5px'></div>";
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapiping btn-sm' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
                             }
 
                         }
@@ -156,7 +157,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             var pipeVar = datapipeEmail_var.split("\n");
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_datapipeEmail' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_datapipeEmail btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
                             }
                         }
 
@@ -164,10 +165,15 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             var pipeVar = surveyLink_var.split("\n");
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_surveyLink' style='margin: 10px 10px 10px 0px;' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_surveyLink btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
                             }
                         }
-                        inputHtml = inputHtml.replace("<td class='external-modules-input-td'>", "<td class='external-modules-input-td'><div>" + buttonsHtml + "<div>");
+
+                        var buttonLegend = "<div style=''><div class='btn_legend'><div class='btn_color_square btn_color_datapipe'></div>Data variable</div>";
+                            buttonLegend += "<div class='btn_legend'><div class='btn_color_square btn_color_datapipeEmail'></div>Email address</div>";
+                            buttonLegend += "<div class='btn_legend'><div class='btn_color_square btn_color_surveyLink'></div>Survey link</div><div>";
+
+                        inputHtml = inputHtml.replace("<td class='external-modules-input-td'>", "<td class='external-modules-input-td'>"+buttonLegend+"<div>" + buttonsHtml + "<div>");
                     }
                     return inputHtml;
                 }else if(setting.type == 'text' && (setting.key == 'email-to' || setting.key == 'email-to-update' || setting.key == 'email-cc' || setting.key == 'email-cc-update')){
@@ -576,15 +582,15 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         <table class="table table-bordered table-hover email_preview_forms_table" id="customizedAlertsPreview">
             <thead>
             <tr class="table_header">
-                <th>Form <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
-                <th>Email Addresses <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
-                <th>Subject <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
-                <th>Message <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
-                <th>More than one time/instrument? <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
-                <th>Leave Timestamp? <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
-                <th>REDCap logic <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
-                <th>Attachments by variables <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
-                <th>#Attachments <span class="glyphicon glyphicon-align-right glyphicon-sort concepts-table-sortable" aria-hidden="true"></span></th>
+                <th>Form</th>
+                <th>Email Addresses</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>More than one time/instrument?</th>
+                <th>Leave Timestamp?</th>
+                <th>REDCap logic</th>
+                <th>Attachments by variables</th>
+                <th>#Attachments</th>
                 <th class="table_header_options">Options</th>
             </tr>
             </thead>
@@ -758,7 +764,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cose</button>
+                    <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
