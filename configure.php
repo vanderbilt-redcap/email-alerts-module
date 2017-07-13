@@ -587,7 +587,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 <th>Subject</th>
                 <th>Message</th>
                 <th>More than one time/instrument?</th>
-                <th>Leave Timestamp?</th>
                 <th>REDCap logic</th>
                 <th>Attachments by variables</th>
                 <th>#Attachments</th>
@@ -603,7 +602,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 $message_sent = "";
                 if($email_sent == "1"){
                     $class_sent = "email_sent";
-                    if($projectData['settings']['email-timestamp']['value'][$index] == "1" && !empty($projectData['settings']['email-timestamp-sent']['value'][$index])){
+                    if(!empty($projectData['settings']['email-timestamp-sent']['value'][$index])){
                         $message_sent = "<span style='display:block;font-style:italic'>Most recently activated on: ".$projectData['settings']['email-timestamp-sent']['value'][$index]."</span>";
                     }else{
                         $message_sent = "<span style='display:block;font-style:italic'>Email activated</span>";

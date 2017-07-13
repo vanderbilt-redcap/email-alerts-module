@@ -41,6 +41,12 @@
           "type": "form-list"
         },
 		{
+			"key": "email-repetitive",
+			"name": "Email more than one time per instrument?",
+			"required": false,
+			"type":"checkbox"
+		},
+		{
 			"key": "email-to",
 			"name": "Email To",
 			"required": true,
@@ -99,18 +105,6 @@
 			"name": "Email Attachment 5",
 			"required": false,
 			"type": "file"
-		},
-		{
-			"key": "email-repetitive",
-			"name": "Email more than one time per instrument?",
-			"required": false,
-			"type":"checkbox"
-		},
-		{
-			"key": "email-timestamp",
-			"name": "Leave Timestamp of Email?",
-			"required": false,
-			"type": "checkbox"
 		},
 		{
 			"key": "email-condition",

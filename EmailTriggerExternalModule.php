@@ -58,7 +58,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id,$instrument){
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
-        $email_timestamp = $this->getProjectSetting("email-timestamp",$project_id)[$id];
+//        $email_timestamp = $this->getProjectSetting("email-timestamp",$project_id)[$id];
         if(($email_repetitive == "1") || ($email_repetitive == '0' && $email_sent[$id] == "0")) {
             $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
             //If the condition is met or if we don't have any, we send the email
@@ -203,10 +203,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 } else {
                     $email_sent[$id] = "1";
-                    if($email_timestamp == "1"){
+//                    if($email_timestamp == "1"){
                         $email_timestamp_sent[$id] = date('Y-m-d H:i:s');
                         $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id) ;
-                    }
+//                    }
                     $this->setProjectSetting('email-sent', $email_sent, $project_id) ;
 
                 }

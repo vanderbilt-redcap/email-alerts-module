@@ -14,7 +14,6 @@ $email_subject =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email
 $email_text =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-text'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-text');
 $email_attachment_variable =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-attachment-variable'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-attachment-variable');
 $email_repetitive =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive');
-$email_timestamp =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp');
 $email_condition =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-condition'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-condition');
 
 #checkboxes
@@ -22,12 +21,6 @@ if(!isset($_REQUEST['email-repetitive-update'])){
     $repetitive = "0";
 }else{
     $repetitive = "1";
-}
-
-if(!isset($_REQUEST['email-timestamp-update'])){
-    $timestamp = "0";
-}else{
-    $timestamp = "1";
 }
 
 #Replace new data with old
@@ -38,7 +31,6 @@ $email_subject[$index] = $_REQUEST['email-subject-update'];
 $email_text[$index] = $_REQUEST['email-text-update-editor'];
 $email_attachment_variable[$index] = $_REQUEST['email-attachment-variable-update'];
 $email_repetitive[$index] = $repetitive;
-$email_timestamp[$index] = $timestamp;
 $email_condition[$index] = $_REQUEST['email-condition-update'];
 
 #Save data
@@ -49,7 +41,6 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-subject', $email_subject
 ExternalModules::setProjectSetting($prefix,$pid, 'email-text', $email_text);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-attachment-variable', $email_attachment_variable);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive', $email_repetitive);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp', $email_timestamp);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condition);
 
 echo json_encode(array(

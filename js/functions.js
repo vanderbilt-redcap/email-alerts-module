@@ -40,7 +40,6 @@ function editEmailAlert(modal, index){
     $('#external-modules-configure-modal-update textarea[name="email-text-update"]').val(modal['email-text']);
     $('#external-modules-configure-modal-update input[name="email-attachment-variable-update"]').val(modal['email-attachment-variable']);
     $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').val(modal['email-repetitive']);
-    $('#external-modules-configure-modal-update input[name="email-timestamp-update"]').val(modal['email-timestamp']);
     $('#external-modules-configure-modal-update input[name="email-condition-update"]').val(modal['email-condition']);
 
     //Add Files
@@ -48,11 +47,6 @@ function editEmailAlert(modal, index){
         getFileFieldElement(modal['email-attachment'+i], i);
     }
 
-    //Add checked
-    $('#external-modules-configure-modal-update input[name="email-timestamp-update"]').prop('checked',false);
-    if(modal['email-timestamp'] == '1'){
-        $('#external-modules-configure-modal-update input[name="email-timestamp-update"]').prop('checked',true);
-    }
     $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').prop('checked',false);
     if(modal['email-repetitive'] == '1'){
         $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').prop('checked',true);

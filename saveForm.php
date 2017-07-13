@@ -13,7 +13,6 @@ $email_subject =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email
 $email_text =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-text'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-text');
 $email_attachment_variable =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-attachment-variable'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-attachment-variable');
 $email_repetitive =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive');
-$email_timestamp =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp');
 $email_condition =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-condition'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-condition');
 
 #checkboxes
@@ -21,12 +20,6 @@ if(!isset($_REQUEST['email-repetitive'])){
     $repetitive = "0";
 }else{
     $repetitive = "1";
-}
-
-if(!isset($_REQUEST['email-timestamp'])){
-    $timestamp = "0";
-}else{
-    $timestamp = "1";
 }
 
 #Add new data with old
@@ -37,7 +30,6 @@ array_push($email_subject,$_REQUEST['email-subject']);
 array_push($email_text,$_REQUEST['email-text-editor']);
 array_push($email_attachment_variable,$_REQUEST['email-attachment-variable']);
 array_push($email_repetitive,$repetitive);
-array_push($email_timestamp,$timestamp);
 array_push($email_condition,$_REQUEST['email-condition']);
 
 #Save data
@@ -48,7 +40,6 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-subject', $email_subject
 ExternalModules::setProjectSetting($prefix,$pid, 'email-text', $email_text);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-text', $email_attachment_variable);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive', $email_repetitive);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp', $email_timestamp);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condition);
 
 //Extra Data
