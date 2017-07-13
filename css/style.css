@@ -21,6 +21,7 @@
 .table_subheader{
     background-color:#f0f8ff;
     color: #005299;
+    cursor: pointer;
 }
 .table_subheader:hover {
     background-color: #f0f8ff !important;
@@ -237,4 +238,14 @@
 }
 .description_config{
     padding: 18px;
+}
+.sorting_icon{
+    display: inline-block;
+    line-height: 0em;
+    position: relative;
+    width: 2em;
+    float: right;
+}
+.sorting_icon:hover{
+    color:#8c8c8c;
 }
