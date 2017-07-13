@@ -488,41 +488,58 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             <div class="col-md-12 page_title">Configure Email Alerts</div>
             <div id='errMsgContainer' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>
             <div class="alert alert-success fade in col-md-12" style="border-color: #b2dba1 !important;display: none;" id="succMsgContainer"></div>
-
-            <div class="col-md-12">
+              <div class="col-md-12">
                 <table class="table table-bordered table-hover" style="margin-bottom: 0">
                     <tr class="table_header">
-                        <td>Enable</td>
-                        <td>Field </td>
-                        <td>Description</td>
+                        <td>Option</td>
+                        <td>Field Mappings</td>
+                    </tr>
+                    <tr class="table_subheader">
+                        <td>Email Addresses</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td style="width: 15%;"><input type="checkbox" name="datapipeEmail_enable" id="datapipeEmail_enable" <?=($emailTriggerModule->getProjectSetting('datapipeEmail_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> to email addresses. </span><div class="description_config">Allows email fields from the REDCap form(s) to be piped into the TO, and CC fields of email messages. </div></td>
+                        <td style="width: 25%;padding: 10px 30px;">
+                            <span class="table_example">Format: [variable_name], Button Name</span><br/>
+                            <textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[dob], Fake email ..." value="<?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?></textarea>
+                            <div class="btn_color_square btn_color_datapipeEmail"></div>Email button (blue)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width: 15%;"><input type="checkbox" name="emailFromForm_enable" id="emailFromForm_enable" <?=($emailTriggerModule->getProjectSetting('emailFromForm_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;"><strong>Preload email addresses</strong> from existing REDCap records. <span><div class="description_config">Enables autocomplete from email addresses entered in already existing REDCap records to be used into the TO and CC fields.</div></td>
+                        <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
                     </tr>
 
-                    <tr>
-                        <td style="width: 15%;"><input type="checkbox" name="datapipe_enable" id="datapipe_enable" <?=($emailTriggerModule->getProjectSetting('datapipe_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping<span></td>
-                        <td style="width: 25%;"><div class="btn_color_square btn_color_datapipe"></div>Variable name<br/><span class="table_example">Example: [name_var], name ...</span><br/><textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="[variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipe_var');?></textarea></td>
-                        <td>Enables the option to create workflow messages that allow to pipe data from the form.<br/>The format of the data must be "[variable], label". This will create a button with the label that, on click, will insert the variable.</td>
+                    <tr class="table_subheader">
+                        <td>Email Content</td>
+                        <td></td>
                     </tr>
                     <tr>
-                        <td style="width: 15%;"><input type="checkbox" name="emailFromForm_enable" id="emailFromForm_enable" <?=($emailTriggerModule->getProjectSetting('emailFromForm_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Preload Email Addresses<span></td>
-                        <td style="width: 25%;">Email variable<br/><span class="table_example">Example: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
-                        <td>Enables the option to preload email addresses from form variables and activates autocomplete.</td>
+                        <td style="width: 15%;"><input type="checkbox" name="datapipe_enable" id="datapipe_enable" <?=($emailTriggerModule->getProjectSetting('datapipe_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> in email content. <span><div class="description_config">Allows data from the REDCap form(s) to be piped into the email messages. Project variables must be mapped to labels to be used in email piping. Enter one mapping per line.</div></td>
+                        <td style="width: 25%;padding: 10px 30px;">
+                            <span class="table_example">Format: [email_variable], Button Name</span><br/>
+                            <textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="" value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipe_var');?></textarea>
+                            <div class="btn_color_square btn_color_datapipe"></div>Data variable button (gray)
+                        </td>
                     </tr>
                     <tr>
-                        <td style="width: 15%;"><input type="checkbox" name="datapipeEmail_enable" id="datapipeEmail_enable" <?=($emailTriggerModule->getProjectSetting('datapipeEmail_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Data Piping Email<span></td>
-                        <td style="width: 25%;"><div class="btn_color_square btn_color_datapipeEmail"></div>Email variable<br/><span class="table_example">Example: [name_var], name ...</span><br/><textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[variable], label ..." value="<?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?></textarea></td>
-                        <td>Enables the option to use Redcap variables as data piping in the email fields. </td>
-                    </tr>
-                    <tr>
-                        <td style="width: 15%;"><input type="checkbox" name="surveyLink_enable" id="surveyLink_enable" <?=($emailTriggerModule->getProjectSetting('surveyLink_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Surey Link<span></td>
-                        <td style="width: 25%;"><div class="btn_color_square btn_color_surveyLink"></div>Survey variable<br/><span class="table_example">Example: [form_name], name ...</span><br/>
+                        <td style="width: 15%;"><input type="checkbox" name="surveyLink_enable" id="surveyLink_enable" <?=($emailTriggerModule->getProjectSetting('surveyLink_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content<span><div class="description_config">Allows REDCap survey links for any survey-enabled form to be inserted into email messages.</div></td>
+                        <td style="width: 25%;padding: 10px 30px;">
+                            <span class="table_example">Example: [form_name], name ...</span><br/>
                             <a id="addLinkBtn" onclick="javascript:$('#addLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
-                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[form_name], name ..." value="<?=$emailTriggerModule->getProjectSetting('surveyLink_var');?>"><?=$emailTriggerModule->getProjectSetting('surveyLink_var');?></textarea></td>
-                        <td>Enables the option to use add Survey Links in the text field.</td>
+                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[form_name], name ..." value="<?=$emailTriggerModule->getProjectSetting('surveyLink_var');?>"><?=$emailTriggerModule->getProjectSetting('surveyLink_var');?></textarea>
+                            <div class="btn_color_square btn_color_surveyLink"></div>Survey link button (orange)
+                        </td>
+                    </tr>
+
+                    <tr class="table_subheader">
+                        <td>Bounced Emails</td>
+                        <td></td>
                     </tr>
                     <tr>
-                        <td style="width: 15%;"><input type="checkbox" name="emailFailed_enable" id="emailFailed_enable" <?=($emailTriggerModule->getProjectSetting('emailFailed_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Send Failed Emails To<span></td>
-                        <td style="width: 25%;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="<?=$emailTriggerModule->getProjectSetting('emailFailed_var');?>"/></td>
-                        <td>Enables the option to send failed emails to one or more email addresses.</td>
+                        <td style="width: 15%;"><input type="checkbox" name="emailFailed_enable" id="emailFailed_enable" <?=($emailTriggerModule->getProjectSetting('emailFailed_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Send <strong>Failed Email Alerts</strong> to specified address<span></td>
+                        <td style="width: 25%;padding: 10px 30px;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="<?=$emailTriggerModule->getProjectSetting('emailFailed_var');?>"/></td>
                     </tr>
                 </table>
             </div>
@@ -530,7 +547,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
     </div>
 </form>
 <div>
-    <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Submit</button>
+    <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Save Settings</button>
 </div>
 <?PHP require('codes_modal.php');?>
 
@@ -631,7 +648,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     </div>
                     <div class="modal-body">
                         <div id='errMsgModalContainer' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>
-                        <div><i>Once the survey link is added, remember to click on <strong>Submit</strong> button to save the changes.</i></div>
+                        <div><i>Once the survey link is added, remember to click on <strong>Save Settings</strong> button to save the changes.</i></div>
                         </br>
                         <table class="code_modal_table">
                             <tr class="form-control-custom">

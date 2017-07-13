@@ -1,7 +1,7 @@
 .alert{border: 1px solid red;}
 /***TABLE***/
 .table_header{
-    background-color:aliceblue;
+    background-color:#cce7ff;
     font-weight:bold;
     font-size: 13px;
     text-align: center;
@@ -14,6 +14,15 @@
 }
 .table_header th span{
     color:red;
+}
+.table_subheader{
+    background-color:#f0f8ff;
+    color: #005299;
+}
+.table textarea, .table input{
+    border-radius: 3px;
+    border: 1px solid #999;
+    padding:3px;
 }
 .page_title {
     padding-bottom: 30px;
@@ -219,4 +228,7 @@
 
 .external-modules-input-td .mce-path {
     display: none;
+}
+.description_config{
+    padding: 18px;
 }

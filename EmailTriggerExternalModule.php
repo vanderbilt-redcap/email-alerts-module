@@ -103,6 +103,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $instrument_form =  str_replace('[', '', $var);
                         $instrument_form =  str_replace(']', '', $instrument_form);
                         $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $event_id);
+
                         $returnCode = $passthruData['return_code'];
                         $hash = $passthruData['hash'];
 
