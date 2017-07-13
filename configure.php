@@ -631,6 +631,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     </div>
                     <div class="modal-body">
                         <div id='errMsgModalContainer' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>
+                        <div><i>Once the survey link is added, remember to click on <strong>Submit</strong> button to save the changes.</i></div>
+                        </br>
                         <table class="code_modal_table">
                             <tr class="form-control-custom">
                                 <td>Form name:</td>
