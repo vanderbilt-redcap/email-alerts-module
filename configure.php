@@ -602,11 +602,11 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             <thead>
             <tr class="table_header">
                 <th>Form</th>
+                <th>REDCap logic</th>
                 <th>Email Addresses</th>
                 <th>Subject</th>
                 <th>Message</th>
                 <th>More than one time/instrument?</th>
-                <th>REDCap logic</th>
                 <th>Attachments by variables</th>
                 <th>#Attachments</th>
                 <th class="table_header_options">Options</th>
