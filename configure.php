@@ -507,6 +507,13 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             });
         };
     </script>
+<?php
+    $tr_class = 'in';
+    if($indexSubSet>0) {
+        //collapse columns as there is some existing info
+        $tr_class = '';
+    }
+?>
 <form class="form-inline" action="" method="post" id='mainForm'>
     <div class="container-fluid wiki">
         <div class='row' style=''>
@@ -529,7 +536,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             </span>
                         </td>
                     </tr>
-                    <tr class="panel-collapse collapse EA_collapsed in" aria-expanded="true">
+                    <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><input type="checkbox" name="datapipeEmail_enable" id="datapipeEmail_enable" <?=($emailTriggerModule->getProjectSetting('datapipeEmail_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> to email addresses. </span><div class="description_config">Allows email fields from the REDCap form(s) to be piped into the TO and CC fields of email messages. </div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             <span class="table_example">Format: [variable_name], Button Name</span><br/>
@@ -537,7 +544,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             <div class="btn_color_square btn_color_datapipeEmail"></div>Email button (blue)
                         </td>
                     </tr>
-                    <tr class="panel-collapse collapse EA_collapsed in" aria-expanded="true">
+                    <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><input type="checkbox" name="emailFromForm_enable" id="emailFromForm_enable" <?=($emailTriggerModule->getProjectSetting('emailFromForm_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;"><strong>Preload email addresses</strong> from existing REDCap records. <span><div class="description_config">Enables autocomplete of email addresses in the TO and CC email fields. The list of email addresses is pulled from the specified variables in already existing REDCap records. </div></td>
                         <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
                     </tr>
@@ -551,7 +558,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             </span>
                         </td>
                     </tr>
-                    <tr class="panel-collapse collapse EC_collapsed in" aria-expanded="true">
+                    <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><input type="checkbox" name="datapipe_enable" id="datapipe_enable" <?=($emailTriggerModule->getProjectSetting('datapipe_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> in email content. <span><div class="description_config">Allows data from the REDCap form(s) to be piped into the email messages. Project variables must be mapped to labels to be used in email piping. Enter one mapping per line.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             <span class="table_example">Format: [email_variable], Button Name</span><br/>
@@ -559,7 +566,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             <div class="btn_color_square btn_color_datapipe"></div>Data variable button (gray)
                         </td>
                     </tr>
-                    <tr class="panel-collapse collapse EC_collapsed in" aria-expanded="true">
+                    <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><input type="checkbox" name="surveyLink_enable" id="surveyLink_enable" <?=($emailTriggerModule->getProjectSetting('surveyLink_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content<span><div class="description_config">Allows REDCap survey links for any survey-enabled form to be inserted into email messages.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             <span class="table_example">Example: [form_name], name ...</span><br/>
@@ -578,7 +585,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             </span>
                         </td>
                     </tr>
-                    <tr class="panel-collapse collapse EE_collapsed in" aria-expanded="true">
+                    <tr class="panel-collapse collapse EE_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><input type="checkbox" name="emailFailed_enable" id="emailFailed_enable" <?=($emailTriggerModule->getProjectSetting('emailFailed_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Send <strong>Failed Email Alerts</strong> to specified address<span></td>
                         <td style="width: 25%;padding: 10px 30px;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="<?=$emailTriggerModule->getProjectSetting('emailFailed_var');?>"/></td>
                     </tr>
