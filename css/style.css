@@ -171,7 +171,7 @@
 .form-control-custom input[type='checkbox']{
     box-shadow:none;
     width: 20px;
-    /*margin-left:13px;*/
+    margin-left:13px;
 }
 .form-control-custom input[type='file']{
     box-shadow:none;
@@ -179,6 +179,12 @@
 }
 .form-control-custom textarea{
     height: 100%;
+}
+.form-control-custom-title{
+    font-weight: bold;
+    text-align: center;
+    background-color: #ebebfa;
+    padding: 7px;
 }
 
 .btn_datapiping{

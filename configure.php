@@ -129,21 +129,21 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             var EMparent = ExternalModules.Settings.prototype;
             var EMSettings = function(){}
             EMSettings.prototype = Object.create(ExternalModules.Settings.prototype);
-            EMSettings.prototype.getSettingColumns  = function(setting, instance, header){
+            EMSettings.prototype.getSettingColumns  = function(setting, instance, header) {
                 instance = undefined;
                 var name = EMparent.getInstanceName(setting.key, instance);
-                if(setting.type == "checkbox") {
+                if (setting.type == "checkbox") {
                     if (setting.value == "false" || setting.value == undefined) {
                         setting.value = 0;
                     }
                 }
 
                 //We customize depending on the field type
-                if(setting.type == 'rich-text'){
+                if (setting.type == 'rich-text') {
                     //We add the Data Pipping buttons
                     var inputHtml = EMparent.getSettingColumns.call(this, setting, instance, header);
                     var buttonsHtml = "";
-                    if(datapipeEmail_enable == 'on' || datapipe_enable == 'on' || surveyLink_enable == 'on') {
+                    if (datapipeEmail_enable == 'on' || datapipe_enable == 'on' || surveyLink_enable == 'on') {
                         if (datapipe_enable == 'on') {
                             var pipeVar = datapipe_var.split("\n");
                             buttonsHtml += "<div style='padding-top:5px'></div>";
@@ -170,21 +170,27 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         }
 
                         var buttonLegend = "<div style=''><div class='btn_legend'><div class='btn_color_square btn_color_datapipe'></div>Data variable</div>";
-                            buttonLegend += "<div class='btn_legend'><div class='btn_color_square btn_color_datapipeEmail'></div>Email address</div>";
-                            buttonLegend += "<div class='btn_legend'><div class='btn_color_square btn_color_surveyLink'></div>Survey link</div><div>";
+                        buttonLegend += "<div class='btn_legend'><div class='btn_color_square btn_color_datapipeEmail'></div>Email address</div>";
+                        buttonLegend += "<div class='btn_legend'><div class='btn_color_square btn_color_surveyLink'></div>Survey link</div><div>";
 
-                        inputHtml = inputHtml.replace("<td class='external-modules-input-td'>", "<td class='external-modules-input-td'>"+buttonLegend+"<div>" + buttonsHtml + "<div>");
+                        inputHtml = inputHtml.replace("<td class='external-modules-input-td'>", "<td class='external-modules-input-td'>" + buttonLegend + "<div>" + buttonsHtml + "<div>");
                     }
                     return inputHtml;
-                }else if(setting.type == 'text' && (setting.key == 'email-to' || setting.key == 'email-to-update' || setting.key == 'email-cc' || setting.key == 'email-cc-update')){
+                } else if (setting.type == 'text' && (setting.key == 'email-to' || setting.key == 'email-to-update' || setting.key == 'email-cc' || setting.key == 'email-cc-update')) {
                     //We add the datalist for the emails
-                    inputHtml += "<tr class='"+customClass+"'><td><span class='external-modules-instance-label'></span><label>" + setting.name + ":</label></td>";
-                    var datalistname = "json-datalist-"+setting.key;
-                    var inputProperties = {'list':datalistname,'class':'flexdatalist','multiple':'multiple','data-min-length':'1','id':setting.key};
-                    inputHtml += "<td class='external-modules-input-td'>"+this.getInputElement(setting.type, setting.key, setting.value, inputProperties);
-                    inputHtml += "<datalist id='"+datalistname+"'></datalist></td><td></td><tr>";
+                    inputHtml += "<tr class='" + customClass + "'><td><span class='external-modules-instance-label'></span><label>" + setting.name + ":</label></td>";
+                    var datalistname = "json-datalist-" + setting.key;
+                    var inputProperties = {
+                        'list': datalistname,
+                        'class': 'flexdatalist',
+                        'multiple': 'multiple',
+                        'data-min-length': '1',
+                        'id': setting.key
+                    };
+                    inputHtml += "<td class='external-modules-input-td'>" + this.getInputElement(setting.type, setting.key, setting.value, inputProperties);
+                    inputHtml += "<datalist id='" + datalistname + "'></datalist></td><td></td><tr>";
                     return inputHtml;
-                } else{
+                }else{
                     return EMparent.getSettingColumns.call(this, setting, instance, header);
                 }
             }
@@ -194,6 +200,19 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             var rowsHtmlUpdate = '';
             configSettings.forEach(function(setting){
                 var setting = $.extend({}, setting);
+
+                if(setting.type == 'form-list' && setting.key == 'form-name') {
+                    rowsHtml += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Triggers</div></td></tr>";
+                    rowsHtmlUpdate += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Triggers</div></td></tr>";
+                }else if(setting.type == 'text' && setting.key == 'email-to') {
+                    rowsHtml += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Content</div></td></tr>";
+                    rowsHtmlUpdate += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Content</div></td></tr>";
+                }else if(setting.type == 'text' && setting.key == 'email-attachment-variable') {
+                    rowsHtml += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Attachments</div></td></tr>";
+                    rowsHtmlUpdate += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Attachments</div></td></tr>";
+                }
+
+
                 rowsHtml += EMSettingsInstance.getProjectSettingHTML(setting,false, <?=json_encode($indexSubSet)?>,'', customClass);
 
                 //We change names for the second modal elements so the rich text works

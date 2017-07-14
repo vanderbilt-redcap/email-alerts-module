@@ -36,16 +36,16 @@
 	"email-dashboard-settings": [
         {
           "key": "form-name",
-          "name": "Email Form",
+          "name": "REDCap Instrument",
           "required": true,
           "type": "form-list"
         },
-		{
-			"key": "email-repetitive",
-			"name": "Email more than one time per instrument?",
-			"required": false,
-			"type":"checkbox"
-		},
+        {
+          "key": "email-condition",
+          "name": "Email Condition (REDCap logic)",
+          "required": false,
+          "type":"text"
+        },
 		{
 			"key": "email-to",
 			"name": "Email To",
@@ -60,19 +60,19 @@
 		},
 		{
 			"key": "email-subject",
-			"name": "Email Subject",
+			"name": "Subject",
 			"required": true,
 			"type": "text"
 		},
 		{
 			"key": "email-text",
-			"name": "Email Text",
+			"name": "Message",
 			"required": true,
 			"type": "rich-text"
 		},
 		{
 			"key": "email-attachment-variable",
-			"name": "Email Attachment as variables",
+			"name": "REDCap file variables",
 			"required": false,
 			"type": "text"
 		},
@@ -106,12 +106,12 @@
 			"required": false,
 			"type": "file"
 		},
-		{
-			"key": "email-condition",
-			"name": "Email Condition (REDCap logic)",
-			"required": false,
-			"type":"text"
-		}
+        {
+          "key": "email-repetitive",
+          "name": "Email more than one time per instrument?",
+          "required": false,
+          "type":"checkbox"
+        }
 
 	],
 
