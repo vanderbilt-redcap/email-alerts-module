@@ -108,7 +108,7 @@
 		},
         {
           "key": "email-repetitive",
-          "name": "Email more than one time per instrument?",
+          "name": "Resend Emails on Form Re-save?",
           "required": false,
           "type":"checkbox"
         }
