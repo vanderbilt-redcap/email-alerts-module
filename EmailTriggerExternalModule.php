@@ -62,7 +62,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_repetitive_sent = json_decode($email_repetitive_sent);
 
-//        $this->setProjectSetting('email-repetitive-sent', '{"prescreening_survey":{"0":50,"1":45}}', $project_id) ;
+//        $this->setProjectSetting('email-repetitive-sent', '', $project_id) ;
 
 //        $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument);
 //        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id) ;
@@ -397,6 +397,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $jsonArray[$sv_name] = $jsonVarArray;
             }
 
+        }else{
+            $found_new_instrument = true;
         }
 
         //add new record for new survey
