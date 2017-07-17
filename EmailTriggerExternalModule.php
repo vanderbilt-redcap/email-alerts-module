@@ -27,7 +27,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         if ($row['form_name'] == $form) {
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
                             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id,$instrument);
+                            $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
+                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument);
                         }
                     }
 
@@ -48,7 +49,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         if ($_REQUEST['page'] == $form) {
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
                             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id,$instrument);
+                            $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
+                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument);
                         }
                     }
                 }
@@ -56,10 +58,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		}
 	}
 
-    function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$event_id,$instrument){
+    function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument){
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
-//        $email_timestamp = $this->getProjectSetting("email-timestamp",$project_id)[$id];
-        if(($email_repetitive == "1") || ($email_repetitive == '0' && $email_sent[$id] == "0")) {
+        $email_repetitive_sent = json_decode($email_repetitive_sent);
+
+//        $this->setProjectSetting('email-repetitive-sent', '{"prescreening_survey":{"0":50,"1":45}}', $project_id) ;
+
+//        $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument);
+//        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id) ;
+//        echo $this->addJSONRecord($email_repetitive_sent, $record, $instrument);
+//        echo $this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument);
+//        die;
+
+        if(($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument))) {
             $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
             //If the condition is met or if we don't have any, we send the email
             if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)) {
@@ -209,6 +220,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     $this->setProjectSetting('email-sent', $email_sent, $project_id) ;
 
+                    $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument);
+                    $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id) ;
                 }
                 unlink($privatekeyfile);
                 // Clear all addresses and attachments for next loop
@@ -356,6 +369,60 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         return $mail;
+    }
+
+    function addJSONRecord($email_repetitive_sent, $new_record, $instrument){
+        $found_new_instrument = false;
+        $found_record = false;
+
+        if(!empty($email_repetitive_sent)){
+            foreach ($email_repetitive_sent as $sv_name => $survey_records){
+                $jsonArray[$sv_name] = array();
+                $jsonVarArray = array();
+                foreach ($survey_records as $sv_number => $survey_record){
+                    array_push($jsonVarArray,$survey_record);
+
+                    if($survey_record == $new_record){
+                        $found_record = true;
+                    }
+                }
+                //If it's the same survey and a new record, we add it
+                if($sv_name == $instrument && !$found_record) {
+                    //add new record for specific instrument
+                    array_push($jsonVarArray, $new_record);
+                }else if($sv_name != $instrument){
+                    //It's a new survey
+                    $found_new_instrument = true;
+                }
+                $jsonArray[$sv_name] = $jsonVarArray;
+            }
+
+        }
+
+        //add new record for new survey
+        if($found_new_instrument){
+            $jsonArray[$instrument] = array();
+            $jsonVarArray = array();
+            array_push($jsonVarArray,$new_record);
+            $jsonArray[$instrument] = $jsonVarArray;
+        }
+//        printf("<pre>%s</pre>",print_r($jsonArray,TRUE));
+        return json_encode($jsonArray,JSON_FORCE_OBJECT);
+    }
+
+    function isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument){
+        if(!empty($email_repetitive_sent)){
+            foreach ($email_repetitive_sent as $sv_name => $survey_records){
+                if($sv_name == $instrument) {
+                    foreach ($survey_records as $sv_number => $survey_record) {
+                        if($record == $survey_record){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 }

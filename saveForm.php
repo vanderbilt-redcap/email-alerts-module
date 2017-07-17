@@ -30,6 +30,7 @@ array_push($email_subject,$_REQUEST['email-subject']);
 array_push($email_text,$_REQUEST['email-text-editor']);
 array_push($email_attachment_variable,$_REQUEST['email-attachment-variable']);
 array_push($email_repetitive,$repetitive);
+array_push($email_timestamp,$timestamp);
 array_push($email_condition,$_REQUEST['email-condition']);
 
 #Save data
