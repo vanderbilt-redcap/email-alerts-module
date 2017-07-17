@@ -673,9 +673,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             $alerts .= '<td><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
                         }else if($configRow['key'] == 'email-attachment-variable'){
                             $attchVar = preg_split("/[;,]+/",  $configRow['value'][$index]);
-                            if(!empty($attchVar)){
-                                foreach ($attchVar as $var){
-                                    $attachmentVar .= '- '.$var.'<br/>';
+                            foreach ($attchVar as $var){
+                                if(!empty($var)){
+                                 $attachmentVar .= '- '.$var.'<br/>';
                                 }
                             }
                         }else if($configRow['key'] == 'email-subject') {
