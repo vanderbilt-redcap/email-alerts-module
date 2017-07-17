@@ -611,12 +611,10 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 <th>Form</th>
                 <th>REDCap logic</th>
                 <th>Email Addresses</th>
-                <th>Subject</th>
                 <th>Message</th>
-                <th>More than one time/instrument?</th>
-                <th>Attachments by variables</th>
-                <th>#Attachments</th>
-                <th class="table_header_options">Options</th>
+                <th>Resend Emails on Form Re-save?</th>
+                <th>Attachments</th>
+                <th class="table_header_options">Actions</th>
             </tr>
             </thead>
             <tbody>
@@ -637,17 +635,30 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 }
                 $alerts .= '<tr class="'.$class_sent.'">';
                 $fileAttachments = 0;
+                $attachmentVar ='';
+                $attachmentFile ='';
                 foreach ($config['email-dashboard-settings'] as $configKey => $configRow) {
 
                     if ($configRow['type'] == 'file') {
-                        if(!empty($configRow['value'][$index])){
+                        if(!empty($configRow['value'][$index])) {
                             $fileAttachments++;
+
+                            if (!empty($configRow['value'][$index])) {
+                                $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=" . $configRow['value'][$index];
+                                $q = db_query($sql);
+
+                                if ($error = db_error()) {
+                                    die($sql . ': ' . $error);
+                                }
+
+                                while ($row = db_fetch_assoc($q)) {
+                                    $attachmentFile .= '- '.$row['doc_name'].'<br/>';
+                                }
+                            }
                         }
                     } else if ($configRow['type'] == 'checkbox') {
                         $value = ($configRow['value'][$index] == 0) ? "No" : "Yes";
                         $alerts .= '<td  style="text-align: center"><span>' . $value . '</span></td>';
-                    } else if ($configRow['type'] == 'rich-text') {
-                       $alerts .= '<td  style="text-align: center"><span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview</a></span></td>';
                     } else {
                         $value = preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', $configRow['value'][$index]);
                         if ($configRow['key'] == 'email-to') {
@@ -661,7 +672,14 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         } else if($configRow['key'] == 'form-name') {
                             $alerts .= '<td><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
                         }else if($configRow['key'] == 'email-attachment-variable'){
-                            $attachmentVar = '<td><span>'.$configRow['value'][$index] . '</span></td>';
+                            $attchVar = preg_split("/[;,]+/",  $configRow['value'][$index]);
+                            foreach ($attchVar as $var){
+                                $attachmentVar .= '- '.$var.'<br/>';
+                            }
+                        }else if($configRow['key'] == 'email-subject') {
+                            $alerts .= '<td><span>'.$configRow['value'][$index] . '</span><br/>';
+                        }else if ($configRow['key'] == 'email-text'){
+                            $alerts .= '<span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview Message</a></span></td>';
                         }else{
                             $alerts .= '<td><span>'.$configRow['value'][$index] . '</span></td>';
                         }
@@ -670,11 +688,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
 
                 }
-                $fileAttachments = ($fileAttachments == 0) ? "None" : $fileAttachments;
-                $alerts .= $attachmentVar;
-                $alerts .= "<td><span style='text-align: center'>" . $fileAttachments . "</span></td>";
-                $alerts .= "<td style='text-align: center'><strong><a id='emailRow$index' style='cursor:pointer' ><img src='" . APP_PATH_WEBROOT_FULL . APP_PATH_WEBROOT . "Resources/images/pencil.png'/></a></strong>";
-                $alerts .= "<br/><br/><strong><a onclick='deleteEmailAlert(".$index.")' style='cursor:pointer' >Delete</a></strong></td>";
+                $alerts .= "<td><span style='text-align: center;width: 200px;'><strong>" . $fileAttachments . " files</strong><br/></span>".$attachmentVar.$attachmentFile."</td>";
+                $alerts .= "<td><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></br>";
+                $alerts .= "<a onclick='deleteEmailAlert(".$index.")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >Delete</a></td>";
                 $alerts .= "</tr>";
                 $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";
             }

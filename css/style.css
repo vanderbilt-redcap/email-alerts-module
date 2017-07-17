@@ -201,7 +201,6 @@
     border-color: #46b8da;
 }
 
-
 /***BUTTON COLORS***/
 .btn_color_square{
     width: 10px;
@@ -230,6 +229,20 @@ a.btn_color_datapipeEmail:hover{background-color: #99cfff !important;}
 .btn_color_surveyLink{background-color: #fff2e6 !important;color: #000000;}
 .btn_color_surveyLink{border:1px solid #ffd7b3 !important;}
 a.btn_color_surveyLink:hover{background-color: #ffd7b3 !important;}
+
+.btn-new-email, .btn-new-email:hover{
+    color:#fff !important;
+    padding: 4px  !important;
+    font-size: 13px;
+    border:none;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-new-email-edit{background-color: #005299 !important;}
+.btn-new-email-edit:hover{background-color: #007ae6 !important;}
+.btn-new-email-delete{background-color: #ff3333 !important;}
+.btn-new-email-delete:hover{background-color: #ff6666 !important;}
 
 /***FILTER***/
 
