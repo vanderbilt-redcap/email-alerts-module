@@ -16,4 +16,10 @@ $emailTriggerModule->setProjectSetting('surveyLink_var',$_POST['surveyLink_var']
 $emailTriggerModule->setProjectSetting('emailFailed_enable',$_POST['emailFailed_enable']);
 $emailTriggerModule->setProjectSetting('emailFailed_var',$_POST['emailFailed_var']);
 
+
+echo json_encode(array(
+    'status' => 'success',
+    'message' => ''
+));
+
 ?>

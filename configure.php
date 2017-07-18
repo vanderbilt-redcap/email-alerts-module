@@ -46,6 +46,12 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'U'){
 else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'D'){
     $message='<strong>Success!</strong> Email Deleted.';
 }
+else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'AC'){
+    $message='<strong>Success!</strong> Email Activated.';
+}
+else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'NO'){
+    $message='<strong>Success!</strong> Email Deactivated.';
+}
 
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
@@ -401,6 +407,12 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 return false;
             });
 
+            $('#deactivateForm').submit(function () {
+                var data = $('#deactivateForm').serialize();
+                ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('activateDeactivateForm.php')?>',"");
+                return false;
+            });
+
             $('#AddSurveyForm').submit(function () {
                 $('#errMsgModalContainer').hide();
                 var errMsg = [];
@@ -633,6 +645,16 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     }
 
                 }
+
+                $deactivate = "";
+                if($projectData['settings']['email-deactivate']['value'][$index] == '1'){
+                    $message_sent = "<span style='display:block;font-style:italic'>Email deactivated</span>";
+                    $class_sent = "email_deactivated";
+                    $deactivate = "Activate";
+                }else{
+                    $deactivate = "Deactivate";
+                }
+
                 $alerts .= '<tr class="'.$class_sent.'">';
                 $fileAttachments = 0;
                 $attachmentVar ='';
@@ -693,6 +715,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 }
                 $alerts .= "<td><span style='text-align: center;width: 200px;'><strong>" . $fileAttachments . " files</strong><br/></span>".$attachmentVar.$attachmentFile."</td>";
                 $alerts .= "<td><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></br>";
+                $alerts .= "<a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\")' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a>";
                 $alerts .= "<a onclick='deleteEmailAlert(".$index.")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >Delete</a></td>";
                 $alerts .= "</tr>";
                 $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";
@@ -789,6 +812,29 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                     <div class="modal-footer">
                         <button type="submit" form="deleteForm" class="btn btn-default btn-delete" id='btnModalDeleteForm'>Delete</button>
+                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="external-modules-configure-modal-deactivate-confirmation" tabindex="-1" role="dialog" aria-labelledby="Codes">
+        <form class="form-horizontal" action="" method="post" id='deactivateForm'>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Activate/Deactivate Email Alert</h4>
+                    </div>
+                    <div class="modal-body">
+                        <span id="index_modal_message"></span>
+                        <input type="hidden" value="" id="index_modal_deactivate" name="index_modal_deactivate">
+                        <input type="hidden" value="" id="index_modal_status" name="index_modal_status">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" form="deactivateForm" class="btn btn-default btn-delete" id='btnModalDeactivateForm'></button>
                         <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
                     </div>
                 </div>

@@ -46,10 +46,13 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condi
 //Extra Data
 $email_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-sent');
 $email_timestamp_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp-sent');
+$email_deactivate =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate');
 array_push($email_sent,"0");
 array_push($email_timestamp_sent,"0");
+array_push($email_deactivate,"0");
 ExternalModules::setProjectSetting($prefix,$pid, 'email-sent', $email_sent);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp-sent', $email_timestamp_sent);
+ExternalModules::setProjectSetting($prefix,$pid, 'email-deactivate', $email_deactivate);
 
 //check if forms where uploaded and if not add blank values
 for($i=1; $i<6; $i++){
@@ -62,7 +65,8 @@ for($i=1; $i<6; $i++){
 
 
 echo json_encode(array(
-    'status' => 'success'
+    'status' => 'success',
+    'message' => ''
 ));
 
 ?>

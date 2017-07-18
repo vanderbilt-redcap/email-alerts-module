@@ -60,6 +60,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument){
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
+        $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_repetitive_sent = json_decode($email_repetitive_sent);
 
 //        $this->setProjectSetting('email-repetitive-sent', '', $project_id) ;
@@ -73,7 +74,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 //        echo "getSurveyLink".\REDCap::getSurveyLink($record,$instrument,$event_id);
 //        die;
 
-        if(($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument))) {
+        if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument))) && $email_deactivate == "0") {
             $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
             //If the condition is met or if we don't have any, we send the email
             if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)) {
@@ -114,17 +115,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $datasurvey = explode("\n", $surveyLink_var);
                     foreach ($datasurvey as $surveylink) {
                         $var = preg_split("/[;,]+/", $surveylink)[0];
-                        $instrument_form =  str_replace('[', '', $var);
-                        $instrument_form =  str_replace(']', '', $instrument_form);
-                        $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $event_id);
+                        //only if the variable is in the text we reset the survey link status
+                        if (strpos($email_text, $var) !== false) {
+                            $instrument_form = str_replace('[', '', $var);
+                            $instrument_form = str_replace(']', '', $instrument_form);
+                            $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $event_id);
 
-                        $returnCode = $passthruData['return_code'];
-                        $hash = $passthruData['hash'];
+                            $returnCode = $passthruData['return_code'];
+                            $hash = $passthruData['hash'];
 
-//                        $url= $emailTriggerModule->getUrl('surveyPassthru.php') . "&hash=" . $hash . "&returnCode=" . $returnCode;
-                        $url= $emailTriggerModule->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form ."&record=" . $record. "&returnCode=" . $returnCode;
-                        $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
-                        $email_text = str_replace($var, $link, $email_text);
+                            $url = $emailTriggerModule->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode;
+                            $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
+                            $email_text = str_replace($var, $link, $email_text);
+                        }
                     }
                 }
                 $mail = new \PHPMailer;

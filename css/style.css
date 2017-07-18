@@ -72,6 +72,9 @@
 .email_preview_forms_table tr.email_sent{
     background-color: #e6ffe6 !important;
 }
+.email_preview_forms_table tr.email_deactivated{
+    background-color: #ffe6e6 !important;
+}
 .dataTables_length label{
     float:left;
     font-weight:normal;

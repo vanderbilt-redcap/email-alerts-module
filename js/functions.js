@@ -105,6 +105,13 @@ function deleteEmailAlert(index){
     $('#index_modal_delete').val(index);
     $('#external-modules-configure-modal-delete-confirmation').modal('show');
 }
+function deactivateEmailAlert(index, status){
+    $('#index_modal_deactivate').val(index);
+    $('#index_modal_status').val(status);
+    $('#btnModalDeactivateForm').html(status);
+    $('#index_modal_message').html('Are you sure you want to '+status+' this Email Alert?');
+    $('#external-modules-configure-modal-deactivate-confirmation').modal('show');
+}
 
 //We insert the button text depending on which field we are
 function insertAtCursorTinyMCE(myValue) {
@@ -222,8 +229,12 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
 
 function ajaxLoadOptionAndMessage(data, url, message){
     $.post(url, data, function(returnData){
-        if(returnData.status != 'success'){
+        jsonAjax = jQuery.parseJSON(returnData);
+        if(jsonAjax.status == 'success'){
             //refresh page to show changes
+            if(returnData.message != '' && jsonAjax.message != undefined){
+                message = jsonAjax.message;
+            }
             window.location.href = gerUtlMessageParam(message);
         }
         else {

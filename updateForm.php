@@ -44,7 +44,8 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive', $email_repe
 ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condition);
 
 echo json_encode(array(
-    'status' => 'success'
+    'status' => 'success',
+    'message' => ''
 ));
 
 ?>

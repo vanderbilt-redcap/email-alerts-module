@@ -5,7 +5,7 @@ require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 $prefix = ExternalModules::getPrefixForID($_GET['id']);
 $pid = $_GET['pid'];
 $index =  $_REQUEST['index_modal_delete'];
-echo $index;
+
 
 #get data from the DB
 $form_name = empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name');
@@ -77,7 +77,8 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-sent', $email_sent);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp-sent', $email_timestamp_sent);
 
 echo json_encode(array(
-    'status' => 'success'
+    'status' => 'success',
+    'message' => ''
 ));
 
 ?>
