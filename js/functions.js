@@ -232,7 +232,7 @@ function ajaxLoadOptionAndMessage(data, url, message){
         jsonAjax = jQuery.parseJSON(returnData);
         if(jsonAjax.status == 'success'){
             //refresh page to show changes
-            if(returnData.message != '' && jsonAjax.message != undefined){
+            if(jsonAjax.message != '' && jsonAjax.message != undefined){
                 message = jsonAjax.message;
             }
             window.location.href = gerUtlMessageParam(message);
