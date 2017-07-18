@@ -675,7 +675,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             $attchVar = preg_split("/[;,]+/",  $configRow['value'][$index]);
                             foreach ($attchVar as $var){
                                 if(!empty($var)){
-                                 $attachmentVar .= '- '.$var.'<br/>';
+                                    $fileAttachments++;
+                                    $attachmentVar .= '- '.$var.'<br/>';
                                 }
                             }
                         }else if($configRow['key'] == 'email-subject') {

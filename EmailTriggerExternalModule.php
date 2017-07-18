@@ -70,6 +70,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 //        echo $this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument);
 //        die;
 
+//        echo "getSurveyLink".\REDCap::getSurveyLink($record,$instrument,$event_id);
+//        die;
+
         if(($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument))) {
             $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
             //If the condition is met or if we don't have any, we send the email
