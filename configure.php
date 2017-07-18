@@ -46,10 +46,10 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'U'){
 else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'D'){
     $message='<strong>Success!</strong> Email Deleted.';
 }
-else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'AC'){
+else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'T'){
     $message='<strong>Success!</strong> Email Activated.';
 }
-else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'NA'){
+else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
     $message='<strong>Success!</strong> Email Deactivated.';
 }
 

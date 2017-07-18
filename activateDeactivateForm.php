@@ -13,11 +13,11 @@ $message = '';
 if($status == "Activate"){
     //Active
     $email_deactivate[$index] = "0";
-    $message = "AC";
+    $message = "T";
 }else if($status == "Deactivate"){
     //Not Active
     $email_deactivate[$index] = "1";
-    $message = "NA";
+    $message = "E";
 }
 
 
