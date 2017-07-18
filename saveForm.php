@@ -39,7 +39,7 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-to', $email_to);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-cc', $email_cc);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-subject', $email_subject);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-text', $email_text);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-text', $email_attachment_variable);
+ExternalModules::setProjectSetting($prefix,$pid, 'email-attachment-variable', $email_attachment_variable);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive', $email_repetitive);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condition);
 
