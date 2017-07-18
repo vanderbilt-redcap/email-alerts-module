@@ -714,9 +714,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                 }
                 $alerts .= "<td><span style='text-align: center;width: 200px;'><strong>" . $fileAttachments . " files</strong><br/></span>".$attachmentVar.$attachmentFile."</td>";
-                $alerts .= "<td><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></br>";
-                $alerts .= "<a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\")' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a>";
-                $alerts .= "<a onclick='deleteEmailAlert(".$index.")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >Delete</a></td>";
+                $alerts .= "<td><div><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
+                $alerts .= "<div><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\")' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
+                $alerts .= "<div><a onclick='deleteEmailAlert(".$index.")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >Delete</a></div></td>";
                 $alerts .= "</tr>";
                 $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";
             }
