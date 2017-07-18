@@ -49,7 +49,7 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'D'){
 else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'AC'){
     $message='<strong>Success!</strong> Email Activated.';
 }
-else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'NO'){
+else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'NA'){
     $message='<strong>Success!</strong> Email Deactivated.';
 }
 
