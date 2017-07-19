@@ -228,6 +228,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument);
                     $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id) ;
+
+                    //Add some logs
+                    \REDCap::logEvent("Email Sent","combine the email header and body, and insert as one big text string. That way we will have the tracking record of what was sent and to whom.",NULL,$record,$event_id,$project_id);
+
                 }
                 unlink($privatekeyfile);
                 // Clear all addresses and attachments for next loop

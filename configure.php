@@ -632,6 +632,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             <tbody>
             <?php
             $alerts = "";
+            $email_repetitive_sent = json_decode($projectData['settings']['email-repetitive-sent']['value']);
+
             for ($index = 0; $index < $indexSubSet; $index++) {
                 $email_sent = $projectData['settings']['email-sent']['value'][$index];
                 $class_sent = "";
@@ -648,11 +650,16 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                 $deactivate = "";
                 if($projectData['settings']['email-deactivate']['value'][$index] == '1'){
-                    $message_sent = "<span style='display:block;font-style:italic'>Email deactivated</span>";
+                    $message_sent .= "<span style='display:block;font-style:italic'>Email deactivated</span>";
                     $class_sent = "email_deactivated";
                     $deactivate = "Activate";
                 }else{
                     $deactivate = "Deactivate";
+                }
+
+                if(array_key_exists($projectData['settings']['form-name']['value'][$index],$email_repetitive_sent)){
+                    $instrument = $projectData['settings']['form-name']['value'][$index];
+                    $message_sent .= "Total of emails sent on this form: ".count((array)$email_repetitive_sent->$instrument);
                 }
 
                 $alerts .= '<tr class="'.$class_sent.'">';
