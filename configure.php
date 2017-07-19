@@ -631,7 +631,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             <?php
             $alerts = "";
             $email_repetitive_sent = json_decode($projectData['settings']['email-repetitive-sent']['value']);
-//            printf("<pre>%s</pre>",print_r($email_repetitive_sent,TRUE));
             for ($index = 0; $index < $indexSubSet; $index++) {
                 $email_sent = $projectData['settings']['email-sent']['value'][$index];
                 $class_sent = "";
@@ -655,10 +654,16 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     $deactivate = "Deactivate";
                 }
 
-//                if(array_key_exists($projectData['settings']['form-name']['value'][$index],$email_repetitive_sent)){
-//                    $instrument = $projectData['settings']['form-name']['value'][$index];
-//                    $message_sent .= "Total of emails sent on this form: ".count((array)$email_repetitive_sent->$instrument);
-//                }
+                if(!empty($email_repetitive_sent)){
+                    if(array_key_exists($projectData['settings']['form-name']['value'][$index],$email_repetitive_sent)){
+                        $form = $email_repetitive_sent->$projectData['settings']['form-name']['value'][$index];
+                        foreach ($form as $alert =>$value){
+                            if($alert == $index){
+                                $message_sent .= "Emails sent: ".count((array)$form->$alert)."<br/>";
+                            }
+                        }
+                    }
+                }
 
                 $alerts .= '<tr class="'.$class_sent.'">';
                 $fileAttachments = 0;
