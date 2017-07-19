@@ -57,8 +57,6 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
 //printf("<pre>%s</pre>",print_r($simple_config['email-dashboard-settings'][0]['choices'],TRUE));
-
-
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">

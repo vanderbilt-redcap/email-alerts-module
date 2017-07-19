@@ -26,6 +26,23 @@ $email_timestamp_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid,
 $email_deactivate =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate');
 
 
+#Delete email repetitive sent from JSON before deleting all data
+$email_repetitive_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive-sent');
+$email_repetitive_sent = json_decode($email_repetitive_sent);
+
+if(!empty($email_repetitive_sent)){
+    if(array_key_exists($form_name[$index],$email_repetitive_sent)){
+        $form = $email_repetitive_sent->$form_name[$index];
+        foreach ($form as $alert =>$value){
+            if($alert == $index){
+                unset($form->$alert);
+                ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive-sent', $form);
+            }
+        }
+    }
+}
+
+
 #Delete one element in array
 unset($form_name[$index]);
 unset($email_to[$index]);
@@ -79,6 +96,7 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condi
 ExternalModules::setProjectSetting($prefix,$pid, 'email-sent', $email_sent);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp-sent', $email_timestamp_sent);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-deactivate', $email_deactivate);
+
 
 echo json_encode(array(
     'status' => 'success',
