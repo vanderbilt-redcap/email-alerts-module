@@ -231,7 +231,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     //Add some logs
                     $action_description = "Email Sent - Alert ".$id;
-                    $changes_made = "Subkect: ".$email_subject." Message: ".$email_text;
+                    $changes_made = "[Subject]: ".$email_subject.", [Message]: ".$email_text;
                     \REDCap::logEvent($action_description,$changes_made,NULL,$record,$event_id,$project_id);
 
                 }
