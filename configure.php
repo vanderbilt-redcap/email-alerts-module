@@ -657,10 +657,10 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     $deactivate = "Deactivate";
                 }
 
-                if(array_key_exists($projectData['settings']['form-name']['value'][$index],$email_repetitive_sent)){
-                    $instrument = $projectData['settings']['form-name']['value'][$index];
-                    $message_sent .= "Total of emails sent on this form: ".count((array)$email_repetitive_sent->$instrument);
-                }
+//                if(array_key_exists($projectData['settings']['form-name']['value'][$index],$email_repetitive_sent)){
+//                    $instrument = $projectData['settings']['form-name']['value'][$index];
+//                    $message_sent .= "Total of emails sent on this form: ".count((array)$email_repetitive_sent->$instrument);
+//                }
 
                 $alerts .= '<tr class="'.$class_sent.'">';
                 $fileAttachments = 0;

@@ -230,7 +230,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id) ;
 
                     //Add some logs
-                    \REDCap::logEvent("Email Sent","combine the email header and body, and insert as one big text string. That way we will have the tracking record of what was sent and to whom.",NULL,$record,$event_id,$project_id);
+                    $action_description = "Email Sent - Alert ".$id;
+                    $changes_made = "Subkect: ".$email_subject." Message: ".$email_text;
+                    \REDCap::logEvent($action_description,$changes_made,NULL,$record,$event_id,$project_id);
 
                 }
                 unlink($privatekeyfile);
