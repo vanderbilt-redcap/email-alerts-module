@@ -631,6 +631,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             <?php
             $alerts = "";
             $email_repetitive_sent = json_decode($projectData['settings']['email-repetitive-sent']['value']);
+//            printf("<pre>%s</pre>",print_r($email_repetitive_sent,TRUE));
             for ($index = 0; $index < $indexSubSet; $index++) {
                 $email_sent = $projectData['settings']['email-sent']['value'][$index];
                 $class_sent = "";

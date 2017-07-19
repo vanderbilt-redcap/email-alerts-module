@@ -62,17 +62,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_repetitive_sent = json_decode($email_repetitive_sent);
+
 //        printf("<pre>%s</pre>",print_r($email_repetitive_sent,TRUE));
-//        echo "<br/>ALERT ".$id." Record: ".$record."<br/>";
+//        $email_repetitive_sent = "";
 //        $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id);
-//                    printf("<pre>%s</pre>",print_r($email_repetitive_sent,TRUE));
-//        $this->setProjectSetting('email-repetitive-sent', '{"prescreening_survey":{"0":{"0":55,"1":57}}}', $project_id) ;
+//
+//        $email_repetitive_sent = json_decode($email_repetitive_sent);
+//        $id=1;
+//        $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id);
+
+//        $this->setProjectSetting('email-repetitive-sent', '{"prescreening_survey":{"0":{"0":"52"}}}', $project_id) ;
 //        $this->setProjectSetting('email-repetitive-sent', '', $project_id) ;
 
 //        die;
 
         if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id))) && $email_deactivate == "0") {
-            echo "ENTRO ALERT ".$id."<br/>";
             //If the condition is met or if we don't have any, we send the email
             if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)) {
                 $email_to = $this->getProjectSetting("email-to", $project_id)[$id];
@@ -391,6 +395,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function addJSONRecord($email_repetitive_sent, $new_record, $instrument, $alertid){
         $found_new_instrument = false;
+//        echo "ALERT: ".$alertid." Record: ".$new_record."<br/>";
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
                 $found_alert = false;
@@ -398,7 +403,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $jsonArray[$sv_name][$alert] = array();
                     $jsonVarArray = array();
 
-                    if($alert != $alertid){
+                    if($alert == $alertid){
                         $found_alert = true;
                     }
 
@@ -415,18 +420,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if($sv_name == $instrument && $alert == $alertid && !$found_record) {
                         //add new record for specific instrument
                         array_push($jsonVarArray, $new_record);
-                    }else if($sv_name != $instrument){
-                        //It's a new survey
-                        $found_new_instrument = true;
                     }
                     $jsonArray[$sv_name][$alert] = $jsonVarArray;
                 }
 
-
                 //NEW Alert same instrument
-                if(!$found_alert && !$found_new_instrument){
+                if(!$found_alert && $sv_name == $instrument){
+//                    echo "entro alert ".$alertid;
                     $jsonArray = $this->addNewJSONRecord($jsonArray,$sv_name,$alertid,$new_record);
-
                 }
             }
 
