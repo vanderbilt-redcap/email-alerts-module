@@ -32,11 +32,10 @@ $email_repetitive_sent = json_decode($email_repetitive_sent);
 
 if(!empty($email_repetitive_sent)){
     if(array_key_exists($form_name[$index],$email_repetitive_sent)){
-        $form = $email_repetitive_sent->$form_name[$index];
-        foreach ($form as $alert =>$value){
+        foreach ($email_repetitive_sent->$form_name[$index] as $alert =>$value){
             if($alert == $index){
-                unset($form->$alert);
-                ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive-sent', $form);
+                unset($email_repetitive_sent->$form_name[$index]->$alert);
+                ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive-sent', json_encode($email_repetitive_sent));
             }
         }
     }
