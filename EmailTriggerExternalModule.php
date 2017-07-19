@@ -63,18 +63,34 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_repetitive_sent = json_decode($email_repetitive_sent);
 
+//        $this->setProjectSetting('email-repetitive-sent', '{"prescreening_survey":{"0":{"0":55,"1":57}}}', $project_id) ;
 //        $this->setProjectSetting('email-repetitive-sent', '', $project_id) ;
 
-//        $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument);
-//        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id) ;
-//        echo $this->addJSONRecord($email_repetitive_sent, $record, $instrument);
-//        echo $this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument);
+//        $id=4;
+//        if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id))) && $email_deactivate == "0") {
+//            $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id);
+//
+//            echo "SI<br/>";
+//        }else{
+//            echo "NO<br/>";
+//        }
+//
+//        $id=2;
+//        $email_repetitive_sent = json_decode($email_repetitive_sent);
+//        if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id))) && $email_deactivate == "0") {
+//            $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id);
+//
+//            echo "SI<br/>";
+//        }else{
+//            echo "NO<br/>";
+//        }
+//
 //        die;
 
-//        echo "getSurveyLink".\REDCap::getSurveyLink($record,$instrument,$event_id);
-//        die;
 
-        if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument))) && $email_deactivate == "0") {
+
+
+        if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id))) && $email_deactivate == "0") {
             $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
             //If the condition is met or if we don't have any, we send the email
             if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)) {
@@ -226,7 +242,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     $this->setProjectSetting('email-sent', $email_sent, $project_id) ;
 
-                    $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument);
+                    $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id);
                     $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id) ;
 
                     //Add some logs
@@ -383,54 +399,99 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $mail;
     }
 
-    function addJSONRecord($email_repetitive_sent, $new_record, $instrument){
+    /**
+     * Function that creates and returns the JSON of the emails sent by [survey][alert][record]
+     * @param $email_repetitive_sent, the JSON
+     * @param $new_record, the new record
+     * @param $instrument, the survey
+     * @param $alertid, the email alert
+     * @return string
+     */
+    function addJSONRecord($email_repetitive_sent, $new_record, $instrument, $alertid){
         $found_new_instrument = false;
         $found_record = false;
-
+        $found_alert = false;
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
-                $jsonArray[$sv_name] = array();
-                $jsonVarArray = array();
-                foreach ($survey_records as $sv_number => $survey_record){
-                    array_push($jsonVarArray,$survey_record);
+                foreach ($survey_records as $alert => $alert_value){
+                    $jsonArray[$sv_name][$alert] = array();
+                    $jsonVarArray = array();
 
-                    if($survey_record == $new_record){
-                        $found_record = true;
+                    if($alert == $alertid){
+                        $found_alert = true;
                     }
+
+                    foreach ($alert_value as $sv_number => $survey_record){
+                        array_push($jsonVarArray,$survey_record);
+
+                        if($survey_record == $new_record){
+                            $found_record = true;
+                        }
+                    }
+                    //If it's the same survey,alert and a new record, we add it
+                    if($sv_name == $instrument && !$found_record && $found_alert) {
+                        //add new record for specific instrument
+                        array_push($jsonVarArray, $new_record);
+                    }else if($sv_name != $instrument){
+                        //It's a new survey
+                        $found_new_instrument = true;
+                    }
+                    $jsonArray[$sv_name][$alert] = $jsonVarArray;
                 }
-                //If it's the same survey and a new record, we add it
-                if($sv_name == $instrument && !$found_record) {
-                    //add new record for specific instrument
-                    array_push($jsonVarArray, $new_record);
-                }else if($sv_name != $instrument){
-                    //It's a new survey
-                    $found_new_instrument = true;
+
+                //NEW Alert same instrument
+                if(!$found_alert && !$found_new_instrument){
+                    $jsonArray = $this->addNewJSONRecord($jsonArray,$sv_name,$alertid,$new_record);
                 }
-                $jsonArray[$sv_name] = $jsonVarArray;
             }
 
         }else{
-            $found_new_instrument = true;
+            $jsonArray = $this->addNewJSONRecord("",$instrument,$alertid,$new_record);
         }
 
         //add new record for new survey
         if($found_new_instrument){
-            $jsonArray[$instrument] = array();
-            $jsonVarArray = array();
-            array_push($jsonVarArray,$new_record);
-            $jsonArray[$instrument] = $jsonVarArray;
+            $jsonArray = $this->addNewJSONRecord($jsonArray,$instrument,$alertid,$new_record);
         }
 //        printf("<pre>%s</pre>",print_r($jsonArray,TRUE));
         return json_encode($jsonArray,JSON_FORCE_OBJECT);
     }
 
-    function isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument){
+    /**
+     * Function that adds a new record in the JSON
+     * @param $jsonArray
+     * @param $instrument
+     * @param $alertid
+     * @param $new_record
+     * @return mixed
+     */
+    function addNewJSONRecord($jsonArray, $instrument, $alertid, $new_record){
+        $jsonArray[$instrument][$alertid] = array();
+        $jsonVarArray = array();
+        array_push($jsonVarArray,$new_record);
+        $jsonArray[$instrument][$alertid] = $jsonVarArray;
+        return $jsonArray;
+    }
+
+    /**
+     * Function that checks in the JSON if an email has already been sent by [survey][alert][record]
+     * @param $email_repetitive_sent, the JSON
+     * @param $new_record, the new record
+     * @param $instrument, the survey
+     * @param $alertid, the email alert
+     * @return bool
+     */
+    function isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument, $alertid){
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
                 if($sv_name == $instrument) {
-                    foreach ($survey_records as $sv_number => $survey_record) {
-                        if($record == $survey_record){
-                            return true;
+                    foreach ($survey_records as $alert => $alert_value) {
+                        if($alertid == $alert) {
+                            foreach ($alert_value as $sv_number => $survey_record) {
+                                if ($record == $survey_record) {
+                                    return true;
+                                }
+                            }
                         }
                     }
                 }
