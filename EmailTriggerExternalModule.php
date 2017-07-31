@@ -228,7 +228,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $this->setProjectSetting('email-sent', $email_sent, $project_id) ;
 
                     $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id);
-                    printf("<pre>%s</pre>",print_r($email_repetitive_sent,TRUE));
                     $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id) ;
 
                     //Add some logs
@@ -395,7 +394,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function addJSONRecord($email_repetitive_sent, $new_record, $instrument, $alertid){
         $found_new_instrument = false;
-//        echo "ALERT: ".$alertid." Record: ".$new_record."<br/>";
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
                 $found_alert = false;
@@ -426,7 +424,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 //NEW Alert same instrument
                 if(!$found_alert && $sv_name == $instrument){
-//                    echo "entro alert ".$alertid;
                     $jsonArray = $this->addNewJSONRecord($jsonArray,$sv_name,$alertid,$new_record);
                 }
             }
