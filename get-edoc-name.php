@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
+//require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 
 $pid = @$_GET['pid'];

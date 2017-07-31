@@ -1,6 +1,6 @@
 <?php
 namespace ExternalModules;
-require_once dirname(__FILE__) . '/../../external_modules/classes/ExternalModules.php';
+//require_once dirname(__FILE__) . '/../../external_modules/classes/ExternalModules.php';
 require_once 'EmailTriggerExternalModule.php';
 
 define('NOAUTH',true);
@@ -19,17 +19,17 @@ if($returnCode == $_REQUEST['returnCode']){
 
 
     <html>
-        <body>
-            <form id='passthruform' name='passthruform' action='<?=$surveyLink?>' method='post' enctype='multipart/form-data'>
-                 <?=$link?>
-                <input type='hidden' value='1' name='__prefill' />
-            </form>
-            <script type='text/javascript'>
-                window.onload = function(){
-                    document.passthruform.submit();
-                }
+    <body>
+    <form id='passthruform' name='passthruform' action='<?=$surveyLink?>' method='post' enctype='multipart/form-data'>
+             <?=$link?>
+            <input type='hidden' value='1' name='__prefill' />
+    </form>
+        <script type='text/javascript'>
+        window.onload = function(){
+            document.passthruform.submit();
+        }
 
-            </script>
-        </body>
+    </script>
+    </body>
     </html>
 <?php } ?>

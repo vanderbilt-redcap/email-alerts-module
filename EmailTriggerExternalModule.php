@@ -1,6 +1,6 @@
 <?php
 namespace ExternalModules;
-require_once dirname(__FILE__) . '/../../external_modules/classes/ExternalModules.php';
+//require_once dirname(__FILE__) . '/../../external_modules/classes/ExternalModules.php';
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 require_once 'vendor/autoload.php';
 require_once 'EmailTriggerExternalModule.php';

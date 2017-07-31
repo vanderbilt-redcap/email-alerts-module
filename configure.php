@@ -1,6 +1,6 @@
 <?php
 namespace ExternalModules;
-require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
+//require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 require_once ExternalModules::getProjectHeaderPath();
 require_once 'EmailTriggerExternalModule.php';
 require_once __DIR__ . '/../../external_modules/manager/templates/globals.php';

@@ -1,6 +1,6 @@
 <?php
 namespace ExternalModules;
-require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
+//require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 
 $prefix = ExternalModules::getPrefixForID($_GET['id']);
 $pid = $_GET['pid'];

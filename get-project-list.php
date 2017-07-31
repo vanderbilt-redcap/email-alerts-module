@@ -1,6 +1,6 @@
 <?php
 namespace ExternalModules;
-require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
+//require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 
 $searchTerms = $_REQUEST['parameters'];
 $project_id = $_REQUEST['project_id'];
