@@ -17,6 +17,7 @@ function previewEmailAlert(index){
 
 function editEmailAlert(modal, index){
     tinymce.remove();
+	ExternalModules.Settings.projectList = [];
     EMparentAux.configureSettings(configSettingsUpdate, configSettingsUpdate);
 
     for(var i=0; i<tinymce.editors.length; i++){

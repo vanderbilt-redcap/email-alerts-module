@@ -216,13 +216,20 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     rowsHtmlUpdate += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Attachments</div></td></tr>";
                 }
 
+				if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
+					rowsHtml += EMSettingsInstance.getProjectSettingHTML(setting,false, <?=json_encode($indexSubSet)?>,'', customClass);
 
-                rowsHtml += EMSettingsInstance.getProjectSettingHTML(setting,false, <?=json_encode($indexSubSet)?>,'', customClass);
+					//We change names for the second modal elements so the rich text works
+					setting.key = setting.key+'-update';
+					rowsHtmlUpdate += EMSettingsInstance.getProjectSettingHTML(setting,false, <?=json_encode($indexSubSet)?>,'', customClass);
+				}
+				else {
+					rowsHtml += ExternalModules.Settings.prototype.getColumnHtml(setting,"",customClass);
 
-                //We change names for the second modal elements so the rich text works
-                setting.key = setting.key+'-update';
-                rowsHtmlUpdate += EMSettingsInstance.getProjectSettingHTML(setting,false, <?=json_encode($indexSubSet)?>,'', customClass);
-
+					//We change names for the second modal elements so the rich text works
+					setting.key = setting.key+'-update';
+					rowsHtmlUpdate += ExternalModules.Settings.prototype.getColumnHtml(setting,"",customClass);
+				}
             });
             EMparentAux = EMparent;
 
@@ -234,6 +241,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
             //Show Add New Email modal
             $('#btnViewCodes').on('click', function(e){
+				// configureSettings now expects this variable to be defined because it's filled by 2 ajax calls
+				// So if calling configureSettings without going through getSettingsRows, muct manually define
+				ExternalModules.Settings.projectList = [];
                 EMparent.configureSettings(configSettings, configSettings);
 
                 for(var i=0; i<tinymce.editors.length; i++){
