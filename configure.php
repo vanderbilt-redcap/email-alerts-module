@@ -133,9 +133,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             var EMparent = ExternalModules.Settings.prototype;
             var EMSettings = function(){}
             EMSettings.prototype = Object.create(ExternalModules.Settings.prototype);
-            EMSettings.prototype.getSettingColumns  = function(setting, instance, header) {
-                instance = undefined;
-                var name = EMparent.getInstanceName(setting.key, instance);
+            EMSettings.prototype.getSettingColumns  = function(setting,savedSettings,previousInstance) {
+				previousInstance = undefined;
                 if (setting.type == "checkbox") {
                     if (setting.value == "false" || setting.value == undefined) {
                         setting.value = 0;
@@ -145,7 +144,12 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 //We customize depending on the field type
                 if (setting.type == 'rich-text') {
                     //We add the Data Pipping buttons
-                    var inputHtml = EMparent.getSettingColumns.call(this, setting, instance, header);
+					if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
+						var inputHtml = EMparent.getSettingColumns.call(this, setting, instance, header);
+					}
+	                else {
+						var inputHtml = EMparent.getColumnHtml(setting);
+					}
                     var buttonsHtml = "";
                     if (datapipeEmail_enable == 'on' || datapipe_enable == 'on' || surveyLink_enable == 'on') {
                         if (datapipe_enable == 'on') {
@@ -195,7 +199,13 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     inputHtml += "<datalist id='" + datalistname + "'></datalist></td><td></td><tr>";
                     return inputHtml;
                 }else{
-                    return EMparent.getSettingColumns.call(this, setting, instance, header);
+
+					if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
+						return EMparent.getSettingColumns.call(this, setting, instance, header);
+					}
+					else {
+						return EMparent.getColumnHtml(setting);
+					}
                 }
             }
 
@@ -224,18 +234,21 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 					rowsHtmlUpdate += EMSettingsInstance.getProjectSettingHTML(setting,false, <?=json_encode($indexSubSet)?>,'', customClass);
 				}
 				else {
-					rowsHtml += ExternalModules.Settings.prototype.getColumnHtml(setting,"",customClass);
+					rowsHtml += EMSettingsInstance.getSettingColumns(setting);
 
 					//We change names for the second modal elements so the rich text works
 					setting.key = setting.key+'-update';
-					rowsHtmlUpdate += ExternalModules.Settings.prototype.getColumnHtml(setting,"",customClass);
+					rowsHtmlUpdate += EMSettingsInstance.getSettingColumns(setting);
 				}
             });
             EMparentAux = EMparent;
 
             //We add the HTML code to the respective modal windows
-            $('#code_modal_table').html('<tr>'+rowsHtml+'</tr>');
-            $('#code_modal_table_update').html('<tr>'+rowsHtmlUpdate+'</tr>');
+            $('#code_modal_table').html(rowsHtml);
+            $('#code_modal_table_update').html(rowsHtmlUpdate);
+
+			$('#code_modal_table tr').addClass(customClass);
+			$('#code_modal_table_update tr').addClass(customClass);
             //Email repetitive by default checked
 //            $('#external-modules-configure-modal input[name="email-repetitive"]').prop('checked',true);
 
