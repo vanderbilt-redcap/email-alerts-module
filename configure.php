@@ -71,13 +71,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         var configSettingsUpdate = <?=json_encode($simple_config_update['email-dashboard-settings'])?>;
         var project_id = <?=json_encode($_GET['pid'])?>;
         //Dashboard info
-        var datapipe_enable = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_enable'))?>;
         var datapipe_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_var'))?>;
-        var emailFromForm_enable = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_enable'))?>;
         var emailFromForm_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_var'))?>;
-        var datapipeEmail_enable = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_enable'))?>;
         var datapipeEmail_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_var'))?>;
-        var surveyLink_enable = <?=json_encode($emailTriggerModule->getProjectSetting('surveyLink_enable'))?>;
         var surveyLink_var = <?=json_encode($emailTriggerModule->getProjectSetting('surveyLink_var'))?>;
 
         //Url
@@ -151,29 +147,29 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 						var inputHtml = EMparent.getColumnHtml(setting);
 					}
                     var buttonsHtml = "";
-                    if (datapipeEmail_enable == 'on' || datapipe_enable == 'on' || surveyLink_enable == 'on') {
-                        if (datapipe_enable == 'on') {
+                    if (datapipeEmail_var != '' || datapipe_var != '' || surveyLink_var != '') {
+                        if (datapipe_var != '') {
                             var pipeVar = datapipe_var.split("\n");
                             buttonsHtml += "<div style='padding-top:5px'></div>";
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",0);'>" + trim(pipeName[1]) + "</a>";
                             }
 
                         }
-                        if (datapipeEmail_enable == 'on') {
+                        if (datapipeEmail_var != '') {
                             var pipeVar = datapipeEmail_var.split("\n");
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_datapipeEmail btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_datapipeEmail btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",1);'>" + trim(pipeName[1]) + "</a>";
                             }
                         }
 
-                        if (surveyLink_enable == 'on') {
+                        if (surveyLink_var != '') {
                             var pipeVar = surveyLink_var.split("\n");
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_surveyLink btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\");'>" + trim(pipeName[1]) + "</a>";
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_surveyLink btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",0);'>" + trim(pipeName[1]) + "</a>";
                             }
                         }
 
@@ -275,74 +271,57 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 $('#errMsgContainer').hide();
                 $('#succMsgContainer').hide();
                 var errMsg = [];
-                if ($("#datapipe_enable").is(":checked") == true) {
-                    if ($('#datapipe_var').val() === "" || $('#datapipe_var').val() === "0") {
-                        errMsg.push('Please insert at least one <strong>Variable Name</strong>.');
-                    }else{
-                        var pipeVar = $('#datapipe_var').val().split("\n");
-                        for (var i = 0; i < pipeVar.length; i++) {
-                            var pipeName = pipeVar[i].split(",");
-                            if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
-                                errMsg.push('<strong>Data Piping field</strong> must be follow the format: <i>[variable_name],label</i> .');
-                            }
+                if ($('#datapipe_var').val() != "" && $('#datapipe_var').val() != "0") {
+                    var pipeVar = $('#datapipe_var').val().split("\n");
+                    for (var i = 0; i < pipeVar.length; i++) {
+                        var pipeName = pipeVar[i].split(",");
+                        if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
+                            errMsg.push('<strong>Data Piping field</strong> must be follow the format: <i>[variable_name],label</i> .');
                         }
                     }
                 }
 
-                if ($("#datapipeEmail_enable").is(":checked") == true) {
-                    if ($('#datapipeEmail_var').val() === "" || $('#datapipeEmail_var').val() === "0") {
-                        errMsg.push('Please insert at least one <strong>Email variable</strong>.');
-                    }else{
-                        var pipeVar = $('#datapipeEmail_var').val().split("\n");
-                        for (var i = 0; i < pipeVar.length; i++) {
-                            var pipeName = pipeVar[i].split(",");
-                            if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
-                                errMsg.push('<strong>Data Piping Email field</strong> must be follow the format: <i>[variable_name],label</i> .');
-                            }
+
+                if ($('#datapipeEmail_var').val() != "" && $('#datapipeEmail_var').val() != "0") {
+                    var pipeVar = $('#datapipeEmail_var').val().split("\n");
+                    for (var i = 0; i < pipeVar.length; i++) {
+                        var pipeName = pipeVar[i].split(",");
+                        if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
+                            errMsg.push('<strong>Data Piping Email field</strong> must be follow the format: <i>[variable_name],label</i> .');
                         }
                     }
                 }
 
-                if ($("#emailFromForm_enable").is(":checked") == true) {
-                    if ($('#emailFromForm_var').val() === "" || $('#emailFromForm_var').val() === "0") {
-                        errMsg.push('Please insert at least one <strong>Email variable</strong>.');
-                    }else{
-                        var result = $('#emailFromForm_var').val().split(",");
-                        for(var i=0;i<result.length;i++){
-                            if(!(trim(result[i]).startsWith("[")) || !(trim(result[i]).endsWith("]"))){
-                                errMsg.push('<strong>Email Addresses field</strong> must be follow the format: <i>[variable_name]</i>.');
-                            }
+
+                if ($('#emailFromForm_var').val() != "" && $('#emailFromForm_var').val() != "0") {
+                    var result = $('#emailFromForm_var').val().split(",");
+                    for(var i=0;i<result.length;i++){
+                        if(!(trim(result[i]).startsWith("[")) || !(trim(result[i]).endsWith("]"))){
+                            errMsg.push('<strong>Email Addresses field</strong> must be follow the format: <i>[variable_name]</i>.');
                         }
                     }
                 }
 
-                if ($("#surbeyLink_enable").is(":checked") == true) {
-                    if ($('#surbeyLink_var').val() === "" || $('#surbeyLink_var').val() === "0") {
-                        errMsg.push('Please insert at least one <strong>Survey variable</strong>.');
-                    }else{
-                        var pipeVar = $('#surbeyLink_var').val().split("\n");
-                        for (var i = 0; i < pipeVar.length; i++) {
-                            var pipeName = pipeVar[i].split(",");
-                            if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
-                                errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>Y/N,[variable_name],label</i> .');
-                            }
+                if ($('#surveyLink_var').val() != "" && $('#surveyLink_var').val() != "0") {
+                    var pipeVar = $('#surveyLink_var').val().split("\n");
+                    for (var i = 0; i < pipeVar.length; i++) {
+                        var pipeName = pipeVar[i].split(",");
+                        if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
+                            errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>[variable_name],label</i> .');
                         }
                     }
                 }
 
-                if ($("#emailFailed_enable").is(":checked") == true) {
-                    if ($('#emailFailed_var').val() === "" || $('#emailFailed_var').val() === "0") {
-                        errMsg.push('Please insert at least one <strong>Email address</strong>.');
-                    }else{
-                        var result = $('#emailFailed_var').val().split(/[;,]+/);
-                        for(var i=0;i<result.length;i++){
-                            if(!validateEmail(result[i])){
-                                errMsg.push('<strong>Email '+result[i]+'</strong> is not a valid email.');
-                                break;
-                            }
+                if ($('#emailFailed_var').val() != "" && $('#emailFailed_var').val() != "0") {
+                    var result = $('#emailFailed_var').val().split(/[;,]+/);
+                    for(var i=0;i<result.length;i++){
+                        if(!validateEmail(result[i])){
+                            errMsg.push('<strong>Email '+result[i]+'</strong> is not a valid email.');
+                            break;
                         }
                     }
                 }
+
 
                 if (errMsg.length > 0) {
                     $('#errMsgContainer').empty();
@@ -353,22 +332,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     $('html,body').scrollTop(0);
                     return false;
                 }else{
-                    if ($("#datapipe_enable").is(":checked") == false) {
-                        $('#datapipe_var').val("");
-                    }
-
-                    if ($("#datapipeEmail_enable").is(":checked") == false) {
-                        $('#datapipeEmail_var').val("");
-                    }
-
-                    if ($("#surbeyLink_enable").is(":checked") == false) {
-                        $('#surbeyLink_var').val("");
-                    }
-
-                    if ($("#emailFailed_enable").is(":checked") == false) {
-                        $('#emailFailed_var').val("");
-                    }
-
                     var data = $('#mainForm').serialize();
                     ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('configureAJAX.php')?>',"C");
                 }
@@ -381,7 +344,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             });
             //we call each time a letter is typed to search in the DB for the options and load them
             $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist').on('keyup', function(e){
-                if(emailFromForm_enable == 'on'){
+                if(emailFromForm_var != ''){
                     var cutword = "-flexdatalist";
                     var id = $(this).attr('id').substr(0, $(this).attr('id').length-cutword.length);
                     var value = $(this).val();
@@ -483,13 +446,14 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     var name = '#'+$(this).attr("id");
                 }
 
-                if(datapipeEmail_enable != 'on' && (id == "email-to-flexdatalist" || id == "email-to-update-flexdatalist" || id == "email-cc-flexdatalist" || id == "email-cc-update-flexdatalist")){
-                    lastClick = '';
-                }else{
+//                if(datapipeEmail_var != '' && (id == "email-to-flexdatalist" || id == "email-to-update-flexdatalist" || id == "email-cc-flexdatalist" || id == "email-cc-update-flexdatalist")){
+//                    lastClick = '';
+//                }else{
                     lastClick = name;
-                }
+//                }
 
             });
+
             //save the cursor position
             $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('keyup click', function(e){
                 startPos = this.selectionStart;
@@ -568,7 +532,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         </td>
                     </tr>
                     <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><input type="checkbox" name="datapipeEmail_enable" id="datapipeEmail_enable" <?=($emailTriggerModule->getProjectSetting('datapipeEmail_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> to email addresses. </span><div class="description_config">Allows email fields from the REDCap form(s) to be piped into the TO and CC fields of email messages. </div></td>
+                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> to email addresses. </span><div class="description_config">Allows email fields from the REDCap form(s) to be piped into the TO and CC fields of email messages. </div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             <span class="table_example">Format: [variable_name], Button Name</span><br/>
                             <textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[dob], Fake email ..." value="<?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?></textarea>
@@ -576,7 +540,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         </td>
                     </tr>
                     <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><input type="checkbox" name="emailFromForm_enable" id="emailFromForm_enable" <?=($emailTriggerModule->getProjectSetting('emailFromForm_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;"><strong>Preload email addresses</strong> from existing REDCap records. <span><div class="description_config">Enables autocomplete of email addresses in the TO and CC email fields. The list of email addresses is pulled from the specified variables in already existing REDCap records. </div></td>
+                        <td style="width: 15%;"><span style="padding-left: 5px;"><strong>Preload email addresses</strong> from existing REDCap records. <span><div class="description_config">Enables autocomplete of email addresses in the TO and CC email fields. The list of email addresses is pulled from the specified variables in already existing REDCap records. </div></td>
                         <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
                     </tr>
 
@@ -590,7 +554,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         </td>
                     </tr>
                     <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><input type="checkbox" name="datapipe_enable" id="datapipe_enable" <?=($emailTriggerModule->getProjectSetting('datapipe_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> in email content. <span><div class="description_config">Allows data from the REDCap form(s) to be piped into the email messages. Project variables must be mapped to labels to be used in email piping. Enter one mapping per line.</div></td>
+                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> in email content. <span><div class="description_config">Allows data from the REDCap form(s) to be piped into the email messages. Project variables must be mapped to labels to be used in email piping. Enter one mapping per line.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             <span class="table_example">Format: [email_variable], Button Name</span><br/>
                             <textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="" value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipe_var');?></textarea>
@@ -598,7 +562,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         </td>
                     </tr>
                     <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><input type="checkbox" name="surveyLink_enable" id="surveyLink_enable" <?=($emailTriggerModule->getProjectSetting('surveyLink_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content<span><div class="description_config">Allows REDCap survey links for any survey-enabled form to be inserted into email messages.</div></td>
+                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content<span><div class="description_config">Allows REDCap survey links for any survey-enabled form to be inserted into email messages.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             <span class="table_example">Example: [form_name], name ...</span><br/>
                             <a id="addLinkBtn" onclick="javascript:$('#addLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
@@ -617,7 +581,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         </td>
                     </tr>
                     <tr class="panel-collapse collapse EE_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><input type="checkbox" name="emailFailed_enable" id="emailFailed_enable" <?=($emailTriggerModule->getProjectSetting('emailFailed_enable') == "on")?"checked":"";?>><span style="padding-left: 5px;">Send <strong>Failed Email Alerts</strong> to specified address<span></td>
+                        <td style="width: 15%;"><span style="padding-left: 5px;">Send <strong>Failed Email Alerts</strong> to specified address<span></td>
                         <td style="width: 25%;padding: 10px 30px;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="<?=$emailTriggerModule->getProjectSetting('emailFailed_var');?>"/></td>
                     </tr>
                 </table>

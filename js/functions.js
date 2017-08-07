@@ -115,30 +115,31 @@ function deactivateEmailAlert(index, status){
 }
 
 //We insert the button text depending on which field we are
-function insertAtCursorTinyMCE(myValue) {
+function insertAtCursorTinyMCE(myValue,option) {
     if(lastClick != '') {
         if (lastClick != null) {
-            var myField = $(lastClick);
-            // console.log(lastClick+': '+myValue+'...'+myField.val());
+            if((lastClick !='#email-cc-flexdatalist' && lastClick !='#email-to-flexdatalist' && lastClick !='#email-cc-update-flexdatalist' && lastClick !='#email-to-update-flexdatalist' && option == 0) || option == 1) {
+                var myField = $(lastClick);
 
-            //IE support
-            if (document.selection) {
-                myField.focus();
-                sel = document.selection.createRange();
-                sel.text = myValue;
-            }
-            //MOZILLA and others
-            else if (startPos || startPos == '0') {
-                myField.val(myField.val().substring(0, startPos) + myValue + myField.val().substring(endPos, myField.val().length));
-                myField.selectionStart = startPos + myValue.length;
-                myField.selectionEnd = startPos + myValue.length;
-            } else {
-                myField.val(myField.val() + myValue);
-            }
+                //IE support
+                if (document.selection) {
+                    myField.focus();
+                    sel = document.selection.createRange();
+                    sel.text = myValue;
+                }
+                //MOZILLA and others
+                else if (startPos || startPos == '0') {
+                    myField.val(myField.val().substring(0, startPos) + myValue + myField.val().substring(endPos, myField.val().length));
+                    myField.selectionStart = startPos + myValue.length;
+                    myField.selectionEnd = startPos + myValue.length;
+                } else {
+                    myField.val(myField.val() + myValue);
+                }
 
-            //We update positions to add next text after the new one
-            startPos = startPos + myValue.length;
-            endPos = startPos + myValue.length;
+                //We update positions to add next text after the new one
+                startPos = startPos + myValue.length;
+                endPos = startPos + myValue.length;
+            }
         } else {
             if (tinymce.isIE) {
                 tinyMCE.activeEditor.selection.moveToBookmark(actualCaretPositionBookmark);
