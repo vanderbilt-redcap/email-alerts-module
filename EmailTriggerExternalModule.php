@@ -62,6 +62,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_repetitive_sent = json_decode($email_repetitive_sent);
+        $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
 
 //        printf("<pre>%s</pre>",print_r($email_repetitive_sent,TRUE));
 //        $email_repetitive_sent = "";
