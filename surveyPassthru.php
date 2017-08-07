@@ -1,6 +1,6 @@
 <?php
-define('NOAUTH',true);
 namespace ExternalModules;
+define('NOAUTH',true);
 //require_once dirname(__FILE__) . '/../../external_modules/classes/ExternalModules.php';
 require_once 'EmailTriggerExternalModule.php';
 
