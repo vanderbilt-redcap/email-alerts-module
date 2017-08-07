@@ -12,6 +12,8 @@ $emailTriggerModule = new EmailTriggerExternalModule();
             var data = $('#AddNewForm').serialize();
             var editor_text = tinymce.activeEditor.getContent();
             data += "&email-text-editor="+encodeURIComponent(editor_text);
+            data += "&email-to="+$('#email-to').val();
+            data += "&email-cc="+$('#email-cc').val();
 
             var files = {};
             $('#AddNewForm').find('input, select, textarea').each(function(index, element){

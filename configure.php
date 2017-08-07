@@ -249,8 +249,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
 			$('#code_modal_table tr').addClass(customClass);
 			$('#code_modal_table_update tr').addClass(customClass);
-            //Email repetitive by default checked
-//            $('#external-modules-configure-modal input[name="email-repetitive"]').prop('checked',true);
 
             //Show Add New Email modal
             $('#btnViewCodes').on('click', function(e){
