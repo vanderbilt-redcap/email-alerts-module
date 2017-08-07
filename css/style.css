@@ -280,3 +280,10 @@ a.btn_color_surveyLink:hover{background-color: #ffd7b3 !important;}
 .sorting_icon:hover{
     color:#8c8c8c;
 }
+.save{
+    background-color:#5cb85c;
+    color:#fff;
+}
+.save:hover{
+    color:#000;
+}

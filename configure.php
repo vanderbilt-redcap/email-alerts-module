@@ -818,8 +818,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default" id='btnCloseCodesModal' data-dismiss="modal">CLOSE</button>
-                            <button type="submit" form="updateForm" class="btn btn-default save" id='btnModalUpdateForm'>Save changes</button>
+                            <button type="button" class="btn btn-default" id='btnCloseCodesModal' data-dismiss="modal">Cancel</button>
+                            <button type="submit" form="updateForm" class="btn btn-default save" id='btnModalUpdateForm'>Save</button>
                         </div>
                     </div>
                 </div>
