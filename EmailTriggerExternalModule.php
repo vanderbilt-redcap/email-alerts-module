@@ -123,7 +123,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $returnCode = $passthruData['return_code'];
                             $hash = $passthruData['hash'];
 
-                            $url = $emailTriggerModule->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode;
+                            $url = $emailTriggerModule->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&NOAUTH";
                             $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
                             $email_text = str_replace($var, $link, $email_text);
                         }
