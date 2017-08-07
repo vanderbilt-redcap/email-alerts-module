@@ -449,6 +449,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return false;
     }
 
+    /**
+     * Function to send an extra error email if there is a value in the configuration
+     * @param $emailFailed_var
+     * @param $subject
+     * @param $message
+     */
     function sendFailedEmailRecipient($emailFailed_var, $subject, $message){
         if(!empty($emailFailed_var)){
             $emailsFailed = preg_split("/[;,]+/", $emailFailed_var);

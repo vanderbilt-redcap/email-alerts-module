@@ -116,7 +116,6 @@ function deactivateEmailAlert(index, status){
 
 //We insert the button text depending on which field we are
 function insertAtCursorTinyMCE(myValue,option) {
-    console.log(lastClick)
     if(lastClick != '') {
         if (lastClick != null) {
             if((lastClick !='#email-cc-flexdatalist' && lastClick !='#email-to-flexdatalist' && lastClick !='#email-cc-update-flexdatalist' && lastClick !='#email-to-update-flexdatalist' && option == 0) || option == 1) {
