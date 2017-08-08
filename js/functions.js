@@ -267,23 +267,27 @@ function loadAjax(parameters, url, id){
     });
 }
 
-function checkIfSurveyIsSaveAndReturn(data){
+function checkIfSurveyIsSaveAndReturn(data,url){
     $.ajax({
         type: "POST",
-        url: 'check_survey_save_return_AJAX.php',
+        url: url,
         data:data
         ,
         error: function (xhr, status, error) {
             alert(xhr.responseText);
         },
         success: function (result) {
-            jsonAjax = jQuery.parseJSON(returnData);
+            jsonAjax = jQuery.parseJSON(result);
             if(jsonAjax.status == 'success'){
                 if(jsonAjax.message != '' && jsonAjax.message != undefined){
-                    return(jsonAjax.message);
+                    console.log("MESSAGE!")
+                    $('#errMsgContainer').append('<div>' + jsonAjax.message + '</div>');
+                    $('#errMsgContainer').show();
+                    $('html,body').scrollTop(0);
+                    return true;
                 }
             }
-            return("");
+            return false;
 
         }
     });

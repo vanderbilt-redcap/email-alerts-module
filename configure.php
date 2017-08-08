@@ -326,24 +326,21 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     }
                 }
 
-                console.log("before error_form")
-                var error_form = checkIfSurveyIsSaveAndReturn($('#surveyLink_var').val());
-                if(error_form != ""){
-                    errMsg.push(error_form);
-                    console.log(error_form)
-                }
-
+                $('#errMsgContainer').empty();
                 if (errMsg.length > 0) {
-                    $('#errMsgContainer').empty();
                     $.each(errMsg, function (i, e) {
                         $('#errMsgContainer').append('<div>' + e + '</div>');
                     });
+                    checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$emailTriggerModule->getUrl('check_survey_save_return_AJAX.php')?>');
                     $('#errMsgContainer').show();
                     $('html,body').scrollTop(0);
                     return false;
                 }else{
-                    var data = $('#mainForm').serialize();
-                    ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('configureAJAX.php')?>',"C");
+                    if(checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$emailTriggerModule->getUrl('check_survey_save_return_AJAX.php')?>'))
+                    {
+                        var data = $('#mainForm').serialize();
+                        ajaxLoadOptionAndMessage(data, '<?=$emailTriggerModule->getUrl('configureAJAX.php')?>', "C");
+                    }
                 }
                 return false;
             });
