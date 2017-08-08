@@ -6,11 +6,13 @@
 	"authors": [
 		{
 			"name": "Eva Bascompte Moragas",
-			"email": "eva.bascompte.moragas@vanderbilt.edu"
+			"email": "eva.bascompte.moragas@vanderbilt.edu",
+			"institution": "Vanderbilt University Medical Center"
 		},
 		{
 			"name": "Scott J. Pearson",
-			"email": "scott.j.pearson@vanderbilt.edu"
+			"email": "scott.j.pearson@vanderbilt.edu",
+			"institution": "Vanderbilt University Medical Center"
 		}
 	],
 
