@@ -1,5 +1,9 @@
 <?php
-namespace ExternalModules;
+namespace Vanderbilt\EmailTriggerExternalModule;
+
+use ExternalModules\AbstractExternalModule;
+use ExternalModules\ExternalModules;
+
 //require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 
