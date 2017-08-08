@@ -246,8 +246,6 @@ function ajaxLoadOptionAndMessage(data, url, message){
     });
 }
 
-
-
 function loadAjax(parameters, url, id){
     var loadAJAX = 'json-datalist-'+id;
     $.ajax({
@@ -264,6 +262,28 @@ function loadAjax(parameters, url, id){
                 $("#" + loadAJAX).html(jQuery.parseJSON(result));
                 $("#" + id).flexdatalist('reload');
             }
+
+        }
+    });
+}
+
+function checkIfSurveyIsSaveAndReturn(data){
+    $.ajax({
+        type: "POST",
+        url: 'check_survey_save_return_AJAX.php',
+        data:data
+        ,
+        error: function (xhr, status, error) {
+            alert(xhr.responseText);
+        },
+        success: function (result) {
+            jsonAjax = jQuery.parseJSON(returnData);
+            if(jsonAjax.status == 'success'){
+                if(jsonAjax.message != '' && jsonAjax.message != undefined){
+                    return(jsonAjax.message);
+                }
+            }
+            return("");
 
         }
     });

@@ -326,6 +326,12 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     }
                 }
 
+                console.log("before error_form")
+                var error_form = checkIfSurveyIsSaveAndReturn($('#surveyLink_var').val());
+                if(error_form != ""){
+                    errMsg.push(error_form);
+                    console.log(error_form)
+                }
 
                 if (errMsg.length > 0) {
                     $('#errMsgContainer').empty();
@@ -481,7 +487,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     async: false,
                     type: 'POST',
                     success: function(returnData) {
-//                        console.log("returnData: "+JSON.stringify(returnData));
                         if (returnData.status != 'success') {
                             alert(returnData.status+" One or more of the files could not be saved."+JSON.stringify(returnData));
                         }

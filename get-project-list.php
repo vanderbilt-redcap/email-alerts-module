@@ -4,7 +4,6 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-//require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 
 $searchTerms = $_REQUEST['parameters'];
 $project_id = $_REQUEST['project_id'];
