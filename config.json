@@ -1,6 +1,8 @@
 {
 	"name": "Email Alerts",
 
+	"namespace": "Vanderbilt\\EmailTriggerExternalModule",
+
 	"authors": [
 		{
 			"name": "Eva Bascompte Moragas",
