@@ -56,7 +56,7 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
-//printf("<pre>%s</pre>",print_r($simple_config['email-dashboard-settings'][0]['choices'],TRUE));
+//printf("<pre>%s</pre>",print_r($config['email-dashboard-settings'],TRUE));
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
@@ -600,7 +600,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
     </div
     <div style="padding-left:15px">
         <?php  if($indexSubSet>0) { ?>
-        <table class="table table-bordered table-hover email_preview_forms_table" id="customizedAlertsPreview">
+        <table class="table table-bordered table-hover email_preview_forms_table" id="customizedAlertsPreview" style="width: 100%;">
             <thead>
             <tr class="table_header">
                 <th>Form</th>
