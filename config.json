@@ -32,9 +32,6 @@
 		]
 	},
 
-	"global-settings": [
-	],
-
 	"no-auth-pages":["surveyPassthru"],
 
 	"email-dashboard-settings": [
