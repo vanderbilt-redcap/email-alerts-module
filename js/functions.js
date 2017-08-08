@@ -280,7 +280,6 @@ function checkIfSurveyIsSaveAndReturn(data,url){
             jsonAjax = jQuery.parseJSON(result);
             if(jsonAjax.status == 'success'){
                 if(jsonAjax.message != '' && jsonAjax.message != undefined){
-                    console.log("MESSAGE!")
                     $('#errMsgContainer').append('<div>' + jsonAjax.message + '</div>');
                     $('#errMsgContainer').show();
                     $('html,body').scrollTop(0);
