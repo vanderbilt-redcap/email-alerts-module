@@ -1,5 +1,9 @@
 <?php
-namespace ExternalModules;
+namespace Vanderbilt\EmailTriggerExternalModule;
+
+use ExternalModules\AbstractExternalModule;
+use ExternalModules\ExternalModules;
+
 require_once 'EmailTriggerExternalModule.php';
 
 
