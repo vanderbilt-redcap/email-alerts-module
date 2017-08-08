@@ -1,6 +1,8 @@
 {
 	"name": "Selective Email",
 
+	"namespace": "Vanderbilt\\SelectiveEmailsExternalModule",
+
 	"description": "Send emails to different groups based on DAG, users, and User Role",
 
     "authors": [
