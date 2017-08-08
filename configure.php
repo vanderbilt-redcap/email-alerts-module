@@ -1,5 +1,9 @@
 <?php
-	namespace ExternalModules;
+	namespace Vanderbilt\SelectiveEmailsExternalModule;
+    
+	use ExternalModules\AbstractExternalModule;
+	use ExternalModules\ExternalModules;
+
 	require_once APP_PATH_DOCROOT.'Classes/LogicTester.php';
 
 	$prefix = "vanderbilt_selectiveEmails";
