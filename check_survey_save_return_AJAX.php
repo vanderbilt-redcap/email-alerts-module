@@ -24,7 +24,8 @@ if(!empty($surveyLink_var)){
         $result = db_query($sql);
 
         while($row = db_fetch_assoc($result)) {
-            $messsage .= "Button <strong>".$button."</strong> for <strong>".$instrument_form."</strong> survey, is not activated as a <strong>Save And Return</strong> survey. Please activate it to use it as a link.<br/>";
+            $link = '<a href="'.APP_PATH_WEBROOT_FULL.APP_PATH_WEBROOT.'Surveys/edit_info.php?pid='.$project_id.'&view=showform&page=request&redirectDesigner=1" target="_blank"><u>enable "<strong>Save and Return</strong>" in Survey Settings</u></a>';
+            $messsage .= 'The survey titled "<strong>prescreening_survey</strong>" is not activated as a Save and Return survey. Please '.$link.' to use the link. If you want the survey to be editable, also select "Allow respondents to modify completed responses."<br/>';
         }
     }
 
