@@ -14,6 +14,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
 	function hook_survey_complete ($project_id,$record = NULL,$instrument,$event_id){
         $data = \REDCap::getData($project_id);
+        $this->setEmailTriggerRequested(false);
         if(isset($project_id)){
             #Form Complete
             $forms_name = $this->getProjectSetting("form-name",$project_id);
@@ -28,6 +29,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     while($row = db_fetch_assoc($q)){
                         if ($row['form_name'] == $form) {
+                            $this->setEmailTriggerRequested(true);
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
                             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
                             $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
@@ -42,7 +44,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
 	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id){
 		$data = \REDCap::getData($project_id);
-
+        $this->setEmailTriggerRequested(false);
 		if(isset($project_id)){
 			#Form Complete
 			$forms_name = $this->getProjectSetting("form-name",$project_id);
@@ -50,6 +52,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 foreach ($forms_name as $id => $form){
                     if($data[$record][$event_id][$form.'_complete'] == '2'){
                         if ($_REQUEST['page'] == $form) {
+                            $this->setEmailTriggerRequested(true);
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
                             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
                             $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
@@ -61,24 +64,20 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		}
 	}
 
+	private $email_requested = false;
+	function getEmailTriggerRequested(){
+	    return $this->email_requested;
+    }
+
+    function setEmailTriggerRequested($email_requested){
+       $this->email_requested =  $email_requested;
+    }
+
     function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument){
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_repetitive_sent = json_decode($email_repetitive_sent);
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
-
-//        printf("<pre>%s</pre>",print_r($email_repetitive_sent,TRUE));
-//        $email_repetitive_sent = "";
-//        $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id);
-//
-//        $email_repetitive_sent = json_decode($email_repetitive_sent);
-//        $id=1;
-//        $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id);
-
-//        $this->setProjectSetting('email-repetitive-sent', '{"prescreening_survey":{"0":{"0":"52"}}}', $project_id) ;
-//        $this->setProjectSetting('email-repetitive-sent', '', $project_id) ;
-
-//        die;
 
         if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id))) && $email_deactivate == "0") {
             //If the condition is met or if we don't have any, we send the email
