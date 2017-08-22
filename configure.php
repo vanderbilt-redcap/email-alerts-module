@@ -336,7 +336,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     $('html,body').scrollTop(0);
                     return false;
                 }else{
-                    if(checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$emailTriggerModule->getUrl('check_survey_save_return_AJAX.php')?>'))
+                    if(!checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$emailTriggerModule->getUrl('check_survey_save_return_AJAX.php')?>'))
                     {
                         var data = $('#mainForm').serialize();
                         ajaxLoadOptionAndMessage(data, '<?=$emailTriggerModule->getUrl('configureAJAX.php')?>', "C");
