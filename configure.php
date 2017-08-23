@@ -115,7 +115,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         .columns().search( '' )
                         .draw();
                 }
-            }).on('div.dataTables_filter input','keydown', function( e ){
+            });
+            $('div.dataTables_filter input').on('keydown', function(e){
                 if(e.keyCode == 8){
                     $('div.dataTables_filter input').val($('div.dataTables_filter input').val().slice(0, -1));
                 }
