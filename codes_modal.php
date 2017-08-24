@@ -58,8 +58,8 @@ $emailTriggerModule = new EmailTriggerExternalModule();
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id='btnCloseCodesModal' data-dismiss="modal">CLOSE</button>
-                    <button type="submit" form="AddNewForm" class="btn btn-default" id='btnModalAddForm'>Add Form</button>
+                    <button type="button" class="btn btn-default" id='btnCloseCodesModal' data-dismiss="modal">Cancel</button>
+                    <button type="submit" form="AddNewForm" class="btn btn-default save" id='btnModalAddForm'>Save</button>
                 </div>
             </div>
         </div>
