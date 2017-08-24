@@ -163,7 +163,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                         }
                         if (datapipe_var != '' && datapipe_var != null) {
-                            var pipeVar = datapipeEmail_var.split("\n");
+                            var pipeVar = datapipe_var.split("\n");
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
                                 buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_datapipeEmail btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",1);'>" + trim(pipeName[1]) + "</a>";
