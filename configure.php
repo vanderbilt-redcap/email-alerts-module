@@ -153,21 +153,22 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 					}
                     var buttonsHtml = "";
                     if ((datapipeEmail_var != '' && datapipeEmail_var != null) || (datapipe_var != '' && datapipe_var != null) || (surveyLink_var != '' && surveyLink_var != null)) {
+                        if (datapipe_var != '' && datapipe_var != null) {
+                            var pipeVar = datapipe_var.split("\n");
+                            for (var i = 0; i < pipeVar.length; i++) {
+                                var pipeName = pipeVar[i].split(",");
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm  btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",1);'>" + trim(pipeName[1]) + "</a>";
+                            }
+                        }
+
                         if (datapipeEmail_var != '' && datapipeEmail_var != null) {
                             var pipeVar = datapipe_var.split("\n");
                             buttonsHtml += "<div style='padding-top:5px'></div>";
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",0);'>" + trim(pipeName[1]) + "</a>";
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_piping btn_color_datapipeEmail' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",0);'>" + trim(pipeName[1]) + "</a>";
                             }
 
-                        }
-                        if (datapipe_var != '' && datapipe_var != null) {
-                            var pipeVar = datapipe_var.split("\n");
-                            for (var i = 0; i < pipeVar.length; i++) {
-                                var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_datapipeEmail btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",1);'>" + trim(pipeName[1]) + "</a>";
-                            }
                         }
 
                         if (surveyLink_var != '' && surveyLink_var != null) {
