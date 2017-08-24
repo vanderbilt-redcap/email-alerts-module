@@ -312,8 +312,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     var pipeVar = $('#surveyLink_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
-                        if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
-                            errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>[variable_name],label</i> .');
+                        if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]")) || !(trim(pipeName[0]).startsWith("[SURVEYLINK_"))){
+                            errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>[SURVEYLINK_variable_name],label</i> .');
                         }
                     }
                 }
@@ -751,7 +751,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                                         <option value=""></option>
                                         <?php
                                         foreach ($simple_config['email-dashboard-settings'][0]['choices'] as $choice){
-                                            echo '<option value="'.$choice['value'].'">'.$choice['name'].'</option>';
+                                            echo '<option value="SURVEYLINK_'.$choice['value'].'">'.$choice['name'].'</option>';
                                         }
                                         ?>
                                     </select>

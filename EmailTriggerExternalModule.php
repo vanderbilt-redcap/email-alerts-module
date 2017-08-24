@@ -118,7 +118,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $var = preg_split("/[;,]+/", $surveylink)[0];
                         //only if the variable is in the text we reset the survey link status
                         if (strpos($email_text, $var) !== false) {
-                            $instrument_form = str_replace('[', '', $var);
+                            $instrument_form = str_replace('[SURVEYLINK_', '', $var);
                             $instrument_form = str_replace(']', '', $instrument_form);
                             $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $event_id);
 
