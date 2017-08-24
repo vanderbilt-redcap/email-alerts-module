@@ -466,6 +466,34 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
+    function getLogicLabel ($var, $value, $project_id){
+
+        $var = 'consent';
+
+        $metadata = \REDCap::getDataDictionary($project_id,'array',false,$var);
+        $label = "";
+        echo "meta: ".$metadata[$var]['field_type'];
+        printf("<pre>%s</pre>",print_r($metadata,TRUE));
+        if($metadata[$var]['field_type'] == 'checkbox'){
+            $choices = preg_split("/\s*\|\s*/", $metadata[$var]['select_choices_or_calculations']);
+            printf("<pre>%s</pre>",print_r($choices,TRUE));
+            foreach ($choices as $choice){
+                $option = preg_match("/([^,]+)/", $choice);
+                echo "choice:".$choice;
+                printf("<pre>%s</pre>",print_r($option,TRUE));
+            }
+        }else if($metadata[$var]['field_type'] == 'truefalse'){
+            if($value == '1'){
+                $label = "True";
+            }else{
+                $label = "False";
+            }
+        }
+        printf("<pre>%s</pre>",print_r("Label: ".$label,TRUE));
+        die;
+        return $label;
+    }
+
 }
 
 
