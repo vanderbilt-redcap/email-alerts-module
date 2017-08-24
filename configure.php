@@ -152,7 +152,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 						var inputHtml = EMparent.getColumnHtml(setting);
 					}
                     var buttonsHtml = "";
-                    if (datapipeEmail_var != '' || datapipe_var != '' || surveyLink_var != '') {
+                    if (datapipeEmail_var != '' || datapipeEmail_var != null || datapipe_var != '' || datapipe_var != null || surveyLink_var != '' || surveyLink_var != null) {
                         if (datapipe_var != '') {
                             var pipeVar = datapipe_var.split("\n");
                             buttonsHtml += "<div style='padding-top:5px'></div>";
