@@ -267,8 +267,8 @@ function loadAjax(parameters, url, id){
     });
 }
 
-function checkIfSurveyIsSaveAndReturn(data,url){
-    $.ajax({
+function checkIfSurveyIsSaveAndReturn(data,url,saveUrl){
+    return $.ajax({
         type: "POST",
         url: url,
         data:data
@@ -278,15 +278,17 @@ function checkIfSurveyIsSaveAndReturn(data,url){
         },
         success: function (result) {
             jsonAjax = jQuery.parseJSON(result);
+            console.log(jsonAjax)
             if(jsonAjax.status == 'success'){
                 if(jsonAjax.message != '' && jsonAjax.message != undefined){
                     $('#errMsgContainer').append('<div>' + jsonAjax.message + '</div>');
                     $('#errMsgContainer').show();
                     $('html,body').scrollTop(0);
-                    return true;
+                }else if(saveUrl != ''){
+                    var data = $('#mainForm').serialize();
+                    ajaxLoadOptionAndMessage(data, saveUrl, "C");
                 }
             }
-            return false;
 
         }
     });
