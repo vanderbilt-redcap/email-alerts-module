@@ -466,31 +466,33 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
-    function getLogicLabel ($var, $value, $project_id){
-
-        $var = 'consent';
-
-        $metadata = \REDCap::getDataDictionary($project_id,'array',false,$var);
+    function getLogicLabel ($var, $value, $project_id, $data){
+        $field_name = str_replace('[', '', $var);
+        $field_name = str_replace(']', '', $field_name);
+        $metadata = \REDCap::getDataDictionary($project_id,'array',false,$field_name);
         $label = "";
-        echo "meta: ".$metadata[$var]['field_type'];
-        printf("<pre>%s</pre>",print_r($metadata,TRUE));
-        if($metadata[$var]['field_type'] == 'checkbox'){
-            $choices = preg_split("/\s*\|\s*/", $metadata[$var]['select_choices_or_calculations']);
-            printf("<pre>%s</pre>",print_r($choices,TRUE));
+        if($metadata[$field_name]['field_type'] == 'checkbox' || $metadata[$field_name]['field_type'] == 'dropdown' || $metadata[$field_name]['field_type'] == 'radio'){
+            $choices = preg_split("/\s*\|\s*/", $metadata[$field_name]['select_choices_or_calculations']);
             foreach ($choices as $choice){
-                $option = preg_match("/([^,]+)/", $choice);
-                echo "choice:".$choice;
-                printf("<pre>%s</pre>",print_r($option,TRUE));
+                $option_value = preg_split("/,/", $choice)[0];
+                if(empty($value)){
+                    foreach ($data[$field_name] as $choiceValue=>$multipleChoice){
+                        if($multipleChoice === "1" && $choiceValue == $option_value) {
+                            $label .= trim(preg_split("/^(.+?),/", $choice)[1])." ";
+                        }
+                    }
+                }else if($value === $option_value){
+                    $label = trim(preg_split("/^(.+?),/", $choice)[1]);
+                    break;
+                }
             }
-        }else if($metadata[$var]['field_type'] == 'truefalse'){
+        }else if($metadata[$field_name]['field_type'] == 'truefalse'){
             if($value == '1'){
                 $label = "True";
             }else{
                 $label = "False";
             }
         }
-        printf("<pre>%s</pre>",print_r("Label: ".$label,TRUE));
-        die;
         return $label;
     }
 
