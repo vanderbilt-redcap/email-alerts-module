@@ -500,6 +500,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }else{
                 $label = "False";
             }
+        }else if($metadata[$field_name]['field_type'] == 'sql'){
+            if(!empty($value)) {
+                $q = db_query($metadata[$field_name]['select_choices_or_calculations']);
+
+                if ($error = db_error()) {
+                    die($metadata[$field_name]['select_choices_or_calculations'] . ': ' . $error);
+                }
+
+                while ($row = db_fetch_assoc($q)) {
+                    if($row['record'] == $value ) {
+                        $label = $row['value'];
+                        break;
+                    }
+                }
+            }
         }
         return $label;
     }
