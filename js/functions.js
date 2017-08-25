@@ -149,7 +149,8 @@ function insertAtCursorTinyMCE(myValue,option) {
             }
         }
     }
-    lastClick = '#email-to-update-flexdatalist';
+
+    // lastClick = '#email-to-update-flexdatalist';
 }
 
 function randomString() {
