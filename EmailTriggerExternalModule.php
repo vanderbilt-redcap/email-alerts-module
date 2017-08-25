@@ -109,7 +109,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
 
-                die;
                 //Survey Link
                 if(!empty($surveyLink_var)) {
                     $emailTriggerModule = new EmailTriggerExternalModule();
