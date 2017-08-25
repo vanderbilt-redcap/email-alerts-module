@@ -98,7 +98,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $var = preg_split("/[;,]+/", $emailvar)[0];
                         if (\LogicTester::isValid($var)) {
                             $logic = \LogicTester::apply($var, $data[$record], null, true);
-                            $label = $this->getLogicLabel($var, $logic,$data[$record][$event_id]);
+                            $label = $this->getLogicLabel($var, $logic,$project_id,$data[$record][$event_id]);
                             if(!empty($label)){
                                 $logic = $label;
                             }
@@ -109,6 +109,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
 
+                die;
                 //Survey Link
                 if(!empty($surveyLink_var)) {
                     $emailTriggerModule = new EmailTriggerExternalModule();
@@ -466,6 +467,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
+    /**
+     * Function that returns the label of the certain fields instead of their values
+     * @param $var, the field name we want to look for
+     * @param $value, the value of the field
+     * @param $project_id
+     * @param $data, the project data
+     * @return string, the label
+     */
     function getLogicLabel ($var, $value, $project_id, $data){
         $field_name = str_replace('[', '', $var);
         $field_name = str_replace(']', '', $field_name);
