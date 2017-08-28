@@ -673,7 +673,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         $form = $email_repetitive_sent->$projectData['settings']['form-name']['value'][$index];
                         foreach ($form as $alert =>$value){
                             if($alert == $index){
-                                $message_sent .= "Emails sent: ".count((array)$form->$alert)."<br/>";
+                                $message_sent .= "Records activated: ".count((array)$form->$alert)."<br/>";
                             }
                         }
                     }
