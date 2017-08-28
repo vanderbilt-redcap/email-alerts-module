@@ -163,6 +163,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 //Email From
                 if(!empty($emailSender_var)){
                     $emailSender = preg_split("/[;,]+/", $emailSender_var);
+                    $emailSender = str_replace('"', '', $emailSender);
                     $mail->SetFrom($emailSender[0], $emailSender[1]);
                 }
 
