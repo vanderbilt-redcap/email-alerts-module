@@ -77,6 +77,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         //Dashboard info
         var datapipe_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_var'))?>;
         var emailFromForm_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_var'))?>;
+        var emailSender_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailSender_var'))?>;
         var datapipeEmail_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_var'))?>;
         var surveyLink_var = <?=json_encode($emailTriggerModule->getProjectSetting('surveyLink_var'))?>;
 
@@ -328,6 +329,17 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         }
                     }
                 }
+                if ($('#emailSender_var').val() != "" && $('#emailSender_var').val() != "0") {
+                    var result = $('#emailSender_var').val().split(/[;,]+/);
+                    if(!(trim(result[1]).startsWith('"')) || !(trim(result[1]).endsWith('"'))){
+                        errMsg.push('<strong>Sender Email field</strong> must be follow the format: <i>myemail@server.com, "Sender name"</i> .');
+                    }
+                    if(!validateEmail(result[0])){
+                        errMsg.push('<strong>Email '+result[0]+'</strong> is not a valid email.');
+                    }
+                }else{
+                    errMsg.push('<strong>Sender Email</strong> is a required field.');
+                }
 
                 $('#errMsgContainer').empty();
                 if (errMsg.length > 0) {
@@ -552,6 +564,13 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><span style="padding-left: 5px;"><strong>Preload email addresses</strong> from existing REDCap records. <span><div class="description_config">Enables autocomplete of email addresses in the TO and CC email fields. The list of email addresses is pulled from the specified variables in already existing REDCap records. </div></td>
                         <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
+                    </tr>
+                    <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
+                        <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Address and Name</strong> for email alerts<span><div class="description_config">Allows the user to specify the values in the "from:" field of the email. These must be email addresses from which your server has permission to send emails, or else your server could be blacklisted for spam and email spoofing.</div></td>
+                        <td style="width: 25%;padding: 10px 30px;">
+                            <span class="table_example">Format: myemail@server.com, "Sender name"</span><br/>
+                            <input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='myemail@server.com, "Sender name"' value='<?=$emailTriggerModule->getProjectSetting('emailSender_var');?>'/>
+                        </td>
                     </tr>
 
                     <tr class="table_subheader panel-heading" data-toggle="collapse" data-target=".EC_collapsed">

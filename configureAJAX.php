@@ -14,6 +14,7 @@ $emailTriggerModule->setProjectSetting('emailFromForm_var',$_POST['emailFromForm
 $emailTriggerModule->setProjectSetting('datapipeEmail_var',$_POST['datapipeEmail_var']);
 $emailTriggerModule->setProjectSetting('surveyLink_var',$_POST['surveyLink_var']);
 $emailTriggerModule->setProjectSetting('emailFailed_var',$_POST['emailFailed_var']);
+$emailTriggerModule->setProjectSetting('emailSender_var',$_POST['emailSender_var']);
 
 
 echo json_encode(array(

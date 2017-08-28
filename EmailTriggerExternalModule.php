@@ -90,6 +90,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $datapipe_var = $this->getProjectSetting("datapipe_var", $project_id);
                 $datapipeEmail_var = $this->getProjectSetting("datapipeEmail_var", $project_id);
                 $surveyLink_var = $this->getProjectSetting("surveyLink_var", $project_id);
+                $emailSender_var = $this->getProjectSetting("emailSender_var", $project_id);
 
                 //Data piping
                 if (!empty($datapipe_var)) {
@@ -157,6 +158,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $mail->AddCC($email);
                         }
                     }
+                }
+
+                //Email From
+                if(!empty($emailSender_var)){
+                    $emailSender = preg_split("/[;,]+/", $emailSender_var);
+                    $mail->SetFrom($emailSender[0], $emailSender[1]);
                 }
 
                 //Embedded images
