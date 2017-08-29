@@ -103,8 +103,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             if(!empty($label)){
                                 $logic = $label;
                             }
-                            $email_text = json_encode(str_replace($var, $logic, $email_text));
-                            $email_subject = json_encode(str_replace($var, $logic, $email_subject));
+                            $email_text = str_replace($var, $logic, $email_text);
+                            $email_subject = str_replace($var, $logic, $email_subject);
 
                         }
                     }
