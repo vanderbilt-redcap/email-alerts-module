@@ -468,13 +468,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 }else{
                     var name = '#'+$(this).attr("id");
                 }
-
-//                if(datapipeEmail_var != '' && (id == "email-to-flexdatalist" || id == "email-to-update-flexdatalist" || id == "email-cc-flexdatalist" || id == "email-cc-update-flexdatalist")){
-//                    lastClick = '';
-//                }else{
-                    lastClick = name;
-//                }
-
+                lastClick = name;
             });
 
             //save the cursor position
@@ -679,7 +673,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     }
                 }
 
-                $alerts .= '<tr class="'.$class_sent.'">';
+                $alerts .= '<tr>';
                 $fileAttachments = 0;
                 $attachmentVar ='';
                 $attachmentFile ='';
@@ -716,7 +710,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                                 $alerts .= '<em>' . $configRow['name'] . '</em><span>' . str_replace (',',', ',$value) . '</span></td>';
                             }
                         } else if($configRow['key'] == 'form-name') {
-                            $alerts .= '<td><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                            $alerts .= '<td class="'.$class_sent.'"><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
                         }else if($configRow['key'] == 'email-attachment-variable'){
                             $attchVar = preg_split("/[;,]+/",  $configRow['value'][$index]);
                             foreach ($attchVar as $var){
