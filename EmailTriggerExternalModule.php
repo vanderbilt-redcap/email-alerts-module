@@ -104,7 +104,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $logic = $label;
                             }
                             $email_text = str_replace($var, $logic, $email_text);
-                            $email_subject = str_replace($var, $logic, $email_subject);
+                            $email_subject = json_encode(str_replace($var, $logic, $email_subject));
 
                         }
                     }
@@ -128,7 +128,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                             $url = $emailTriggerModule->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&NOAUTH";
                             $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
-                            $email_text = json_encode(str_replace($var, $link, $email_text));
+                            $email_text = str_replace($var, $link, $email_text);
                         }
                     }
                 }
