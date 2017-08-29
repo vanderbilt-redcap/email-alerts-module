@@ -163,7 +163,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         }
 
                         if (datapipeEmail_var != '' && datapipeEmail_var != null) {
-                            var pipeVar = datapipe_var.split("\n");
+                            var pipeVar = datapipeEmail_var.split("\n");
                             buttonsHtml += "<div style='padding-top:5px'></div>";
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
