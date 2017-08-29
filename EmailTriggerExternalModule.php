@@ -182,9 +182,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
 
                 $mail->CharSet = 'UTF-8';
-                $mail->Subject = htmlspecialchars($email_subject);
+                $mail->Subject = $email_subject;
                 $mail->IsHTML(true);
-                $mail->Body = htmlspecialchars($email_text);
+                $mail->Body = $email_text;
 
                 //Attachments
                 for($i=1; $i<6 ; $i++){
