@@ -90,7 +90,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $datapipe_var = $this->getProjectSetting("datapipe_var", $project_id);
                 $datapipeEmail_var = $this->getProjectSetting("datapipeEmail_var", $project_id);
                 $surveyLink_var = $this->getProjectSetting("surveyLink_var", $project_id);
-                $emailSender_var = $this->getProjectSetting("emailSender_var", $project_id);
+                $emailSender_name = $this->getProjectSetting("emailSender_var", $project_id);
+                $emailSender_email = $this->getProjectSetting("email-sender", $project_id);
 
                 //Data piping
                 if (!empty($datapipe_var)) {
@@ -161,10 +162,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
 
                 //Email From
-                if(!empty($emailSender_var)){
-                    $emailSender = preg_split("/[;,]+/", $emailSender_var);
-                    $emailSender = str_replace('"', '', $emailSender);
-                    $mail->SetFrom($emailSender[0], $emailSender[1]);
+                if(!empty($emailSender_email)){
+                    $mail->SetFrom($emailSender_email, $emailSender_name);
+                }else{
+                    $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Sender is empty" ,"The sender in the project ".$project_id.", is empty.");
                 }
 
                 //Embedded images
@@ -218,8 +219,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $mail->DKIM_selector = 'PHPMailer';
                 $mail->DKIM_passphrase = ''; //key is not encrypted
                 if (!$mail->send()) {
-                    \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Mailer Error", "Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
-                    $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
+                   $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
 
                 } else {
                     $email_sent[$id] = "1";
@@ -293,8 +293,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $mail->addCC($email);
             }
         }else{
-            \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Wrong recipient", "The email ".$email." in the project ".$project_id.", do not exist");
-            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$email." in the project ".$project_id.", do not exist");
+           $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$email." in the project ".$project_id.", do not exist");
         }
         return $mail;
     }
@@ -321,9 +320,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         if(!empty($email_list_error)){
-            //if error send email to datacore@vanderbilt.edu
-            \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "Wrong recipient", "The email/s ".implode(",",$email_list_error)." in the project ".$project_id.", do not exist");
-            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$email." in the project ".$project_id.", do not exist");
+           $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$email." in the project ".$project_id.", do not exist");
         }
         return $email_list;
     }
@@ -346,8 +343,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
             while ($row = db_fetch_assoc($q)) {
                 if($row['doc_size'] > 3145728 ){
-                    \REDCap::email('eva.bascompte.moragas@vanderbilt.edu', 'noreply@vanderbilt.edu', "File Size too big", "One or more ".$type."  in the project ".$project_id.", are too big to be sent.");
-                    $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"File Size too big" ,"One or more ".$type." in the project ".$project_id.", are too big to be sent.");
+                   $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"File Size too big" ,"One or more ".$type." in the project ".$project_id.", are too big to be sent.");
                 }else{
                     if($type == 'files'){
                         //attach file with a different name

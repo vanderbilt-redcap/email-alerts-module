@@ -119,5 +119,15 @@
 	],
 
 	"project-settings": [
+	],
+
+	"system-settings": [
+		{
+			"key": "email-sender",
+			"name": "Sender Email Address",
+			"required": true,
+			"type": "text"
+		}
 	]
+
 }

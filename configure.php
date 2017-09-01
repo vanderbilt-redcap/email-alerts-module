@@ -80,6 +80,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         var emailSender_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailSender_var'))?>;
         var datapipeEmail_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_var'))?>;
         var surveyLink_var = <?=json_encode($emailTriggerModule->getProjectSetting('surveyLink_var'))?>;
+        var email_sender = <?=json_encode($emailTriggerModule->getProjectSetting('email-sender'))?>;
 
         //Url
         var pid = '<?=$pid?>';
@@ -329,16 +330,17 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         }
                     }
                 }
-                if ($('#emailSender_var').val() != "" && $('#emailSender_var').val() != "0") {
-                    var result = $('#emailSender_var').val().split(/[;,]+/);
-                    if(!(trim(result[1]).startsWith('"')) || !(trim(result[1]).endsWith('"'))){
-                        errMsg.push('<strong>Sender Email field</strong> must be follow the format: <i>myemail@server.com, "Sender name"</i> .');
-                    }
-                    if(!validateEmail(result[0])){
-                        errMsg.push('<strong>Email '+result[0]+'</strong> is not a valid email.');
-                    }
-                }else{
+
+                if ($('#emailSender_var').val() == "" && $('#emailSender_var').val() == "0") {
                     errMsg.push('<strong>Sender Email</strong> is a required field.');
+                }
+
+                if (email_sender == "" || email_sender == null) {
+                    var control_center = <?=json_encode(APP_PATH_WEBROOT_FULL . "external_modules/manager/control_center.php")?>;
+                    errMsg.push('<strong>Email Sender </strong> is empty. Go back to the <a href="'+control_center+'" target="_blank"><strong>Control Center</strong></a> to add an email address.');
+                }else if(!validateEmail(email_sender)){
+                    var control_center = <?=json_encode(APP_PATH_WEBROOT_FULL . "external_modules/manager/control_center.php")?>;
+                    errMsg.push('<strong>Email '+email_sender+'</strong> is not a valid Sender email. Go back to the <a href="'+control_center+'" target="_blank"><strong>Control Center</strong></a> to change the email address.');
                 }
 
                 $('#errMsgContainer').empty();
@@ -560,10 +562,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
                     </tr>
                     <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Address and Name</strong> for email alerts<span><div class="description_config">Allows the user to specify the values in the "from:" field of the email. These must be email addresses from which your server has permission to send emails, or else your server could be blacklisted for spam and email spoofing.</div></td>
+                        <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Name</strong> for email alerts<span><div class="description_config">Allows the user to specify the values in the "from:" field of the email. These must be email addresses from which your server has permission to send emails, or else your server could be blacklisted for spam and email spoofing.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
-                            <span class="table_example">Format: myemail@server.com, "Sender name"</span><br/>
-                            <input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='myemail@server.com, "Sender name"' value='<?=$emailTriggerModule->getProjectSetting('emailSender_var');?>'/>
+                            Sender name<br/><input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='myemail@server.com, "Sender name"' value='<?=$emailTriggerModule->getProjectSetting('emailSender_var');?>'/>
                         </td>
                     </tr>
 
