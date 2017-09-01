@@ -564,7 +564,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Name</strong> for email alerts<span><div class="description_config">Allows the user to set a custom sender name for the email alerts. This only affects the sender name, not the sender email address. The sender email address used by this email alerts tool is configured by your REDCap administrator.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
-                            Sender name<br/><input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='myemail@server.com, "Sender name"' value='<?=$emailTriggerModule->getProjectSetting('emailSender_var');?>'/>
+                            Sender name<br/><input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='Sender name' value='<?=$emailTriggerModule->getProjectSetting('emailSender_var');?>'/>
                         </td>
                     </tr>
 
@@ -588,9 +588,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content<span><div class="description_config">Allows REDCap survey links for any survey-enabled form to be inserted into email messages.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
-                            <span class="table_example">Example: [form_name], name ...</span><br/>
+                            <span class="table_example">Example: [SURVEYLINK_form_name], name ...</span><br/>
                             <a id="addLinkBtn" onclick="javascript:$('#addLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
-                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[form_name], name ..." value="<?=$emailTriggerModule->getProjectSetting('surveyLink_var');?>"><?=$emailTriggerModule->getProjectSetting('surveyLink_var');?></textarea>
+                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[SURVEYLINK_form_name], name ..." value="<?=$emailTriggerModule->getProjectSetting('surveyLink_var');?>"><?=$emailTriggerModule->getProjectSetting('surveyLink_var');?></textarea>
                             <div class="btn_color_square btn_color_surveyLink"></div>Survey link button (orange)
                         </td>
                     </tr>
