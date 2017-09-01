@@ -337,10 +337,10 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                 if (email_sender == "" || email_sender == null) {
                     var control_center = <?=json_encode(APP_PATH_WEBROOT_FULL . "external_modules/manager/control_center.php")?>;
-                    errMsg.push('<strong>Email Sender </strong> is empty. Go back to the <a href="'+control_center+'" target="_blank"><strong>Control Center</strong></a> to add an email address.');
+                    errMsg.push('<strong>Email Sender </strong> is empty. Contact your REDCap administrator to update the module settings in the Control Center.');
                 }else if(!validateEmail(email_sender)){
                     var control_center = <?=json_encode(APP_PATH_WEBROOT_FULL . "external_modules/manager/control_center.php")?>;
-                    errMsg.push('<strong>Email '+email_sender+'</strong> is not a valid Sender email. Go back to the <a href="'+control_center+'" target="_blank"><strong>Control Center</strong></a> to change the email address.');
+                    errMsg.push('<strong>Email '+email_sender+'</strong> is not a valid Sender email. Contact your REDCap administrator to update the module settings in the Control Center.');
                 }
 
                 $('#errMsgContainer').empty();
@@ -562,7 +562,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
                     </tr>
                     <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Name</strong> for email alerts<span><div class="description_config">Allows the user to specify the values in the "from:" field of the email. These must be email addresses from which your server has permission to send emails, or else your server could be blacklisted for spam and email spoofing.</div></td>
+                        <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Name</strong> for email alerts<span><div class="description_config">Allows the user to set a custom sender name for the email alerts. This only affects the sender name, not the sender email address. The sender email address used by this email alerts tool is configured by your REDCap administrator.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             Sender name<br/><input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='myemail@server.com, "Sender name"' value='<?=$emailTriggerModule->getProjectSetting('emailSender_var');?>'/>
                         </td>
