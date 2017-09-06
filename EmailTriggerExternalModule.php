@@ -50,7 +50,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 			$forms_name = $this->getProjectSetting("form-name",$project_id);
 			if(!empty($forms_name) && $record != NULL){
                 foreach ($forms_name as $id => $form){
-                    if($data[$record][$event_id][$form.'_complete'] == '2' || (array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' )){
+                    if($data[$record][$event_id][$form.'_complete'] == '2' || (array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2') )){
                         if ($_REQUEST['page'] == $form) {
                             $this->setEmailTriggerRequested(true);
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
@@ -536,10 +536,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      */
     function isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var, $option){
-        if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$instrument.'_complete'] == '2' ) {
+        if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$instrument.'_complete'] == '2') {
+            //Repeating instruments by form
             $var_name = str_replace('[', '', $var);
             $var_name = str_replace(']', '', $var_name);
             $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
+        }else if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$instrument.'_complete'] == '2') {
+            //Repeating instruments by event
+            $var_name = str_replace('[', '', $var);
+            $var_name = str_replace(']', '', $var_name);
+            $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
         }else{
             if($option == '1'){
                 $logic = \LogicTester::apply($var, $data, null, true);
