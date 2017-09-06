@@ -12,7 +12,7 @@ require_once 'EmailTriggerExternalModule.php';
 class EmailTriggerExternalModule extends AbstractExternalModule
 {
 
-	function hook_survey_complete ($project_id,$record = NULL,$instrument,$event_id){
+	function hook_survey_complete ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         $data = \REDCap::getData($project_id);
         $this->setEmailTriggerRequested(false);
         if(isset($project_id)){
@@ -33,7 +33,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
                             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
                             $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
-                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument);
+                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance);
                         }
                     }
 
@@ -42,7 +42,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
-	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id){
+	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
 		$data = \REDCap::getData($project_id);
         $this->setEmailTriggerRequested(false);
 		if(isset($project_id)){
@@ -50,15 +50,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 			$forms_name = $this->getProjectSetting("form-name",$project_id);
 			if(!empty($forms_name) && $record != NULL){
                 foreach ($forms_name as $id => $form){
-                    if($data[$record][$event_id][$form.'_complete'] == '2'){
+                    if($data[$record][$event_id][$form.'_complete'] == '2' || (array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' )){
                         if ($_REQUEST['page'] == $form) {
                             $this->setEmailTriggerRequested(true);
                             $email_sent = $this->getProjectSetting("email-sent",$project_id);
                             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
                             $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
-                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument);
+                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance);
                         }
                     }
+
                 }
 			}
 		}
@@ -73,7 +74,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
        $this->email_requested =  $email_requested;
     }
 
-    function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument){
+    function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance){
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_repetitive_sent = json_decode($email_repetitive_sent);
@@ -99,7 +100,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     foreach ($datapipe as $emailvar) {
                         $var = preg_split("/[;,]+/", $emailvar)[0];
                         if (\LogicTester::isValid($var)) {
-                            $logic = \LogicTester::apply($var, $data[$record], null, true);
+                            //Repeatble instruments
+                            $logic = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var,0);
                             $label = $this->getLogicLabel($var, $logic,$project_id,$data[$record][$event_id]);
                             if(!empty($label)){
                                 $logic = $label;
@@ -110,7 +112,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
                 }
-
                 //Survey Link
                 if(!empty($surveyLink_var)) {
                     $emailTriggerModule = new EmailTriggerExternalModule();
@@ -141,8 +142,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     $emailsTo = preg_split("/[;,]+/", $email_to);
                     $emailsCC = preg_split("/[;,]+/", $email_cc);
-                    $mail = $this->fill_emails($mail,$emailsTo, $email_form_var, $data[$record], 'to',$project_id);
-                    $mail = $this->fill_emails($mail,$emailsCC, $email_form_var, $data[$record], 'cc',$project_id);
+                    $mail = $this->fill_emails($mail,$emailsTo, $email_form_var, $data[$record], 'to',$project_id,$record, $event_id, $instrument, $repeat_instance);
+                    $mail = $this->fill_emails($mail,$emailsCC, $email_form_var, $data[$record], 'cc',$project_id,$record, $event_id, $instrument, $repeat_instance);
 
                 }else{
                     $email_to_ok = $this->check_email ($email_to,$project_id);
@@ -197,7 +198,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $var = preg_split("/[;,]+/", $email_attachment_variable);
                     foreach ($var as $attachment) {
                         if(\LogicTester::isValid(trim($attachment))) {
-                            $edoc = \LogicTester::apply(trim($attachment), $data[$record], null, true);
+                            $edoc = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $attachment,0);
                             $this->addNewAttachment($mail,$edoc,$project_id,'files');
                         }
                     }
@@ -256,13 +257,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $project_id
      * @return mixed
      */
-    function fill_emails($mail, $emailsTo, $email_form_var, $data, $option, $project_id){
+    function fill_emails($mail, $emailsTo, $email_form_var, $data, $option, $project_id, $record, $event_id, $instrument, $repeat_instance){
         foreach ($emailsTo as $email){
             foreach ($email_form_var as $email_var) {
                 $var = preg_split("/[;,]+/", $email_var);
                 if(!empty($email)) {
                     if (\LogicTester::isValid($var[0])) {
-                        $email_redcap = \LogicTester::apply($var[0], $data, null, true);
+                        $email_redcap = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var[0],1);
                         if (!empty($email_redcap) && strpos($email, $var[0]) !== false) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
                         } else {
@@ -522,6 +523,32 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         return $label;
+    }
+
+    /**
+     * Function that checks that returns the logic depending on if it's a repeating instrument
+     * @param $data
+     * @param $record
+     * @param $event_id
+     * @param $instrument
+     * @param $repeat_instance
+     * @param $var
+     * @return mixed
+     */
+    function isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var, $option){
+        if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$instrument.'_complete'] == '2' ) {
+            $var_name = str_replace('[', '', $var);
+            $var_name = str_replace(']', '', $var_name);
+            $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
+        }else{
+            if($option == '1'){
+                $logic = \LogicTester::apply($var, $data, null, true);
+            }else{
+                $logic = \LogicTester::apply($var, $data[$record], null, true);
+            }
+        }
+
+        return $logic;
     }
 
 }
