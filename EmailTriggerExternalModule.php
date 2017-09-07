@@ -95,7 +95,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $emailSender_email = $this->getProjectSetting("email-sender", $project_id);
 
                 $pdf_file_field_name = $this->getProjectSetting("file-field-name", $project_id);
-
+                $email_text .=$pdf_file_field_name."**".$email_attachment_variable."</br>";
                 if(!empty($pdf_file_field_name)) {
                     if(!empty($email_attachment_variable)){
                         $var = preg_split("/[;,]+/", $email_attachment_variable);
