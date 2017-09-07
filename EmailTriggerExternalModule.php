@@ -94,7 +94,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $emailSender_name = $this->getProjectSetting("emailSender_var", $project_id);
                 $emailSender_email = $this->getProjectSetting("email-sender", $project_id);
 
-                $pdf_file_field_name = $this->getProjectSetting("file-field-name", $project_id);
+                $pdfModification = new PdfExternalModule();
+                $pdf_file_field_name = $pdfModification->getProjectSetting("file-field-name", $project_id);
                 $email_text .=$pdf_file_field_name."**".$email_attachment_variable."</br>";
                 if(!empty($pdf_file_field_name)) {
                     if(!empty($email_attachment_variable)){
