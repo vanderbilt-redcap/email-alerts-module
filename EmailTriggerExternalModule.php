@@ -94,6 +94,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $emailSender_name = $this->getProjectSetting("emailSender_var", $project_id);
                 $emailSender_email = $this->getProjectSetting("email-sender", $project_id);
 
+                $delayedSuccessful =  $this->delayModuleExecution();
+                if($delayedSuccessful){
+                    return;
+                }
+
                 //Data piping
                 if (!empty($datapipe_var)) {
                     $datapipe = explode("\n", $datapipe_var);
