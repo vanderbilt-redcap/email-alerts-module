@@ -94,6 +94,25 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $emailSender_name = $this->getProjectSetting("emailSender_var", $project_id);
                 $emailSender_email = $this->getProjectSetting("email-sender", $project_id);
 
+                $pdf_file_field_name = $this->getProjectSetting("file-field-name", $project_id);
+
+                if(!empty($pdf_file_field_name)) {
+                    if(!empty($email_attachment_variable)){
+                        $var = preg_split("/[;,]+/", $email_attachment_variable);
+                        foreach ($var as $attachment) {
+                            if($pdf_file_field_name == $attachment) {
+                                if (\LogicTester::isValid(trim($attachment))) {
+                                    $edoc = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $attachment, 0);
+                                    if (empty($edoc) && !empty($email_condition)) {
+                                        $this->delayModuleExecution();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 //Data piping
                 if (!empty($datapipe_var)) {
                     $datapipe = explode("\n", $datapipe_var);
