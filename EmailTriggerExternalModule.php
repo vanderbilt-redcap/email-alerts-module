@@ -380,7 +380,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return string
      */
     function addJSONRecord($email_repetitive_sent, $new_record, $instrument, $alertid){
-        echo $instrument."</br>";
         $found_new_instrument = false;
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
