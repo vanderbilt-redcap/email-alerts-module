@@ -105,10 +105,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if($delayedSuccessful){
                     return;
                 }
+
                 //Data piping
                 if (!empty($datapipe_var)) {
                     $datapipe = explode("\n", $datapipe_var);
                     foreach ($datapipe as $emailvar) {
+
                         $var = preg_split("/[;,]+/", $emailvar)[0];
                         if (\LogicTester::isValid($var)) {
                             //Repeatble instruments
@@ -500,11 +502,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $choices = preg_split("/\s*\|\s*/", $metadata[$field_name]['select_choices_or_calculations']);
             foreach ($choices as $choice){
                 $option_value = preg_split("/,/", $choice)[0];
-                if(empty($value)){
-                    foreach ($data[$field_name] as $choiceValue=>$multipleChoice){
-                        if($multipleChoice === "1" && $choiceValue == $option_value) {
-                            $label .= trim(preg_split("/^(.+?),/", $choice)[1])." ";
+                if($value != ""){
+                    if(is_array($data[$field_name])){
+                        foreach ($data[$field_name] as $choiceValue=>$multipleChoice){
+                            if($multipleChoice === "1" && $choiceValue == $option_value) {
+                                $label .= trim(preg_split("/^(.+?),/", $choice)[1])." ";
+                            }
                         }
+                    }else if($value === $option_value){
+                        $label = trim(preg_split("/^(.+?),/", $choice)[1]);
                     }
                 }else if($value === $option_value){
                     $label = trim(preg_split("/^(.+?),/", $choice)[1]);
