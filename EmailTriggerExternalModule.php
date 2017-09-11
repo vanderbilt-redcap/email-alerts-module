@@ -380,6 +380,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return string
      */
     function addJSONRecord($email_repetitive_sent, $new_record, $instrument, $alertid){
+        echo $instrument."</br>";
         $found_new_instrument = false;
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
@@ -411,6 +412,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 //NEW Alert same instrument
                 if(!$found_alert && $sv_name == $instrument){
+                    $found_new_instrument = true;
                     $jsonArray = $this->addNewJSONRecord($jsonArray,$sv_name,$alertid,$new_record);
                 }
             }
@@ -420,10 +422,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         //add new record for new survey
-        if($found_new_instrument){
+        if(!$found_new_instrument){
             $jsonArray = $this->addNewJSONRecord($jsonArray,$instrument,$alertid,$new_record);
         }
-//        printf("<pre>%s</pre>",print_r($jsonArray,TRUE));
         return json_encode($jsonArray,JSON_FORCE_OBJECT);
     }
 
