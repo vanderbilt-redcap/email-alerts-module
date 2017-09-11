@@ -60,7 +60,8 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
-//printf("<pre>%s</pre>",print_r($config['email-dashboard-settings'],TRUE));
+//print_array($simple_config);
+
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
@@ -74,6 +75,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         var configSettings = <?=json_encode($simple_config['email-dashboard-settings'])?>;
         var configSettingsUpdate = <?=json_encode($simple_config_update['email-dashboard-settings'])?>;
         var project_id = <?=json_encode($_GET['pid'])?>;
+        var isLongitudinal = <?=json_encode(\REDCap::isLongitudinal())?>;
         //Dashboard info
         var datapipe_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_var'))?>;
         var emailFromForm_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_var'))?>;
@@ -86,6 +88,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         var pid = '<?=$pid?>';
         var _preview_url = '<?=$emailTriggerModule->getUrl('previewForm.php')?>';
         var _edoc_name_url = '<?=$emailTriggerModule->getUrl('get-edoc-name.php')?>';
+        var _longitudinal_url = '<?=$emailTriggerModule->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
         var lastClick = null;
         var startPos = 0;
         var endPos = 0;
@@ -202,8 +205,17 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     inputHtml += "<td class='external-modules-input-td'>" + this.getInputElement(setting.type, setting.key, setting.value, inputProperties);
                     inputHtml += "<datalist id='" + datalistname + "'></datalist></td><td></td><tr>";
                     return inputHtml;
-                }else{
-
+                }else if((setting.key == 'form-name' || setting.key == 'form-name-update') && isLongitudinal){
+                    if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
+                        var inputHtml = EMparent.getSettingColumns.call(this, setting, instance, header);
+                    }
+                    else {
+                        var inputHtml = EMparent.getColumnHtml(setting);
+                    }
+                    inputHtml += '<tr field="form-name-event" class="form-control-custom" style="display:none"></tr>';
+                    return inputHtml;
+                }
+                else {
 					if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
 						return EMparent.getSettingColumns.call(this, setting, instance, header);
 					}
@@ -363,6 +375,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 return false;
             });
 
+            $('[name=form-name],[name=form-name-update]').on('change', function(e){
+                uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val());
+            });
             //we call first the flexalist function to create the options for the email
             $('.flexdatalist').flexdatalist({
                 minLength: 1

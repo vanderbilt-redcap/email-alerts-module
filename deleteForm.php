@@ -13,6 +13,7 @@ $index =  $_REQUEST['index_modal_delete'];
 
 #get data from the DB
 $form_name = empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name');
+$form_name_event = empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name-event'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name-event');
 $email_to = empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-to'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-to');
 $email_cc =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-cc'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-cc');
 $email_subject =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-subject'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-subject');
@@ -48,6 +49,7 @@ if(!empty($email_repetitive_sent)){
 
 #Delete one element in array
 unset($form_name[$index]);
+unset($form_name_event[$index]);
 unset($email_to[$index]);
 unset($email_cc[$index]);
 unset($email_subject[$index]);
@@ -66,6 +68,7 @@ unset($email_deactivate[$index]);
 
 #Rearrange the indexes
 array_values($form_name);
+array_values($form_name_event);
 array_values($email_to);
 array_values($email_cc);
 array_values($email_subject);
@@ -84,6 +87,7 @@ array_values($email_deactivate);
 
 #Save data
 ExternalModules::setProjectSetting($prefix,$pid, 'form-name', $form_name);
+ExternalModules::setProjectSetting($prefix,$pid, 'form-name-event', $form_name_event);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-to', $email_to);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-cc', $email_cc);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-subject', $email_subject);

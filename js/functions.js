@@ -43,6 +43,8 @@ function editEmailAlert(modal, index){
     $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').val(modal['email-repetitive']);
     $('#external-modules-configure-modal-update input[name="email-condition-update"]').val(modal['email-condition']);
 
+    uploadLongitudinalEvent('project_id='+project_id+'&form='+modal['form-name']+'&index='+index);
+
     //Add Files
     for(i=1; i<6 ; i++){
         getFileFieldElement(modal['email-attachment'+i], i);
@@ -293,4 +295,19 @@ function checkIfSurveyIsSaveAndReturn(data,url,saveUrl){
 
         }
     });
+}
+
+function uploadLongitudinalEvent(data){
+    if(isLongitudinal){
+        $.post(_longitudinal_url, data, function(returnData){
+            jsonAjax = jQuery.parseJSON(returnData);
+            if(jsonAjax.status == 'success'){
+                $( "[field=form-name-event]" ).html(jsonAjax.event);
+                $( "[field=form-name-event]" ).show();
+            }
+            else {
+                alert("An error ocurred");
+            }
+        });
+    }
 }

@@ -12,6 +12,7 @@ $index =  $_REQUEST['index_modal_update'];
 
 #get data from the DB
 $form_name = empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name');
+$form_name_event = empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name-event'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name-event');
 $email_to = empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-to'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-to');
 $email_cc =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-cc'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-cc');
 $email_subject =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-subject'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-subject');
@@ -29,6 +30,7 @@ if(!isset($_REQUEST['email-repetitive-update'])){
 
 #Replace new data with old
 $form_name[$index] = $_REQUEST['form-name-update'];
+$form_name_event[$index] = $_REQUEST['form-name-event'];
 $email_to[$index] = $_REQUEST['email-to-update'];
 $email_cc[$index] = $_REQUEST['email-cc-update'];
 $email_subject[$index] = $_REQUEST['email-subject-update'];
@@ -39,6 +41,7 @@ $email_condition[$index] = $_REQUEST['email-condition-update'];
 
 #Save data
 ExternalModules::setProjectSetting($prefix,$pid, 'form-name', $form_name);
+ExternalModules::setProjectSetting($prefix,$pid, 'form-name-event', $form_name_event);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-to', $email_to);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-cc', $email_cc);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-subject', $email_subject);

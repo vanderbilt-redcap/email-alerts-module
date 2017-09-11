@@ -50,16 +50,22 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 			$forms_name = $this->getProjectSetting("form-name",$project_id);
 			if(!empty($forms_name) && $record != NULL){
                 foreach ($forms_name as $id => $form){
-                    if($data[$record][$event_id][$form.'_complete'] == '2' || (array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2') )){
-                        if ($_REQUEST['page'] == $form) {
-                            $this->setEmailTriggerRequested(true);
-                            $email_sent = $this->getProjectSetting("email-sent",$project_id);
-                            $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-                            $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
-                            $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance);
+                    $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
+                    $isLongitudinalData = false;
+                    if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
+                        $isLongitudinalData = true;
+                    }
+                    if($data[$record][$event_id][$form.'_complete'] == '2' || (array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2'))){
+                        if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
+                            if ($_REQUEST['page'] == $form) {
+                                $this->setEmailTriggerRequested(true);
+                                $email_sent = $this->getProjectSetting("email-sent",$project_id);
+                                $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
+                                $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
+                                $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance);
+                            }
                         }
                     }
-
                 }
 			}
 		}
@@ -94,11 +100,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $emailSender_name = $this->getProjectSetting("emailSender_var", $project_id);
                 $emailSender_email = $this->getProjectSetting("email-sender", $project_id);
 
+                //To ensure it's the last module called
                 $delayedSuccessful =  $this->delayModuleExecution();
                 if($delayedSuccessful){
                     return;
                 }
-
                 //Data piping
                 if (!empty($datapipe_var)) {
                     $datapipe = explode("\n", $datapipe_var);
