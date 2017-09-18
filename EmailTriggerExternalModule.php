@@ -95,14 +95,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive_sent = json_decode($email_repetitive_sent);
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
 
-//        echo "event_id: ".$event_id."</br>";
-//        echo "record: ".$record."</br>";
-//        echo "repeat_instance: ".$repeat_instance."</br>";
-//        echo "addJSONRecord: ".$this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id,$isRepeatInstrument,$repeat_instance)."</br>";
-//        $email_repetitive_sent = json_decode($this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id,$isRepeatInstrument,$repeat_instance));
-//        echo "isEmailAlreadySentForThisSurvery: ".$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance)."</br>";
-//        die;
-
         if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance))) && $email_deactivate == "0") {
             //If the condition is met or if we don't have any, we send the email
             if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)) {
@@ -167,7 +159,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $mail = new \PHPMailer;
 
                 //Email Addresses
-                if (!empty($datapipe_var)) {
+                if (!empty($datapipeEmail_var)) {
                     $email_form_var = explode("\n", $datapipeEmail_var);
 
                     $emailsTo = preg_split("/[;,]+/", $email_to);
