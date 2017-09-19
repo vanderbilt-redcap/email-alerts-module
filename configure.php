@@ -336,7 +336,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 if ($('#emailFailed_var').val() != "" && $('#emailFailed_var').val() != "0") {
                     var result = $('#emailFailed_var').val().split(/[;,]+/);
                     for(var i=0;i<result.length;i++){
-                        if(!validateEmail(result[i])){
+                        if(!validateEmail(trim(result[i]))){
                             errMsg.push('<strong>Email '+result[i]+'</strong> is not a valid email.');
                             break;
                         }

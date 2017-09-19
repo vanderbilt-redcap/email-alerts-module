@@ -166,7 +166,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $emailsCC = preg_split("/[;,]+/", $email_cc);
                     $mail = $this->fill_emails($mail,$emailsTo, $email_form_var, $data[$record], 'to',$project_id,$record, $event_id, $instrument, $repeat_instance);
                     $mail = $this->fill_emails($mail,$emailsCC, $email_form_var, $data[$record], 'cc',$project_id,$record, $event_id, $instrument, $repeat_instance);
-
                 }else{
                     $email_to_ok = $this->check_email ($email_to,$project_id);
                     $email_cc_ok = $this->check_email ($email_cc,$project_id);
@@ -288,7 +287,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $email_redcap = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var[0],1);
                         if (!empty($email_redcap) && strpos($email, $var[0]) !== false) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
-                        } else {
+                        } else if(!empty($email_redcap)){
                             $mail = $this->check_single_email($mail,$email,$option,$project_id);
                         }
                     } else {
@@ -308,8 +307,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $project_id
      * @return mixed
      */
-    function check_single_email($mail,$email, $option, $project_id){
-        if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    function check_single_email($mail,$email, $option, $project_id,$var){
+        if(filter_var(trim($email), FILTER_VALIDATE_EMAIL)) {
             if($option == "to"){
                 $mail->addAddress($email);
             }else if($option == "cc"){
@@ -511,7 +510,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if(!empty($emailFailed_var)){
             $emailsFailed = preg_split("/[;,]+/", $emailFailed_var);
             foreach ($emailsFailed as $failed){
-                \REDCap::email($failed, 'noreply@vanderbilt.edu',$subject, $message);
+                \REDCap::email(trim($failed), 'noreply@vanderbilt.edu',$subject, $message);
             }
         }
     }
@@ -601,7 +600,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $logic = \LogicTester::apply($var, $data[$record], null, true);
             }
         }
-
         return $logic;
     }
 
