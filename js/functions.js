@@ -120,9 +120,9 @@ function deactivateEmailAlert(index, status){
 function insertAtCursorTinyMCE(myValue,option) {
     if(lastClick != '') {
         if (lastClick != null) {
-            if((lastClick !='#email-cc-flexdatalist' && lastClick !='#email-to-flexdatalist' && lastClick !='#email-cc-update-flexdatalist' && lastClick !='#email-to-update-flexdatalist' && option == 0) || option == 1) {
+            // logic on to add button content
+            if((lastClick !='#email-cc-flexdatalist' && lastClick !='#email-to-flexdatalist' && lastClick !='#email-cc-update-flexdatalist' && lastClick !='#email-to-update-flexdatalist' && option == 1) || option == 0) {
                 var myField = $(lastClick);
-
                 //IE support
                 if (document.selection) {
                     myField.focus();
@@ -152,7 +152,6 @@ function insertAtCursorTinyMCE(myValue,option) {
         }
     }
 
-    // lastClick = '#email-to-update-flexdatalist';
 }
 
 function randomString() {
