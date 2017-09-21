@@ -287,8 +287,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $email_redcap = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var[0],1);
                         if (!empty($email_redcap) && strpos($email, $var[0]) !== false) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
-                        } else if(!empty($email_redcap)){
-                            $mail = $this->check_single_email($mail,$email,$option,$project_id);
+                        } else if(!empty($email_redcap) && strpos($email, $var[0]) === false){
+                           $mail = $this->check_single_email($mail,$email,$option,$project_id);
                         }
                     } else {
                         $mail = $this->check_single_email($mail,$email,$option,$project_id);
