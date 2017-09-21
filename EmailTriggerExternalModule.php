@@ -285,8 +285,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(!empty($email)) {
                     if (\LogicTester::isValid($var[0])) {
                         $email_redcap = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var[0],1);
+                        $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"email: ".$email." emailredcap: ".$email_redcap." var:".$var[0]." EQUALS: ".strpos($email, '[emailp]').", do not exist");
                         if (!empty($email_redcap) && strpos($email, $var[0]) !== false) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
+                        } else if(!empty($email_redcap)){
+//                            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"email: ".$email." emailredcap: ".$email_redcap." var:".$var[0]." EQUALS: ".strpos($email, '[emailp]').", do not exist");
+//                            $mail = $this->check_single_email($mail,$email,$option,$project_id);
                         }
                     } else {
                         $mail = $this->check_single_email($mail,$email,$option,$project_id);
