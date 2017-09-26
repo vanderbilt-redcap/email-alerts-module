@@ -28,6 +28,13 @@
 	},
 
 	"project-settings": [
+        {
+            "key": "email-from",
+            "name": "FROM for email",
+            "required": false,
+            "type": "text",
+            "repeatable": false
+        },
 		{
 
 			"key": "form",

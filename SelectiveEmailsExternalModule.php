@@ -106,6 +106,10 @@ class SelectiveEmailsExternalModule extends AbstractExternalModule
                             }
                         }
 
+                        $from = $this->getProjectSetting("email-from",$project_id);
+                        if (!$from) {
+                            $from = "no-reply@vanderbilt.edu";
+                        }
 				    	if (count($emails) > 0) {
 							//we check the emails
 							$email_list = check_email(implode(",", $emails), $project_id);
@@ -119,11 +123,11 @@ class SelectiveEmailsExternalModule extends AbstractExternalModule
 									$conditionValue = \LogicTester::apply($logic[$i], $evData, null, false);
                                     $specificText = "\n\nProject $projectTitle\nRecord $record\n".APP_PATH_WEBROOT_FULL.substr(APP_PATH_WEBROOT, 1)."/DataEntry/index.php?pid=$project_id&page=$instrument&id=$record";
 									if ($conditionValue) {
-										\REDCap::email($email_list, 'noreply@vanderbilt.edu', $subject[$i], $email_text[$i].$specificText);
+										\REDCap::email($email_list, $from, $subject[$i], $email_text[$i].$specificText);
                                     }
                                 }
 							} else {
-								\REDCap::email($email_list, 'noreply@vanderbilt.edu', $subject[$i], $email_text[$i]);
+								\REDCap::email($email_list, $from, $subject[$i], $email_text[$i]);
 							}
                         }
 					}

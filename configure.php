@@ -83,7 +83,12 @@
                     $unsaved[$key] = "A ".$value;
                 }
 			} else {
-                $unsaved[$key] = "B ".$value;
+				if (preg_match("/^logic/", $key)) {
+					ExternalModules::setInstance($prefix, $_GET['pid'], $key, 0, $value);
+					$saved[$key." 0"] = $value;
+                } else {
+                    $unsaved[$key] = "B ".$value;
+                }
             }
 		}
         $initialValue = "";
