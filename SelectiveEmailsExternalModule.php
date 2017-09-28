@@ -113,7 +113,7 @@ class SelectiveEmailsExternalModule extends AbstractExternalModule
 				    	if (count($emails) > 0) {
 							//we check the emails
 							$email_list = check_email(implode(",", $emails), $project_id);
-							if ($logic[$i] !== "") {
+							if ($logic[$i] != "") {
 								if (\LogicTester::isValid($logic[$i])) {
                                     $evID = findEventIDForForm($forms_name[$i]);
                                     $evData = array($evID => $data[$record][$evID]);
@@ -170,7 +170,7 @@ function changeFormat($sourceArray) {
     if (count($sourceArray) > 0) {
         foreach ($sourceArray[0] as $role) {
             $destArray[] = array();
-            if ($sourceArray[0][$i] !== "") {
+            if ($sourceArray[0][$i] != "") {
                 $destArray[$i][] = $sourceArray[0][$i];
             }
             if ($userRole2[$i] !== "") {
