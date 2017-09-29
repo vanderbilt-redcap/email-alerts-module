@@ -19,12 +19,12 @@
     color:red;
 }
 .table_subheader{
-    background-color:#f0f8ff;
+    background-color:#e6f3ff;
     color: #005299;
     cursor: pointer;
 }
 .table_subheader:hover {
-    background-color: #f0f8ff !important;
+    background-color: #e6f3ff !important;
 }
 .table textarea, .table input{
     border-radius: 3px;
@@ -58,7 +58,7 @@
     color: #000000 !important;
 }
 .email_preview_forms_table th{
-    background-color: #ebebfa;
+    background-color: #d6d6f5;
     font-size: 13px;
     text-align: center;
     font-weight: bold;
@@ -114,13 +114,13 @@
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover{
     border:1px solid #c2c2f0;
-    background-color:#ebebfa;
-    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #c2c2f0), color-stop(100%, #ebebfa));
-    background:-webkit-linear-gradient(top, #c2c2f0 0%, #ebebfa 100%);
-    background:-moz-linear-gradient(top, #c2c2f0 0%, #ebebfa 100%);
-    background:-ms-linear-gradient(top, #c2c2f0 0%, #ebebfa 100%);
-    background:-o-linear-gradient(top, #c2c2f0 0%, #ebebfa 100%);
-    background:linear-gradient(to bottom, #c2c2f0 0%, #ebebfa 100%);
+    background-color:#d6d6f5;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #c2c2f0), color-stop(100%, #d6d6f5));
+    background:-webkit-linear-gradient(top, #c2c2f0 0%, #d6d6f5 100%);
+    background:-moz-linear-gradient(top, #c2c2f0 0%, #d6d6f5 100%);
+    background:-ms-linear-gradient(top, #c2c2f0 0%, #d6d6f5 100%);
+    background:-o-linear-gradient(top, #c2c2f0 0%, #d6d6f5 100%);
+    background:linear-gradient(to bottom, #c2c2f0 0%, #d6d6f5 100%);
 }
 #customizedAlertsPreview_info{float:left;}
 #customizedAlertsPreview_paginate{float:right;}
@@ -186,7 +186,7 @@
 .form-control-custom-title{
     font-weight: bold;
     text-align: center;
-    background-color: #ebebfa;
+    background-color: #d6d6f5;
     padding: 7px;
 }
 
