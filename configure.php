@@ -191,7 +191,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         inputHtml = inputHtml.replace("<td class='external-modules-input-td'>", "<td class='external-modules-input-td'>" + buttonLegend + "<div>" + buttonsHtml + "<div>");
                     }
                     return inputHtml;
-                } else if (setting.type == 'text' && (setting.key == 'email-to' || setting.key == 'email-to-update' || setting.key == 'email-cc' || setting.key == 'email-cc-update')) {
+                } else if (setting.type == 'text' && (setting.key == 'email-to' || setting.key == 'email-to-update' || setting.key == 'email-cc' || setting.key == 'email-cc-update' || setting.key == 'email-bcc' || setting.key == 'email-bcc-update')) {
                     //We add the datalist for the emails
                     inputHtml += "<tr class='" + customClass + "'><td><span class='external-modules-instance-label'></span><label>" + setting.name + ":</label></td>";
                     var datalistname = "json-datalist-" + setting.key;
@@ -477,7 +477,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
             /***PIPPING BUTTONS INTERACTION***/
             //Saves the field id/name in which field we are
-            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('focus', function(e){
+            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, #email-bcc-flexdatalist, #email-bcc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('focus', function(e){
                 var id = $(this).attr("id");
                 if(id == undefined){
                     var name = '[name="'+$(this).attr("name")+'"]';
@@ -489,7 +489,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             });
 
             //save the cursor position
-            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('keyup click', function(e){
+            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, #email-bcc-flexdatalist, #email-bcc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('keyup click', function(e){
                 startPos = this.selectionStart;
                 endPos = this.selectionEnd;
             });
@@ -719,11 +719,12 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         $value = preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', $configRow['value'][$index]);
                         if ($configRow['key'] == 'email-to') {
                             $alerts .= '<td><em>' . $configRow['name'] . '</em><span>' . str_replace (',',', ',$value) . '</span><br/>';
-                        } else if ($configRow['key'] == 'email-cc') {
-                            if(empty($value)){
+                        } else if ($configRow['key'] == 'email-cc' || $configRow['key'] == 'email-bcc') {
+                            if(!empty($value)){
+                                $alerts .= '<em>' . $configRow['name'] . '</em><span>' . str_replace (',',', ',$value) . '</span>';
+                            }
+                            if($configRow['key'] == 'email-bcc'){
                                 $alerts .= '</td>';
-                            }else{
-                                $alerts .= '<em>' . $configRow['name'] . '</em><span>' . str_replace (',',', ',$value) . '</span></td>';
                             }
                         } else if($configRow['key'] == 'form-name') {
                             $alerts .= '<td class="'.$class_sent.'"><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';

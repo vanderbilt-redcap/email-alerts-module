@@ -100,6 +100,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)) {
                 $email_to = $this->getProjectSetting("email-to", $project_id)[$id];
                 $email_cc = $this->getProjectSetting("email-cc", $project_id)[$id];
+                $email_bcc = $this->getProjectSetting("email-bcc", $project_id)[$id];
                 $email_subject = $this->getProjectSetting("email-subject", $project_id)[$id];
                 $email_text = $this->getProjectSetting("email-text", $project_id)[$id];
                 $email_attachment_variable = $this->getProjectSetting("email-attachment-variable", $project_id)[$id];
@@ -164,11 +165,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     $emailsTo = preg_split("/[;,]+/", $email_to);
                     $emailsCC = preg_split("/[;,]+/", $email_cc);
+                    $emailsBCC = preg_split("/[;,]+/", $email_bcc);
                     $mail = $this->fill_emails($mail,$emailsTo, $email_form_var, $data[$record], 'to',$project_id,$record, $event_id, $instrument, $repeat_instance);
                     $mail = $this->fill_emails($mail,$emailsCC, $email_form_var, $data[$record], 'cc',$project_id,$record, $event_id, $instrument, $repeat_instance);
+                    $mail = $this->fill_emails($mail,$emailsBCC, $email_form_var, $data[$record], 'bcc',$project_id,$record, $event_id, $instrument, $repeat_instance);
                 }else{
                     $email_to_ok = $this->check_email ($email_to,$project_id);
                     $email_cc_ok = $this->check_email ($email_cc,$project_id);
+                    $email_bcc_ok = $this->check_email ($email_bcc,$project_id);
 
                     if(!empty($email_to_ok)) {
                         foreach ($email_to_ok as $email) {
@@ -179,6 +183,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if(!empty($email_cc_ok)){
                         foreach ($email_cc_ok as $email) {
                             $mail->AddCC($email);
+                        }
+                    }
+
+                    if(!empty($email_bcc_ok)){
+                        foreach ($email_bcc_ok as $email) {
+                            $mail->AddBCC($email);
                         }
                     }
                 }
@@ -285,11 +295,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(!empty($email)) {
                     if (\LogicTester::isValid($var[0])) {
                         $email_redcap = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var[0],1);
+
                        if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email)) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
-                        } else if(!empty($email_redcap)){
+                        } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && empty($email_redcap)){
+//                        } else if(!empty($email_redcap)){
     //                            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"email: ".$email." emailredcap: ".$email_redcap." var:".$var[0]." EQUALS: ".strpos($email, '[emailp]').", do not exist");
-    //                            $mail = $this->check_single_email($mail,$email,$option,$project_id);
+                                $mail = $this->check_single_email($mail,$email,$option,$project_id);
                         }
                     } else {
                         $mail = $this->check_single_email($mail,$email,$option,$project_id);
@@ -314,6 +326,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $mail->addAddress($email);
             }else if($option == "cc"){
                 $mail->addCC($email);
+            }else if($option == "bcc"){
+                $mail->addBCC($email);
             }
         }else{
            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$email." in the project ".$project_id.", do not exist");

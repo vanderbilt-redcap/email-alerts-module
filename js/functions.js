@@ -37,6 +37,7 @@ function editEmailAlert(modal, index){
     $('#external-modules-configure-modal-update select[name="form-name-update"]').val(modal['form-name']);
     $('#external-modules-configure-modal-update input[name="email-to-update"]').val(modal['email-to']);
     $('#external-modules-configure-modal-update input[name="email-cc-update"]').val(modal['email-cc']);
+    $('#external-modules-configure-modal-update input[name="email-bcc-update"]').val(modal['email-bcc']);
     $('#external-modules-configure-modal-update input[name="email-subject-update"]').val(modal['email-subject']);
     $('#external-modules-configure-modal-update textarea[name="email-text-update"]').val(modal['email-text']);
     $('#external-modules-configure-modal-update input[name="email-attachment-variable-update"]').val(modal['email-attachment-variable']);
@@ -121,7 +122,7 @@ function insertAtCursorTinyMCE(myValue,option) {
     if(lastClick != '') {
         if (lastClick != null) {
             // logic on to add button content
-            if((lastClick !='#email-cc-flexdatalist' && lastClick !='#email-to-flexdatalist' && lastClick !='#email-cc-update-flexdatalist' && lastClick !='#email-to-update-flexdatalist' && option == 1) || option == 0) {
+            if((lastClick !='#email-cc-flexdatalist' && lastClick !='#email-to-flexdatalist' && lastClick !='#email-bcc-flexdatalist' && lastClick !='#email-cc-update-flexdatalist' && lastClick !='#email-bcc-update-flexdatalist' && lastClick !='#email-to-update-flexdatalist' && option == 1) || option == 0) {
                 var myField = $(lastClick);
                 //IE support
                 if (document.selection) {
