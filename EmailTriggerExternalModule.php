@@ -268,10 +268,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $changes_made = "[Subject]: ".$email_subject.", [Message]: ".$email_text;
                     \REDCap::logEvent($action_description,$changes_made,NULL,$record,$event_id,$project_id);
 
+                    $action_description = "Email Sent To - Alert ".$id;
+                    $email_list = '';
+                    foreach ($mail->getAllRecipientAddresses() as $email=>$value){
+                        $email_list .= $email.";";
+                    }
+                    \REDCap::logEvent($action_description,$email_list,NULL,$record,$event_id,$project_id);
+
                 }
                 unlink($privatekeyfile);
                 // Clear all addresses and attachments for next loop
                 $mail->clearAddresses();
+                $mail->ClearAllRecipients();
                 $mail->clearAttachments();
             }
         }
@@ -617,7 +625,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
         return $logic;
     }
-
 }
 
 
