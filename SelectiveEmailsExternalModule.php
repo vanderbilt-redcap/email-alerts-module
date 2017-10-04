@@ -8,6 +8,11 @@ require_once APP_PATH_DOCROOT. '/Classes/LogicTester.php';
 
 class SelectiveEmailsExternalModule extends AbstractExternalModule
 {
+	public function __construct(){
+		parent::__construct();
+		$this->disableUserBasedSettingPermissions();
+	}
+
 	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id)
 	{
 		if(isset($project_id)){
