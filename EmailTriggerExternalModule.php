@@ -11,6 +11,10 @@ require_once 'EmailTriggerExternalModule.php';
 
 class EmailTriggerExternalModule extends AbstractExternalModule
 {
+	public function __construct(){
+		parent::__construct();
+		$this->disableUserBasedSettingPermissions();
+	}
 
 	function hook_survey_complete ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         $data = \REDCap::getData($project_id);
