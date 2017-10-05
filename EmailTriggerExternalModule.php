@@ -279,7 +279,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 unlink($privatekeyfile);
                 // Clear all addresses and attachments for next loop
                 $mail->clearAddresses();
-                $mail->ClearAllRecipients();
+//                $mail->ClearAllRecipients();
                 $mail->clearAttachments();
             }
         }
