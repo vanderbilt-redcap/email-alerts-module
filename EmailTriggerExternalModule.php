@@ -255,7 +255,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $mail->DKIM_selector = 'PHPMailer';
                 $mail->DKIM_passphrase = ''; //key is not encrypted
                 if (!$mail->send()) {
-                   $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error:".$mail->ErrorInfo." in project ".$project_id);
+                   $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error:".$mail->ErrorInfo." in project ".$project_id." Alert #".$id);
 
                 } else {
                     $email_sent[$id] = "1";
