@@ -17,7 +17,7 @@ if(!empty($surveyLink_var)){
         $var = preg_split("/[;,]+/", $surveylink)[0];
         $button = preg_split("/[;,]+/", $surveylink)[1];
 
-        $instrument_form = str_replace('[SURVEYLINK_', '', $var);
+        $instrument_form = str_replace('[__SURVEYLINK_', '', $var);
         $instrument_form = str_replace(']', '', $instrument_form);
 
         $sql = "SELECT save_and_return from `redcap_surveys` where project_id = ".$project_id." AND form_name ='".$instrument_form."'";

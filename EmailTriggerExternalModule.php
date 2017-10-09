@@ -11,6 +11,8 @@ require_once 'EmailTriggerExternalModule.php';
 
 class EmailTriggerExternalModule extends AbstractExternalModule
 {
+	private $email_requested = false;
+
 	public function __construct(){
 		parent::__construct();
 		$this->disableUserBasedSettingPermissions();
@@ -49,44 +51,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
             }
         }
-    }
-
-	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
-		$data = \REDCap::getData($project_id);
-        $this->setEmailTriggerRequested(false);
-		if(isset($project_id)){
-			#Form Complete
-			$forms_name = $this->getProjectSetting("form-name",$project_id);
-			if(!empty($forms_name) && $record != NULL){
-                foreach ($forms_name as $id => $form){
-                    $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
-                    $isLongitudinalData = false;
-                    if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
-                        $isLongitudinalData = true;
-                    }
-                    $isRepeatInstrument = false;
-                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2'))){
-                        $isRepeatInstrument = true;
-                    }
-                    if($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrument){
-                        if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
-                            if ($_REQUEST['page'] == $form) {
-                                $this->setEmailTriggerRequested(true);
-                                $email_sent = $this->getProjectSetting("email-sent",$project_id);
-                                $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-                                $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
-                                $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
-                            }
-                        }
-                    }
-                }
-			}
-		}
-	}
-
-	private $email_requested = false;
-	function getEmailTriggerRequested(){
-	    return $this->email_requested;
     }
 
     function setEmailTriggerRequested($email_requested){
@@ -148,7 +112,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $var = preg_split("/[;,]+/", $surveylink)[0];
                         //only if the variable is in the text we reset the survey link status
                         if (strpos($email_text, $var) !== false) {
-                            $instrument_form = str_replace('[SURVEYLINK_', '', $var);
+                            $instrument_form = str_replace('[__SURVEYLINK_', '', $var);
                             $instrument_form = str_replace(']', '', $instrument_form);
                             $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $event_id);
 
@@ -291,6 +255,133 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     /**
+     * Function that checks in the JSON if an email has already been sent by [survey][alert][record]
+     * @param $email_repetitive_sent, the JSON
+     * @param $new_record, the new record
+     * @param $instrument, the survey
+     * @param $alertid, the email alert
+     * @return bool
+     */
+    function isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
+        if(!empty($email_repetitive_sent)){
+            foreach ($email_repetitive_sent as $sv_name => $survey_records){
+                if($sv_name == $instrument) {
+                    foreach ($survey_records as $alert => $alert_value) {
+                        if($alertid == $alert) {
+                            foreach ($alert_value as $sv_number => $survey_record) {
+                                if($isRepeatInstrument){
+                                    if($sv_number == 'repeat_instances'){
+                                        foreach ($survey_record as $record_repeat => $record_value) {
+                                            if ($record == $record_repeat) {
+                                                foreach ($record_value as $instance => $instance_value) {
+                                                    if ($repeat_instance == $instance_value) {
+                                                        return true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }else if ($record == $survey_record) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Function that checks that returns the logic depending on if it's a repeating instrument
+     * @param $data
+     * @param $record
+     * @param $event_id
+     * @param $instrument
+     * @param $repeat_instance
+     * @param $var
+     * @return mixed
+     */
+    function isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var, $option){
+        if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$instrument.'_complete'] == '2') {
+            //Repeating instruments by form
+            $var_name = str_replace('[', '', $var);
+            $var_name = str_replace(']', '', $var_name);
+            $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
+        }else if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$instrument.'_complete'] == '2') {
+            //Repeating instruments by event
+            $var_name = str_replace('[', '', $var);
+            $var_name = str_replace(']', '', $var_name);
+            $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
+        }else{
+            if($option == '1'){
+                $logic = \LogicTester::apply($var, $data, null, true);
+            }else{
+                $logic = \LogicTester::apply($var, $data[$record], null, true);
+            }
+        }
+        return $logic;
+    }
+
+    /**
+     * Function that returns the label of the certain fields instead of their values
+     * @param $var, the field name we want to look for
+     * @param $value, the value of the field
+     * @param $project_id
+     * @param $data, the project data
+     * @return string, the label
+     */
+    function getLogicLabel ($var, $value, $project_id, $data){
+        $field_name = str_replace('[', '', $var);
+        $field_name = str_replace(']', '', $field_name);
+        $metadata = \REDCap::getDataDictionary($project_id,'array',false,$field_name);
+        $label = "";
+        if($metadata[$field_name]['field_type'] == 'checkbox' || $metadata[$field_name]['field_type'] == 'dropdown' || $metadata[$field_name]['field_type'] == 'radio'){
+            $choices = preg_split("/\s*\|\s*/", $metadata[$field_name]['select_choices_or_calculations']);
+            foreach ($choices as $choice){
+                $option_value = preg_split("/,/", $choice)[0];
+                if($value != ""){
+                    if(is_array($data[$field_name])){
+                        foreach ($data[$field_name] as $choiceValue=>$multipleChoice){
+                            if($multipleChoice === "1" && $choiceValue == $option_value) {
+                                $label .= trim(preg_split("/^(.+?),/", $choice)[1])." ";
+                            }
+                        }
+                    }else if($value === $option_value){
+                        $label = trim(preg_split("/^(.+?),/", $choice)[1]);
+                    }
+                }else if($value === $option_value){
+                    $label = trim(preg_split("/^(.+?),/", $choice)[1]);
+                    break;
+                }
+            }
+        }else if($metadata[$field_name]['field_type'] == 'truefalse'){
+            if($value == '1'){
+                $label = "True";
+            }else{
+                $label = "False";
+            }
+        }else if($metadata[$field_name]['field_type'] == 'sql'){
+            if(!empty($value)) {
+                $q = db_query($metadata[$field_name]['select_choices_or_calculations']);
+
+                if ($error = db_error()) {
+                    die($metadata[$field_name]['select_choices_or_calculations'] . ': ' . $error);
+                }
+
+                while ($row = db_fetch_assoc($q)) {
+                    if($row['record'] == $value ) {
+                        $label = $row['value'];
+                        break;
+                    }
+                }
+            }
+        }
+        return $label;
+    }
+
+    /**
      * Function that replaces the logic variables for email values and checks if they are valid
      * @param $mail
      * @param $emailsTo, liest of emaisl to send as CC or To
@@ -345,6 +436,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$email." in the project ".$project_id.", do not exist");
         }
         return $mail;
+    }
+
+    /**
+     * Function to send an extra error email if there is a value in the configuration
+     * @param $emailFailed_var
+     * @param $subject
+     * @param $message
+     */
+    function sendFailedEmailRecipient($emailFailed_var, $subject, $message){
+        if(!empty($emailFailed_var)){
+            $emailsFailed = preg_split("/[;,]+/", $emailFailed_var);
+            foreach ($emailsFailed as $failed){
+                \REDCap::email(trim($failed), 'noreply@vanderbilt.edu',$subject, $message);
+            }
+        }
     }
 
     /**
@@ -488,146 +594,41 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $jsonArray;
     }
 
-    /**
-     * Function that checks in the JSON if an email has already been sent by [survey][alert][record]
-     * @param $email_repetitive_sent, the JSON
-     * @param $new_record, the new record
-     * @param $instrument, the survey
-     * @param $alertid, the email alert
-     * @return bool
-     */
-    function isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
-        if(!empty($email_repetitive_sent)){
-            foreach ($email_repetitive_sent as $sv_name => $survey_records){
-                if($sv_name == $instrument) {
-                    foreach ($survey_records as $alert => $alert_value) {
-                        if($alertid == $alert) {
-                            foreach ($alert_value as $sv_number => $survey_record) {
-                                if($isRepeatInstrument){
-                                    if($sv_number == 'repeat_instances'){
-                                        foreach ($survey_record as $record_repeat => $record_value) {
-                                            if ($record == $record_repeat) {
-                                                foreach ($record_value as $instance => $instance_value) {
-                                                    if ($repeat_instance == $instance_value) {
-                                                        return true;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }else if ($record == $survey_record) {
-                                    return true;
-                                }
+	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
+		$data = \REDCap::getData($project_id);
+        $this->setEmailTriggerRequested(false);
+		if(isset($project_id)){
+			#Form Complete
+			$forms_name = $this->getProjectSetting("form-name",$project_id);
+			if(!empty($forms_name) && $record != NULL){
+                foreach ($forms_name as $id => $form){
+                    $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
+                    $isLongitudinalData = false;
+                    if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
+                        $isLongitudinalData = true;
+                    }
+                    $isRepeatInstrument = false;
+                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2'))){
+                        $isRepeatInstrument = true;
+                    }
+                    if($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrument){
+                        if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
+                            if ($_REQUEST['page'] == $form) {
+                                $this->setEmailTriggerRequested(true);
+                                $email_sent = $this->getProjectSetting("email-sent",$project_id);
+                                $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
+                                $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
+                                $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
                             }
                         }
                     }
                 }
-            }
-        }
-        return false;
-    }
+			}
+		}
+	}
 
-    /**
-     * Function to send an extra error email if there is a value in the configuration
-     * @param $emailFailed_var
-     * @param $subject
-     * @param $message
-     */
-    function sendFailedEmailRecipient($emailFailed_var, $subject, $message){
-        if(!empty($emailFailed_var)){
-            $emailsFailed = preg_split("/[;,]+/", $emailFailed_var);
-            foreach ($emailsFailed as $failed){
-                \REDCap::email(trim($failed), 'noreply@vanderbilt.edu',$subject, $message);
-            }
-        }
-    }
-
-    /**
-     * Function that returns the label of the certain fields instead of their values
-     * @param $var, the field name we want to look for
-     * @param $value, the value of the field
-     * @param $project_id
-     * @param $data, the project data
-     * @return string, the label
-     */
-    function getLogicLabel ($var, $value, $project_id, $data){
-        $field_name = str_replace('[', '', $var);
-        $field_name = str_replace(']', '', $field_name);
-        $metadata = \REDCap::getDataDictionary($project_id,'array',false,$field_name);
-        $label = "";
-        if($metadata[$field_name]['field_type'] == 'checkbox' || $metadata[$field_name]['field_type'] == 'dropdown' || $metadata[$field_name]['field_type'] == 'radio'){
-            $choices = preg_split("/\s*\|\s*/", $metadata[$field_name]['select_choices_or_calculations']);
-            foreach ($choices as $choice){
-                $option_value = preg_split("/,/", $choice)[0];
-                if($value != ""){
-                    if(is_array($data[$field_name])){
-                        foreach ($data[$field_name] as $choiceValue=>$multipleChoice){
-                            if($multipleChoice === "1" && $choiceValue == $option_value) {
-                                $label .= trim(preg_split("/^(.+?),/", $choice)[1])." ";
-                            }
-                        }
-                    }else if($value === $option_value){
-                        $label = trim(preg_split("/^(.+?),/", $choice)[1]);
-                    }
-                }else if($value === $option_value){
-                    $label = trim(preg_split("/^(.+?),/", $choice)[1]);
-                    break;
-                }
-            }
-        }else if($metadata[$field_name]['field_type'] == 'truefalse'){
-            if($value == '1'){
-                $label = "True";
-            }else{
-                $label = "False";
-            }
-        }else if($metadata[$field_name]['field_type'] == 'sql'){
-            if(!empty($value)) {
-                $q = db_query($metadata[$field_name]['select_choices_or_calculations']);
-
-                if ($error = db_error()) {
-                    die($metadata[$field_name]['select_choices_or_calculations'] . ': ' . $error);
-                }
-
-                while ($row = db_fetch_assoc($q)) {
-                    if($row['record'] == $value ) {
-                        $label = $row['value'];
-                        break;
-                    }
-                }
-            }
-        }
-        return $label;
-    }
-
-    /**
-     * Function that checks that returns the logic depending on if it's a repeating instrument
-     * @param $data
-     * @param $record
-     * @param $event_id
-     * @param $instrument
-     * @param $repeat_instance
-     * @param $var
-     * @return mixed
-     */
-    function isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var, $option){
-        if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$instrument.'_complete'] == '2') {
-            //Repeating instruments by form
-            $var_name = str_replace('[', '', $var);
-            $var_name = str_replace(']', '', $var_name);
-            $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
-        }else if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$instrument.'_complete'] == '2') {
-            //Repeating instruments by event
-            $var_name = str_replace('[', '', $var);
-            $var_name = str_replace(']', '', $var_name);
-            $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
-        }else{
-            if($option == '1'){
-                $logic = \LogicTester::apply($var, $data, null, true);
-            }else{
-                $logic = \LogicTester::apply($var, $data[$record], null, true);
-            }
-        }
-        return $logic;
+	function getEmailTriggerRequested(){
+	    return $this->email_requested;
     }
 }
 

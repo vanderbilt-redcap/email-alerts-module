@@ -327,8 +327,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     var pipeVar = $('#surveyLink_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
-                        if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]")) || !(trim(pipeName[0]).startsWith("[SURVEYLINK_"))){
-                            errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>[SURVEYLINK_variable_name],label</i> .');
+                        if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]")) || !(trim(pipeName[0]).startsWith("[__SURVEYLINK_"))){
+                            errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>[__SURVEYLINK_variable_name],label</i> .');
                         }
                     }
                 }
@@ -603,9 +603,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content<span><div class="description_config">Allows REDCap survey links for any survey-enabled form to be inserted into email messages.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
-                            <span class="table_example">Example: [SURVEYLINK_form_name], name ...</span><br/>
+                            <span class="table_example">Example: [__SURVEYLINK_form_name], name ...</span><br/>
                             <a id="addLinkBtn" onclick="javascript:$('#addLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
-                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[SURVEYLINK_form_name], name ..." value="<?=$emailTriggerModule->getProjectSetting('surveyLink_var');?>"><?=$emailTriggerModule->getProjectSetting('surveyLink_var');?></textarea>
+                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[__SURVEYLINK_form_name], name ..." value="<?=$emailTriggerModule->getProjectSetting('surveyLink_var');?>"><?=$emailTriggerModule->getProjectSetting('surveyLink_var');?></textarea>
                             <div class="btn_color_square btn_color_surveyLink"></div>Survey link button (orange)
                         </td>
                     </tr>
@@ -782,7 +782,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                                         <option value=""></option>
                                         <?php
                                         foreach ($simple_config['email-dashboard-settings'][0]['choices'] as $choice){
-                                            echo '<option value="SURVEYLINK_'.$choice['value'].'">'.$choice['name'].'</option>';
+                                            echo '<option value="__SURVEYLINK_'.$choice['value'].'">'.$choice['name'].'</option>';
                                         }
                                         ?>
                                     </select>
