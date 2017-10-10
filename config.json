@@ -45,6 +45,12 @@
           "type":"text"
         },
 		{
+			"key": "email-from",
+			"name": "Email From",
+			"required": true,
+			"type": "text"
+		},
+		{
 			"key": "email-to",
 			"name": "Email To",
 			"required": true,

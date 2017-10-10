@@ -14,6 +14,7 @@ $index =  $_REQUEST['index_modal_delete'];
 #get data from the DB
 $form_name = empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name');
 $form_name_event = empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name-event'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name-event');
+$email_from = empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-from'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-from');
 $email_to = empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-to'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-to');
 $email_cc =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-cc'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-cc');
 $email_bcc =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-bcc'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-bcc');
@@ -51,6 +52,7 @@ if(!empty($email_repetitive_sent)){
 #Delete one element in array
 unset($form_name[$index]);
 unset($form_name_event[$index]);
+unset($email_from[$index]);
 unset($email_to[$index]);
 unset($email_cc[$index]);
 unset($email_bcc[$index]);
@@ -71,6 +73,7 @@ unset($email_deactivate[$index]);
 #Rearrange the indexes
 array_values($form_name);
 array_values($form_name_event);
+array_values($email_from);
 array_values($email_to);
 array_values($email_cc);
 array_values($email_bcc);
@@ -91,6 +94,7 @@ array_values($email_deactivate);
 #Save data
 ExternalModules::setProjectSetting($prefix,$pid, 'form-name', $form_name);
 ExternalModules::setProjectSetting($prefix,$pid, 'form-name-event', $form_name_event);
+ExternalModules::setProjectSetting($prefix,$pid, 'email-from', $email_from);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-to', $email_to);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-cc', $email_cc);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-bcc', $email_bcc);

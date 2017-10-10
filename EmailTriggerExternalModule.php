@@ -66,6 +66,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance))) && $email_deactivate == "0") {
             //If the condition is met or if we don't have any, we send the email
             if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)) {
+                $email_from = $this->getProjectSetting("email-from", $project_id)[$id];
                 $email_to = $this->getProjectSetting("email-to", $project_id)[$id];
                 $email_cc = $this->getProjectSetting("email-cc", $project_id)[$id];
                 $email_bcc = $this->getProjectSetting("email-bcc", $project_id)[$id];
@@ -75,8 +76,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $datapipe_var = $this->getProjectSetting("datapipe_var", $project_id);
                 $datapipeEmail_var = $this->getProjectSetting("datapipeEmail_var", $project_id);
                 $surveyLink_var = $this->getProjectSetting("surveyLink_var", $project_id);
-                $emailSender_name = $this->getProjectSetting("emailSender_var", $project_id);
-                $emailSender_email = $this->getProjectSetting("email-sender", $project_id);
 
                 //To ensure it's the last module called
                 $delayedSuccessful =  $this->delayModuleExecution();
@@ -144,28 +143,38 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     if(!empty($email_to_ok)) {
                         foreach ($email_to_ok as $email) {
-                            $mail->addAddress($email);
+                            $mail = $this->check_single_email($mail,$email, 'to', $project_id);
                         }
                     }
 
                     if(!empty($email_cc_ok)){
                         foreach ($email_cc_ok as $email) {
-                            $mail->AddCC($email);
+                            $mail = $this->check_single_email($mail,$email, 'cc', $project_id);
                         }
                     }
 
                     if(!empty($email_bcc_ok)){
                         foreach ($email_bcc_ok as $email) {
-                            $mail->AddBCC($email);
+                            $mail = $this->check_single_email($mail,$email, 'bcc', $project_id);
                         }
                     }
                 }
 
                 //Email From
-                if(!empty($emailSender_email)){
-                    $mail->SetFrom($emailSender_email, $emailSender_name);
+                if(!empty($email_from)){
+                    $from_data = preg_split("/[;,]+/", $email_from);
+                    if(filter_var(trim($from_data[0]), FILTER_VALIDATE_EMAIL)) {
+                        if($from_data[1] == '""' || empty($from_data[1])){
+                            $mail->SetFrom($from_data[0]);
+                        }else{
+                            $mail->SetFrom($from_data[0], $from_data[1]);
+                        }
+
+                    }else{
+                        $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$from_data[0]." in Project: ".$project_id.", Record: ".$record." Alert #".$id.", does not exist");
+                    }
                 }else{
-                    $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Sender is empty" ,"The sender in the project ".$project_id.", is empty.");
+                    $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Sender is empty" ,"The sender in Project: ".$project_id.", Record: ".$record." Alert #".$id.", is empty.");
                 }
 
                 //Embedded images
@@ -402,9 +411,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                        if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email)) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
                         } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && empty($email_redcap)){
-//                        } else if(!empty($email_redcap)){
-    //                            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"email: ".$email." emailredcap: ".$email_redcap." var:".$var[0]." EQUALS: ".strpos($email, '[emailp]').", do not exist");
-                                $mail = $this->check_single_email($mail,$email,$option,$project_id);
+                            $mail = $this->check_single_email($mail,$email,$option,$project_id);
                         }
                     } else {
                         $mail = $this->check_single_email($mail,$email,$option,$project_id);
@@ -423,7 +430,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $project_id
      * @return mixed
      */
-    function check_single_email($mail,$email, $option, $project_id,$var){
+    function check_single_email($mail,$email, $option, $project_id){
         if(filter_var(trim($email), FILTER_VALIDATE_EMAIL)) {
             if($option == "to"){
                 $mail->addAddress($email);

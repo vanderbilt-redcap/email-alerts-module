@@ -14,6 +14,8 @@ $emailTriggerModule = new EmailTriggerExternalModule();
 $config = $emailTriggerModule->getConfig();
 $prefix = ExternalModules::getPrefixForID($_GET['id']);
 $pid = $_GET['pid'];
+$from_default = empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-sender'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-sender').',"'.$emailTriggerModule->getProjectSetting('emailSender_var').'"';
+
 
 $projectData= (array(
     'status' => 'success',
@@ -76,13 +78,13 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         var configSettingsUpdate = <?=json_encode($simple_config_update['email-dashboard-settings'])?>;
         var project_id = <?=json_encode($_GET['pid'])?>;
         var isLongitudinal = <?=json_encode(\REDCap::isLongitudinal())?>;
+        var from_default = <?=json_encode($from_default)?>;
         //Dashboard info
         var datapipe_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_var'))?>;
         var emailFromForm_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_var'))?>;
         var emailSender_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailSender_var'))?>;
         var datapipeEmail_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_var'))?>;
         var surveyLink_var = <?=json_encode($emailTriggerModule->getProjectSetting('surveyLink_var'))?>;
-        var email_sender = <?=json_encode($emailTriggerModule->getProjectSetting('email-sender'))?>;
 
         //Url
         var pid = '<?=$pid?>';
@@ -191,7 +193,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         inputHtml = inputHtml.replace("<td class='external-modules-input-td'>", "<td class='external-modules-input-td'>" + buttonLegend + "<div>" + buttonsHtml + "<div>");
                     }
                     return inputHtml;
-                } else if (setting.type == 'text' && (setting.key == 'email-to' || setting.key == 'email-to-update' || setting.key == 'email-cc' || setting.key == 'email-cc-update' || setting.key == 'email-bcc' || setting.key == 'email-bcc-update')) {
+                }else if (setting.type == 'text' && (setting.key == 'email-to' || setting.key == 'email-to-update' || setting.key == 'email-cc' || setting.key == 'email-cc-update' || setting.key == 'email-bcc' || setting.key == 'email-bcc-update')) {
                     //We add the datalist for the emails
                     inputHtml += "<tr class='" + customClass + "'><td><span class='external-modules-instance-label'></span><label>" + setting.name + ":</label></td>";
                     var datalistname = "json-datalist-" + setting.key;
@@ -214,8 +216,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     }
                     inputHtml += '<tr field="form-name-event" class="form-control-custom" style="display:none"></tr>';
                     return inputHtml;
-                }
-                else {
+                }else {
 					if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
 						return EMparent.getSettingColumns.call(this, setting, instance, header);
 					}
@@ -234,7 +235,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 if(setting.type == 'form-list' && setting.key == 'form-name') {
                     rowsHtml += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Triggers</div></td></tr>";
                     rowsHtmlUpdate += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Triggers</div></td></tr>";
-                }else if(setting.type == 'text' && setting.key == 'email-to') {
+                }else if(setting.type == 'text' && setting.key == 'email-from') {
                     rowsHtml += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Content</div></td></tr>";
                     rowsHtmlUpdate += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Content</div></td></tr>";
                 }else if(setting.type == 'text' && setting.key == 'email-attachment-variable') {
@@ -270,7 +271,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             $('#btnViewCodes').on('click', function(e){
 				// configureSettings now expects this variable to be defined because it's filled by 2 ajax calls
 				// So if calling configureSettings without going through getSettingsRows, muct manually define
-				ExternalModules.Settings.projectList = [];
+                ExternalModules.Settings.projectList = [];
                 EMparent.configureSettings(configSettings, configSettings);
 
                 for(var i=0; i<tinymce.editors.length; i++){
@@ -280,7 +281,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     })
                 }
 
-                $('[name="email-attachment-variable"]').attr('placeholder','[variable1], [variable2], ...')
+                $('[name="email-attachment-variable"]').attr('placeholder','[variable1], [variable2], ...');
+                $('[name="email-from"]').attr('placeholder','myemail@server.com, "Sender name"');
+                $('[name="email-from"]').val(from_default);
 
                 $('#external-modules-configure-modal').modal('show');
                 e.preventDefault();
@@ -341,18 +344,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                             break;
                         }
                     }
-                }
-
-                if ($('#emailSender_var').val() == "" && $('#emailSender_var').val() == "0") {
-                    errMsg.push('<strong>Sender Email</strong> is a required field.');
-                }
-
-                if (email_sender == "" || email_sender == null) {
-                    var control_center = <?=json_encode(APP_PATH_WEBROOT_FULL . "external_modules/manager/control_center.php")?>;
-                    errMsg.push('<strong>Email Sender </strong> is empty. Contact your REDCap administrator to update the module settings in the Control Center.');
-                }else if(!validateEmail(email_sender)){
-                    var control_center = <?=json_encode(APP_PATH_WEBROOT_FULL . "external_modules/manager/control_center.php")?>;
-                    errMsg.push('<strong>Email '+email_sender+'</strong> is not a valid Sender email. Contact your REDCap administrator to update the module settings in the Control Center.');
                 }
 
                 $('#errMsgContainer').empty();
@@ -577,7 +568,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                         <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[name_var], [surname_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
                     </tr>
                     <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Name</strong> for email alerts<span><div class="description_config">Allows the user to set a custom sender name for the email alerts. This only affects the sender name, not the sender email address. The sender email address used by this email alerts tool is configured by your REDCap administrator.</div></td>
+                        <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Name</strong> for email alerts<span><div class="description_config">Allows the user to set a default custom sender name for the email alerts. This only affects the sender name, not the sender email address, that will appear in the alert by default.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             Sender name<br/><input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='Sender name' value='<?=$emailTriggerModule->getProjectSetting('emailSender_var');?>'/>
                         </td>
@@ -693,6 +684,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 $fileAttachments = 0;
                 $attachmentVar ='';
                 $attachmentFile ='';
+                $alerts_from = '';
                 foreach ($config['email-dashboard-settings'] as $configKey => $configRow) {
 
                     if ($configRow['type'] == 'file') {
@@ -736,8 +728,14 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                                     $attachmentVar .= '- '.$var.'<br/>';
                                 }
                             }
+                        }else if ($configRow['key'] == 'email-from'){
+                            if(empty($configRow['value'][$index])){
+                                $alerts_from = '<span>From: '.$from_default . '</span><br/>';
+                            }else{
+                                $alerts_from = '<span>From: '.$configRow['value'][$index] . '</span><br/>';
+                            }
                         }else if($configRow['key'] == 'email-subject') {
-                            $alerts .= '<td><span>'.$configRow['value'][$index] . '</span><br/>';
+                            $alerts .= '<td>'.$alerts_from.'<span>'.$configRow['value'][$index] . '</span><br/>';
                         }else if ($configRow['key'] == 'email-text'){
                             $alerts .= '<span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview Message</a></span></td>';
                         }else{

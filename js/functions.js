@@ -32,9 +32,11 @@ function editEmailAlert(modal, index){
     $("#index_modal_update").val(index);
 
     $('[name="email-attachment-variable-update"]').attr('placeholder','[variable1], [variable2], ...')
+    $('[name="email-from-update"]').attr('placeholder','myemail@server.com, "Sender name"');
 
     //Add values
     $('#external-modules-configure-modal-update select[name="form-name-update"]').val(modal['form-name']);
+    $('#external-modules-configure-modal-update input[name="email-from-update"]').val(modal['email-from']);
     $('#external-modules-configure-modal-update input[name="email-to-update"]').val(modal['email-to']);
     $('#external-modules-configure-modal-update input[name="email-cc-update"]').val(modal['email-cc']);
     $('#external-modules-configure-modal-update input[name="email-bcc-update"]').val(modal['email-bcc']);
@@ -213,6 +215,11 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
         }
     }
 
+    if ($('#external-modules-configure-modal'+suffix+' input[name=email-from'+suffix+']').val() === "" || $('#external-modules-configure-modal'+suffix+' input[name=email-from'+suffix+']').val() === "0") {
+        errMsg.push('Please insert an <strong>email sender</strong>.');
+        $('#external-modules-configure-modal'+suffix+' input[name=email-from'+suffix+']').addClass('alert');
+    }else{ $('#external-modules-configure-modal'+suffix+' input[name=email-from'+suffix+']').removeClass('alert');}
+
     var editor_text = tinymce.activeEditor.getContent();
     if(editor_text == ""){
         errMsg.push('Please insert an <strong>email message</strong>.');
@@ -226,6 +233,7 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
         });
         $('#errMsgContainerModal'+errorContainerSuffix).show();
         $('html,body').scrollTop(0);
+        $('#external-modules-configure-modal'+suffix).scrollTop(0);
         return false;
     }
     else {
