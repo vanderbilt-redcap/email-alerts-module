@@ -4,11 +4,9 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-//require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 require_once ExternalModules::getProjectHeaderPath();
 require_once 'EmailTriggerExternalModule.php';
 require_once __DIR__ . '/../../external_modules/manager/templates/globals.php';
-
 
 $emailTriggerModule = new EmailTriggerExternalModule();
 $config = $emailTriggerModule->getConfig();
@@ -62,7 +60,6 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
-//print_array($simple_config);
 
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
@@ -466,7 +463,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 return false;
             });
 
-            /***PIPPING BUTTONS INTERACTION***/
+            /***PIPING BUTTONS INTERACTION***/
             //Saves the field id/name in which field we are
             $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, #email-bcc-flexdatalist, #email-bcc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('focus', function(e){
                 var id = $(this).attr("id");
@@ -533,6 +530,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         $tr_class = '';
     }
 ?>
+<!-- CONFIGURATION TABLE -->
 <form class="form-inline" action="" method="post" id='mainForm'>
     <div class="container-fluid wiki">
         <div class='row' style=''>
@@ -624,6 +622,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 </div>
 <?PHP require('codes_modal.php');?>
 
+<!-- ALERTS TABLE -->
 <div style="padding-top:50px" class="col-md-12">
     <div>
         <a href="" id='btnViewCodes' type="button" class="btn btn-info pull-left email_forms_button_color email_forms_button open-codesModal" style="font-size:14px;color:#fff;margin-top: 0;margin-bottom: 10px;">Add New Email</a>

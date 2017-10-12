@@ -256,7 +256,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 unlink($privatekeyfile);
                 // Clear all addresses and attachments for next loop
                 $mail->clearAddresses();
-//                $mail->ClearAllRecipients();
                 $mail->clearAttachments();
             }
         }
@@ -573,7 +572,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $jsonArray = $this->addNewJSONRecord($jsonArray,$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
         }
 
-//        print_array($jsonArray);
         return json_encode($jsonArray,JSON_FORCE_OBJECT);
     }
 
@@ -601,13 +599,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $jsonArray;
     }
 
-	function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
-		$data = \REDCap::getData($project_id);
+    function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
+        $data = \REDCap::getData($project_id);
         $this->setEmailTriggerRequested(false);
-		if(isset($project_id)){
-			#Form Complete
-			$forms_name = $this->getProjectSetting("form-name",$project_id);
-			if(!empty($forms_name) && $record != NULL){
+        if(isset($project_id)){
+            #Form Complete
+            $forms_name = $this->getProjectSetting("form-name",$project_id);
+            if(!empty($forms_name) && $record != NULL){
                 foreach ($forms_name as $id => $form){
                     $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
                     $isLongitudinalData = false;
@@ -630,12 +628,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
                 }
-			}
-		}
-	}
+            }
+        }
+    }
 
-	function getEmailTriggerRequested(){
-	    return $this->email_requested;
+    /**
+     *To call externally to see if the email has been requested to send or not.
+     * It is used in other Plugins
+     *
+     */
+    function getEmailTriggerRequested(){
+        return $this->email_requested;
     }
 }
 

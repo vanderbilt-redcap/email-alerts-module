@@ -1,3 +1,7 @@
+/**
+ * Function to preview the message on the alerts table
+ * @param index, the alert id
+ */
 function previewEmailAlert(index){
     var data = "&index_modal_preview="+index;
     $.ajax({
@@ -15,6 +19,11 @@ function previewEmailAlert(index){
     });
 }
 
+/**
+ * Function that shows the modal with the alert information to modify it
+ * @param modal, array with the data from a specific aler
+ * @param index, the alert id
+ */
 function editEmailAlert(modal, index){
     tinymce.remove();
 	ExternalModules.Settings.projectList = [];
@@ -71,6 +80,7 @@ function editEmailAlert(modal, index){
 
 }
 
+/***FILES***/
 function getAttributeValueHtml(s){
     if(typeof s == 'string'){
         s = s.replace(/"/g, '&quot;');
@@ -120,6 +130,11 @@ function deactivateEmailAlert(index, status){
 }
 
 //We insert the button text depending on which field we are
+/**
+ * Function to add the cursor position so the text from the data piping buttons can be added on those specific fields
+ * @param myValue
+ * @param option
+ */
 function insertAtCursorTinyMCE(myValue,option) {
     if(lastClick != '') {
         if (lastClick != null) {
@@ -157,11 +172,11 @@ function insertAtCursorTinyMCE(myValue,option) {
 
 }
 
-function randomString() {
-    var length = 7;
-    return Math.round((Math.pow(36, length + 1) - Math.random() * Math.pow(36, length))).toString(36).slice(1);
-}
-
+/**
+ * Function that reloads the page and updates the success message
+ * @param letter
+ * @returns {string}
+ */
 function gerUtlMessageParam(letter){
     var url = window.location.href;
     if(window.location.href.match(/(&message=)([A-Z]{1})/)){
@@ -169,7 +184,6 @@ function gerUtlMessageParam(letter){
     }else{
         url = window.location.href + "&message="+letter;
     }
-    // url = url + "&rand=" + randomString();
     return url;
 }
 
@@ -178,6 +192,10 @@ function validateEmail(email) {
     return re.test(email);
 }
 
+/**
+ * Function that checks if all required fields form the alerts are filled @param errorContainerSuffix
+ * @returns {boolean}
+ */
 function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
     $('#succMsgContainer').hide();
     $('#errMsgContainerModal'+errorContainerSuffix).hide();
@@ -305,6 +323,10 @@ function checkIfSurveyIsSaveAndReturn(data,url,saveUrl){
     });
 }
 
+/**
+ * If the instrument is longitufinal we show the drop down to select the event
+ * @param data
+ */
 function uploadLongitudinalEvent(data){
     if(isLongitudinal){
         $.post(_longitudinal_url, data, function(returnData){
