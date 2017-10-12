@@ -53,6 +53,48 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
+    function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
+        $data = \REDCap::getData($project_id);
+        $this->setEmailTriggerRequested(false);
+        if(isset($project_id)){
+            #Form Complete
+            $forms_name = $this->getProjectSetting("form-name",$project_id);
+            if(!empty($forms_name) && $record != NULL){
+                foreach ($forms_name as $id => $form){
+                    $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
+                    $isLongitudinalData = false;
+                    if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
+                        $isLongitudinalData = true;
+                    }
+                    $isRepeatInstrument = false;
+                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2'))){
+                        $isRepeatInstrument = true;
+                    }
+                    if($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrument){
+                        if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
+                            if ($_REQUEST['page'] == $form) {
+                                $this->setEmailTriggerRequested(true);
+                                $email_sent = $this->getProjectSetting("email-sent",$project_id);
+                                $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
+                                $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
+                                $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     *To call externally to see if the email has been requested to send or not.
+     * It is used in other Plugins
+     *
+     */
+    function getEmailTriggerRequested(){
+        return $this->email_requested;
+    }
+
     function setEmailTriggerRequested($email_requested){
        $this->email_requested =  $email_requested;
     }
@@ -599,47 +641,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $jsonArray;
     }
 
-    function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
-        $data = \REDCap::getData($project_id);
-        $this->setEmailTriggerRequested(false);
-        if(isset($project_id)){
-            #Form Complete
-            $forms_name = $this->getProjectSetting("form-name",$project_id);
-            if(!empty($forms_name) && $record != NULL){
-                foreach ($forms_name as $id => $form){
-                    $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
-                    $isLongitudinalData = false;
-                    if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
-                        $isLongitudinalData = true;
-                    }
-                    $isRepeatInstrument = false;
-                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2'))){
-                        $isRepeatInstrument = true;
-                    }
-                    if($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrument){
-                        if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
-                            if ($_REQUEST['page'] == $form) {
-                                $this->setEmailTriggerRequested(true);
-                                $email_sent = $this->getProjectSetting("email-sent",$project_id);
-                                $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-                                $email_repetitive_sent = $this->getProjectSetting("email-repetitive-sent",$project_id);
-                                $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 
-    /**
-     *To call externally to see if the email has been requested to send or not.
-     * It is used in other Plugins
-     *
-     */
-    function getEmailTriggerRequested(){
-        return $this->email_requested;
-    }
 }
 
 
