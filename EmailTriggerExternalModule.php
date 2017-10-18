@@ -606,7 +606,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
 
         }else{
-            $jsonArray = $this->addNewJSONRecord("",$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
+            $jsonArray = $this->addNewJSONRecord([],$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
         }
 
         //add new record for new survey
