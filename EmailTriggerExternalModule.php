@@ -125,16 +125,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     return;
                 }
 
-
                 //Data piping
                 if (!empty($datapipe_var)) {
                     $datapipe = explode("\n", $datapipe_var);
                     foreach ($datapipe as $emailvar) {
-
                         $var = preg_split("/[;,]+/", $emailvar)[0];
                         if (\LogicTester::isValid($var)) {
-                            //Repeatble instruments
-                            $logic = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var,0);
+                            //Repeatable instruments
+                            $logic = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var,0);
                             $label = $this->getLogicLabel($var, $logic,$project_id,$data,$event_id,$record,$repeat_instance);
                             if(!empty($label)){
                                 $logic = $label;
@@ -145,7 +143,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
                 }
-
                 //Survey Link
                 if(!empty($surveyLink_var)) {
                     $emailTriggerModule = new EmailTriggerExternalModule();
@@ -250,7 +247,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $var = preg_split("/[;,]+/", $email_attachment_variable);
                     foreach ($var as $attachment) {
                         if(\LogicTester::isValid(trim($attachment))) {
-                            $edoc = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $attachment,0);
+                            $edoc = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $attachment,0);
                             $this->addNewAttachment($mail,$edoc,$project_id,'files');
                         }
                     }
@@ -355,22 +352,30 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $var
      * @return mixed
      */
-    function isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var, $option){
+    function isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var, $option){
+        $var_name = str_replace('[', '', $var);
+        $var_name = str_replace(']', '', $var_name);
         if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$instrument.'_complete'] == '2') {
             //Repeating instruments by form
-            $var_name = str_replace('[', '', $var);
-            $var_name = str_replace(']', '', $var_name);
             $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
         }else if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$instrument.'_complete'] == '2') {
             //Repeating instruments by event
-            $var_name = str_replace('[', '', $var);
-            $var_name = str_replace(']', '', $var_name);
             $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
         }else{
             if($option == '1'){
                 $logic = \LogicTester::apply($var, $data, null, true);
             }else{
-                $logic = \LogicTester::apply($var, $data[$record], null, true);
+                if(\REDCap::isLongitudinal() && \LogicTester::apply($var, $data[$record], null, true) == ""){
+                    $logic = $data[$record][$event_id][$var_name];
+                }else{
+                    preg_match_all("/\[[^\]]*\]/", $var, $matches);
+                    //Special case for radio buttons
+                    if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
+                        $logic = $data[$record][$event_id][$var_name];
+                    }else{
+                        $logic = \LogicTester::apply($var, $data[$record], null, true);
+                    }
+                }
             }
         }
         return $logic;
@@ -392,8 +397,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $field_name = str_replace('[', '', $var);
         $field_name = str_replace(']', '', $field_name);
         $metadata = \REDCap::getDataDictionary($project_id,'array',false,$field_name);
+        //event arm is defined
+        if(empty($metadata)){
+            preg_match_all("/\[[^\]]*\]/", $var, $matches);
+            $event_name = str_replace('[', '', $matches[0][0]);
+            $event_name = str_replace(']', '', $event_name);
+
+            $field_name = str_replace('[', '', $matches[0][1]);
+            $field_name = str_replace(']', '', $field_name);
+            $metadata = \REDCap::getDataDictionary($project_id,'array',false,$field_name);
+        }
         $label = "";
         if($metadata[$field_name]['field_type'] == 'checkbox' || $metadata[$field_name]['field_type'] == 'dropdown' || $metadata[$field_name]['field_type'] == 'radio'){
+            $other_event_id = \REDCap::getEventIdFromUniqueEvent($event_name);
             $choices = preg_split("/\s*\|\s*/", $metadata[$field_name]['select_choices_or_calculations']);
             foreach ($choices as $choice){
                 $option_value = preg_split("/,/", $choice)[0];
@@ -410,6 +426,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }else if($value === $option_value){
                     $label = trim(preg_split("/^(.+?),/", $choice)[1]);
                     break;
+                }else if($value == "" && $metadata[$field_name]['field_type'] == 'checkbox'){
+                    //Checkboxes for event_arms
+                    if( $other_event_id == ""){
+                        $other_event_id = $event_id;
+                    }
+                    if($data[$record][$other_event_id][$field_name][$option_value] == "1"){
+                        $label .= trim(preg_split("/^(.+?),/", $choice)[1])."";
+                    }
                 }
             }
         }else if($metadata[$field_name]['field_type'] == 'truefalse'){
@@ -434,6 +458,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
             }
         }
+
         return $label;
     }
 
