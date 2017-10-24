@@ -125,6 +125,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     return;
                 }
 
+
                 //Data piping
                 if (!empty($datapipe_var)) {
                     $datapipe = explode("\n", $datapipe_var);
@@ -134,7 +135,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         if (\LogicTester::isValid($var)) {
                             //Repeatble instruments
                             $logic = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var,0);
-                            $label = $this->getLogicLabel($var, $logic,$project_id,$data[$record][$event_id]);
+                            $label = $this->getLogicLabel($var, $logic,$project_id,$data,$event_id,$record,$repeat_instance);
                             if(!empty($label)){
                                 $logic = $label;
                             }
@@ -144,6 +145,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
                 }
+
                 //Survey Link
                 if(!empty($surveyLink_var)) {
                     $emailTriggerModule = new EmailTriggerExternalModule();
@@ -382,7 +384,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $data, the project data
      * @return string, the label
      */
-    function getLogicLabel ($var, $value, $project_id, $data){
+    function getLogicLabel ($var, $value, $project_id, $data,$event_id,$record,$repeat_instance){
+        $data_event = $data[$record][$event_id];
+        if(empty($data_event)){
+            $data_event = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance];
+        }
         $field_name = str_replace('[', '', $var);
         $field_name = str_replace(']', '', $field_name);
         $metadata = \REDCap::getDataDictionary($project_id,'array',false,$field_name);
@@ -392,8 +398,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             foreach ($choices as $choice){
                 $option_value = preg_split("/,/", $choice)[0];
                 if($value != ""){
-                    if(is_array($data[$field_name])){
-                        foreach ($data[$field_name] as $choiceValue=>$multipleChoice){
+                    if(is_array($data_event[$field_name])){
+                        foreach ($data_event[$field_name] as $choiceValue=>$multipleChoice){
                             if($multipleChoice === "1" && $choiceValue == $option_value) {
                                 $label .= trim(preg_split("/^(.+?),/", $choice)[1])." ";
                             }
