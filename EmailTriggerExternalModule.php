@@ -436,6 +436,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
             }
+            //we delete the last comma and space
             $label = rtrim($label,", ");
         }else if($metadata[$field_name]['field_type'] == 'truefalse'){
             if($value == '1'){
