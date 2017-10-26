@@ -417,7 +417,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if(is_array($data_event[$field_name])){
                         foreach ($data_event[$field_name] as $choiceValue=>$multipleChoice){
                             if($multipleChoice === "1" && $choiceValue == $option_value) {
-                                $label .= trim(preg_split("/^(.+?),/", $choice)[1])." ";
+                                $label .= trim(preg_split("/^(.+?),/", $choice)[1]).", ";
                             }
                         }
                     }else if($value === $option_value){
@@ -432,10 +432,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $other_event_id = $event_id;
                     }
                     if($data[$record][$other_event_id][$field_name][$option_value] == "1"){
-                        $label .= trim(preg_split("/^(.+?),/", $choice)[1])."";
+                        $label .= trim(preg_split("/^(.+?),/", $choice)[1]).", ";
                     }
                 }
             }
+            $label = rtrim($label,", ");
         }else if($metadata[$field_name]['field_type'] == 'truefalse'){
             if($value == '1'){
                 $label = "True";
