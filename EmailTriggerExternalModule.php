@@ -480,7 +480,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $var = preg_split("/[;,]+/", $email_var);
                 if(!empty($email)) {
                     if (\LogicTester::isValid($var[0])) {
-                        $email_redcap = $this->isRepeatingInstrument($data, $record, $event_id, $instrument, $repeat_instance, $var[0],1);
+                        $email_redcap = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var[0],1);
 
                        if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email)) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
