@@ -85,6 +85,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
         //Url
         var pid = '<?=$pid?>';
+        var _duplicateform_url = '<?=$emailTriggerModule->getUrl('duplicateForm.php')?>';
         var _preview_url = '<?=$emailTriggerModule->getUrl('previewForm.php')?>';
         var _edoc_name_url = '<?=$emailTriggerModule->getUrl('get-edoc-name.php')?>';
         var _longitudinal_url = '<?=$emailTriggerModule->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
@@ -748,7 +749,8 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 $alerts .= "<td><span style='text-align: center;width: 200px;'><strong>" . $fileAttachments . " files</strong><br/></span>".$attachmentVar.$attachmentFile."</td>";
                 $alerts .= "<td><div><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
                 $alerts .= "<div><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\")' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
-                $alerts .= "<div><a onclick='deleteEmailAlert(".$index.")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >Delete</a></div></td>";
+                $alerts .= "<div><a onclick='duplicateEmailAlert(\"".$index."\")' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
+                $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >Delete</a></div></td>";
                 $alerts .= "</tr>";
                 $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";
             }

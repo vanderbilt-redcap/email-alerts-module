@@ -128,6 +128,9 @@ function deactivateEmailAlert(index, status){
     $('#index_modal_message').html('Are you sure you want to '+status+' this Email Alert?');
     $('#external-modules-configure-modal-deactivate-confirmation').modal('show');
 }
+function duplicateEmailAlert(index){
+    ajaxLoadOptionAndMessage("&index_duplicate="+index,_duplicateform_url,"A");
+}
 
 //We insert the button text depending on which field we are
 /**
