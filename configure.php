@@ -61,6 +61,10 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
 
+$action_description = "****TEST ERROR";
+$changes_made = json_encode($config['email-dashboard-settings']);
+\REDCap::logEvent($action_description,$changes_made,NULL,1,103,80);
+
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
