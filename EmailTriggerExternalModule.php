@@ -493,7 +493,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                         /******TEST LOGS************/
                         $action_description = "***TEST ERROR: ".$entro;
-                        $changes_made = "Email: ".$email." Email_redcap: ".$email_redcap." Validate email: ".filter_var(trim($email), FILTER_VALIDATE_EMAIL);
+                        $changes_made = "Email: ".$email." Email_redcap: ".$email_redcap."<br> Validate email: ".filter_var(trim($email), FILTER_VALIDATE_EMAIL)."<br> empty?".empty($email_redcap);
                         \REDCap::logEvent($action_description,$changes_made,NULL,$record,$event_id,$project_id);
                     } else {
                         $mail = $this->check_single_email($mail,$email,$option,$project_id);
