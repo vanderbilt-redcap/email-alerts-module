@@ -482,11 +482,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if (\LogicTester::isValid($var[0])) {
                         $email_redcap = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var[0],1);
 
+                        $entro = "";
                        if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email)) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
-                        } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && empty($email_redcap)){
+                           $entro = "1";
+                       } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && empty($email_redcap)){
                             $mail = $this->check_single_email($mail,$email,$option,$project_id);
-                        }
+                           $entro = "2";
+                       }
+
+                        /******TEST LOGS************/
+                        $action_description = "***TEST ERROR: ".$entro;
+                        $changes_made = "Email: ".$email." Email_redcap: ".$email_redcap;
+                        \REDCap::logEvent($action_description,$changes_made,NULL,$record,$event_id,$project_id);
                     } else {
                         $mail = $this->check_single_email($mail,$email,$option,$project_id);
                     }
