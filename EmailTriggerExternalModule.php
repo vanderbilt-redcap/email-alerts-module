@@ -480,23 +480,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $var = preg_split("/[;,]+/", $email_var);
                 if(!empty($email)) {
                     if (\LogicTester::isValid($var[0])) {
-                        $email_redcap = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var[0],1);
-
-                        $entro = "";
+                       $email_redcap = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var[0],1);
                        if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email)) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
-                           $entro = "1";
                        } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap)){
                             $mail = $this->check_single_email($mail,$email,$option,$project_id);
-                           $entro = "2";
-                       }else if(empty($email_redcap)){
-                           $entro = "4";
                        }
-
-                        /******TEST LOGS************/
-                        $action_description = "***TEST ERROR: ".$entro;
-                        $changes_made = "Email: ".$email." Email_redcap: ".$email_redcap." Validate email: ".filter_var(trim($email), FILTER_VALIDATE_EMAIL)." empty?".empty($email_redcap);
-                        \REDCap::logEvent($action_description,$changes_made,NULL,$record,$event_id,$project_id);
                     } else {
                         $mail = $this->check_single_email($mail,$email,$option,$project_id);
                     }
