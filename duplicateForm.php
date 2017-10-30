@@ -61,7 +61,7 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-deactivate', $email_deac
 
 echo json_encode(array(
     'status' => 'success',
-    'message' => "index:".$index." pid:".$pid
+    'message' => ""
 ));
 
 ?>

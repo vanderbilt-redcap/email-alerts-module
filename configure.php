@@ -56,13 +56,15 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'T'){
 else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
     $message='<strong>Success!</strong> Email Deactivated.';
 }
+else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'P'){
+    $message='<strong>Success!</strong> Email Duplicated.';
+}
 
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
 
 ?>
-<!--    <a href="" onclick="javascript:insertExtraEmailAlert()">Click me</a>-->
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
 
@@ -87,7 +89,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         //Url
         var pid = '<?=$pid?>';
         var _duplicateform_url = '<?=$emailTriggerModule->getUrl('duplicateForm.php')?>';
-        var _updateform_url = '<?=$emailTriggerModule->getUrl('updateForm.php')?>';
         var _preview_url = '<?=$emailTriggerModule->getUrl('previewForm.php')?>';
         var _edoc_name_url = '<?=$emailTriggerModule->getUrl('get-edoc-name.php')?>';
         var _longitudinal_url = '<?=$emailTriggerModule->getUrl('getLongitudinal_forms_event_AJAX.php')?>';

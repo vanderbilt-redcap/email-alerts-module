@@ -129,11 +129,7 @@ function deactivateEmailAlert(index, status){
     $('#external-modules-configure-modal-deactivate-confirmation').modal('show');
 }
 function duplicateEmailAlert(index){
-    ajaxLoadOptionAndMessage("&index_duplicate="+index,_duplicateform_url,"A");
-}
-function insertExtraEmailAlert(){
-    console.log("insert!");
-    ajaxLoadOptionAndMessage("&index_modal_update=5&form-name=randomization_module&email-from=noreply@vanderbilt.edu&email-to=eva.bascompte.moragas@vanderbilt.edu&email-subject=DELETE&email-message=Delete",_updateform_url,"A");
+    ajaxLoadOptionAndMessage("&index_duplicate="+index,_duplicateform_url,"P");
 }
 
 //We insert the button text depending on which field we are
