@@ -489,8 +489,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                        } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && empty($email_redcap)){
                             $mail = $this->check_single_email($mail,$email,$option,$project_id);
                            $entro = "2";
-                       }else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL)){
-                           $entro = "3";
                        }else if(empty($email_redcap)){
                            $entro = "4";
                        }
