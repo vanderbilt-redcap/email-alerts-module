@@ -71,25 +71,25 @@ unset($email_timestamp_sent[$index]);
 unset($email_deactivate[$index]);
 
 #Rearrange the indexes
-array_values($form_name);
-array_values($form_name_event);
-array_values($email_from);
-array_values($email_to);
-array_values($email_cc);
-array_values($email_bcc);
-array_values($email_subject);
-array_values($email_text);
-array_values($email_attachment_variable);
-array_values($email_attachment1);
-array_values($email_attachment2);
-array_values($email_attachment3);
-array_values($email_attachment4);
-array_values($email_attachment5);
-array_values($email_repetitive);
-array_values($email_condition);
-array_values($email_sent);
-array_values($email_timestamp_sent);
-array_values($email_deactivate);
+$form_name = array_values($form_name);
+$form_name_event = array_values($form_name_event);
+$email_from = array_values($email_from);
+$email_to = array_values($email_to);
+$email_cc = array_values($email_cc);
+$email_bcc = array_values($email_bcc);
+$email_subject = array_values($email_subject);
+$email_text = array_values($email_text);
+$email_attachment_variable = array_values($email_attachment_variable);
+$email_attachment1 = array_values($email_attachment1);
+$email_attachment2 = array_values($email_attachment2);
+$email_attachment3 = array_values($email_attachment3);
+$email_attachment4 = array_values($email_attachment4);
+$email_attachment5 = array_values($email_attachment5);
+$email_repetitive = array_values($email_repetitive);
+$email_condition = array_values($email_condition);
+$email_sent = array_values($email_sent);
+$email_timestamp_sent = array_values($email_timestamp_sent);
+$email_deactivate = array_values($email_deactivate);
 
 #Save data
 ExternalModules::setProjectSetting($prefix,$pid, 'form-name', $form_name);
