@@ -62,7 +62,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
 
 ?>
-    <a href="" onclick="javascript:insertExtraEmailAlert()">Click me</a>
+<!--    <a href="" onclick="javascript:insertExtraEmailAlert()">Click me</a>-->
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
 
