@@ -61,7 +61,7 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
 
-print_array($config['email-dashboard-settings']);
+//print_array($config['email-dashboard-settings']);
 
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
