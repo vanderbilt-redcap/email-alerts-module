@@ -330,13 +330,13 @@ function checkIfSurveyIsSaveAndReturn(data,url,saveUrl){
  * If the instrument is longitufinal we show the drop down to select the event
  * @param data
  */
-function uploadLongitudinalEvent(data){
+function uploadLongitudinalEvent(data,field){
     if(isLongitudinal){
         $.post(_longitudinal_url, data, function(returnData){
             jsonAjax = jQuery.parseJSON(returnData);
             if(jsonAjax.status == 'success'){
-                $( "[field=form-name-event]" ).html(jsonAjax.event);
-                $( "[field=form-name-event]" ).show();
+                $(field).html(jsonAjax.event);
+                $(field).show();
             }
             else {
                 alert("An error ocurred");

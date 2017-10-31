@@ -150,18 +150,28 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $datasurvey = explode("\n", $surveyLink_var);
                     foreach ($datasurvey as $surveylink) {
                         $var = preg_split("/[;,]+/", $surveylink)[0];
+
+                        $form_event_id = $event_id;
+                        if(\REDCap::isLongitudinal()) {
+                            preg_match_all("/\[[^\]]*\]/", $var, $matches);
+                            if (sizeof($matches[0]) > 1) {
+                                $var = $matches[0][1];
+                                $form_event_id = \REDCap::getDataDictionary($project_id, 'array', false, $matches[0][0]);
+                            }
+                        }
+
                         //only if the variable is in the text we reset the survey link status
                         if (strpos($email_text, $var) !== false) {
                             $instrument_form = str_replace('[__SURVEYLINK_', '', $var);
                             $instrument_form = str_replace(']', '', $instrument_form);
-                            $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $event_id);
+                            $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
 
                             $returnCode = $passthruData['return_code'];
                             $hash = $passthruData['hash'];
 
                             $url = $emailTriggerModule->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&NOAUTH";
                             $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
-                            $email_text = str_replace($var, $link, $email_text);
+                            $email_text = str_replace( preg_split("/[;,]+/", $surveylink)[0], $link, $email_text);
                         }
                     }
                 }

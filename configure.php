@@ -63,7 +63,6 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'P'){
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
-
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
@@ -331,7 +330,13 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     var pipeVar = $('#surveyLink_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
-                        if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]")) || !(trim(pipeName[0]).startsWith("[__SURVEYLINK_"))){
+                        var matches = pipeName[0].match(/\[(.*?)\]/);
+
+                        if (isLongitudinal && matches && matches.length >1) {
+                            if((!(trim(matches[1]).startsWith("[")) || !(trim(matches[1]).endsWith("]")) || !(trim(matches[1]).startsWith("[__SURVEYLINK_"))) || (!(trim(matches[0]).startsWith("[")) || !(trim(matches[0]).endsWith("]")))){
+                                errMsg.push('<strong>Longitudinal Survey Link field</strong> must be follow the format: <i>[event_name][__SURVEYLINK_variable_name],label</i> .');
+                            }
+                        }else if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]")) || !(trim(pipeName[0]).startsWith("[__SURVEYLINK_"))){
                             errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>[__SURVEYLINK_variable_name],label</i> .');
                         }
                     }
@@ -368,8 +373,13 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             });
 
             $('[name=form-name],[name=form-name-update]').on('change', function(e){
-                uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val());
+                uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[field=form-name-event]');
             });
+
+            $('[name=survey_form_name]').on('change', function(e){
+                uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[name=survey-name-event]');
+            });
+
             //we call first the flexalist function to create the options for the email
             $('.flexdatalist').flexdatalist({
                 minLength: 1
@@ -454,7 +464,12 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     $('html,body').scrollTop(0);
                     return false;
                 }else{
-                    var form_alert = '['+$('#survey_form_name').val()+'],'+$('#survey_label').val();
+                    var form_alert = '[__SURVEYLINK_'+$('#survey_form_name').val()+'],'+$('#survey_label').val();
+                    var event_arm = $('[name=form-name-event] option:selected').attr('event_name');
+                    if(isLongitudinal && event_arm != "" && event_arm != undefined){
+                        form_alert = '['+event_arm+']'+form_alert;
+                    }
+
                     if($('#surveyLink_var').val() == ''){
                         $('#surveyLink_var').val(form_alert);
                     }else{
@@ -784,12 +799,15 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                                         <option value=""></option>
                                         <?php
                                         foreach ($simple_config['email-dashboard-settings'][0]['choices'] as $choice){
-                                            echo '<option value="__SURVEYLINK_'.$choice['value'].'">'.$choice['name'].'</option>';
+//                                            echo '<option value="__SURVEYLINK_'.$choice['value'].'">'.$choice['name'].'</option>';
+                                            echo '<option value="'.$choice['value'].'">'.$choice['name'].'</option>';
                                         }
                                         ?>
                                     </select>
                                 </td>
                             </tr>
+                            <tr name="survey-name-event" class="form-control-custom" style="display:none"></tr>
+
                             <tr class="form-control-custom">
                                 <td>Label:</td>
                                 <td><input type="text" name="survey_label" id="survey_label" placeholder="Name"></td>
