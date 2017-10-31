@@ -55,7 +55,7 @@ function editEmailAlert(modal, index){
     $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').val(modal['email-repetitive']);
     $('#external-modules-configure-modal-update input[name="email-condition-update"]').val(modal['email-condition']);
 
-    uploadLongitudinalEvent('project_id='+project_id+'&form='+modal['form-name']+'&index='+index);
+    uploadLongitudinalEvent('project_id='+project_id+'&form='+modal['form-name']+'&index='+index,'[field=form-name-event]');
 
     //Add Files
     for(i=1; i<6 ; i++){
