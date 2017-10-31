@@ -104,7 +104,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             });
 
             //For Entries
-            var rtable = $('#customizedAlertsPreview').DataTable();
+            var rtable = $('#customizedAlertsPreview').DataTable({"pageLength": 50});
             //So it adds the X in the search in DataTables
             $('div.dataTables_filter input').addClass('clearable');
             function tog(v){
@@ -330,7 +330,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     var pipeVar = $('#surveyLink_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
-                        var matches = pipeName[0].match(/\[(.*?)\]/);
+                        var matches = pipeName[0].match(/\[(.*?)\]/g);
 
                         if (isLongitudinal && matches && matches.length >1) {
                             if((!(trim(matches[1]).startsWith("[")) || !(trim(matches[1]).endsWith("]")) || !(trim(matches[1]).startsWith("[__SURVEYLINK_"))) || (!(trim(matches[0]).startsWith("[")) || !(trim(matches[0]).endsWith("]")))){
@@ -518,7 +518,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             );
 
             $(document).ready(function() {
-                console.log("Draw")
                 var loadConceptsAJAX_table = $('#customizedAlertsPreview').DataTable();
 
                 //we hide the columns that we use only as filters
