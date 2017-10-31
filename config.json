@@ -11,7 +11,7 @@
 		}
 	],
 
-	"description": "This module makes it possible to send customized emails alerts after a form/survey is completed to one or several recipients. The user interface enables customized options such as Rich text, Data piping, File attachments, RedCap logic,...",
+	"description": "Allows users to construct and send customized email alerts to one or more recipients, in which the emails are triggered when a form/survey is completed and optionally based on conditional logic. The user interface enables customized options such as rich text, data piping, and file attachments.",
 
 	"permissions": [
 		"hook_save_record",
