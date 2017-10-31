@@ -364,7 +364,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $var
      * @return mixed
      */
-    function isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var, $option){
+    function isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var, $option=null){
         $var_name = str_replace('[', '', $var);
         $var_name = str_replace(']', '', $var_name);
         if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$instrument.'_complete'] == '2') {
