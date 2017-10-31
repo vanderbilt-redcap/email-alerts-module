@@ -156,7 +156,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             preg_match_all("/\[[^\]]*\]/", $var, $matches);
                             if (sizeof($matches[0]) > 1) {
                                 $var = $matches[0][1];
-                                $form_event_id = \REDCap::getDataDictionary($project_id, 'array', false, $matches[0][0]);
+                                $form_name = str_replace('[', '', $matches[0][0]);
+                                $form_name = str_replace(']', '', $form_name);
+                                $form_event_id = \REDCap::getEventIdFromUniqueEvent($form_name);
                             }
                         }
 
