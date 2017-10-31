@@ -500,6 +500,40 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 startPos = this.selectionStart;
                 endPos = this.selectionEnd;
             });
+
+            //To filter the data
+            $.fn.dataTable.ext.search.push(
+                function( settings, data, dataIndex ) {
+                    var active = $('#concept_active').is(':checked');
+                    var column_active = data[6];
+
+                    if(active == true && column_active == 'Y'){
+                        return true;
+                    }else if(active == false){
+                        return true;
+                    }
+
+                    return false;
+                }
+            );
+
+            $(document).ready(function() {
+                console.log("Draw")
+                var loadConceptsAJAX_table = $('#customizedAlertsPreview').DataTable();
+
+                //we hide the columns that we use only as filters
+                var column_active = loadConceptsAJAX_table.column(6);
+                column_active.visible(false);
+
+                var table = $('#customizedAlertsPreview').DataTable();
+                table.draw();
+
+                //when any of the filters is called upon change datatable data
+                $('#concept_active').change( function() {
+                    var table = $('#customizedAlertsPreview').DataTable();
+                    table.draw();
+                } );
+            } );
         });
 
         function saveFilesIfTheyExist(url, files) {
@@ -645,6 +679,9 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 <div style="padding-top:50px" class="col-md-12">
     <div>
         <a href="" id='btnViewCodes' type="button" class="btn btn-info pull-left email_forms_button_color email_forms_button open-codesModal" style="font-size:14px;color:#fff;margin-top: 0;margin-bottom: 10px;">Add New Email</a>
+        <div style="float:right;margin-top: 5px;">
+            <input value="" id="concept_active" checked class="auto-submit" type="checkbox" name="concept_active"> Active only
+        </div>
     </div
     <div style="padding-left:15px">
         <?php  if($indexSubSet>0) { ?>
@@ -657,6 +694,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 <th>Message</th>
                 <th>Resend Emails on Form Re-save?</th>
                 <th>Attachments</th>
+                <th>Active</th>
                 <th class="table_header_options">Actions</th>
             </tr>
             </thead>
@@ -679,12 +717,15 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 }
 
                 $deactivate = "";
+                $active_col = "Y";
                 if($projectData['settings']['email-deactivate']['value'][$index] == '1'){
                     $message_sent .= "<span style='display:block;font-style:italic'>Email deactivated</span>";
                     $class_sent = "email_deactivated";
                     $deactivate = "Activate";
+                    $active_col = "N";
                 }else{
                     $deactivate = "Deactivate";
+                    $active_col = "Y";
                 }
 
                 if(!empty($email_repetitive_sent)){
@@ -765,6 +806,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                 }
                 $alerts .= "<td><span style='text-align: center;width: 200px;'><strong>" . $fileAttachments . " files</strong><br/></span>".$attachmentVar.$attachmentFile."</td>";
+                $alerts .= "<td style='visibility: hidden;'>".$active_col."</td>";
                 $alerts .= "<td><div><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
                 $alerts .= "<div><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\")' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
                 $alerts .= "<div><a onclick='duplicateEmailAlert(\"".$index."\")' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
