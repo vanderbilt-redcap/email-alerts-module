@@ -6,7 +6,7 @@ use ExternalModules\ExternalModules;
 
 require_once ExternalModules::getProjectHeaderPath();
 require_once 'EmailTriggerExternalModule.php';
-require_once __DIR__ . '/../../external_modules/manager/templates/globals.php';
+require_once APP_PATH_EXTMOD . 'manager/templates/globals.php';
 
 $emailTriggerModule = new EmailTriggerExternalModule();
 $config = $emailTriggerModule->getConfig();
