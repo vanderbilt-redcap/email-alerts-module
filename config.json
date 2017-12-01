@@ -135,6 +135,11 @@
 			"required": true,
 			"type": "text"
 		}
-	]
-
+	],
+        "compatibility": {
+	        "php-version-min": "5.5.0",
+	        "php-version-max": "",
+	        "redcap-version-min": "8.0.0",
+	        "redcap-version-max": ""
+        }
 }
