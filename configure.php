@@ -62,7 +62,6 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'P'){
 
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
-
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
@@ -777,7 +776,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                                 $alerts .= '</td>';
                             }
                         } else if($configRow['key'] == 'form-name') {
-                            $alerts .= '<td class="'.$class_sent.'"><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                            $alerts .= '<td class="'.$class_sent.'"><span><i>Alert #'.$index.'</i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
                         }else if($configRow['key'] == 'email-attachment-variable'){
                             $attchVar = preg_split("/[;,]+/",  $configRow['value'][$index]);
                             foreach ($attchVar as $var){

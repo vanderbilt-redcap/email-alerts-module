@@ -613,6 +613,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return string
      */
     function addJSONRecord($email_repetitive_sent, $new_record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
+        print_array($email_repetitive_sent);
         $found_new_instrument = false;
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
@@ -658,6 +659,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $jsonArray = $this->addNewJSONRecord($jsonArray,$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
         }
 
+        print_array($jsonArray);
+//        die;
         return json_encode($jsonArray,JSON_FORCE_OBJECT);
     }
 
