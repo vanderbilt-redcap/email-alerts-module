@@ -642,25 +642,23 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                     $jsonArray[$sv_name][$alert] = $jsonVarArray;
                 }
-
                 //NEW Alert same instrument
                 if(!$found_alert && $sv_name == $instrument){
                     $found_new_instrument = true;
                     $jsonArray = $this->addNewJSONRecord($jsonArray,$sv_name,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
                 }
             }
-
         }else{
             $jsonArray = $this->addNewJSONRecord([],$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
         }
 
         //add new record for new survey
-        if(!$found_new_instrument){
+        //if(!$found_new_instrument){
             $jsonArray = $this->addNewJSONRecord($jsonArray,$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
-        }
+        //}
 
         print_array($jsonArray);
-//        die;
+        //die;
         return json_encode($jsonArray,JSON_FORCE_OBJECT);
     }
 
