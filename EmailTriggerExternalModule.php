@@ -47,7 +47,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $this->sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
                         }
                     }
-
                 }
             }
         }
@@ -104,8 +103,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_repetitive_sent = json_decode($email_repetitive_sent);
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
-
-        if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance))) && $email_deactivate == "0") {
+        if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance))) && ($email_deactivate == "0" || $email_deactivate == "")) {
             //If the condition is met or if we don't have any, we send the email
             if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)) {
                 $email_from = $this->getProjectSetting("email-from", $project_id)[$id];
@@ -124,7 +122,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if($delayedSuccessful){
                     return;
                 }
-
                 //Data piping
                 if (!empty($datapipe_var)) {
                     $datapipe = explode("\n", $datapipe_var);
@@ -613,8 +610,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return string
      */
     function addJSONRecord($email_repetitive_sent, $new_record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
-        print_array($email_repetitive_sent);
-        $found_new_instrument = false;
+        //print_array($email_repetitive_sent);
+        $found_new_instrument = true;
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
                 $found_alert = false;
@@ -642,9 +639,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                     $jsonArray[$sv_name][$alert] = $jsonVarArray;
                 }
+
+                if($sv_name == $instrument){
+                    $found_new_instrument = false;
+                }
+
                 //NEW Alert same instrument
                 if(!$found_alert && $sv_name == $instrument){
-                    $found_new_instrument = true;
                     $jsonArray = $this->addNewJSONRecord($jsonArray,$sv_name,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
                 }
             }
@@ -653,11 +654,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         //add new record for new survey
-        //if(!$found_new_instrument){
+        if($found_new_instrument){
             $jsonArray = $this->addNewJSONRecord($jsonArray,$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
-        //}
+        }
 
-        print_array($jsonArray);
+        //print_array($jsonArray);
         //die;
         return json_encode($jsonArray,JSON_FORCE_OBJECT);
     }
