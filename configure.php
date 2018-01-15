@@ -62,34 +62,6 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'P'){
 
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
-
-
-$email_repetitive_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive-sent');
-$email_repetitive_sent = json_decode($email_repetitive_sent);
-$form_name = empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name');
-$email_subject =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-subject'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-subject');
-print_array($email_repetitive_sent);
-print_array($form_name);
-
-//$index = 1;
-//if(!empty($email_repetitive_sent)) {
-//    $one_less = 0;
-//    foreach ($email_repetitive_sent as $form => $form_value) {
-//        foreach ($email_repetitive_sent->$form as $alert => $value) {
-//            //$number_of_children = count((array)$value);
-//            echo "alert: ".$alert."<br>";
-//            if ($alert == $index) {
-//                $one_less = 1;
-//                echo "Delete alert ".$index."<br>";
-//            }else if($alert >=0){
-//                $jsonArray[$form][$alert - $one_less] = $value;
-//            }
-//        }
-//    }
-//    //ExternalModules::setProjectSetting($prefix, $pid, 'email-repetitive-sent', json_encode($jsonArray));
-//}
-//print_array($jsonArray);
-
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">

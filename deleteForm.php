@@ -48,9 +48,11 @@ if(!empty($email_repetitive_sent)) {
     $one_less = 0;
     foreach ($email_repetitive_sent as $form => $form_value) {
         foreach ($email_repetitive_sent->$form as $alert => $value) {
+            //we don't add the deleted alert and rename the old ones.
             if ($alert == $index) {
                 $one_less = 1;
             }else if($alert >= 0){
+                //if the alert is -1 do not add it. When copying a project sometimes it has a weird config.
                 $jsonArray[$form][$alert - $one_less] = $value;
             }
         }
