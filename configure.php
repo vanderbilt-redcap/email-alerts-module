@@ -71,6 +71,24 @@ $email_subject =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email
 print_array($email_repetitive_sent);
 print_array($form_name);
 
+$index = 1;
+if(!empty($email_repetitive_sent)) {
+    $one_less = 0;
+    foreach ($email_repetitive_sent as $form => $form_value) {
+        foreach ($email_repetitive_sent->$form as $alert => $value) {
+            //$number_of_children = count((array)$value);
+            echo "alert: ".$alert."<br>";
+            if ($alert == $index) {
+                $one_less = 1;
+                echo "Delete alert ".$index."<br>";
+            }else if($alert >=0){
+                $jsonArray[$form][$alert - $one_less] = $value;
+            }
+        }
+    }
+    //ExternalModules::setProjectSetting($prefix, $pid, 'email-repetitive-sent', json_encode($jsonArray));
+}
+print_array($jsonArray);
 
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">

@@ -48,16 +48,11 @@ if(!empty($email_repetitive_sent)) {
     $one_less = 0;
     foreach ($email_repetitive_sent as $form => $form_value) {
         foreach ($email_repetitive_sent->$form as $alert => $value) {
-            //$number_of_children = count((array)$value);
-
             if ($alert == $index) {
                 $one_less = 1;
-                echo "Delete alert ".$index."<br>";
-            }else{
+            }else if($alert >= 0){
                 $jsonArray[$form][$alert - $one_less] = $value;
             }
-
-            echo "alert: ".$alert."<br>";
         }
     }
     ExternalModules::setProjectSetting($prefix, $pid, 'email-repetitive-sent', json_encode($jsonArray));
