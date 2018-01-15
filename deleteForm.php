@@ -44,34 +44,20 @@ $action_description = "Deleted Alert #".$index." To";
 $email_repetitive_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive-sent');
 $email_repetitive_sent = json_decode($email_repetitive_sent);
 
-//if(!empty($email_repetitive_sent)){
-//    if(array_key_exists($form_name[$index],$email_repetitive_sent)){
-//        foreach ($email_repetitive_sent->$form_name[$index] as $alert =>$value){
-//            if($alert == $index){
-//                unset($email_repetitive_sent->$form_name[$index]->$alert);
-//                ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive-sent', json_encode($email_repetitive_sent));
-//            }
-//        }
-//    }
-//}
 if(!empty($email_repetitive_sent)) {
     $one_less = 0;
     foreach ($email_repetitive_sent as $form => $form_value) {
-        $number_of_children = count((array)$form_value);
         foreach ($email_repetitive_sent->$form as $alert => $value) {
-            $found = false;
+            //$number_of_children = count((array)$value);
 
             if ($alert == $index) {
                 $one_less = 1;
-                $found = true;
-            }
-
-            if ($number_of_children == 1 && $one_less == 1) {
-                //we simply don't add it
-            } else if (!$found) {
+                echo "Delete alert ".$index."<br>";
+            }else{
                 $jsonArray[$form][$alert - $one_less] = $value;
             }
 
+            echo "alert: ".$alert."<br>";
         }
     }
     ExternalModules::setProjectSetting($prefix, $pid, 'email-repetitive-sent', json_encode($jsonArray));
