@@ -64,12 +64,12 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'P'){
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
 
-/*$email_repetitive_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive-sent');
+$email_repetitive_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive-sent');
 $email_repetitive_sent = json_decode($email_repetitive_sent);
 $form_name = empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name');
 $email_subject =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-subject'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-subject');
 print_array($email_repetitive_sent);
-print_array($form_name);*/
+print_array($form_name);
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
