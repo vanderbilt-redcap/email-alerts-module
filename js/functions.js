@@ -117,9 +117,12 @@ function hideFile(value,file_number){
     $('#external-modules-configure-modal-update input[name="email-attachment'+file_number+'-update"]').parent().html(html);
 }
 
-function deleteEmailAlert(index){
-    $('#index_modal_delete').val(index);
-    $('#external-modules-configure-modal-delete-confirmation').modal('show');
+function deleteEmailAlert(index,modal,indexmodal){
+    $('#'+indexmodal).val(index);
+    $('#'+modal).modal('show');
+}
+function reactivateEmailAlert(index){
+    ajaxLoadOptionAndMessage("&index_reactivate="+index,_reactivateform_url,"R");
 }
 function deactivateEmailAlert(index, status){
     $('#index_modal_deactivate').val(index);

@@ -7,19 +7,17 @@ use ExternalModules\ExternalModules;
 
 $prefix = ExternalModules::getPrefixForID($_GET['id']);
 $pid = $_GET['pid'];
-$index =  $_REQUEST['index_modal_delete_user'];
+$index =  $_REQUEST['index_reactivate'];
 
 $email_deleted =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-deleted'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-deleted');
 
-$email_deleted[$index] = "1";
-$message = "D";
+$email_deleted[$index] = "0";
 
 
 ExternalModules::setProjectSetting($prefix,$pid, 'email-deleted', $email_deleted);
 
 echo json_encode(array(
-    'status' => 'success',
-    'message' => $message
+    'status' => 'success'
 ));
 
 ?>

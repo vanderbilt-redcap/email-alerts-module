@@ -59,9 +59,18 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
 else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'P'){
     $message='<strong>Success!</strong> Email Duplicated.';
 }
+else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'R'){
+    $message='<strong>Success!</strong> Email Re-Activated.';
+}
 
 #get number of instances
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
+
+#User rights
+$isAdmin = false;
+if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
+    $isAdmin = true;
+}
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
@@ -87,6 +96,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         //Url
         var pid = '<?=$pid?>';
         var _duplicateform_url = '<?=$emailTriggerModule->getUrl('duplicateForm.php')?>';
+        var _reactivateform_url = '<?=$emailTriggerModule->getUrl('reActivateForm.php')?>';
         var _preview_url = '<?=$emailTriggerModule->getUrl('previewForm.php')?>';
         var _edoc_name_url = '<?=$emailTriggerModule->getUrl('get-edoc-name.php')?>';
         var _longitudinal_url = '<?=$emailTriggerModule->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
@@ -424,9 +434,15 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 				return false;
             });
 
+            $('#deleteUserForm').submit(function () {
+                var data = $('#deleteUserForm').serialize();
+                ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('deleteForm.php')?>',"D");
+                return false;
+            });
+
             $('#deleteForm').submit(function () {
                 var data = $('#deleteForm').serialize();
-                ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('deleteForm.php')?>',"D");
+                ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('deleteFormAdmin.php')?>',"D");
                 return false;
             });
 
@@ -504,12 +520,22 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
             $.fn.dataTable.ext.search.push(
                 function( settings, data, dataIndex ) {
                     var active = $('#concept_active').is(':checked');
+                    var deleted = $('#deleted_alerts').is(':checked');
                     var column_active = data[6];
+                    var column_deleted = data[7];
 
                     if(active == true && column_active == 'Y'){
-                        return true;
+                        if(deleted == true && column_deleted == 'Y'){
+                            return true;
+                        }else if(deleted == false && column_deleted == 'N'){
+                            return true;
+                        }
                     }else if(active == false){
-                        return true;
+                        if(deleted == true && column_deleted == 'Y'){
+                            return true;
+                        }else if(deleted == false && column_deleted == 'N'){
+                            return true;
+                        }
                     }
 
                     return false;
@@ -522,12 +548,14 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 //we hide the columns that we use only as filters
                 var column_active = loadConceptsAJAX_table.column(6);
                 column_active.visible(false);
+                var column_deleted = loadConceptsAJAX_table.column(7);
+                column_deleted.visible(false);
 
                 var table = $('#customizedAlertsPreview').DataTable();
                 table.draw();
 
                 //when any of the filters is called upon change datatable data
-                $('#concept_active').change( function() {
+                $('#concept_active, #deleted_alerts').change( function() {
                     var table = $('#customizedAlertsPreview').DataTable();
                     table.draw();
                 } );
@@ -672,7 +700,6 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
     <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Save Settings</button>
 </div>
 <?PHP require('codes_modal.php');?>
-
 <!-- ALERTS TABLE -->
 <div style="padding-top:50px" class="col-md-12">
     <div>
@@ -680,6 +707,11 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
         <div style="float:right;margin-top: 5px;">
             <input value="" id="concept_active" checked class="auto-submit" type="checkbox" name="concept_active"> Active only
         </div>
+        <?php if($isAdmin){?>
+        <div style="float:right;margin-top: 5px;padding-right: 10px">
+            <input value="" id="deleted_alerts" class="auto-submit" type="checkbox" name="deleted_alerts"> Deleted (user)
+        </div>
+        <?php } ?>
     </div
     <div style="padding-left:15px">
         <?php  if($indexSubSet>0) { ?>
@@ -693,6 +725,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 <th>Resend Emails on Form Re-save?</th>
                 <th>Attachments</th>
                 <th>Active</th>
+                <th>Deleted</th>
                 <th class="table_header_options">Actions</th>
             </tr>
             </thead>
@@ -714,6 +747,7 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
                 }
 
+                //DEACTIVATE
                 $deactivate = "";
                 $active_col = "Y";
                 if($projectData['settings']['email-deactivate']['value'][$index] == '1'){
@@ -724,6 +758,23 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 }else{
                     $deactivate = "Deactivate";
                     $active_col = "Y";
+                }
+
+                //DELETE
+                $deleted = "";
+                $deleted_col = "N";
+                $deleted_text = "Delete";
+                if($projectData['settings']['email-deleted']['value'][$index] == '1'){
+                    $message_sent .= "<span><span style='font-style:italic;color:red;line-height: 2;float: left;'><strong>Email deleted</strong></span><a onclick='reactivateEmailAlert(\"".$index."\")' type='button' class='btn email_forms_button_color email_reactivate' style='margin-left:10px;'>Re-Activate</a></span>";
+                    $class_sent = "email_deleted";
+                    $deleted_modal = "external-modules-configure-modal-delete-confirmation";
+                    $deleted_index = "index_modal_delete";
+                    $deleted_col = "Y";
+                    $deleted_text = "Permanently Delete";
+                }else{
+                    $deleted_modal = "external-modules-configure-modal-delete-user-confirmation";
+                    $deleted_index = "index_modal_delete_user";
+                    $deleted_col = "N";
                 }
 
                 if(!empty($email_repetitive_sent)){
@@ -805,10 +856,11 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                 }
                 $alerts .= "<td><span style='text-align: center;width: 200px;'><strong>" . $fileAttachments . " files</strong><br/></span>".$attachmentVar.$attachmentFile."</td>";
                 $alerts .= "<td style='visibility: hidden;'>".$active_col."</td>";
+                $alerts .= "<td style='visibility: hidden;'>".$deleted_col."</td>";
                 $alerts .= "<td><div><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
                 $alerts .= "<div><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\")' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
                 $alerts .= "<div><a onclick='duplicateEmailAlert(\"".$index."\")' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
-                $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >Delete</a></div></td>";
+                $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\",\"".$deleted_modal."\",\"".$deleted_index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >".$deleted_text."</a></div></td>";
                 $alerts .= "</tr>";
                 $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";
             }
@@ -901,12 +953,37 @@ $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
                     </div>
                     <div class="modal-body">
                         <span>Are you sure you want to delete this Email Alert?</span>
+                        <br/>
+                        <span style="color:red;font-weight: bold">*This will permanently delete the email.</span>
                         <input type="hidden" value="" id="index_modal_delete" name="index_modal_delete">
-                        <input type="hidden" value="<?=$emailTriggerModule->getUrl('deleteForm.php')?>" id="url_modal_delete" name="url_modal_delete">
+                        <input type="hidden" value="<?=$emailTriggerModule->getUrl('deleteFormAdmin.php')?>" id="url_modal_delete" name="url_modal_delete">
                     </div>
 
                     <div class="modal-footer">
                         <button type="submit" form="deleteForm" class="btn btn-default btn-delete" id='btnModalDeleteForm'>Delete</button>
+                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="external-modules-configure-modal-delete-user-confirmation" tabindex="-1" role="dialog" aria-labelledby="Codes">
+        <form class="form-horizontal" action="" method="post" id='deleteUserForm'>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Delete Email Alert</h4>
+                    </div>
+                    <div class="modal-body">
+                        <span>Are you sure you want to delete this Email Alert?</span>
+                        <input type="hidden" value="" id="index_modal_delete_user" name="index_modal_delete_user">
+                        <input type="hidden" value="<?=$emailTriggerModule->getUrl('deleteForm.php')?>" id="url_modal_delete_user" name="url_modal_delete_user">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" form="deleteUserForm" class="btn btn-default btn-delete" id='btnModalDeleteForm'>Delete</button>
                         <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
                     </div>
                 </div>

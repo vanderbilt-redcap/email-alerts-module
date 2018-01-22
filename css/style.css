@@ -44,7 +44,18 @@
 .email_forms_button{
     margin-top:8px;
     margin-right:15px;
-    color:#fff
+    color:#fff;
+}
+.email_reactivate{
+    color:#fff !important;
+    padding: 4px  !important;
+    font-size: 13px;
+    border:none;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.email_reactivate:hover{
+    color:#000 !important;
 }
 .email_forms_button_color{
     background-color: #a6a6a6;
@@ -73,6 +84,9 @@
     background-color: #e6ffe6 !important;
 }
 .email_preview_forms_table tr.email_deactivated{
+    background-color: #ffe6e6 !important;
+}
+.email_deleted{
     background-color: #ffe6e6 !important;
 }
 .dataTables_length label{

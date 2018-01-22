@@ -51,12 +51,15 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condi
 $email_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-sent');
 $email_timestamp_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp-sent');
 $email_deactivate =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate');
+$email_deleted =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-deleted'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-deleted');
 array_push($email_sent,"0");
 array_push($email_timestamp_sent,"0");
 array_push($email_deactivate,"0");
+array_push($email_deleted,"0");
 ExternalModules::setProjectSetting($prefix,$pid, 'email-sent', $email_sent);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp-sent', $email_timestamp_sent);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-deactivate', $email_deactivate);
+ExternalModules::setProjectSetting($prefix,$pid, 'email-deleted', $email_deleted);
 
 
 echo json_encode(array(
