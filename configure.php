@@ -59,8 +59,8 @@ else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
 else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'P'){
     $message='<strong>Success!</strong> Email Duplicated.';
 }
-else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'R'){
-    $message='<strong>Success!</strong> Email Re-Activated.';
+else if(array_key_exists('message', $_REQUEST) && ($_REQUEST['message'] === 'R' || $_REQUEST['message'] === 'N')){
+    $message='<strong>Success!</strong> Email Re-Enabled.';
 }
 
 #get number of instances
@@ -86,6 +86,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var project_id = <?=json_encode($_GET['pid'])?>;
         var isLongitudinal = <?=json_encode(\REDCap::isLongitudinal())?>;
         var from_default = <?=json_encode($from_default)?>;
+        var message_letter = <?=json_encode($_REQUEST['message'])?>;
+
         //Dashboard info
         var datapipe_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_var'))?>;
         var emailFromForm_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_var'))?>;
@@ -96,7 +98,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         //Url
         var pid = '<?=$pid?>';
         var _duplicateform_url = '<?=$emailTriggerModule->getUrl('duplicateForm.php')?>';
-        var _reactivateform_url = '<?=$emailTriggerModule->getUrl('reActivateForm.php')?>';
+        var _reenableform_url = '<?=$emailTriggerModule->getUrl('reEnableForm.php')?>';
         var _preview_url = '<?=$emailTriggerModule->getUrl('previewForm.php')?>';
         var _edoc_name_url = '<?=$emailTriggerModule->getUrl('get-edoc-name.php')?>';
         var _longitudinal_url = '<?=$emailTriggerModule->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
@@ -521,8 +523,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 function( settings, data, dataIndex ) {
                     var active = $('#concept_active').is(':checked');
                     var deleted = $('#deleted_alerts').is(':checked');
-                    var column_active = data[6];
-                    var column_deleted = data[7];
+                    var column_active = data[7];
+                    var column_deleted = data[8];
 
                     if(active == true && column_active == 'Y'){
                         if(deleted == true && column_deleted == 'Y'){
@@ -546,9 +548,9 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 var loadConceptsAJAX_table = $('#customizedAlertsPreview').DataTable();
 
                 //we hide the columns that we use only as filters
-                var column_active = loadConceptsAJAX_table.column(6);
+                var column_active = loadConceptsAJAX_table.column(7);
                 column_active.visible(false);
-                var column_deleted = loadConceptsAJAX_table.column(7);
+                var column_deleted = loadConceptsAJAX_table.column(8);
                 column_deleted.visible(false);
 
                 var table = $('#customizedAlertsPreview').DataTable();
@@ -559,6 +561,18 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     var table = $('#customizedAlertsPreview').DataTable();
                     table.draw();
                 } );
+
+                //When message reactivated reload on the Deleted status
+                if(message_letter == 'R' || message_letter === 'N'){
+                    $('#deleted_alerts').prop('checked',true);
+                    if(message_letter === 'N'){
+                        $('#concept_active').prop('checked',false);
+                    }
+                    var table = $('#customizedAlertsPreview').DataTable();
+                    table.draw();
+                }
+
+
             } );
         });
 
@@ -720,6 +734,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             <tr class="table_header">
                 <th>Form</th>
                 <th>REDCap logic</th>
+                <th>Send Emails on Form Incomplete?</th>
                 <th>Email Addresses</th>
                 <th>Message</th>
                 <th>Resend Emails on Form Re-save?</th>
@@ -748,10 +763,12 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 }
 
                 //DEACTIVATE
-                $deactivate = "";
-                $active_col = "Y";
                 if($projectData['settings']['email-deactivate']['value'][$index] == '1'){
-                    $message_sent .= "<span style='display:block;font-style:italic'>Email deactivated</span>";
+                    //Only show when message is not deleted
+                    if($projectData['settings']['email-deleted']['value'][$index] != '1'){
+                        $message_sent .= "<span style='display:block;font-style:italic'>Email deactivated</span>";
+                    }
+
                     $class_sent = "email_deactivated";
                     $deactivate = "Activate";
                     $active_col = "N";
@@ -761,20 +778,23 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 }
 
                 //DELETE
-                $deleted = "";
-                $deleted_col = "N";
                 $deleted_text = "Delete";
                 if($projectData['settings']['email-deleted']['value'][$index] == '1'){
-                    $message_sent .= "<span><span style='font-style:italic;color:red;line-height: 2;float: left;'><strong>Email deleted</strong></span><a onclick='reactivateEmailAlert(\"".$index."\")' type='button' class='btn email_forms_button_color email_reactivate' style='margin-left:10px;'>Re-Activate</a></span>";
+                    $deactivated_deleted_text = ($active_col == 'N')?'Email was INNACTIVE when deleted':'Email was ACTIVE when deleted';
+                    $message_sent .= "<span style='font-style:italic;color:red;line-height: 2;float: left;'><strong>".$deactivated_deleted_text."</strong></span>";
                     $class_sent = "email_deleted";
                     $deleted_modal = "external-modules-configure-modal-delete-confirmation";
                     $deleted_index = "index_modal_delete";
                     $deleted_col = "Y";
                     $deleted_text = "Permanently Delete";
+                    $show_button = "display:none";
+                    $reactivate_button = "<div><a onclick='reactivateEmailAlert(\"".$index."\",$(\"#concept_active\").is(\":checked\"));' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate'>Re-Enable</a></div>";
                 }else{
                     $deleted_modal = "external-modules-configure-modal-delete-user-confirmation";
                     $deleted_index = "index_modal_delete_user";
                     $deleted_col = "N";
+                    $show_button = "";
+                    $reactivate_button = "";
                 }
 
                 if(!empty($email_repetitive_sent)){
@@ -857,9 +877,9 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 $alerts .= "<td><span style='text-align: center;width: 200px;'><strong>" . $fileAttachments . " files</strong><br/></span>".$attachmentVar.$attachmentFile."</td>";
                 $alerts .= "<td style='visibility: hidden;'>".$active_col."</td>";
                 $alerts .= "<td style='visibility: hidden;'>".$deleted_col."</td>";
-                $alerts .= "<td><div><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
-                $alerts .= "<div><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\")' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
-                $alerts .= "<div><a onclick='duplicateEmailAlert(\"".$index."\")' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
+                $alerts .= "<td>".$reactivate_button."<div style='".$show_button."'><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
+                $alerts .= "<div style='".$show_button."'><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\")' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
+                $alerts .= "<div style='".$show_button."'><a onclick='duplicateEmailAlert(\"".$index."\")' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
                 $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\",\"".$deleted_modal."\",\"".$deleted_index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >".$deleted_text."</a></div></td>";
                 $alerts .= "</tr>";
                 $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";

@@ -30,6 +30,7 @@ $email_condition =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'ema
 $email_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-sent');
 $email_timestamp_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp-sent');
 $email_deactivate =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate');
+$email_incomplete =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-incomplete'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-incomplete');
 
 //Add some logs
 $action_description = "Deleted Alert #".$index;
@@ -80,6 +81,7 @@ unset($email_condition[$index]);
 unset($email_sent[$index]);
 unset($email_timestamp_sent[$index]);
 unset($email_deactivate[$index]);
+unset($email_incomplete[$index]);
 
 #Rearrange the indexes
 $form_name = array_values($form_name);
@@ -101,6 +103,7 @@ $email_condition = array_values($email_condition);
 $email_sent = array_values($email_sent);
 $email_timestamp_sent = array_values($email_timestamp_sent);
 $email_deactivate = array_values($email_deactivate);
+$email_incomplete = array_values($email_incomplete);
 
 #Save data
 ExternalModules::setProjectSetting($prefix,$pid, 'form-name', $form_name);
@@ -122,6 +125,7 @@ ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condi
 ExternalModules::setProjectSetting($prefix,$pid, 'email-sent', $email_sent);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp-sent', $email_timestamp_sent);
 ExternalModules::setProjectSetting($prefix,$pid, 'email-deactivate', $email_deactivate);
+ExternalModules::setProjectSetting($prefix,$pid, 'email-incomplete', $email_incomplete);
 
 echo json_encode(array(
     'status' => 'success',

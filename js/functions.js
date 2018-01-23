@@ -54,6 +54,7 @@ function editEmailAlert(modal, index){
     $('#external-modules-configure-modal-update input[name="email-attachment-variable-update"]').val(modal['email-attachment-variable']);
     $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').val(modal['email-repetitive']);
     $('#external-modules-configure-modal-update input[name="email-condition-update"]').val(modal['email-condition']);
+    $('#external-modules-configure-modal-update input[name="email-incomplete-update"]').val(modal['email-incomplete']);
 
     uploadLongitudinalEvent('project_id='+project_id+'&form='+modal['form-name']+'&index='+index,'[field=form-name-event]');
 
@@ -62,9 +63,15 @@ function editEmailAlert(modal, index){
         getFileFieldElement(modal['email-attachment'+i], i);
     }
 
+    //Checkboxes
     $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').prop('checked',false);
     if(modal['email-repetitive'] == '1'){
         $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').prop('checked',true);
+    }
+
+    $('#external-modules-configure-modal-update input[name="email-incomplete-update"]').prop('checked',false);
+    if(modal['email-incomplete'] == '1'){
+        $('#external-modules-configure-modal-update input[name="email-incomplete-update"]').prop('checked',true);
     }
 
     //clean up error messages
@@ -121,8 +128,8 @@ function deleteEmailAlert(index,modal,indexmodal){
     $('#'+indexmodal).val(index);
     $('#'+modal).modal('show');
 }
-function reactivateEmailAlert(index){
-    ajaxLoadOptionAndMessage("&index_reactivate="+index,_reactivateform_url,"R");
+function reactivateEmailAlert(index,active){
+   ajaxLoadOptionAndMessage("&index_reenable="+index+"&active="+active,_reenableform_url,"R");
 }
 function deactivateEmailAlert(index, status){
     $('#index_modal_deactivate').val(index);

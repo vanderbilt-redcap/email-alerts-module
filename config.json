@@ -45,6 +45,12 @@
           "type":"text"
         },
 		{
+			"key": "email-incomplete",
+			"name": "Send Emails on Form Incomplete?",
+			"required": false,
+			"type":"checkbox"
+		},
+		{
 			"key": "email-from",
 			"name": "Email From",
 			"required": true,
@@ -122,7 +128,6 @@
           "required": false,
           "type":"checkbox"
         }
-
 	],
 
 	"project-settings": [
