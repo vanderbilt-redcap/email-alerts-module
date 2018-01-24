@@ -46,7 +46,7 @@
         },
 		{
 			"key": "email-incomplete",
-			"name": "Send Emails on Form Incomplete?",
+			"name": "Send emails for any Form status?",
 			"required": false,
 			"type":"checkbox"
 		},

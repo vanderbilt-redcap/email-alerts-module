@@ -734,7 +734,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             <tr class="table_header">
                 <th>Form</th>
                 <th>REDCap logic</th>
-                <th>Send Emails on Form Incomplete?</th>
+                <th>Send emails for any Form status?</th>
                 <th>Email Addresses</th>
                 <th>Message</th>
                 <th>Resend Emails on Form Re-save?</th>
