@@ -4,17 +4,15 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-//require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 require_once 'EmailTriggerExternalModule.php';
 
-$emailTriggerModule = new EmailTriggerExternalModule();
-$emailTriggerModule->setProjectSetting('datapipe_label',$_POST['datapipe_label']);
-$emailTriggerModule->setProjectSetting('datapipe_var',$_POST['datapipe_var']);
-$emailTriggerModule->setProjectSetting('emailFromForm_var',$_POST['emailFromForm_var']);
-$emailTriggerModule->setProjectSetting('datapipeEmail_var',$_POST['datapipeEmail_var']);
-$emailTriggerModule->setProjectSetting('surveyLink_var',$_POST['surveyLink_var']);
-$emailTriggerModule->setProjectSetting('emailFailed_var',$_POST['emailFailed_var']);
-$emailTriggerModule->setProjectSetting('emailSender_var',$_POST['emailSender_var']);
+$module->setProjectSetting('datapipe_label',$_POST['datapipe_label']);
+$module->setProjectSetting('datapipe_var',$_POST['datapipe_var']);
+$module->setProjectSetting('emailFromForm_var',$_POST['emailFromForm_var']);
+$module->setProjectSetting('datapipeEmail_var',$_POST['datapipeEmail_var']);
+$module->setProjectSetting('surveyLink_var',$_POST['surveyLink_var']);
+$module->setProjectSetting('emailFailed_var',$_POST['emailFailed_var']);
+$module->setProjectSetting('emailSender_var',$_POST['emailSender_var']);
 
 
 echo json_encode(array(

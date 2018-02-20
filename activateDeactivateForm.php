@@ -4,14 +4,12 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-//require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 
-$prefix = ExternalModules::getPrefixForID($_GET['id']);
 $pid = $_GET['pid'];
 $index =  $_REQUEST['index_modal_deactivate'];
 $status =  $_REQUEST['index_modal_status'];
 
-$email_deactivate =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate');
+$email_deactivate =  empty($module->getProjectSetting('email-deactivate'))?array():$module->getProjectSetting('email-deactivate');
 
 $message = '';
 if($status == "Activate"){
@@ -25,7 +23,7 @@ if($status == "Activate"){
 }
 
 
-ExternalModules::setProjectSetting($prefix,$pid, 'email-deactivate', $email_deactivate);
+$module->setProjectSetting('email-deactivate', $email_deactivate);
 
 echo json_encode(array(
     'status' => 'success',

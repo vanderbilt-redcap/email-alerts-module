@@ -8,7 +8,7 @@ require_once 'EmailTriggerExternalModule.php';
 $form = $_REQUEST['form'];
 $project_id = $_REQUEST['project_id'];
 $index = $_REQUEST['index'];
-$prefix = ExternalModules::getPrefixForID($project_id);
+
 if(!empty($form) && !empty($project_id)){
     $Project = new \Project($project_id);
 
@@ -24,7 +24,7 @@ if(!empty($form) && !empty($project_id)){
     if(!empty($events_array)){
 
         if($index != ""){
-            $form_name_event = empty(ExternalModules::getProjectSetting($prefix, $project_id, 'form-name-event'))?array():ExternalModules::getProjectSetting($prefix, $project_id, 'form-name-event');
+            $form_name_event = empty($module->getProjectSetting('form-name-event'))?array():$module->getProjectSetting('form-name-event');
             $selected_event = $form_name_event[$index];
         }
 

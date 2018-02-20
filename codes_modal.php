@@ -5,7 +5,6 @@ use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 require_once 'EmailTriggerExternalModule.php';
 
-$emailTriggerModule = new EmailTriggerExternalModule();
 ?>
 
 <script>
@@ -34,8 +33,8 @@ $emailTriggerModule = new EmailTriggerExternalModule();
             });
 
             if(checkRequiredFieldsAndLoadOption('','')){
-                saveFilesIfTheyExist('<?=$emailTriggerModule->getUrl('save-file.php')?>', files);
-                ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('saveForm.php')?>',"A");
+                saveFilesIfTheyExist('<?=$module->getUrl('save-file.php')?>', files);
+                ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('saveForm.php')?>',"A");
             }
 			return false;
         });

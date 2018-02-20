@@ -144,8 +144,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
                 //Survey Link
                 if(!empty($surveyLink_var)) {
-                    $emailTriggerModule = new EmailTriggerExternalModule();
-
                     $datasurvey = explode("\n", $surveyLink_var);
                     foreach ($datasurvey as $surveylink) {
                         $var = preg_split("/[;,]+/", $surveylink)[0];
@@ -165,12 +163,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         if (strpos($email_text, $var) !== false) {
                             $instrument_form = str_replace('[__SURVEYLINK_', '', $var);
                             $instrument_form = str_replace(']', '', $instrument_form);
-                            $passthruData = $emailTriggerModule->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
+                            $passthruData = $this->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
 
                             $returnCode = $passthruData['return_code'];
                             $hash = $passthruData['hash'];
 
-                            $url = $emailTriggerModule->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&NOAUTH";
+                            $url = $this->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&NOAUTH";
                             $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
                             $email_text = str_replace( preg_split("/[;,]+/", $surveylink)[0], $link, $email_text);
                         }

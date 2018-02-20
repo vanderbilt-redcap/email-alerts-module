@@ -4,24 +4,19 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-//require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
-
-$prefix = ExternalModules::getPrefixForID($_GET['id']);
-$pid = $_GET['pid'];
-
 #get data from the DB
-$form_name = empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name');
-$form_name_event =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'form-name-event'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'form-name-event');
-$email_from = empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-from'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-from');
-$email_to = empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-to'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-to');
-$email_cc =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-cc'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-cc');
-$email_bcc =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-bcc'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-bcc');
-$email_subject =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-subject'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-subject');
-$email_text =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-text'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-text');
-$email_attachment_variable =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-attachment-variable'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-attachment-variable');
-$email_repetitive =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-repetitive');
-$email_condition =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-condition'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-condition');
-$email_incomplete =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-incomplete'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-incomplete');
+$form_name = empty($module->getProjectSetting('form-name'))?array():$module->getProjectSetting('form-name');
+$form_name_event =  empty($module->getProjectSetting('form-name-event'))?array():$module->getProjectSetting('form-name-event');
+$email_from = empty($module->getProjectSetting('email-from'))?array():$module->getProjectSetting('email-from');
+$email_to = empty($module->getProjectSetting('email-to'))?array():$module->getProjectSetting('email-to');
+$email_cc =  empty($module->getProjectSetting('email-cc'))?array():$module->getProjectSetting('email-cc');
+$email_bcc =  empty($module->getProjectSetting('email-bcc'))?array():$module->getProjectSetting('email-bcc');
+$email_subject =  empty($module->getProjectSetting('email-subject'))?array():$module->getProjectSetting('email-subject');
+$email_text =  empty($module->getProjectSetting('email-text'))?array():$module->getProjectSetting('email-text');
+$email_attachment_variable =  empty($module->getProjectSetting('email-attachment-variable'))?array():$module->getProjectSetting('email-attachment-variable');
+$email_repetitive =  empty($module->getProjectSetting('email-repetitive'))?array():$module->getProjectSetting('email-repetitive');
+$email_condition =  empty($module->getProjectSetting('email-condition'))?array():$module->getProjectSetting('email-condition');
+$email_incomplete =  empty($module->getProjectSetting('email-incomplete'))?array():$module->getProjectSetting('email-incomplete');
 
 #checkboxes
 if(!isset($_REQUEST['email-repetitive'])){
@@ -51,39 +46,39 @@ array_push($email_condition,$_REQUEST['email-condition']);
 array_push($email_incomplete,$incomplete);
 
 #Save data
-ExternalModules::setProjectSetting($prefix,$pid, 'form-name', $form_name);
-ExternalModules::setProjectSetting($prefix,$pid, 'form-name-event', $form_name_event);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-from', $email_from);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-to', $email_to);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-cc', $email_cc);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-bcc', $email_bcc);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-subject', $email_subject);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-text', $email_text);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-attachment-variable', $email_attachment_variable);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-repetitive', $email_repetitive);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-condition', $email_condition);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-incomplete', $email_incomplete);
+$module->setProjectSetting('form-name', $form_name);
+$module->setProjectSetting('form-name-event', $form_name_event);
+$module->setProjectSetting('email-from', $email_from);
+$module->setProjectSetting('email-to', $email_to);
+$module->setProjectSetting('email-cc', $email_cc);
+$module->setProjectSetting('email-bcc', $email_bcc);
+$module->setProjectSetting('email-subject', $email_subject);
+$module->setProjectSetting('email-text', $email_text);
+$module->setProjectSetting('email-attachment-variable', $email_attachment_variable);
+$module->setProjectSetting('email-repetitive', $email_repetitive);
+$module->setProjectSetting('email-condition', $email_condition);
+$module->setProjectSetting('email-incomplete', $email_incomplete);
 
 //Extra Data
-$email_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-sent');
-$email_timestamp_sent =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp-sent'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-timestamp-sent');
-$email_deactivate =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-deactivate');
-$email_deleted =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-deleted'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-deleted');
+$email_sent =  empty($module->getProjectSetting('email-sent'))?array():$module->getProjectSetting('email-sent');
+$email_timestamp_sent =  empty($module->getProjectSetting('email-timestamp-sent'))?array():$module->getProjectSetting('email-timestamp-sent');
+$email_deactivate =  empty($module->getProjectSetting('email-deactivate'))?array():$module->getProjectSetting('email-deactivate');
+$email_deleted =  empty($module->getProjectSetting('email-deleted'))?array():$module->getProjectSetting('email-deleted');
 array_push($email_sent,"0");
 array_push($email_timestamp_sent,"0");
 array_push($email_deactivate,"0");
 array_push($email_deleted,"0");
-ExternalModules::setProjectSetting($prefix,$pid, 'email-sent', $email_sent);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-timestamp-sent', $email_timestamp_sent);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-deactivate', $email_deactivate);
-ExternalModules::setProjectSetting($prefix,$pid, 'email-deleted', $email_deleted);
+$module->setProjectSetting('email-sent', $email_sent);
+$module->setProjectSetting('email-timestamp-sent', $email_timestamp_sent);
+$module->setProjectSetting('email-deactivate', $email_deactivate);
+$module->setProjectSetting('email-deleted', $email_deleted);
 
 //check if forms where uploaded and if not add blank values
 for($i=1; $i<6; $i++){
-    $email_attachment =  empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-attachment'.$i))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-attachment'.$i);
+    $email_attachment =  empty($module->getProjectSetting('email-attachment'.$i))?array():$module->getProjectSetting('email-attachment'.$i);
     if((count($form_name)-1 == count($email_attachment)) || (count($form_name) > count($email_attachment))){
         array_push($email_attachment,"");
-        ExternalModules::setProjectSetting($prefix,$pid, 'email-attachment'.$i, $email_attachment);
+        $module->setProjectSetting('email-attachment'.$i, $email_attachment);
     }
 }
 

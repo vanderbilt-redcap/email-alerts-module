@@ -4,11 +4,8 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-//require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 
-$pid = @$_GET['pid'];
-$moduleDirectoryPrefix = ExternalModules::getPrefixForID($_GET['id']);
 $index = $_GET['index'];
 
 $edoc = null;
@@ -19,14 +16,14 @@ foreach($_FILES as $key=>$value){
         # use REDCap's uploadFile
         $edoc = \Files::uploadFile($_FILES[$key]);
         if ($edoc) {
-            $email_attachment =  empty(ExternalModules::getProjectSetting($moduleDirectoryPrefix, $pid, $key))?array():ExternalModules::getProjectSetting($moduleDirectoryPrefix, $pid, $key);
+            $email_attachment =  empty($module->getProjectSetting($key))?array():$module->getProjectSetting($key);
 
             if(!isset($index)){
                 array_push($email_attachment,$edoc);
             }else{
                 $email_attachment[$index] = $edoc;
             }
-            ExternalModules::setProjectSetting($moduleDirectoryPrefix,$pid, $key, $email_attachment);
+            $module->setProjectSetting($key, $email_attachment);
         } else {
             header('Content-type: application/json');
             echo json_encode(array(

@@ -8,16 +8,15 @@ require_once ExternalModules::getProjectHeaderPath();
 require_once 'EmailTriggerExternalModule.php';
 require_once APP_PATH_EXTMOD . 'manager/templates/globals.php';
 
-$emailTriggerModule = new EmailTriggerExternalModule();
-$config = $emailTriggerModule->getConfig();
-$prefix = ExternalModules::getPrefixForID($_GET['id']);
-$pid = $_GET['pid'];
-$from_default = empty(ExternalModules::getProjectSetting($prefix, $pid, 'email-sender'))?array():ExternalModules::getProjectSetting($prefix, $pid, 'email-sender').',"'.$emailTriggerModule->getProjectSetting('emailSender_var').'"';
+$config = $module->getConfig();
+$prefix = $_GET['prefix'];
 
+$pid = $_GET['pid'];
+$from_default = empty($module->getProjectSetting('email-sender'))?array():$module->getProjectSetting('email-sender').',"'.$module->getProjectSetting('emailSender_var').'"';
 
 $projectData= (array(
     'status' => 'success',
-    'settings' => ExternalModules::getProjectSettingsAsArray($prefix, $pid)));
+    'settings' => $module->getProjectSettings($pid)));
 
 $simple_config = $config;
 $simple_config_update = $config;
@@ -72,12 +71,12 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
     $isAdmin = true;
 }
 ?>
-    <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/style.css')?>">
-    <link rel="stylesheet" type="text/css" href="<?=$emailTriggerModule->getUrl('css/jquery.flexdatalist.min.css')?>">
+    <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/style.css')?>">
+    <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/jquery.flexdatalist.min.css')?>">
 
-    <script type="text/javascript" src="<?=$emailTriggerModule->getUrl('js/jquery.dataTables.min.js')?>"></script>
-    <script type="text/javascript" src="<?=$emailTriggerModule->getUrl('js/jquery.flexdatalist.js')?>"></script>
-    <script type="text/javascript" src="<?=$emailTriggerModule->getUrl('js/functions.js')?>"></script>
+    <script type="text/javascript" src="<?=$module->getUrl('js/jquery.dataTables.min.js')?>"></script>
+    <script type="text/javascript" src="<?=$module->getUrl('js/jquery.flexdatalist.js')?>"></script>
+    <script type="text/javascript" src="<?=$module->getUrl('js/functions.js')?>"></script>
 
     <script type="text/javascript">
         var EMparentAux;
@@ -89,19 +88,19 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var message_letter = <?=json_encode($_REQUEST['message'])?>;
 
         //Dashboard info
-        var datapipe_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipe_var'))?>;
-        var emailFromForm_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailFromForm_var'))?>;
-        var emailSender_var = <?=json_encode($emailTriggerModule->getProjectSetting('emailSender_var'))?>;
-        var datapipeEmail_var = <?=json_encode($emailTriggerModule->getProjectSetting('datapipeEmail_var'))?>;
-        var surveyLink_var = <?=json_encode($emailTriggerModule->getProjectSetting('surveyLink_var'))?>;
+        var datapipe_var = <?=json_encode($module->getProjectSetting('datapipe_var'))?>;
+        var emailFromForm_var = <?=json_encode($module->getProjectSetting('emailFromForm_var'))?>;
+        var emailSender_var = <?=json_encode($module->getProjectSetting('emailSender_var'))?>;
+        var datapipeEmail_var = <?=json_encode($module->getProjectSetting('datapipeEmail_var'))?>;
+        var surveyLink_var = <?=json_encode($module->getProjectSetting('surveyLink_var'))?>;
 
         //Url
         var pid = '<?=$pid?>';
-        var _duplicateform_url = '<?=$emailTriggerModule->getUrl('duplicateForm.php')?>';
-        var _reenableform_url = '<?=$emailTriggerModule->getUrl('reEnableForm.php')?>';
-        var _preview_url = '<?=$emailTriggerModule->getUrl('previewForm.php')?>';
-        var _edoc_name_url = '<?=$emailTriggerModule->getUrl('get-edoc-name.php')?>';
-        var _longitudinal_url = '<?=$emailTriggerModule->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
+        var _duplicateform_url = '<?=$module->getUrl('duplicateForm.php')?>';
+        var _reenableform_url = '<?=$module->getUrl('reEnableForm.php')?>';
+        var _preview_url = '<?=$module->getUrl('previewForm.php')?>';
+        var _edoc_name_url = '<?=$module->getUrl('get-edoc-name.php')?>';
+        var _longitudinal_url = '<?=$module->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
         var lastClick = null;
         var startPos = 0;
         var endPos = 0;
@@ -368,16 +367,16 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     $.each(errMsg, function (i, e) {
                         $('#errMsgContainer').append('<div>' + e + '</div>');
                     });
-                    checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$emailTriggerModule->getUrl('check_survey_save_return_AJAX.php')?>','');
+                    checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$module->getUrl('check_survey_save_return_AJAX.php')?>','');
                     $('#errMsgContainer').show();
                     $('html,body').scrollTop(0);
                     return false;
                 }else{
                     if ($('#surveyLink_var').val() != "" && $('#surveyLink_var').val() != "0") {
-                        checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$emailTriggerModule->getUrl('check_survey_save_return_AJAX.php')?>','<?=$emailTriggerModule->getUrl('configureAJAX.php')?>');
+                        checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$module->getUrl('check_survey_save_return_AJAX.php')?>','<?=$module->getUrl('configureAJAX.php')?>');
                     }else{
                         var data = $('#mainForm').serialize();
-                        ajaxLoadOptionAndMessage(data, '<?=$emailTriggerModule->getUrl('configureAJAX.php')?>', "C");
+                        ajaxLoadOptionAndMessage(data, '<?=$module->getUrl('configureAJAX.php')?>', "C");
                     }
                 }
                 return false;
@@ -401,7 +400,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     var cutword = "-flexdatalist";
                     var id = $(this).attr('id').substr(0, $(this).attr('id').length-cutword.length);
                     var value = $(this).val();
-                    loadAjax('parameters='+value+'&project_id='+project_id+'&variables='+emailFromForm_var, '<?=$emailTriggerModule->getUrl('get-project-list.php')?>', id);
+                    loadAjax('parameters='+value+'&project_id='+project_id+'&variables='+emailFromForm_var, '<?=$module->getUrl('get-project-list.php')?>', id);
                 }
             });
 
@@ -430,27 +429,27 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                  if(checkRequiredFieldsAndLoadOption('-update','Update')){
                      var index = $('#index_modal_update').val();
                      deleteFile(index);
-                     saveFilesIfTheyExist('<?=$emailTriggerModule->getUrl('save-file.php')?>&index='+index, files);
-                     ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('updateForm.php')?>',"U");
+                     saveFilesIfTheyExist('<?=$module->getUrl('save-file.php')?>&index='+index, files);
+                     ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('updateForm.php')?>',"U");
                  }
 				return false;
             });
 
             $('#deleteUserForm').submit(function () {
                 var data = $('#deleteUserForm').serialize();
-                ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('deleteForm.php')?>',"D");
+                ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('deleteForm.php')?>',"D");
                 return false;
             });
 
             $('#deleteForm').submit(function () {
                 var data = $('#deleteForm').serialize();
-                ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('deleteFormAdmin.php')?>',"D");
+                ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('deleteFormAdmin.php')?>',"D");
                 return false;
             });
 
             $('#deactivateForm').submit(function () {
                 var data = $('#deactivateForm').serialize();
-                ajaxLoadOptionAndMessage(data,'<?=$emailTriggerModule->getUrl('activateDeactivateForm.php')?>',"");
+                ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('activateDeactivateForm.php')?>',"");
                 return false;
             });
 
@@ -605,7 +604,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 
         function deleteFile(index) {
             $('.deletedFile').each(function() {
-                $.post("<?=$emailTriggerModule->getUrl('delete-file.php')?>?pid="+pid, { key: $(this).attr('name'), edoc: $(this).val(), index: index }, function(data) {
+                $.post("<?=$module->getUrl('delete-file.php')?>?pid="+pid, { key: $(this).attr('name'), edoc: $(this).val(), index: index }, function(data) {
                     if (data.status != "success") {
                         // failure
                         alert("The file was not able to be deleted. "+JSON.stringify(data));
@@ -650,18 +649,18 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> to email addresses. </span><div class="description_config">Allows email fields from the REDCap form(s) to be piped into the TO and CC fields of email messages. </div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             <span class="table_example">Format: [variable_name], Button Name</span><br/>
-                            <textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[variable_name], Button Name ..." value="<?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipeEmail_var');?></textarea>
+                            <textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[variable_name], Button Name ..." value="<?=$module->getProjectSetting('datapipeEmail_var');?>"><?=$module->getProjectSetting('datapipeEmail_var');?></textarea>
                             <div class="btn_color_square btn_color_datapipeEmail"></div>Email button (blue)
                         </td>
                     </tr>
                     <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><span style="padding-left: 5px;"><strong>Preload email addresses</strong> from existing REDCap records. <span><div class="description_config">Enables autocomplete of email addresses in the TO and CC email fields. The list of email addresses is pulled from the specified variables in already existing REDCap records. </div></td>
-                        <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[email_var], ..." value="<?=$emailTriggerModule->getProjectSetting('emailFromForm_var');?>"></td>
+                        <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[email_var], ..." value="<?=$module->getProjectSetting('emailFromForm_var');?>"></td>
                     </tr>
                     <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Name</strong> for email alerts<span><div class="description_config">Allows the user to set a default custom sender name for the email alerts. This only affects the sender name, not the sender email address, that will appear in the alert by default.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
-                            Sender name<br/><input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='Sender name' value='<?=$emailTriggerModule->getProjectSetting('emailSender_var');?>'/>
+                            Sender name<br/><input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='Sender name' value='<?=$module->getProjectSetting('emailSender_var');?>'/>
                         </td>
                     </tr>
 
@@ -678,7 +677,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> in email content. <span><div class="description_config">Allows data from the REDCap form(s) to be piped into the email messages. Project variables must be mapped to labels to be used in email piping. Enter one mapping per line.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             <span class="table_example">Format: [email_variable], Button Name</span><br/>
-                            <textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="[email_variable], Button Name" value="<?=$emailTriggerModule->getProjectSetting('datapipe_var');?>"><?=$emailTriggerModule->getProjectSetting('datapipe_var');?></textarea>
+                            <textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="[email_variable], Button Name" value="<?=$module->getProjectSetting('datapipe_var');?>"><?=$module->getProjectSetting('datapipe_var');?></textarea>
                             <div class="btn_color_square btn_color_datapipe"></div>Data variable button (gray)
                         </td>
                     </tr>
@@ -687,7 +686,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         <td style="width: 25%;padding: 10px 30px;">
                             <span class="table_example">Example: [__SURVEYLINK_form_name], name ...</span><br/>
                             <a id="addLinkBtn" onclick="javascript:$('#addLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
-                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[__SURVEYLINK_form_name], name ..." value="<?=$emailTriggerModule->getProjectSetting('surveyLink_var');?>"><?=$emailTriggerModule->getProjectSetting('surveyLink_var');?></textarea>
+                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[__SURVEYLINK_form_name], name ..." value="<?=$module->getProjectSetting('surveyLink_var');?>"><?=$module->getProjectSetting('surveyLink_var');?></textarea>
                             <div class="btn_color_square btn_color_surveyLink"></div>Survey link button (orange)
                         </td>
                     </tr>
@@ -703,7 +702,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     </tr>
                     <tr class="panel-collapse collapse EE_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><span style="padding-left: 5px;">Send <strong>Failed Email Alerts</strong> to specified address<span></td>
-                        <td style="width: 25%;padding: 10px 30px;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="<?=$emailTriggerModule->getProjectSetting('emailFailed_var');?>"/></td>
+                        <td style="width: 25%;padding: 10px 30px;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="<?=$module->getProjectSetting('emailFailed_var');?>"/></td>
                     </tr>
                 </table>
             </div>
@@ -828,7 +827,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                                 }
 
                                 while ($row = db_fetch_assoc($q)) {
-                                    $attachmentFile .= '- '.$row['doc_name'].'<br/>';
+                                    $url = "downloadFile.php?sname=".$row['stored_name']."&file=".$row['doc_name']."&NOAUTH";
+                                    $attachmentFile .= '- <a href="'.$module->getUrl($url).'" target="_blank">'.$row['doc_name'].'</a><br/>';
                                 }
                             }
                         }
@@ -976,7 +976,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         <br/>
                         <span style="color:red;font-weight: bold">*This will permanently delete the email.</span>
                         <input type="hidden" value="" id="index_modal_delete" name="index_modal_delete">
-                        <input type="hidden" value="<?=$emailTriggerModule->getUrl('deleteFormAdmin.php')?>" id="url_modal_delete" name="url_modal_delete">
+                        <input type="hidden" value="<?=$module->getUrl('deleteFormAdmin.php')?>" id="url_modal_delete" name="url_modal_delete">
                     </div>
 
                     <div class="modal-footer">
@@ -999,7 +999,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     <div class="modal-body">
                         <span>Are you sure you want to delete this Email Alert?</span>
                         <input type="hidden" value="" id="index_modal_delete_user" name="index_modal_delete_user">
-                        <input type="hidden" value="<?=$emailTriggerModule->getUrl('deleteForm.php')?>" id="url_modal_delete_user" name="url_modal_delete_user">
+                        <input type="hidden" value="<?=$module->getUrl('deleteForm.php')?>" id="url_modal_delete_user" name="url_modal_delete_user">
                     </div>
 
                     <div class="modal-footer">

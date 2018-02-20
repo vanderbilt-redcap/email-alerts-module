@@ -29,7 +29,7 @@
 		]
 	},
 
-	"no-auth-pages":["surveyPassthru"],
+	"no-auth-pages":["surveyPassthru","downloadFile"],
 
 	"email-dashboard-settings": [
         {

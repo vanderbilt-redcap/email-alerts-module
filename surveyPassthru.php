@@ -4,14 +4,9 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-//require_once dirname(__FILE__) . '/../../external_modules/classes/ExternalModules.php';
 require_once 'EmailTriggerExternalModule.php';
 
-
-
-$emailTriggerModule = new EmailTriggerExternalModule();
-
-$passthruData = $emailTriggerModule->resetSurveyAndGetCodes($_REQUEST['pid'], $_REQUEST['record'], $_REQUEST['instrument']);
+$passthruData = $module->resetSurveyAndGetCodes($_REQUEST['pid'], $_REQUEST['record'], $_REQUEST['instrument']);
 
 $returnCode = $passthruData['return_code'];
 $hash = $passthruData['hash'];
