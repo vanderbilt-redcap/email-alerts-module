@@ -1,0 +1,150 @@
+{
+	"name": "Email Alerts",
+
+	"namespace": "Vanderbilt\\EmailTriggerExternalModule",
+
+	"authors": [
+		{
+			"name": "Eva Bascompte Moragas",
+			"email": "datacore@vanderbilt.edu",
+			"institution": "Vanderbilt University Medical Center"
+		}
+	],
+
+	"description": "Allows users to construct and send customized email alerts to one or more recipients, in which the emails are triggered when a form/survey is completed and optionally based on conditional logic. The user interface enables customized options such as rich text, data piping, and file attachments.",
+
+	"permissions": [
+		"hook_save_record",
+		"hook_survey_complete",
+		"select_data"
+	],
+
+	"links": {
+		"project": [
+			{
+				"name": "Configure Email Alerts",
+				"icon": "report",
+				"url": "configure.php"
+			}
+		]
+	},
+
+	"no-auth-pages":["surveyPassthru","downloadFile"],
+
+	"email-dashboard-settings": [
+        {
+          "key": "form-name",
+          "name": "REDCap Instrument",
+          "required": true,
+          "type": "form-list"
+        },
+        {
+          "key": "email-condition",
+          "name": "Email Condition (REDCap logic)",
+          "required": false,
+          "type":"text"
+        },
+		{
+			"key": "email-incomplete",
+			"name": "Send emails for any Form status?",
+			"required": false,
+			"type":"checkbox"
+		},
+		{
+			"key": "email-from",
+			"name": "Email From",
+			"required": true,
+			"type": "text"
+		},
+		{
+			"key": "email-to",
+			"name": "Email To",
+			"required": true,
+			"type": "text"
+		},
+		{
+			"key": "email-cc",
+			"name": "Email CC",
+			"required": true,
+			"type": "text"
+		},
+		{
+			"key": "email-bcc",
+			"name": "Email BCC",
+			"required": true,
+			"type": "text"
+		},
+		{
+			"key": "email-subject",
+			"name": "Subject",
+			"required": true,
+			"type": "text"
+		},
+		{
+			"key": "email-text",
+			"name": "Message",
+			"required": true,
+			"type": "rich-text"
+		},
+		{
+			"key": "email-attachment-variable",
+			"name": "REDCap file variables",
+			"required": false,
+			"type": "text"
+		},
+		{
+			"key": "email-attachment1",
+			"name": "Email Attachment 1",
+			"required": false,
+			"type": "file"
+		},
+		{
+			"key": "email-attachment2",
+			"name": "Email Attachment 2",
+			"required": false,
+			"type": "file"
+		},
+		{
+			"key": "email-attachment3",
+			"name": "Email Attachment 3",
+			"required": false,
+			"type": "file"
+		},
+		{
+			"key": "email-attachment4",
+			"name": "Email Attachment 4",
+			"required": false,
+			"type": "file"
+		},
+		{
+			"key": "email-attachment5",
+			"name": "Email Attachment 5",
+			"required": false,
+			"type": "file"
+		},
+        {
+          "key": "email-repetitive",
+          "name": "Resend Emails on Form Re-save?",
+          "required": false,
+          "type":"checkbox"
+        }
+	],
+
+	"project-settings": [
+	],
+
+	"system-settings": [
+		{
+			"key": "email-sender",
+			"name": "Sender Email Address",
+			"required": true,
+			"type": "text"
+		}
+	],
+        "compatibility": {
+	        "php-version-min": "5.5.0",
+	        "php-version-max": "",
+	        "redcap-version-min": "8.0.0",
+	        "redcap-version-max": ""
+        }
+}
