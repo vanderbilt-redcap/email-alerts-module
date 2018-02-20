@@ -233,7 +233,7 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
         var result = $('#external-modules-configure-modal'+suffix+' input[name=email-attachment-variable'+suffix+']').val().split(",");
         var errorInField = false;
         for(var i=0;i<result.length;i++){
-            if(!(trim(result[i]).startsWith("[")) || !(trim(result[i]).endsWith("]"))){
+            if(trim(result[i]).substring(0, 1) != "[" || trim(result[i]).substring(trim(result[i]).length-1, trim(result[i]).length) != "]"){
                 errorInField = true;
                 break;
             }

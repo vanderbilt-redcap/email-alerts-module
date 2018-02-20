@@ -309,7 +309,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     var pipeVar = $('#datapipe_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
-                        if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
+                        if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]"){
                             errMsg.push('<strong>Data Piping field</strong> must be follow the format: <i>[variable_name],label</i> .');
                         }
                     }
@@ -320,7 +320,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     var pipeVar = $('#datapipeEmail_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
-                        if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]"))){
+                        if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]"){
                             errMsg.push('<strong>Data Piping Email field</strong> must be follow the format: <i>[variable_name],label</i> .');
                         }
                     }
@@ -330,7 +330,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 if ($('#emailFromForm_var').val() != "" && $('#emailFromForm_var').val() != "0") {
                     var result = $('#emailFromForm_var').val().split(",");
                     for(var i=0;i<result.length;i++){
-                        if(!(trim(result[i]).startsWith("[")) || !(trim(result[i]).endsWith("]"))){
+                        if(trim(result[i]).substring(0, 1) != "[" || trim(result[i]).substring(trim(result[i]).length-1, trim(result[i]).length) != "]"){
                             errMsg.push('<strong>Email Addresses field</strong> must be follow the format: <i>[variable_name]</i>.');
                         }
                     }
@@ -343,10 +343,11 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         var matches = pipeName[0].match(/\[(.*?)\]/g);
 
                         if (isLongitudinal && matches && matches.length >1) {
-                            if((!(trim(matches[1]).startsWith("[")) || !(trim(matches[1]).endsWith("]")) || !(trim(matches[1]).startsWith("[__SURVEYLINK_"))) || (!(trim(matches[0]).startsWith("[")) || !(trim(matches[0]).endsWith("]")))){
+                            if(trim(matches[1]).substring(0, 1) != "[" || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]" || trim(matches[1]).substring(trim(result[i]).length-14, trim(matches[1]).length) != "[__SURVEYLINK_" || trim(matches[0]).substring(0, 1) != "[" || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"){
                                 errMsg.push('<strong>Longitudinal Survey Link field</strong> must be follow the format: <i>[event_name][__SURVEYLINK_variable_name],label</i> .');
                             }
-                        }else if(!(trim(pipeName[0]).startsWith("[")) || !(trim(pipeName[0]).endsWith("]")) || !(trim(pipeName[0]).startsWith("[__SURVEYLINK_"))){
+                        }
+                        else if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]" || trim(pipeName[0]).substring(0, 14) != "[__SURVEYLINK_"){
                             errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>[__SURVEYLINK_variable_name],label</i> .');
                         }
                     }
@@ -708,10 +709,11 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             </div>
         </div>
     </div>
+    <div>
+        <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Save Settings</button>
+    </div>
 </form>
-<div>
-    <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Save Settings</button>
-</div>
+
 <?PHP require('codes_modal.php');?>
 <!-- ALERTS TABLE -->
 <div style="padding-top:50px" class="col-md-12">
