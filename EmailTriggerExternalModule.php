@@ -405,6 +405,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
         $field_name = str_replace('[', '', $var);
         $field_name = str_replace(']', '', $field_name);
+
+		$dateFormats = [
+				"date_dmy" => "d-m-Y",
+				"date_mdy" => "m-d-Y",
+				"date_ymd" => "Y-m-d",
+				"datetime_dmy" => "d-m-Y h:i",
+				"datetime_mdy" => "m-d-Y h:i",
+				"datetime_ymd" => "Y-m-d h:i",
+				"datetime_seconds_dmy" => "d-m-Y h:i:s",
+				"datetime_seconds_mdy" => "m-d-Y h:i:s",
+				"datetime_seconds_ymd" => "Y-m-d  h:i:s"
+		];
+
         $metadata = \REDCap::getDataDictionary($project_id,'array',false,$field_name);
         //event arm is defined
         if(empty($metadata)){
@@ -468,8 +481,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
             }
-        }
-
+        } else if(in_array($metadata[$field_name]['text_validation_type_or_show_slider_number'],array_keys($dateFormats))) {
+			$label = date($dateFormats[$metadata[$field_name]['text_validation_type_or_show_slider_number']],strtotime($value));
+		}
         return $label;
     }
 
