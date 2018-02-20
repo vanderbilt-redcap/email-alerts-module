@@ -466,6 +466,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }else{
                 $label = "False";
             }
+        }else if($metadata[$field_name]['field_type'] == 'yesno'){
+            if($value == '1'){
+                $label = "Yes";
+            }else{
+                $label = "No";
+            }
         }else if($metadata[$field_name]['field_type'] == 'sql'){
             if(!empty($value)) {
                 $q = db_query($metadata[$field_name]['select_choices_or_calculations']);
