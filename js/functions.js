@@ -142,6 +142,21 @@ function duplicateEmailAlert(index){
     ajaxLoadOptionAndMessage("&index_duplicate="+index,_duplicateform_url,"P");
 }
 
+/**
+ * We save the last click value on focus to know which element the button has to update to
+ * @param element
+ */
+function flexalistFocus(element){
+    var id = $(element).attr("id");
+    if(id == undefined){
+        var name = '[name="'+$(element).attr("name")+'"]';
+        var id = $(element).attr("name");
+    }else{
+        var name = '#'+$(element).attr("id");
+    }
+    lastClick = name;
+}
+
 //We insert the button text depending on which field we are
 /**
  * Function to add the cursor position so the text from the data piping buttons can be added on those specific fields
@@ -154,19 +169,31 @@ function insertAtCursorTinyMCE(myValue,option) {
             // logic on to add button content
             if((lastClick !='#email-cc-flexdatalist' && lastClick !='#email-to-flexdatalist' && lastClick !='#email-bcc-flexdatalist' && lastClick !='#email-cc-update-flexdatalist' && lastClick !='#email-bcc-update-flexdatalist' && lastClick !='#email-to-update-flexdatalist' && option == 1) || option == 0) {
                 var myField = $(lastClick);
+                var elementflexalist = '<li class="value"><span class="text">'+myValue+'</span><span class="fdl-remove">×</span></li>';
+                var varId = lastClick.replace(/-flexdatalist/g,'');
+
                 //IE support
                 if (document.selection) {
                     myField.focus();
                     sel = document.selection.createRange();
                     sel.text = myValue;
                 }
-                //MOZILLA and others
-                else if (startPos || startPos == '0') {
-                    myField.val(myField.val().substring(0, startPos) + myValue + myField.val().substring(endPos, myField.val().length));
-                    myField.selectionStart = startPos + myValue.length;
-                    myField.selectionEnd = startPos + myValue.length;
-                } else {
-                    myField.val(myField.val() + myValue);
+                if(varId =='#email-cc' || varId == '#email-to' || varId =='#email-bcc' || varId =='#email-cc-update' || varId =='#email-bcc-update' || varId =='#email-to-update') {
+                    myField.parent().before(elementflexalist);
+                    if($(varId).val() == ""){
+                        $(varId).val(myValue);
+                    }else{
+                        $(varId).val($(varId).val()+","+myValue);
+                    }
+                }else{
+                    //MOZILLA and others
+                    if (startPos || startPos == '0') {
+                        myField.val(myField.val().substring(0, startPos) + myValue + myField.val().substring(endPos, myField.val().length));
+                        myField.selectionStart = startPos + myValue.length;
+                        myField.selectionEnd = startPos + myValue.length;
+                    } else {
+                        myField.val(myField.val() + myValue);
+                    }
                 }
 
                 //We update positions to add next text after the new one

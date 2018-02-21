@@ -192,7 +192,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                             var pipeVar = surveyLink_var.split("\n");
                             for (var i = 0; i < pipeVar.length; i++) {
                                 var pipeName = pipeVar[i].split(",");
-                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_surveyLink btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",0);'>" + trim(pipeName[1]) + "</a>";
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_surveyLink btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",1);'>" + trim(pipeName[1]) + "</a>";
                             }
                         }
 
@@ -212,6 +212,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         'class': 'flexdatalist',
                         'multiple': 'multiple',
                         'data-min-length': '1',
+                        'onFocus': 'flexalistFocus(this)',
                         'id': setting.key
                     };
                     inputHtml += "<td class='external-modules-input-td'>" + this.getInputElement(setting.type, setting.key, setting.value, inputProperties);
@@ -294,6 +295,11 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 $('[name="email-attachment-variable"]').attr('placeholder','[variable1], [variable2], ...');
                 $('[name="email-from"]').attr('placeholder','myemail@server.com, "Sender name"');
                 $('[name="email-from"]').val(from_default);
+
+                //Clean up values
+                $('#email-to').val("");
+                $('#email-cc').val("");
+                $('#email-bcc').val("");
 
                 $('#external-modules-configure-modal').modal('show');
                 e.preventDefault();
@@ -500,18 +506,9 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             });
 
             /***PIPING BUTTONS INTERACTION***/
-            //Saves the field id/name in which field we are
-            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, #email-bcc-flexdatalist, #email-bcc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('focus', function(e){
-                var id = $(this).attr("id");
-                if(id == undefined){
-                    var name = '[name="'+$(this).attr("name")+'"]';
-                    var id = $(this).attr("name");
-                }else{
-                    var name = '#'+$(this).attr("id");
-                }
-                lastClick = name;
+            $('input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('focus', function(e){
+                flexalistFocus(this);
             });
-
             //save the cursor position
             $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist, #email-bcc-flexdatalist, #email-bcc-update-flexdatalist, input[name="email-subject"], input[name="email-subject-update"], input[name="email-attachment-variable"], input[name="email-attachment-variable-update"], input[name="email-condition"], input[name="email-condition-update"]').on('keyup click', function(e){
                 startPos = this.selectionStart;
