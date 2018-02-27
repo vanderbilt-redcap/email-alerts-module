@@ -307,7 +307,6 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             });
 
             $('#mainForm').submit(function () {
-                console.log("mainForm")
                 $('#errMsgContainer').hide();
                 $('#succMsgContainer').hide();
 
