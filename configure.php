@@ -270,10 +270,10 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 				}
             });
             EMparentAux = EMparent;
-            EMparent.getPrefix = function() {
-                var prefix = <?=json_encode($_REQUEST['prefix'])?>;
-                return prefix;
-            };
+//            EMparent.getPrefix = function() {
+//                var prefix = <?//=json_encode($_REQUEST['prefix'])?>//;
+//                return prefix;
+//            };
 
             //We add the HTML code to the respective modal windows
             $('#code_modal_table').html(rowsHtml);
@@ -941,7 +941,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 
     <div class="col-md-12">
         <form class="form-horizontal" action="" method="post" id='updateForm'>
-            <div class="modal fade" id="external-modules-configure-modal-update" tabindex="-1" role="dialog" aria-labelledby="Codes">
+            <div class="modal fade" name="external-modules-configure-modal-update" data-module="<?=$_REQUEST['prefix']?>" tabindex="-1" role="dialog" aria-labelledby="Codes">
                 <div class="modal-dialog" role="document" style="width: 800px">
                     <div class="modal-content">
                         <div class="modal-header">

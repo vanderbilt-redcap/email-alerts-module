@@ -15,6 +15,7 @@ require_once 'EmailTriggerExternalModule.php';
             data += "&email-text-editor="+encodeURIComponent(editor_text);
             data += "&email-to="+$('#email-to').val();
             data += "&email-cc="+$('#email-cc').val();
+            console.log(data);
 
             var files = {};
             $('#AddNewForm').find('input, select, textarea').each(function(index, element){
@@ -42,7 +43,7 @@ require_once 'EmailTriggerExternalModule.php';
 </script>
 <!-- Modal -->
 <form class="form-horizontal" action="" method="post" id='AddNewForm'>
-    <div class="modal fade" id="external-modules-configure-modal" tabindex="-1" role="dialog" aria-labelledby="Codes">
+    <div class="modal fade" id="external-modules-configure-modal" name="external-modules-configure-modal" data-module="<?=$_REQUEST['prefix']?>" tabindex="-1" role="dialog" aria-labelledby="Codes">
         <div class="modal-dialog" role="document" style="width: 800px">
             <div class="modal-content">
                 <div class="modal-header">

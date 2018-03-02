@@ -44,17 +44,17 @@ function editEmailAlert(modal, index){
     $('[name="email-from-update"]').attr('placeholder','myemail@server.com, "Sender name"');
 
     //Add values
-    $('#external-modules-configure-modal-update select[name="form-name-update"]').val(modal['form-name']);
-    $('#external-modules-configure-modal-update input[name="email-from-update"]').val(modal['email-from']);
-    $('#external-modules-configure-modal-update input[name="email-to-update"]').val(modal['email-to']);
-    $('#external-modules-configure-modal-update input[name="email-cc-update"]').val(modal['email-cc']);
-    $('#external-modules-configure-modal-update input[name="email-bcc-update"]').val(modal['email-bcc']);
-    $('#external-modules-configure-modal-update input[name="email-subject-update"]').val(modal['email-subject']);
-    $('#external-modules-configure-modal-update textarea[name="email-text-update"]').val(modal['email-text']);
-    $('#external-modules-configure-modal-update input[name="email-attachment-variable-update"]').val(modal['email-attachment-variable']);
-    $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').val(modal['email-repetitive']);
-    $('#external-modules-configure-modal-update input[name="email-condition-update"]').val(modal['email-condition']);
-    $('#external-modules-configure-modal-update input[name="email-incomplete-update"]').val(modal['email-incomplete']);
+    $('[name=external-modules-configure-modal-update] select[name="form-name-update"]').val(modal['form-name']);
+    $('[name=external-modules-configure-modal-update] input[name="email-from-update"]').val(modal['email-from']);
+    $('[name=external-modules-configure-modal-update] input[name="email-to-update"]').val(modal['email-to']);
+    $('[name=external-modules-configure-modal-update] input[name="email-cc-update"]').val(modal['email-cc']);
+    $('[name=external-modules-configure-modal-update] input[name="email-bcc-update"]').val(modal['email-bcc']);
+    $('[name=external-modules-configure-modal-update] input[name="email-subject-update"]').val(modal['email-subject']);
+    $('[name=external-modules-configure-modal-update] textarea[name="email-text-update"]').val(modal['email-text']);
+    $('[name=external-modules-configure-modal-update] input[name="email-attachment-variable-update"]').val(modal['email-attachment-variable']);
+    $('[name=external-modules-configure-modal-update] input[name="email-repetitive-update"]').val(modal['email-repetitive']);
+    $('[name=external-modules-configure-modal-update] input[name="email-condition-update"]').val(modal['email-condition']);
+    $('[name=external-modules-configure-modal-update] input[name="email-incomplete-update"]').val(modal['email-incomplete']);
 
     uploadLongitudinalEvent('project_id='+project_id+'&form='+modal['form-name']+'&index='+index,'[field=form-name-event]');
 
@@ -64,26 +64,26 @@ function editEmailAlert(modal, index){
     }
 
     //Checkboxes
-    $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').prop('checked',false);
+    $('[name=external-modules-configure-modal-update] input[name="email-repetitive-update"]').prop('checked',false);
     if(modal['email-repetitive'] == '1'){
-        $('#external-modules-configure-modal-update input[name="email-repetitive-update"]').prop('checked',true);
+        $('[name=external-modules-configure-modal-update] input[name="email-repetitive-update"]').prop('checked',true);
     }
 
-    $('#external-modules-configure-modal-update input[name="email-incomplete-update"]').prop('checked',false);
+    $('[name=external-modules-configure-modal-update] input[name="email-incomplete-update"]').prop('checked',false);
     if(modal['email-incomplete'] == '1'){
-        $('#external-modules-configure-modal-update input[name="email-incomplete-update"]').prop('checked',true);
+        $('[name=external-modules-configure-modal-update] input[name="email-incomplete-update"]').prop('checked',true);
     }
 
     //clean up error messages
     $('#errMsgContainerModalUpdate').empty();
     $('#errMsgContainerModalUpdate').hide();
-    $('#external-modules-configure-modal-update input[name=form-name]').removeClass('alert');
-    $('#external-modules-configure-modal-update input[name=email-to]').removeClass('alert');
-    $('#external-modules-configure-modal-update input[name=email-subject]').removeClass('alert');
-    $('#external-modules-configure-modal-update [name=email-text]').removeClass('alert');
+    $('[name=external-modules-configure-modal-update] input[name=form-name]').removeClass('alert');
+    $('[name=external-modules-configure-modal-update] input[name=email-to]').removeClass('alert');
+    $('[name=external-modules-configure-modal-update] input[name=email-subject]').removeClass('alert');
+    $('[name=external-modules-configure-modal-update] [name=email-text]').removeClass('alert');
 
     //Show modal
-    $('#external-modules-configure-modal-update').modal('show');
+    $('[name=external-modules-configure-modal-update]').modal('show');
 
 }
 
@@ -114,14 +114,14 @@ function getFileFieldElement(value, file_number){
     } else {
         var html = '<input type="file" name="' + name + '" value="' + getAttributeValueHtml(value) + '" class="external-modules-input-element">';
     }
-    $('#external-modules-configure-modal-update input[name="email-attachment'+file_number+'-update"]').parent().html(html);
+    $('[name=external-modules-configure-modal-update] input[name="email-attachment'+file_number+'-update"]').parent().html(html);
 }
 
 function hideFile(value,file_number){
     var name = "email-attachment"+file_number;
     var html = '<input type="file" name="' + name + '-update" value="" class="external-modules-input-element">';
     html += '<input type="hidden" name="'+name+'" value="'+value+'" class="external-modules-input-element deletedFile">';
-    $('#external-modules-configure-modal-update input[name="email-attachment'+file_number+'-update"]').parent().html(html);
+    $('[name=external-modules-configure-modal-update] input[name="email-attachment'+file_number+'-update"]').parent().html(html);
 }
 
 function deleteEmailAlert(index,modal,indexmodal){
@@ -241,23 +241,23 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
     $('#errMsgContainerModal'+errorContainerSuffix).hide();
 
     var errMsg = [];
-    if ($('#external-modules-configure-modal'+suffix+' input[name=email-to'+suffix+']').val() === "" || $('#external-modules-configure-modal'+suffix+' input[name=email-to'+suffix+']').val() === "0") {
+    if ($('[name=external-modules-configure-modal'+suffix+'] input[name=email-to'+suffix+']').val() === "" || $('[name=external-modules-configure-modal'+suffix+'] input[name=email-to'+suffix+']').val() === "0") {
         errMsg.push('Please insert an <strong>email receiver</strong>.');
-        $('#external-modules-configure-modal'+suffix+' input[name=email-to'+suffix+']').addClass('alert');
-    }else{ $('#external-modules-configure-modal'+suffix+' input[name=email-to'+suffix+']').removeClass('alert');}
+        $('[name=external-modules-configure-modal'+suffix+'] input[name=email-to'+suffix+']').addClass('alert');
+    }else{ $('[name=external-modules-configure-modal'+suffix+'] input[name=email-to'+suffix+']').removeClass('alert');}
 
-    if ($('#external-modules-configure-modal'+suffix+' input[name=email-subject'+suffix+']').val() === "" || $('#external-modules-configure-modal'+suffix+' input[name=email-subject'+suffix+']').val() === "0") {
+    if ($('[name=external-modules-configure-modal'+suffix+'] input[name=email-subject'+suffix+']').val() === "" || $('[name=external-modules-configure-modal'+suffix+'] input[name=email-subject'+suffix+']').val() === "0") {
             errMsg.push('Please insert an <strong>email subject</strong>.');
-            $('#external-modules-configure-modal' + suffix + ' input[name=email-subject' + suffix + ']').addClass('alert');
-    }else{ $('#external-modules-configure-modal'+suffix+' input[name=email-subject'+suffix+']').removeClass('alert');}
+            $('[name=external-modules-configure-modal' + suffix + '] input[name=email-subject' + suffix + ']').addClass('alert');
+    }else{ $('[name=external-modules-configure-modal'+suffix+'] input[name=email-subject'+suffix+']').removeClass('alert');}
 
-    if ($('#external-modules-configure-modal'+suffix+' select[name=form-name'+suffix+']').val() === "" || $('#external-modules-configure-modal'+suffix+' select[name=form-name'+suffix+']').val() === "0") {
+    if ($('[name=external-modules-configure-modal'+suffix+'] select[name=form-name'+suffix+']').val() === "" || $('[name=external-modules-configure-modal'+suffix+'] select[name=form-name'+suffix+']').val() === "0") {
         errMsg.push('Please select a <strong>Form</strong>.');
-        $('#external-modules-configure-modal'+suffix+' select[name=form-name'+suffix+']').addClass('alert');
-    }else{ $('#external-modules-configure-modal'+suffix+' select[name=form-name'+suffix+']').removeClass('alert');}
+        $('[name=external-modules-configure-modal'+suffix+'] select[name=form-name'+suffix+']').addClass('alert');
+    }else{ $('[name=external-modules-configure-modal'+suffix+'] select[name=form-name'+suffix+']').removeClass('alert');}
 
-    if ($('#external-modules-configure-modal'+suffix+' input[name=email-attachment-variable'+suffix+']').val() != "") {
-        var result = $('#external-modules-configure-modal'+suffix+' input[name=email-attachment-variable'+suffix+']').val().split(",");
+    if ($('[name=external-modules-configure-modal'+suffix+'] input[name=email-attachment-variable'+suffix+']').val() != "") {
+        var result = $('[name=external-modules-configure-modal'+suffix+'] input[name=email-attachment-variable'+suffix+']').val().split(",");
         var errorInField = false;
         for(var i=0;i<result.length;i++){
             if(trim(result[i]).substring(0, 1) != "[" || trim(result[i]).substring(trim(result[i]).length-1, trim(result[i]).length) != "]"){
@@ -267,16 +267,16 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
         }
         if(errorInField == true) {
             errMsg.push('<strong>Email Attachment as variables</strong> must follow the format: <i>[variable1],[variable2],...</i>.');
-            $('#external-modules-configure-modal'+suffix+' input[name=email-attachment-variable'+suffix+']').addClass('alert');
+            $('[name=external-modules-configure-modal'+suffix+'] input[name=email-attachment-variable'+suffix+']').addClass('alert');
         }else{
-            $('#external-modules-configure-modal'+suffix+' input[name=email-attachment-variable'+suffix+']').removeClass('alert');
+            $('[name=external-modules-configure-modal'+suffix+'] input[name=email-attachment-variable'+suffix+']').removeClass('alert');
         }
     }
 
-    if ($('#external-modules-configure-modal'+suffix+' input[name=email-from'+suffix+']').val() === "" || $('#external-modules-configure-modal'+suffix+' input[name=email-from'+suffix+']').val() === "0") {
+    if ($('[name=external-modules-configure-modal'+suffix+'] input[name=email-from'+suffix+']').val() === "" || $('[name=external-modules-configure-modal'+suffix+'] input[name=email-from'+suffix+']').val() === "0") {
         errMsg.push('Please insert an <strong>email sender</strong>.');
-        $('#external-modules-configure-modal'+suffix+' input[name=email-from'+suffix+']').addClass('alert');
-    }else{ $('#external-modules-configure-modal'+suffix+' input[name=email-from'+suffix+']').removeClass('alert');}
+        $('[name=external-modules-configure-modal'+suffix+'] input[name=email-from'+suffix+']').addClass('alert');
+    }else{ $('[name=external-modules-configure-modal'+suffix+'] input[name=email-from'+suffix+']').removeClass('alert');}
 
     var editor_text = tinymce.activeEditor.getContent();
     if(editor_text == ""){
@@ -291,7 +291,7 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
         });
         $('#errMsgContainerModal'+errorContainerSuffix).show();
         $('html,body').scrollTop(0);
-        $('#external-modules-configure-modal'+suffix).scrollTop(0);
+        $('[name=external-modules-configure-modal'+suffix+']').scrollTop(0);
         return false;
     }
     else {
