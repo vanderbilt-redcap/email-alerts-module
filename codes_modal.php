@@ -15,7 +15,6 @@ require_once 'EmailTriggerExternalModule.php';
             data += "&email-text-editor="+encodeURIComponent(editor_text);
             data += "&email-to="+$('#email-to').val();
             data += "&email-cc="+$('#email-cc').val();
-            console.log(data);
 
             var files = {};
             $('#AddNewForm').find('input, select, textarea').each(function(index, element){
