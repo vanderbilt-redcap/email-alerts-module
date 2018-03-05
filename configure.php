@@ -270,10 +270,10 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 				}
             });
             EMparentAux = EMparent;
-//            EMparent.getPrefix = function() {
-//                var prefix = <?//=json_encode($_REQUEST['prefix'])?>//;
-//                return prefix;
-//            };
+            EMparent.getPrefix = function() {
+                var prefix = <?=json_encode($_REQUEST['prefix'])?>;
+                return prefix;
+            };
 
             //We add the HTML code to the respective modal windows
             $('#code_modal_table').html(rowsHtml);
