@@ -46,7 +46,11 @@ function editEmailAlert(modal, index){
     //Add values
     $('[name=external-modules-configure-modal-update] select[name="form-name-update"]').val(modal['form-name']);
     $('[name=external-modules-configure-modal-update] input[name="email-from-update"]').val(modal['email-from']);
-    $('[name=external-modules-configure-modal-update] input[name="email-to-update"]').val(modal['email-to']);
+
+    $('#email-to-update').val(modal['email-to']);
+    $('#email-cc-update').val(modal['email-cc']);
+    $('#email-bcc-update').val(modal['email-bcc']);
+
     $('[name=external-modules-configure-modal-update] input[name="email-cc-update"]').val(modal['email-cc']);
     $('[name=external-modules-configure-modal-update] input[name="email-bcc-update"]').val(modal['email-bcc']);
     $('[name=external-modules-configure-modal-update] input[name="email-subject-update"]').val(modal['email-subject']);

@@ -419,6 +419,9 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 var data = $('#updateForm').serialize();
                 var editor_text = tinymce.activeEditor.getContent();
                 data += "&email-text-update-editor="+encodeURIComponent(editor_text);
+                data += "&email-to-update="+$('#email-to-update').val();
+                data += "&email-cc-update="+$('#email-cc-update').val();
+                data += "&email-bcc-update="+$('#email-bcc-update').val();
 
                 var files = {};
                 $('#updateForm').find('input, select, textarea').each(function(index, element){
