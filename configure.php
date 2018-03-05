@@ -941,7 +941,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 
     <div class="col-md-12">
         <form class="form-horizontal" action="" method="post" id='updateForm'>
-            <div class="modal fade" name="external-modules-configure-modal-update" data-module="<?=$_REQUEST['prefix']?>" tabindex="-1" role="dialog" aria-labelledby="Codes">
+            <div class="modal fade" id="external-modules-configure-modal" name="external-modules-configure-modal-update" data-module="<?=$_REQUEST['prefix']?>" tabindex="-1" role="dialog" aria-labelledby="Codes">
                 <div class="modal-dialog" role="document" style="width: 800px">
                     <div class="modal-content">
                         <div class="modal-header">
