@@ -101,6 +101,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var _preview_url = '<?=$module->getUrl('previewForm.php')?>';
         var _edoc_name_url = '<?=$module->getUrl('get-edoc-name.php')?>';
         var _longitudinal_url = '<?=$module->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
+        var _getProjectList_url = '<?=$module->getUrl('get-project-list.php')?>';
         var lastClick = null;
         var startPos = 0;
         var endPos = 0;
@@ -213,6 +214,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         'multiple': 'multiple',
                         'data-min-length': '1',
                         'onFocus': 'flexalistFocus(this)',
+                        'onkeyup': 'preloadEmail(this)',
                         'id': setting.key
                     };
                     inputHtml += "<td class='external-modules-input-td'>" + this.getInputElement(setting.type, setting.key, setting.value, inputProperties);
@@ -274,6 +276,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 var prefix = <?=json_encode($_REQUEST['prefix'])?>;
                 return prefix;
             };
+            //we call the doBranching but do nothing to avoid getting errors as Email alerts goes differently
+            EMparent.doBranching = function(){}
 
             //We add the HTML code to the respective modal windows
             $('#code_modal_table').html(rowsHtml);
@@ -404,15 +408,6 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             //we call first the flexalist function to create the options for the email
             $('.flexdatalist').flexdatalist({
                 minLength: 1
-            });
-            //we call each time a letter is typed to search in the DB for the options and load them
-            $('#email-to-flexdatalist, #email-to-update-flexdatalist, #email-cc-flexdatalist, #email-cc-update-flexdatalist').on('keyup', function(e){
-                if(emailFromForm_var != ''){
-                    var cutword = "-flexdatalist";
-                    var id = $(this).attr('id').substr(0, $(this).attr('id').length-cutword.length);
-                    var value = $(this).val();
-                    loadAjax('parameters='+value+'&project_id='+project_id+'&variables='+emailFromForm_var, '<?=$module->getUrl('get-project-list.php')?>', id);
-                }
             });
 
             $('#updateForm').submit(function () {

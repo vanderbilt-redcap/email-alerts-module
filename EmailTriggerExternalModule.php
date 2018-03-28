@@ -132,6 +132,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             //Repeatable instruments
                             $logic = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var,0);
                             $label = $this->getLogicLabel($var, $logic,$project_id,$data,$event_id,$record,$repeat_instance);
+//                            $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$repeat_instance));
                             if(!empty($label)){
                                 $logic = $label;
                             }

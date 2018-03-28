@@ -319,6 +319,14 @@ function ajaxLoadOptionAndMessage(data, url, message){
     });
 }
 
+//we call each time a letter is typed to search in the DB for the options and load them
+function preloadEmail(element){
+    var cutword = "-flexdatalist";
+    var id = $(element).attr('id').substr(0, $(element).attr('id').length-cutword.length);
+    var value = $(element).val();
+    loadAjax('parameters='+value+'&project_id='+project_id+'&variables='+emailFromForm_var, _getProjectList_url, id);
+}
+
 function loadAjax(parameters, url, id){
     var loadAJAX = 'json-datalist-'+id;
     $.ajax({
