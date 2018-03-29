@@ -206,7 +206,7 @@ function insertAtCursorTinyMCE(myValue,option) {
             }
         } else {
             if (tinymce.isIE) {
-                tinyMCE.activeEditor.selection.moveToBookmark(actualCaretPositionBookmark);
+                // tinyMCE.activeEditor.selection.moveToBookmark(actualCaretPositionBookmark);
                 tinyMCE.execCommand('mceInsertContent', false, myValue);
             } else {
                 tinyMCE.execCommand('insertHTML', false, myValue);
