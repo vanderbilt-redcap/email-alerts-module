@@ -169,12 +169,11 @@ function flexalistFocus(element){
  */
 function insertAtCursorTinyMCE(myValue,option) {
     if(lastClick != '') {
-        if (lastClick != null) {
-            // logic on to add button content
-            if((lastClick !='#email-cc-flexdatalist' && lastClick !='#email-to-flexdatalist' && lastClick !='#email-bcc-flexdatalist' && lastClick !='#email-cc-update-flexdatalist' && lastClick !='#email-bcc-update-flexdatalist' && lastClick !='#email-to-update-flexdatalist' && option == 1) || option == 0) {
+        if(letButtonAddContent(lastClick, option)) {
+            if (lastClick != null) {
                 var myField = $(lastClick);
-                var elementflexalist = '<li class="value"><span class="text">'+myValue+'</span><span class="fdl-remove">×</span></li>';
-                var varId = lastClick.replace(/-flexdatalist/g,'');
+                var elementflexalist = '<li class="value"><span class="text">' + myValue + '</span><span class="fdl-remove">×</span></li>';
+                var varId = lastClick.replace(/-flexdatalist/g, '');
 
                 //IE support
                 if (document.selection) {
@@ -182,14 +181,14 @@ function insertAtCursorTinyMCE(myValue,option) {
                     sel = document.selection.createRange();
                     sel.text = myValue;
                 }
-                if(varId =='#email-cc' || varId == '#email-to' || varId =='#email-bcc' || varId =='#email-cc-update' || varId =='#email-bcc-update' || varId =='#email-to-update') {
+                if (varId == '#email-cc' || varId == '#email-to' || varId == '#email-bcc' || varId == '#email-cc-update' || varId == '#email-bcc-update' || varId == '#email-to-update') {
                     myField.parent().before(elementflexalist);
-                    if($(varId).val() == ""){
+                    if ($(varId).val() == "") {
                         $(varId).val(myValue);
-                    }else{
-                        $(varId).val($(varId).val()+","+myValue);
+                    } else {
+                        $(varId).val($(varId).val() + "," + myValue);
                     }
-                }else{
+                } else {
                     //MOZILLA and others
                     if (startPos || startPos == '0') {
                         myField.val(myField.val().substring(0, startPos) + myValue + myField.val().substring(endPos, myField.val().length));
@@ -203,17 +202,41 @@ function insertAtCursorTinyMCE(myValue,option) {
                 //We update positions to add next text after the new one
                 startPos = startPos + myValue.length;
                 endPos = startPos + myValue.length;
-            }
-        } else {
-            if (tinymce.isIE) {
-                // tinyMCE.activeEditor.selection.moveToBookmark(actualCaretPositionBookmark);
-                tinyMCE.execCommand('mceInsertContent', false, myValue);
             } else {
-                tinyMCE.execCommand('insertHTML', false, myValue);
+                if (tinymce.isIE) {
+                    // tinyMCE.activeEditor.selection.moveToBookmark(actualCaretPositionBookmark);
+                    tinyMCE.execCommand('mceInsertContent', false, myValue);
+                } else {
+                    tinyMCE.execCommand('insertHTML', false, myValue);
+                }
             }
         }
     }
 
+}
+
+/**
+ * Function that controls the logic on the buttons
+ * @param element
+ * @param type
+ * @returns {boolean}
+ */
+function letButtonAddContent(element, type){
+    if(type == 0){
+        //Email buttons
+        if(element =='#email-cc-flexdatalist' || element =='#email-to-flexdatalist' || element =='#email-bcc-flexdatalist' || element =='#email-to-update-flexdatalist' || element =='#email-cc-update-flexdatalist' || element =='#email-bcc-update-flexdatalist'){
+            return true;
+        }
+    }else if( type == 1){
+        //Data piping buttons
+        return true;
+    }else if(type == 2){
+        //Survey buttons
+        if(element !='#email-cc-flexdatalist' && element !='#email-to-flexdatalist' && element !='#email-bcc-flexdatalist' && element !='#email-to-update-flexdatalist' && element !='#email-cc-update-flexdatalist' && element !='#email-bcc-update-flexdatalist' && element !='[name="email-attachment-variable"]' && element !='[name="email-attachment-variable-update"]' && element !='[name="email-subject"]' && element !='[name="email-subject-update"]'){
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
