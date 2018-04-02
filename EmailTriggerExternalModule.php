@@ -29,7 +29,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $q = db_query($sql);
 
                     if($error = db_error()){
-                        die($sql.': '.$error);
+                        throw new Exception($sql.': '.$error);
                     }
 
                     while($row = db_fetch_assoc($q)){
@@ -477,7 +477,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $q = db_query($metadata[$field_name]['select_choices_or_calculations']);
 
                 if ($error = db_error()) {
-                    die($metadata[$field_name]['select_choices_or_calculations'] . ': ' . $error);
+                    throw new Exception($metadata[$field_name]['select_choices_or_calculations'] . ': ' . $error);
                 }
 
                 while ($row = db_fetch_assoc($q)) {
@@ -602,7 +602,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $q = db_query($sql);
 
             if ($error = db_error()) {
-                die($sql . ': ' . $error);
+                throw new Exception($sql . ': ' . $error);
             }
 
             while ($row = db_fetch_assoc($q)) {
