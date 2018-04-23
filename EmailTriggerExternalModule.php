@@ -106,7 +106,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
         if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance))) && ($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             //If the condition is met or if we don't have any, we send the email
-            if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && \LogicTester::apply($email_condition, $data[$record], null, false)) || empty($email_condition)) {
+            if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && \REDCap::evaluateLogic($email_condition, $project_id, $record, $event_id, $repeat_instance, $instrument)) || empty($email_condition)) {
                 $email_from = $this->getProjectSetting("email-from", $project_id)[$id];
                 $email_to = $this->getProjectSetting("email-to", $project_id)[$id];
                 $email_cc = $this->getProjectSetting("email-cc", $project_id)[$id];
