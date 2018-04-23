@@ -233,11 +233,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 foreach ($result as $img_src){
                     preg_match_all('/(?<=file=)\\s*([0-9]+)\\s*/',$img_src, $result_img);
                     $edoc = array_unique($result_img[1])[0];
-                    $this->addNewAttachment($mail,$edoc,$project_id,'images');
+                    if(is_numeric($edoc)){
+                        $this->addNewAttachment($mail,$edoc,$project_id,'images');
 
-                    if(!empty($edoc)) {
-                        $src = "cid:" . $edoc;
-                        $email_text = str_replace($img_src, $src, $email_text);
+                        if(!empty($edoc)) {
+                            $src = "cid:" . $edoc;
+                            $email_text = str_replace($img_src, $src, $email_text);
+                        }
                     }
                 }
 
@@ -249,7 +251,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 //Attachments
                 for($i=1; $i<6 ; $i++){
                     $edoc = $this->getProjectSetting("email-attachment".$i,$project_id)[$id];
-                    $this->addNewAttachment($mail,$edoc,$project_id,'files');
+                    if(is_numeric($edoc)){
+                        $this->addNewAttachment($mail,$edoc,$project_id,'files');
+                    }
                 }
                 //Attchment from RedCap variable
                 if(!empty($email_attachment_variable)){
@@ -257,7 +261,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     foreach ($var as $attachment) {
                         if(\LogicTester::isValid(trim($attachment))) {
                             $edoc = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $attachment,0);
-                            $this->addNewAttachment($mail,$edoc,$project_id,'files');
+                            if(is_numeric($edoc)) {
+                                $this->addNewAttachment($mail, $edoc, $project_id, 'files');
+                            }
                         }
                     }
                 }
