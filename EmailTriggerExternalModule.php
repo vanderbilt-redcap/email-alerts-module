@@ -130,8 +130,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $var = preg_split("/[;,]+/", $emailvar)[0];
                         if (\LogicTester::isValid($var)) {
                             //Repeatable instruments
-                            $logic = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var,0);
-                            $label = $this->getLogicLabel($var, $logic,$project_id,$data,$event_id,$record,$repeat_instance);
+                            $logic = $this->isRepeatingInstrument($project_id, $data, $record, $event_id, $instrument, $repeat_instance, $var,0);
+                            $label = $this->getLogicLabel($var,$logic,$project_id,$data,$event_id,$record,$repeat_instance);
 //                            $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$repeat_instance));
                             if(!empty($label)){
                                 $logic = $label;
@@ -309,7 +309,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $mail->clearAttachments();
             }
         }
-
     }
 
     /**
@@ -463,13 +462,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }else if($metadata[$field_name]['field_type'] == 'truefalse'){
             if($value == '1'){
                 $label = "True";
-            }else{
+            }else if($value == '0'){
                 $label = "False";
             }
         }else if($metadata[$field_name]['field_type'] == 'yesno'){
             if($value == '1'){
                 $label = "Yes";
-            }else{
+            }else if($value == '0'){
                 $label = "No";
             }
         }else if($metadata[$field_name]['field_type'] == 'sql'){
@@ -487,7 +486,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
             }
-        } else if(in_array($metadata[$field_name]['text_validation_type_or_show_slider_number'],array_keys($dateFormats))) {
+        } else if(in_array($metadata[$field_name]['text_validation_type_or_show_slider_number'],array_keys($dateFormats)) && $value != "") {
 			$label = date($dateFormats[$metadata[$field_name]['text_validation_type_or_show_slider_number']],strtotime($value));
 		}
         return $label;
