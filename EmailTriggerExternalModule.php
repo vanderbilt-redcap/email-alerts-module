@@ -603,7 +603,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function addNewAttachment($mail,$edoc,$project_id, $type){
         if(!empty($edoc)) {
-            $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=" . $edoc;
+            $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=" . $edoc." AND project_id=".$project_id;
             $q = $this->query($sql);
 
             if ($error = db_error()) {
