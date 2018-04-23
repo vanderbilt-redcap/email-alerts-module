@@ -26,7 +26,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             if(!empty($forms_name) && $record != NULL){
                 foreach ($forms_name as $id => $form){
                     $sql="SELECT s.form_name FROM redcap_surveys_participants as sp LEFT JOIN redcap_surveys s ON (sp.survey_id = s.survey_id ) where s.project_id =".$project_id." AND sp.hash='".$_REQUEST['s']."'";
-                    $q = db_query($sql);
+                    $q = $this->query($sql);
 
                     if($error = db_error()){
                         throw new \Exception($sql.': '.$error);
@@ -479,7 +479,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }else if($metadata[$field_name]['field_type'] == 'sql'){
             if(!empty($value)) {
-                $q = db_query($metadata[$field_name]['select_choices_or_calculations']);
+                $q = $this->query($metadata[$field_name]['select_choices_or_calculations']);
 
                 if ($error = db_error()) {
                     throw new \Exception($metadata[$field_name]['select_choices_or_calculations'] . ': ' . $error);
@@ -604,7 +604,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function addNewAttachment($mail,$edoc,$project_id, $type){
         if(!empty($edoc)) {
             $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=" . $edoc;
-            $q = db_query($sql);
+            $q = $this->query($sql);
 
             if ($error = db_error()) {
                 throw new \Exception($sql . ': ' . $error);
