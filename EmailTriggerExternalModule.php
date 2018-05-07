@@ -85,37 +85,34 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
-    function hook_every_page_top ($project_id){
-        echo "<script>
-             var _deleteAllEmailRepetitive_url = '".$this->getUrl('deleteAllEmailRepetitiveSent.php')."';
-             var _deleteRecordEmailRepetitive_url = '".$this->getUrl('deleteRecordEmailRepetitiveSent.php')."';
-             var record = '".$_GET['id']."';
-            $(function(){
-                 window.onload = function(){
-                    $('#row_erase :button:contains(\'Erase all data\')').on('click', function(e){
-                        $(':button:contains(\'Erase all data\')').on('click', function(e){
-                            $.post(_deleteAllEmailRepetitive_url,  '&record='+record, function(returnData){
-                                jsonAjax = jQuery.parseJSON(returnData);
-                                if(jsonAjax.status != 'success'){
-                                    alert(\"An error ocurred\");
-                                }
-                            });
-                        });
-                    }); 
-                    $('#recordActionDropdownDiv a:contains(\'Delete record (all forms/events)\')').on('click', function(e){
-                        $(':button:contains(\'DELETE RECORD\')').on('click', function(e){
-                            $.post(_deleteRecordEmailRepetitive_url, '&record='+record, function(returnData){
-                                console.log('sent')
-                                jsonAjax = jQuery.parseJSON(returnData);
-                                if(jsonAjax.status != 'success'){
-                                    alert(\"An error ocurred\");
-                                }
-                            });
-                        });
-                    });
+    function hook_every_page_before_render($project_id = null){
+        if(strpos($_SERVER['REQUEST_URI'],'erase_project_data.php') !== false && $_POST['action'] == 'erase_data'){
+            $this->setProjectSetting('email-repetitive-sent', '');
+        }else if($_REQUEST['route'] == 'DataEntryController:deleteRecord'){
+            $record_id = $_REQUEST['record'];
+
+            #Delete email repetitive sent from JSON before deleting all data
+            $email_repetitive_sent =  empty($this->getProjectSetting('email-repetitive-sent'))?array():$this->getProjectSetting('email-repetitive-sent');
+            $email_repetitive_sent = json_decode($email_repetitive_sent,true);
+
+            if(!empty($email_repetitive_sent)) {
+                foreach ($email_repetitive_sent as $form => $form_value) {
+                    foreach ($form_value as $alert => $alert_value) {
+                        $one_less = 0;
+                        foreach ($alert_value as $record => $value) {
+                            //we don't add the deleted alert and rename the old ones.
+                            if ($value == $record_id) {
+                                $one_less = 1;
+                            }else if($record >= 0){
+                                //if the record is -1 do not add it. When copying a project sometimes it has a weird config.
+                                $jsonArray[$form][$alert][$record - $one_less] = $value;
+                            }
+                        }
+                    }
                 }
-            });
-        </script>";
+                $this->setProjectSetting('email-repetitive-sent', json_encode($jsonArray));
+            }
+        }
     }
 
     /**
