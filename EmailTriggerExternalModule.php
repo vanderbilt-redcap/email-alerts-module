@@ -187,9 +187,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $emailsTo = preg_split("/[;,]+/", $email_to);
                     $emailsCC = preg_split("/[;,]+/", $email_cc);
                     $emailsBCC = preg_split("/[;,]+/", $email_bcc);
-                    $mail = $this->fill_emails($mail,$emailsTo, $email_form_var, $data[$record], 'to',$project_id,$record, $event_id, $instrument, $repeat_instance);
-                    $mail = $this->fill_emails($mail,$emailsCC, $email_form_var, $data[$record], 'cc',$project_id,$record, $event_id, $instrument, $repeat_instance);
-                    $mail = $this->fill_emails($mail,$emailsBCC, $email_form_var, $data[$record], 'bcc',$project_id,$record, $event_id, $instrument, $repeat_instance);
+                    $mail = $this->fill_emails($mail,$emailsTo, $email_form_var, $data, 'to',$project_id,$record, $event_id, $instrument, $repeat_instance);
+                    $mail = $this->fill_emails($mail,$emailsCC, $email_form_var, $data, 'cc',$project_id,$record, $event_id, $instrument, $repeat_instance);
+                    $mail = $this->fill_emails($mail,$emailsBCC, $email_form_var, $data, 'bcc',$project_id,$record, $event_id, $instrument, $repeat_instance);
                 }else{
                     $email_to_ok = $this->check_email ($email_to,$project_id);
                     $email_cc_ok = $this->check_email ($email_cc,$project_id);
@@ -381,7 +381,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
         }else{
             if($option == '1'){
-                $logic = \LogicTester::apply($var, $data, null, true);
+                if(\REDCap::isLongitudinal() && \LogicTester::apply($var, $data[$record], null, true) == ""){
+                    $logic = $data[$record][$event_id][$var_name];
+                }else{
+                    $logic = \LogicTester::apply($var, $data[$record], null, true);
+                }
             }else{
                 if(\REDCap::isLongitudinal() && \LogicTester::apply($var, $data[$record], null, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
