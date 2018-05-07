@@ -747,7 +747,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             <tbody>
             <?php
             $alerts = "";
-            $email_repetitive_sent = json_decode($projectData['settings']['email-repetitive-sent']['value']);
+            $email_repetitive_sent = json_decode($projectData['settings']['email-repetitive-sent']['value'],true);
             for ($index = 0; $index < $indexSubSet; $index++) {
                 $email_sent = $projectData['settings']['email-sent']['value'][$index];
                 $class_sent = "";
@@ -799,10 +799,10 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 
                 if(!empty($email_repetitive_sent)){
                     if(array_key_exists($projectData['settings']['form-name']['value'][$index],$email_repetitive_sent)){
-                        $form = $email_repetitive_sent->$projectData['settings']['form-name']['value'][$index];
+                        $form = $email_repetitive_sent[$projectData['settings']['form-name']['value'][$index]];
                         foreach ($form as $alert =>$value){
                             if($alert == $index){
-                                $message_sent .= "Records activated: ".count((array)$form->$alert)."<br/>";
+                                $message_sent .= "Records activated: ".count((array)$form[$alert])."<br/>";
                             }
                         }
                     }

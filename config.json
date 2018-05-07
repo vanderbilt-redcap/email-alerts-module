@@ -16,7 +16,7 @@
 	"permissions": [
 		"hook_save_record",
 		"hook_survey_complete",
-		"select_data"
+		"hook_every_page_top"
 	],
 
 	"links": {

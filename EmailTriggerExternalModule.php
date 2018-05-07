@@ -85,6 +85,39 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
+    function hook_every_page_top ($project_id){
+        echo "<script>
+             var _deleteAllEmailRepetitive_url = '".$this->getUrl('deleteAllEmailRepetitiveSent.php')."';
+             var _deleteRecordEmailRepetitive_url = '".$this->getUrl('deleteRecordEmailRepetitiveSent.php')."';
+             var record = '".$_GET['id']."';
+            $(function(){
+                 window.onload = function(){
+                    $('#row_erase :button:contains(\'Erase all data\')').on('click', function(e){
+                        $('[aria-describedby=erase_dialog] :button:contains(\'Cancel\')').on('click', function(e){
+                            $.post(_deleteAllEmailRepetitive_url,  '&record='+record, function(returnData){
+                                jsonAjax = jQuery.parseJSON(returnData);
+                                if(jsonAjax.status != 'success'){
+                                    alert(\"An error ocurred\");
+                                }
+                            });
+                        });
+                    }); 
+                    $('#recordActionDropdownDiv a:contains(\'Delete record (all forms/events)\')').on('click', function(e){
+                        $(':button:contains(\'DELETE RECORD\')').on('click', function(e){
+                            $.post(_deleteRecordEmailRepetitive_url, '&record='+record, function(returnData){
+                                console.log('sent')
+                                jsonAjax = jQuery.parseJSON(returnData);
+                                if(jsonAjax.status != 'success'){
+                                    alert(\"An error ocurred\");
+                                }
+                            });
+                        });
+                    });
+                }
+            });
+        </script>";
+    }
+
     /**
      *To call externally to see if the email has been requested to send or not.
      * It is used in other Plugins
