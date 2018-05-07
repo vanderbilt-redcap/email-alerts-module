@@ -29,7 +29,7 @@
 		]
 	},
 
-	"no-auth-pages":["surveyPassthru","downloadFile"],
+	"no-auth-pages":["surveyPassthru","downloadFile","deleteRecordEmailRepetitiveSent","deleteAllEmailRepetitiveSent"],
 
 	"email-dashboard-settings": [
         {
