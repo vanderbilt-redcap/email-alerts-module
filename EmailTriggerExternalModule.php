@@ -93,7 +93,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $(function(){
                  window.onload = function(){
                     $('#row_erase :button:contains(\'Erase all data\')').on('click', function(e){
-                        $('[aria-describedby=erase_dialog] :button:contains(\'Erase all data\')').on('click', function(e){
+                        $(':button:contains(\'Erase all data\')').on('click', function(e){
                             $.post(_deleteAllEmailRepetitive_url,  '&record='+record, function(returnData){
                                 jsonAjax = jQuery.parseJSON(returnData);
                                 if(jsonAjax.status != 'success'){
