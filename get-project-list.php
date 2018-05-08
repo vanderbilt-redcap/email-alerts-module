@@ -24,7 +24,7 @@ if(!empty($variables)){
 }
 
 $sql = "SELECT DISTINCT(value) from `redcap_data` where project_id = ".$project_id." AND field_name in (".$sqlvariables.") AND value LIKE '".$searchTerms."%' ";
-$result = db_query($sql);
+$result = $module->query($sql);
 
 $matchingProjects = '';
 while($row = db_fetch_assoc($result)) {

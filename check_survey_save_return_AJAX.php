@@ -27,7 +27,7 @@ if(!empty($surveyLink_var)){
 
 
         $sql = "SELECT save_and_return from `redcap_surveys` where project_id = ".$project_id." AND form_name ='".$instrument_form."'";
-        $result = db_query($sql);
+        $result = $module->query($sql);
 
         if(APP_PATH_WEBROOT[0] == '/'){
             $APP_PATH_WEBROOT_ALL = substr(APP_PATH_WEBROOT, 1);

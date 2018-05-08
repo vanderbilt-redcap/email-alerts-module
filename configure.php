@@ -821,7 +821,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 
                             if (!empty($configRow['value'][$index])) {
                                 $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=" . $configRow['value'][$index];
-                                $q = db_query($sql);
+                                $q = $module->query($sql);
 
                                 if ($error = db_error()) {
                                     die($sql . ': ' . $error);
