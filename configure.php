@@ -38,28 +38,12 @@ foreach($simple_config['email-dashboard-settings'] as $configKey => $configRow) 
 }
 
 $message="";
-if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'C'){
-    $message='<strong>Success!</strong> The configuration has been saved.';
-}else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'A'){
-    $message='<strong>Success!</strong> New Email Added.';
-}
-else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'U'){
-    $message='<strong>Success!</strong> Email Updated.';
-}
-else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'D'){
-    $message='<strong>Success!</strong> Email Deleted.';
-}
-else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'T'){
-    $message='<strong>Success!</strong> Email Activated.';
-}
-else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'E'){
-    $message='<strong>Success!</strong> Email Deactivated.';
-}
-else if(array_key_exists('message', $_REQUEST) && $_REQUEST['message'] === 'P'){
-    $message='<strong>Success!</strong> Email Duplicated.';
-}
-else if(array_key_exists('message', $_REQUEST) && ($_REQUEST['message'] === 'R' || $_REQUEST['message'] === 'N')){
-    $message='<strong>Success!</strong> Email Re-Enabled.';
+$message_text = array('C'=>'<strong>Success!</strong> The configuration has been saved.','A'=>'<strong>Success!</strong> New Email Added.','U'=>'<strong>Success!</strong> Email Updated.',
+    'D'=>'<strong>Success!</strong> Email Deleted.','T'=>'<strong>Success!</strong> Email Activated.','E'=>'<strong>Success!</strong> Email Deactivated.',
+    'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.',);
+
+if(array_key_exists('message', $_REQUEST)){
+    $message=$message_text[$_REQUEST['message']];
 }
 
 #get number of instances
@@ -86,6 +70,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var isLongitudinal = <?=json_encode(\REDCap::isLongitudinal())?>;
         var from_default = <?=json_encode($from_default)?>;
         var message_letter = <?=json_encode($_REQUEST['message'])?>;
+        var isAdmin = <?=json_encode($isAdmin)?>;
 
         //Dashboard info
         var datapipe_var = <?=json_encode($module->getProjectSetting('datapipe_var'))?>;
@@ -99,6 +84,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var _duplicateform_url = '<?=$module->getUrl('duplicateForm.php')?>';
         var _reenableform_url = '<?=$module->getUrl('reEnableForm.php')?>';
         var _preview_url = '<?=$module->getUrl('previewForm.php')?>';
+        var _preview_record_url = '<?=$module->getUrl('previewRecordForm.php')?>';
         var _edoc_name_url = '<?=$module->getUrl('get-edoc-name.php')?>';
         var _longitudinal_url = '<?=$module->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
         var _getProjectList_url = '<?=$module->getUrl('get-project-list.php')?>';
@@ -107,12 +93,24 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var endPos = 0;
 
         $(function(){
-            //to use rich text with the modal
-            $(document).on('focusin', function(e) {
-                if ($(e.target).closest(".mce-window").length) {
-                    e.stopImmediatePropagation();
+            jQuery('[data-toggle="popover"]').popover({
+                html : true,
+                content: function() {
+                    return $(jQuery(this).data('target-selector')).html();
+                },
+                title: function(){
+                    return '<span style="padding-top:0px;">'+jQuery(this).data('title')+'<span class="close" style="line-height: 0.5;padding-top:0px;padding-left: 10px">&times;</span></span>';
                 }
+            }).on('shown.bs.popover', function(e){
+                var popover = jQuery(this);
+                jQuery(this).parent().find('div.popover .close').on('click', function(e){
+                    popover.popover('hide');
+                });
             });
+            //We add this or the second time we click it won't work. It's a bug in bootstrap
+            $('[data-toggle="popover"]').on("hidden.bs.popover", function() {
+                $(this).data("bs.popover").inState.click = false
+            })
 
             //For Entries
             var rtable = $('#customizedAlertsPreview').DataTable({"pageLength": 50});
@@ -205,8 +203,12 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     }
                     return inputHtml;
                 }else if (setting.type == 'text' && (setting.key == 'email-to' || setting.key == 'email-to-update' || setting.key == 'email-cc' || setting.key == 'email-cc-update' || setting.key == 'email-bcc' || setting.key == 'email-bcc-update')) {
+                    var reqLabel = '';
+                    if(setting.key == 'email-to' || setting.key == 'email-to-update'){
+                        reqLabel = '<div class="requiredlabel">* must provide value</div>';
+                    }
                     //We add the datalist for the emails
-                    inputHtml += "<tr class='" + customClass + "'><td><span class='external-modules-instance-label'></span><label>" + setting.name + ":</label></td>";
+                    inputHtml += "<tr class='" + customClass + "'><td><span class='external-modules-instance-label'></span><label>" + setting.name + ":</label>"+reqLabel+"</td>";
                     var datalistname = "json-datalist-" + setting.key;
                     var inputProperties = {
                         'list': datalistname,
@@ -220,14 +222,27 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     inputHtml += "<td class='external-modules-input-td'>" + this.getInputElement(setting.type, setting.key, setting.value, inputProperties);
                     inputHtml += "<datalist id='" + datalistname + "'></datalist></td><td></td><tr>";
                     return inputHtml;
-                }else if((setting.key == 'form-name' || setting.key == 'form-name-update') && isLongitudinal){
-                    if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
+                }else if((setting.key == 'form-name' || setting.key == 'form-name-update') && isLongitudinal) {
+                    if (typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
                         var inputHtml = EMparent.getSettingColumns.call(this, setting, instance, header);
                     }
                     else {
                         var inputHtml = EMparent.getColumnHtml(setting);
                     }
                     inputHtml += '<tr field="form-name-event" class="form-control-custom" style="display:none"></tr>';
+                    return inputHtml;
+                }else if(!isAdmin && (setting.key == 'cron-send-email-on' || setting.key == 'cron-send-email-on-field' || setting.key == 'cron-repeat-email' || setting.key == 'cron-repeat-until' || setting.key == 'cron-repeat-until-field' || setting.key == 'cron-repeat-for' || setting.key == 'cron-send-email-on-update' || setting.key == 'cron-send-email-on-field-update' || setting.key == 'cron-repeat-email-update' || setting.key == 'cron-repeat-until-update' || setting.key == 'cron-repeat-until-field-update' || setting.key == 'cron-repeat-for-update')){
+                    //if it's not admin we don't show the Schedule editing
+                }else if(isAdmin && setting.key == 'cron-repeat-until-field-update'){
+
+                    if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
+                        inputHtml += EMparent.getSettingColumns.call(this, setting, instance, header);
+                    }
+                    else {
+                        inputHtml += EMparent.getColumnHtml(setting);
+                    }
+                    inputHtml += '<tr field="cron-queue-update" class="form-control-custom"><td><span class="external-modules-instance-label"> </span><label>On form re-save, delete existing scheduled emails and reschedule emails.<br><i>(this will update piping content and also update logic.)</i></label></td>';
+                    inputHtml += '<td class="external-modules-input-td"><input type="checkbox" name="cron-queue-update" class="external-modules-input-element" value=""></td></tr>';
                     return inputHtml;
                 }else {
 					if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
@@ -254,6 +269,9 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 }else if(setting.type == 'text' && setting.key == 'email-attachment-variable') {
                     rowsHtml += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Attachments</div></td></tr>";
                     rowsHtmlUpdate += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Attachments</div></td></tr>";
+                }else if(setting.type == 'radio' && setting.key == 'cron-send-email-on' && isAdmin) {
+                    rowsHtml += "<tr class='form-control-custom email-schedule-title'><td colspan='4'><div class='form-control-custom-title'>Email Schedule</div></td></tr>";
+                    rowsHtmlUpdate += "<tr class='form-control-custom email-schedule-title-update'><td colspan='4'><div class='form-control-custom-title'>Email Schedule</div></td></tr>";
                 }
 
 				if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
@@ -303,6 +321,13 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 $('[name="email-attachment-variable"]').attr('placeholder','[variable1], [variable2], ...');
                 $('[name="email-from"]').attr('placeholder','myemail@server.com, "Sender name"');
                 $('[name="email-from"]').val(from_default);
+
+                $('[name="cron-send-email-on"][value="now"').prop('checked',true);
+                $('[name="cron-repeat-until"][value="forever"').prop('checked',true);
+                $('[field="cron-send-email-on-field"]').hide();
+                $('[field="cron-repeat-for"]').hide();
+                $('[field="cron-repeat-until"]').hide();
+                $('[field="cron-repeat-until-field"]').hide();
 
                 //Clean up values
                 $('#email-to').val("");
@@ -397,6 +422,59 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 return false;
             });
 
+            /***SCHEDULED EMAIL OPTIONS***/
+            $('[name="cron-send-email-on"],[name="cron-send-email-on-update"]').on('click', function(e){
+                var suffix = '';
+                if($(this).attr('name').includes("-update")){
+                    suffix = '-update';
+                }
+                if($(this).val() == 'now'){
+                    $('[field="cron-send-email-on-field'+suffix+'"]').hide();
+                }else if($(this).val() == 'date' || $(this).val() == 'calc'){
+                    $('[field="cron-send-email-on-field'+suffix+'"]').show();
+                }
+            });
+
+            $('[name="cron-repeat-email"],[name="cron-repeat-email-update"]').on('click', function(e){
+                var suffix = '';
+                if($(this).attr('name').includes("-update")){
+                    suffix = '-update';
+                }
+                if($(this).is(':checked')){
+                    $('[field="cron-repeat-for'+suffix+'"]').show();
+                    $('[field="cron-repeat-until'+suffix+'"]').show();
+                    if($('[name=cron-repeat-until'+suffix+']:checked').val() == "forever" || $('[name=cron-repeat-until'+suffix+']:checked').val() == "" || $('[name=cron-repeat-until'+suffix+']:checked').val() == undefined) {
+                        $('[name=external-modules-configure-modal' + suffix + '] input[name="cron-repeat-until' + suffix + '"][value="forever"]').prop('checked', true);
+                    }
+                }else{
+                    $('[field="cron-repeat-for'+suffix+'"]').hide();
+                    $('[field="cron-repeat-until'+suffix+'"]').hide();
+                    $('[field="cron-repeat-until-field'+suffix+'"]').hide();
+                }
+            });
+
+            $('[name="cron-repeat-until"],[name="cron-repeat-until-update"]').on('click', function(e){
+                var suffix = '';
+                if($(this).attr('name').includes("-update")){
+                    suffix = '-update';
+                }
+                if($(this).val() == 'forever'){
+                    $('[field="cron-repeat-until-field'+suffix+'"]').hide();
+                }else if($(this).val() == 'date' || $(this).val() == 'cond'){
+                    $('[field="cron-repeat-until-field'+suffix+'"]').show();
+                }
+            });
+
+
+            $('[name="email-repetitive"],[name="email-repetitive-update"]').on('click', function(e){
+                var suffix = '';
+                if($(this).attr('name').includes("-update")){
+                    suffix = '-update';
+                }
+                checkSchedule($(this).is(':checked'),suffix,$('[name=cron-send-email-on'+suffix+']:checked').val(),$('[name=cron-send-email-on-field'+suffix+']').val(),$('[name=cron-repeat-email'+suffix+']').is(':checked'),$('[name=cron-repeat-for'+suffix+']').val(),$('[name=cron-repeat-until'+suffix+']:checked').val(),$('[name=cron-repeat-until-field'+suffix+']').val());
+            });
+
+            /***LONGITUDINAL***/
             $('[name=form-name],[name=form-name-update]').on('change', function(e){
                 uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[field=form-name-event]');
             });
@@ -409,6 +487,42 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             $('.flexdatalist').flexdatalist({
                 minLength: 1
             });
+
+            $('#btnModalUpdateForm').click(function() {
+                if($('[name=cron-queue-update]').is(':checked')){
+                    $('#external-modules-configure-modal-schedule-confirmation').modal('show');
+                }else{
+                    $('#updateForm').submit();
+                    $('#external-modules-configure-modal').modal('hide');
+                }
+            });
+
+            /***PREVIEW BY RECORD***/
+            $('select[name=preview_record_id]').on('change', function(e){
+                if($(this).val() == ""){
+                    $('#modal_message_record_preview').html("");
+                }else{
+                    var data = $('#selectPreviewRecord').serialize();
+                    loadPreviewEmailAlertRecord(data);
+                }
+
+                return false;
+            });
+            $('#preview_record_id_btn').on('click', function(e){
+                if($('input[name=preview_record_id]').val() == ""){
+                    $('#modal_message_record_preview').html("");
+                }else{
+                    var data = $('#selectPreviewRecord').serialize();
+                    loadPreviewEmailAlertRecord(data);
+                }
+                return false;
+            });
+
+            $('#external-modules-configure-modal-record').on('hidden.bs.modal', function () {
+                //clean up
+                $('[name=preview_record_id]').val('');
+                $('#modal_message_record_preview').html('');
+            })
 
             $('#updateForm').submit(function () {
                 var data = $('#updateForm').serialize();
@@ -436,6 +550,9 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 });
 
                  if(checkRequiredFieldsAndLoadOption('-update','Update')){
+                     //close confirmation modal
+                     $('#external-modules-configure-modal-schedule-confirmation').modal('hide');
+                     $('#external-modules-configure-modal').modal('hide');
                      var index = $('#index_modal_update').val();
                      deleteFile(index);
                      saveFilesIfTheyExist('<?=$module->getUrl('save-file.php')?>&index='+index, files);
@@ -522,8 +639,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 function( settings, data, dataIndex ) {
                     var active = $('#concept_active').is(':checked');
                     var deleted = $('#deleted_alerts').is(':checked');
-                    var column_active = data[7];
-                    var column_deleted = data[8];
+                    var column_active = data[5];
+                    var column_deleted = data[6];
 
                     if(active == true && column_active == 'Y'){
                         if(deleted == true && column_deleted == 'Y'){
@@ -547,10 +664,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 var loadConceptsAJAX_table = $('#customizedAlertsPreview').DataTable();
 
                 //we hide the columns that we use only as filters
-                var column_active = loadConceptsAJAX_table.column(7);
-                column_active.visible(false);
-                var column_deleted = loadConceptsAJAX_table.column(8);
-                column_deleted.visible(false);
+                loadConceptsAJAX_table.column(5).visible(false);
+                loadConceptsAJAX_table.column(6).visible(false);
 
                 var table = $('#customizedAlertsPreview').DataTable();
                 table.draw();
@@ -733,12 +848,10 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             <thead>
             <tr class="table_header">
                 <th>Form</th>
-                <th>REDCap logic</th>
-                <th>Send emails for any Form status?</th>
-                <th>Email Addresses</th>
+                <th>Scheduled for</th>
                 <th>Message</th>
-                <th>Resend Emails on Form Re-save?</th>
                 <th>Attachments</th>
+                <th>Options</th>
                 <th>Active</th>
                 <th>Deleted</th>
                 <th class="table_header_options">Actions</th>
@@ -748,6 +861,9 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             <?php
             $alerts = "";
             $email_repetitive_sent = json_decode($projectData['settings']['email-repetitive-sent']['value'],true);
+            $email_records_sent = $projectData['settings']['email-records-sent']['value'];
+            $alert_id = $projectData['settings']['alert-id']['value'];
+            $email_queue = $projectData['settings']['email-queue']['value'];
             for ($index = 0; $index < $indexSubSet; $index++) {
                 $email_sent = $projectData['settings']['email-sent']['value'][$index];
                 $class_sent = "";
@@ -797,85 +913,144 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     $reactivate_button = "";
                 }
 
+                if(empty($alert_id)){
+                    $alert_number = $index;
+                }else{
+                    $alert_number = $alert_id[$index];
+                }
+
                 if(!empty($email_repetitive_sent)){
                     if(array_key_exists($projectData['settings']['form-name']['value'][$index],$email_repetitive_sent)){
                         $form = $email_repetitive_sent[$projectData['settings']['form-name']['value'][$index]];
                         foreach ($form as $alert =>$value){
                             if($alert == $index){
-                                $message_sent .= "Records activated: ".count((array)$form[$alert])."<br/>";
+                                if(!empty($email_records_sent[$alert])){
+                                    $message_sent .= '<a href="#" data-toggle="popover"data-target-selector="#records-activated" data-title="Records for Alert #'.$alert.'" >Records activated:</a> '.count((array)$form[$alert]).'<br/>';
+                                    $message_sent .= '<div id="records-activated" class="hidden">
+                                                            <p>'.$email_records_sent[$alert].'</p>
+                                                       </div>';
+                                }else{
+                                    $message_sent .= "Records activated: ".count((array)$form[$alert])."<br/>";
+                                }
                             }
                         }
                     }
                 }
 
-                $alerts .= '<tr>';
+                if(!empty($email_queue)){
+                    $queue_count = 0;
+                    $scheduled_records_activated = "";
+                    foreach ($email_queue as $id=>$email){
+                        if($email['project_id'] == $pid && $email['alert'] == $index){
+                            $queue_count++;
+                            $scheduled_records_activated .= $email['record'].",";
+                        }
+                    }
+
+                    if($queue_count > 0){
+                        $message_sent .= '<a href="#" data-toggle="popover"data-target-selector="#scheduled-activated" data-title="Scheduled Records for Alert #'.$alert.'" >Scheduled records activated:</a> '.$queue_count.'<br/>';
+                        $message_sent .= '<div id="scheduled-activated" class="hidden">
+                                                <p>'.rtrim($scheduled_records_activated,",").'</p>
+                                           </div>';
+                    }
+                }
+
                 $fileAttachments = 0;
                 $attachmentVar ='';
                 $attachmentFile ='';
                 $alerts_from = '';
+                $scheduled_email = '';
+                $checkboxes = '';
+                $formName = '';
+                $msg = '';
+                $redcapLogic = '<br>REDCap Logic: <strong>None</strong>';
+                $isRepeatCron = false;
                 foreach ($config['email-dashboard-settings'] as $configKey => $configRow) {
-
-                    if ($configRow['type'] == 'file') {
-                        if(!empty($configRow['value'][$index])) {
-                            $fileAttachments++;
+                    if ($configRow['key'] == 'cron-send-email-on' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-repeat-email' || $configRow['key'] == 'cron-repeat-until' || $configRow['key'] == 'cron-repeat-until-field' || $configRow['key'] == 'cron-repeat-for') {
+                        //SHCEDULE EMAIL INFO
+                        if($configRow['key'] == 'cron-send-email-on'){
+                            if($configRow['value'][$index] == "now" || $configRow['value'][$index] == ""){
+                                $scheduled_email = "Send <strong>now</strong>";
+                            }else if($configRow['value'][$index] == "date"){
+                                $scheduled_email = "Send on ".$configRow['value'][$index];
+                            }else if($configRow['value'][$index] == "calc"){
+                                $scheduled_email = "Send on calculation";
+                            }
+                        }
+                        if($configRow['key'] == 'cron-send-email-on-field' && $configRow['value'][$index] != ""){
+                            $scheduled_email .= ": <strong>".$configRow['value'][$index]."</strong>";
+                        }
+                        if($configRow['key'] == 'cron-repeat-email' && $configRow['value'][$index] == "1"){
+                            $scheduled_email .= "<br><br> Repeat";
+                            $isRepeatCron = true;
+                        }
+                        if($configRow['key'] == 'cron-repeat-for' && $configRow['value'][$index] != "" && $isRepeatCron){
+                            $scheduled_email .= " for ".$configRow['value'][$index]." days";
+                        }
+                        if($configRow['key'] == 'cron-repeat-until' && $isRepeatCron){
+                            if($configRow['value'][$index] == "forever"){
+                                $scheduled_email .= " forever";
+                            }else if($configRow['value'][$index] == "cond"){
+                                $scheduled_email .= " until condition is met";
+                            }else if($configRow['value'][$index] == "date"){
+                                $scheduled_email .= " until ";
+                            }
+                        }
+                        if($configRow['key'] == 'cron-repeat-until-field' && $configRow['value'][$index] != '' && $isRepeatCron){
+                            $scheduled_email .= $configRow['value'][$index];
+                        }
+                    }else{
+                        //NORMAL EMAIL
+                        if ($configRow['type'] == 'file') {
+                            if(!empty($configRow['value'][$index])) {
+                                $fileAttachments++;
 
                             if (!empty($configRow['value'][$index])) {
                                 $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=" . $configRow['value'][$index];
                                 $q = $module->query($sql);
 
-                                if ($error = db_error()) {
-                                    die($sql . ': ' . $error);
-                                }
+                                    if ($error = db_error()) {
+                                        die($sql . ': ' . $error);
+                                    }
 
-                                while ($row = db_fetch_assoc($q)) {
-                                    $url = "downloadFile.php?sname=".$row['stored_name']."&file=".$row['doc_name']."&NOAUTH";
-                                    $attachmentFile .= '- <a href="'.$module->getUrl($url).'" target="_blank">'.$row['doc_name'].'</a><br/>';
+                                    while ($row = db_fetch_assoc($q)) {
+                                        $url = "downloadFile.php?sname=".$row['stored_name']."&file=".$row['doc_name']."&NOAUTH";
+                                        $attachmentFile .= '- <a href="'.$module->getUrl($url).'" target="_blank">'.$row['doc_name'].'</a><br/>';
+                                    }
                                 }
                             }
-                        }
-                    } else if ($configRow['type'] == 'checkbox') {
-                        $value = ($configRow['value'][$index] == 0) ? "No" : "Yes";
-                        $alerts .= '<td  style="text-align: center"><span>' . $value . '</span></td>';
-                    } else {
-                        $value = preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', $configRow['value'][$index]);
-                        if ($configRow['key'] == 'email-to') {
-                            $alerts .= '<td><em>' . $configRow['name'] . '</em><span>' . str_replace (',',', ',$value) . '</span><br/>';
-                        } else if ($configRow['key'] == 'email-cc' || $configRow['key'] == 'email-bcc') {
-                            if(!empty($value)){
-                                $alerts .= '<em>' . $configRow['name'] . '</em><span>' . str_replace (',',', ',$value) . '</span>';
-                            }
-                            if($configRow['key'] == 'email-bcc'){
-                                $alerts .= '</td>';
-                            }
-                        } else if($configRow['key'] == 'form-name') {
-                            $alerts .= '<td class="'.$class_sent.'"><span><i>Alert #'.$index.'</i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
-                        }else if($configRow['key'] == 'email-attachment-variable'){
-                            $attchVar = preg_split("/[;,]+/",  $configRow['value'][$index]);
-                            foreach ($attchVar as $var){
-                                if(!empty($var)){
-                                    $fileAttachments++;
-                                    $attachmentVar .= '- '.$var.'<br/>';
+                        } else if ($configRow['type'] == 'checkbox') {
+                            $value = ($configRow['value'][$index] == 0) ? "No" : "Yes";
+                            $checkboxes .= '<span>' .$configRow['name'].' <strong>'. $value . '</strong></span>';
+                        } else {
+                            if($configRow['key'] == 'form-name') {
+                                $formName .= '<span><i>Alert #'.$alert_number.'</i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                            }else if($configRow['key'] == 'email-attachment-variable'){
+                                $attchVar = preg_split("/[;,]+/",  $configRow['value'][$index]);
+                                foreach ($attchVar as $var){
+                                    if(!empty($var)){
+                                        $fileAttachments++;
+                                        $attachmentVar .= '- '.$var.'<br/>';
+                                    }
                                 }
+                            }else if($configRow['key'] == 'email-subject') {
+                                $msg .= $alerts_from.'<span>'.$configRow['value'][$index] . '</span><br/>';
+                            }else if ($configRow['key'] == 'email-text'){
+                                $msg .= '<span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview Message</a></span>';
+                                $msg .= '<span><a onclick="previewEmailAlertRecord('.$index.')" style="cursor:pointer" >Preview Message by Record</a></span>';
+                            }else if ($configRow['key'] == 'email-condition' && $configRow['value'][$index] != ""){
+                                $redcapLogic = '<br>REDCap Logic: <strong>'.$configRow['value'][$index].'</strong>';
                             }
-                        }else if ($configRow['key'] == 'email-from'){
-                            if(empty($configRow['value'][$index])){
-                                $alerts_from = '<span>From: '.$from_default . '</span><br/>';
-                            }else{
-                                $alerts_from = '<span>From: '.$configRow['value'][$index] . '</span><br/>';
-                            }
-                        }else if($configRow['key'] == 'email-subject') {
-                            $alerts .= '<td>'.$alerts_from.'<span>'.$configRow['value'][$index] . '</span><br/>';
-                        }else if ($configRow['key'] == 'email-text'){
-                            $alerts .= '<span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview Message</a></span></td>';
-                        }else{
-                            $alerts .= '<td><span>'.$configRow['value'][$index] . '</span></td>';
                         }
                     }
                     $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
-
-
                 }
+                $alerts .= "<tr>";
+                $alerts .= "<td class='".$class_sent."'>".$formName."</td>";
+                $alerts .= "<td>".$scheduled_email."</td>";
+                $alerts .= "<td>".$msg."</td>";
                 $alerts .= "<td><span style='text-align: center;width: 200px;'><strong>" . $fileAttachments . " files</strong><br/></span>".$attachmentVar.$attachmentFile."</td>";
+                $alerts .= "<td>".$checkboxes.$redcapLogic."</td>";
                 $alerts .= "<td style='visibility: hidden;'>".$active_col."</td>";
                 $alerts .= "<td style='visibility: hidden;'>".$deleted_col."</td>";
                 $alerts .= "<td>".$reactivate_button."<div style='".$show_button."'><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
@@ -912,7 +1087,6 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                                         <option value=""></option>
                                         <?php
                                         foreach ($simple_config['email-dashboard-settings'][0]['choices'] as $choice){
-//                                            echo '<option value="__SURVEYLINK_'.$choice['value'].'">'.$choice['name'].'</option>';
                                             echo '<option value="'.$choice['value'].'">'.$choice['name'].'</option>';
                                         }
                                         ?>
@@ -956,8 +1130,53 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" id='btnCloseCodesModal' data-dismiss="modal">Cancel</button>
-                            <button type="submit" form="updateForm" class="btn btn-default save" id='btnModalUpdateForm'>Save</button>
+                            <a href="" data-toggle="modal"  class="btn btn-default save" id='btnModalUpdateForm' style="padding: 7px 13px;">Save</a>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="external-modules-configure-modal-schedule-confirmation" tabindex="-1" role="dialog" aria-labelledby="Codes">
+                <form class="form-horizontal" action="" method="post" id='scheduleForm'>
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">Reschedule Email Alert</h4>
+                            </div>
+                            <div class="modal-body">
+                                <span>Are you sure you want to reschedule emails?</span>
+                                <br/>
+                                <span style="color:red;font-weight: bold">*This will update piping content and also update logic.</span>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="submit" form="updateForm" class="btn btn-default btn-delete" id='btnModalRescheduleForm'>Reschedule</button>
+                                <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="external-modules-configure-modal-delete-user-confirmation" tabindex="-1" role="dialog" aria-labelledby="Codes">
+        <form class="form-horizontal" action="" method="post" id='deleteUserForm'>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Delete Email Alert</h4>
+                    </div>
+                    <div class="modal-body">
+                        <span>Are you sure you want to delete this Email Alert?</span>
+                        <input type="hidden" value="" id="index_modal_delete_user" name="index_modal_delete_user">
+                        <input type="hidden" value="<?=$module->getUrl('deleteForm.php')?>" id="url_modal_delete_user" name="url_modal_delete_user">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" form="deleteUserForm" class="btn btn-default btn-delete" id='btnModalDeleteForm'>Delete</button>
+                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -989,22 +1208,46 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         </form>
     </div>
 
-    <div class="modal fade" id="external-modules-configure-modal-delete-user-confirmation" tabindex="-1" role="dialog" aria-labelledby="Codes">
-        <form class="form-horizontal" action="" method="post" id='deleteUserForm'>
-            <div class="modal-dialog" role="document">
+
+    <div class="modal fade" id="external-modules-configure-modal-record" tabindex="-1" role="dialog" aria-labelledby="Codes">
+        <form class="form-horizontal" action="" method="post" id='selectPreviewRecord'>
+            <div class="modal-dialog" role="document" style="width: 800px">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Delete Email Alert</h4>
+                        <h4 class="modal-title" id="myModalLabel">Record Preview</h4>
                     </div>
-                    <div class="modal-body">
-                        <span>Are you sure you want to delete this Email Alert?</span>
-                        <input type="hidden" value="" id="index_modal_delete_user" name="index_modal_delete_user">
-                        <input type="hidden" value="<?=$module->getUrl('deleteForm.php')?>" id="url_modal_delete_user" name="url_modal_delete_user">
+                    <div class="modal-body form-control-custom">
+                        <div style="padding-bottom: 10px;">Select a record to preview the email</div>
+                        <?php
+                        $events_array = array();
+                        $data = \REDCap::getData($pid,'array');
+                        if(count($data) < 500){
+                            foreach ($data as $record_id => $event){
+                                array_push($events_array,$record_id);
+                            }
+
+                            if(!empty($events_array)){
+                                $event_selector = '<div style="padding-bottom:10px"><select class="external-modules-input-element" name="preview_record_id"><option value="">Select a Record</option>';
+                                foreach ($events_array as $id){
+                                    $event_selector .= '<option value="'.$id.'" >'.$id.'</option>';
+                                }
+                                $event_selector .= '</select></div>';
+                                echo $event_selector;
+                            }
+                        }else{
+                            echo "<div style='margin-bottom: 60px;'><input type='text' name='preview_record_id' id='preview_record_id' placeholder='Type a record' style='width: 80%;float: left;'>
+                                    <a href='#' class='btn btn-default save' id='preview_record_id_btn' style='float: left;margin-left: 20px;padding-top: 8px;padding-bottom: 7px;'>Preview</a></div>";
+                        }
+                        ?>
+                        <div>
+                            <input type="hidden" value="" id="index_modal_record_preview" name="index_modal_record_preview">
+                            <input type="hidden" value="<?=$module->getUrl('previewFormRecord.php')?>" id="url_modal_delete_user" name="url_modal_delete_user">
+                            <div id="modal_message_record_preview"></div>
+                        </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" form="deleteUserForm" class="btn btn-default btn-delete" id='btnModalDeleteForm'>Delete</button>
                         <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -1053,5 +1296,4 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         </div>
     </div>
 </div>
-
 <?php require_once ExternalModules::getProjectFooterPath();

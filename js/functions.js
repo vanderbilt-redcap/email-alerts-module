@@ -19,6 +19,82 @@ function previewEmailAlert(index){
     });
 }
 
+function previewEmailAlertRecord(index){
+    $('#index_modal_record_preview').val(index)
+    $('#external-modules-configure-modal-record').modal('show');
+}
+
+function loadPreviewEmailAlertRecord(data){
+    $.ajax({
+        type: "POST",
+        url: _preview_record_url,
+        data: data,
+        error: function (xhr, status, error) {
+            alert(xhr.responseText);
+        },
+        success: function (result) {
+            $('#modal_message_record_preview').html(result);
+        }
+    });
+}
+
+function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_field,cron_repeat_email,cron_repeat_for,cron_repeat_until,cron_repeat_until_field){
+    if(repetitive == '1'){
+        $('.email-schedule-title'+suffix).hide();
+        $('[field="cron-send-email-on'+suffix+'"]').hide();
+        $('[field="cron-send-email-on-field'+suffix+'"]').hide();
+        $('[field="cron-repeat-email'+suffix+'"]').hide();
+        $('[field="cron-repeat-for'+suffix+'"]').hide();
+        $('[field="cron-repeat-until'+suffix+'"]').hide();
+        $('[field="cron-repeat-until-field'+suffix+'"]').hide();
+        $('[field="cron-queue-update"]').hide();
+    }else{
+        $('.email-schedule-title'+suffix).show();
+        $('[field="cron-send-email-on'+suffix+'"]').show();
+        $('[field="cron-repeat-email'+suffix+'"]').show();
+        $('[field="cron-queue-update"]').show();
+
+        if(cron_send_email_on == "" || cron_send_email_on == undefined || cron_send_email_on == null){
+            $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-send-email-on'+suffix+'"][value="now"]').prop('checked',true);
+            $('[field="cron-send-email-on-field'+suffix+'"]').hide();
+        }else{
+            $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-send-email-on'+suffix+'"][value="'+cron_send_email_on+'"]').prop('checked',true);
+            if(cron_send_email_on == 'date' || cron_send_email_on == 'calc'){
+                $('[field="cron-send-email-on-field'+suffix+'"]').show();
+                $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-send-email-on-field'+suffix+'"]').val(cron_send_email_on_field);
+            }else{
+                $('[field="cron-send-email-on-field'+suffix+'"]').hide();
+            }
+        }
+
+        if(cron_repeat_email == "" || cron_repeat_email == undefined || cron_repeat_email == null){
+            $('[field="cron-repeat-for'+suffix+'"]').hide();
+            $('[field="cron-repeat-until'+suffix+'"]').hide();
+            $('[field="cron-repeat-until-field'+suffix+'"]').hide();
+        }else{
+            if(cron_repeat_email == "1"){
+                $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-email'+suffix+'"]').prop('checked',true);
+                $('[field="cron-repeat-for'+suffix+'"]').show();
+                $('[field="cron-repeat-until'+suffix+'"]').show();
+                $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-for'+suffix+'"]').val(cron_repeat_for);
+
+                if(cron_repeat_until == "date" || cron_repeat_until == "cond"){
+                    $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until'+suffix+'"][value="'+cron_repeat_until+'"]').prop('checked',true);
+                    $('[field="cron-repeat-until-field'+suffix+'"]').show();
+                    $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until-field'+suffix+'"]').val(cron_repeat_until_field);
+                }else if(cron_repeat_until == "forever" || cron_repeat_until == ""){
+                    $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until'+suffix+'"][value="forever"]').prop('checked',true);
+                    $('[field="cron-repeat-until-field'+suffix+'"]').hide();
+                }
+            }else if(cron_repeat_email == "0"){
+                $('[field="cron-repeat-for'+suffix+'"]').hide();
+                $('[field="cron-repeat-until'+suffix+'"]').hide();
+                $('[field="cron-repeat-until-field'+suffix+'"]').hide();
+            }
+        }
+    }
+}
+
 /**
  * Function that shows the modal with the alert information to modify it
  * @param modal, array with the data from a specific aler
@@ -59,6 +135,9 @@ function editEmailAlert(modal, index){
     $('[name=external-modules-configure-modal-update] input[name="email-repetitive-update"]').val(modal['email-repetitive']);
     $('[name=external-modules-configure-modal-update] input[name="email-condition-update"]').val(modal['email-condition']);
     $('[name=external-modules-configure-modal-update] input[name="email-incomplete-update"]').val(modal['email-incomplete']);
+    $('[name=external-modules-configure-modal-update] input[name="cron-queue-update"]').val(modal['cron-queue-update']);
+
+    checkSchedule(modal['email-repetitive'],'-update',modal['cron-send-email-on'],modal['cron-send-email-on-field'],modal['cron-repeat-email'],modal['cron-repeat-for'],modal['cron-repeat-until'],modal['cron-repeat-until-field']);
 
     uploadLongitudinalEvent('project_id='+project_id+'&form='+modal['form-name']+'&index='+index,'[field=form-name-event]');
 
@@ -85,6 +164,7 @@ function editEmailAlert(modal, index){
     $('[name=external-modules-configure-modal-update] input[name=email-to]').removeClass('alert');
     $('[name=external-modules-configure-modal-update] input[name=email-subject]').removeClass('alert');
     $('[name=external-modules-configure-modal-update] [name=email-text]').removeClass('alert');
+
 
     //Show modal
     $('[name=external-modules-configure-modal-update]').modal('show');

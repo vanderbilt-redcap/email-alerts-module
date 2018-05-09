@@ -127,11 +127,85 @@
           "name": "Resend Emails on Form Re-save?",
           "required": false,
           "type":"checkbox"
+        },
+        {
+          "key": "cron-send-email-on",
+          "name": "Send email on",
+          "required": false,
+          "choices": [
+            {
+              "name": "Now",
+              "value": "now"
+            },
+            {
+              "name": "Date",
+              "value": "date"
+            },
+            {
+              "name": "Calculation",
+              "value": "calc"
+            }
+          ],
+          "type":"radio"
+        },
+        {
+          "key": "cron-send-email-on-field",
+          "name": "Inset value",
+          "required": false,
+          "type":"text"
+        },
+        {
+          "key": "cron-repeat-email",
+          "name": "Do you want to repeat this email?",
+          "required": false,
+          "type":"checkbox"
+        },
+        {
+          "key": "cron-repeat-for",
+          "name": "Repeat every # of days",
+          "required": false,
+          "type":"text"
+        },
+        {
+          "key": "cron-repeat-until",
+          "name": "Repeat until",
+          "required": false,
+          "choices": [
+            {
+              "name": "Forever",
+              "value": "forever"
+            },
+            {
+              "name": "Date",
+              "value": "date"
+            },
+            {
+              "name": "Conditional",
+              "value": "cond"
+            }
+          ],
+          "type":"radio"
+        },
+        {
+          "key": "cron-repeat-until-field",
+          "name": "Inset value",
+          "required": false,
+          "type":"text"
         }
 	],
 
 	"project-settings": [
 	],
+
+  "crons": [
+      {
+        "cron_name": "scheduled_emails",
+        "cron_description": "Cron that runs every 15 minutes to send scheduled emails",
+        "method": "scheduledEmails",
+        "cron_frequency": "60",
+        "cron_max_run_time": "60"
+      }
+    ],
 
 	"system-settings": [
 		{
@@ -141,10 +215,11 @@
 			"type": "text"
 		}
 	],
-        "compatibility": {
-	        "php-version-min": "5.5.0",
-	        "php-version-max": "",
-	        "redcap-version-min": "8.0.1",
-	        "redcap-version-max": ""
-        }
+
+    "compatibility": {
+        "php-version-min": "5.5.0",
+        "php-version-max": "",
+        "redcap-version-min": "8.0.1",
+        "redcap-version-max": ""
+    }
 }

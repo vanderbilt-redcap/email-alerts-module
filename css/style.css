@@ -188,7 +188,6 @@
 .form-control-custom input[type='checkbox']{
     box-shadow:none;
     width: 20px;
-    margin-left:13px;
 }
 .form-control-custom input[type='file']{
     box-shadow:none;
@@ -202,6 +201,22 @@
     text-align: center;
     background-color: #d6d6f5;
     padding: 7px;
+}
+.form-control-custom input[type='radio']{
+    width: 15px;
+    box-shadow:none;
+    vertical-align: -2px;
+    margin-right: 5px;
+    display: inline-block;
+}
+.form-control-custom input[type='radio'] + label{
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: 10px;
+    margin-right:20px;
+}
+.form-control-custom input[type='radio'] + label +br{
+    display: none;
 }
 
 .btn_datapiping{
@@ -296,8 +311,23 @@ a.btn_color_surveyLink:hover{background-color: #ffd7b3 !important;}
 }
 .save, .saveFormButton{
     background-color:#5cb85c;
-    color:#fff;
+    color:#fff !important;
 }
 .save:hover, .saveFormButton:hover{
     color:#000;
+}
+
+#modal_message_preview td:nth-child(1),#modal_message_record_preview td:nth-child(1){
+    font-weight: bold;
+}
+#modal_message_preview td,#modal_message_record_preview td{
+    vertical-align: 5px;
+    padding: 10px;
+}
+#modal_message_preview tr,#modal_message_record_preview tr{
+    border: 1px solid #dddddd;
+}
+
+.popover.top>.arrow:after {
+    bottom: 2px;
 }

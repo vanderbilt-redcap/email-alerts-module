@@ -29,6 +29,16 @@ $email_sent =  empty($module->getProjectSetting('email-sent'))?array():$module->
 $email_timestamp_sent =  empty($module->getProjectSetting('email-timestamp-sent'))?array():$module->getProjectSetting('email-timestamp-sent');
 $email_deactivate =  empty($module->getProjectSetting('email-deactivate'))?array():$module->getProjectSetting('email-deactivate');
 $email_incomplete =  empty($module->getProjectSetting('email-incomplete'))?array():$module->getProjectSetting('email-incomplete');
+$cron_send_email_on =  empty($module->getProjectSetting('cron-send-email-on'))?array():$module->getProjectSetting('cron-send-email-on');
+$cron_send_email_on_field =  empty($module->getProjectSetting('cron-send-email-on-field'))?array():$module->getProjectSetting('cron-send-email-on-field');
+$cron_repeat_email =  empty($module->getProjectSetting('cron-repeat-email'))?array():$module->getProjectSetting('cron-repeat-email');
+$cron_repeat_for =  empty($module->getProjectSetting('cron-repeat-for'))?array():$module->getProjectSetting('ccron-repeat-for');
+$cron_repeat_until =  empty($module->getProjectSetting('cron-repeat-until'))?array():$module->getProjectSetting('cron-repeat-until');
+$cron_repeat_until_field =  empty($module->getProjectSetting('cron-repeat-until-field'))?array():$module->getProjectSetting('cron-repeat-until-field');
+$email_records_sent =  empty($module->getProjectSetting('email-records-sent'))?array():$module->getProjectSetting('email-records-sent');
+$email_deleted =  empty($module->getProjectSetting('email-deleted'))?array():$module->getProjectSetting('email-deleted');
+$alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
+$email_queue =  empty($module->getProjectSetting('email-queue'))?array():$module->getProjectSetting('email-queue');
 
 //Add some logs
 $action_description = "Deleted Alert #".$index;
@@ -37,7 +47,6 @@ $changes_made = "[Subject]: ".$email_subject[$index].", [Message]: ".$email_text
 
 $action_description = "Deleted Alert #".$index." To";
 \REDCap::logEvent($action_description,$email_to[$index].$email_cc[$index].$email_bcc[$index],NULL,NULL,NULL,NULL,NULL);
-
 
 #Delete email repetitive sent from JSON before deleting all data
 $email_repetitive_sent =  empty($module->getProjectSetting('email-repetitive-sent'))?array():$module->getProjectSetting('email-repetitive-sent');
@@ -58,6 +67,26 @@ if(!empty($email_repetitive_sent)) {
     }
     $module->setProjectSetting('email-repetitive-sent', json_encode($jsonArray));
 }
+
+#Delete queued alerts
+if(!empty($email_queue)){
+    $scheduled_records_changed = "";
+    $queue = $email_queue;
+    foreach ($email_queue as $id=>$email){
+        if($email['project_id'] == $pid && $email['alert']==$index){
+            $scheduled_records_changed .= $email['record'].",";
+            unset($queue[$id]);
+        }
+    }
+    $queue = array_values($queue);
+    $module->setProjectSetting('email-queue', $queue);
+
+    #Add logs
+    $action_description = "Deleted Scheduled Alert ".$index;
+    $changes_made = "Record IDs deleted: ".rtrim($scheduled_records_changed,",");
+    \REDCap::logEvent($action_description,$changes_made,NULL,NULL,NULL,$pid);
+}
+
 
 #Delete one element in array
 unset($form_name[$index]);
@@ -80,6 +109,15 @@ unset($email_sent[$index]);
 unset($email_timestamp_sent[$index]);
 unset($email_deactivate[$index]);
 unset($email_incomplete[$index]);
+unset($cron_send_email_on[$index]);
+unset($cron_send_email_on_field[$index]);
+unset($cron_repeat_email[$index]);
+unset($cron_repeat_for[$index]);
+unset($cron_repeat_until[$index]);
+unset($cron_repeat_until_field[$index]);
+unset($email_records_sent[$index]);
+unset($email_deleted[$index]);
+unset($alert_id[$index]);
 
 #Rearrange the indexes
 $form_name = array_values($form_name);
@@ -102,6 +140,15 @@ $email_sent = array_values($email_sent);
 $email_timestamp_sent = array_values($email_timestamp_sent);
 $email_deactivate = array_values($email_deactivate);
 $email_incomplete = array_values($email_incomplete);
+$cron_send_email_on = array_values($cron_send_email_on);
+$cron_send_email_on_field = array_values($cron_send_email_on_field);
+$cron_repeat_email = array_values($cron_repeat_email);
+$cron_repeat_for = array_values($cron_repeat_for);
+$cron_repeat_until = array_values($cron_repeat_until);
+$cron_repeat_until_field = array_values($cron_repeat_until_field);
+$email_records_sent = array_values($email_records_sent);
+$email_deleted = array_values($email_deleted);
+$alert_id = array_values($alert_id);
 
 #Save data
 $module->setProjectSetting('form-name', $form_name);
@@ -124,6 +171,15 @@ $module->setProjectSetting('email-sent', $email_sent);
 $module->setProjectSetting('email-timestamp-sent', $email_timestamp_sent);
 $module->setProjectSetting('email-deactivate', $email_deactivate);
 $module->setProjectSetting('email-incomplete', $email_incomplete);
+$module->setProjectSetting('cron-send-email-on', $cron_send_email_on);
+$module->setProjectSetting('cron-send-email-on-field', $cron_send_email_on_field);
+$module->setProjectSetting('cron-repeat-email', $cron_repeat_email);
+$module->setProjectSetting('cron-repeat-for', $cron_repeat_for);
+$module->setProjectSetting('cron-repeat-until', $cron_repeat_until);
+$module->setProjectSetting('cron-repeat-until-field', $cron_repeat_until_field);
+$module->setProjectSetting('email-records-sent', $email_records_sent);
+$module->setProjectSetting('email-deleted', $email_deleted);
+$module->setProjectSetting('alert-id', $alert_id);
 
 echo json_encode(array(
     'status' => 'success',
