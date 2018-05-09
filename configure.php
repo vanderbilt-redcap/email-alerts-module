@@ -974,7 +974,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                             }else if($configRow['value'][$index] == "date"){
                                 $scheduled_email = "Send on ".$configRow['value'][$index];
                             }else if($configRow['value'][$index] == "calc"){
-                                $scheduled_email = "Send on calculation";
+                                $scheduled_email = "Send on conditional";
                             }
                         }
                         if($configRow['key'] == 'cron-send-email-on-field' && $configRow['value'][$index] != ""){
