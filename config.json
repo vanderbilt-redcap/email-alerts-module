@@ -142,7 +142,7 @@
               "value": "date"
             },
             {
-              "name": "Calculation",
+              "name": "Conditional",
               "value": "calc"
             }
           ],
