@@ -221,6 +221,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function sendToday($queue, $index)
     {
         $cron_send_email_on_field = empty($this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])) ? array() : $this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])[$index];
+        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$index];
         $cron_repeat_for =  empty($this->getProjectSetting('cron-repeat-for',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$index];
         $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$index];
         $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$index];
@@ -241,24 +242,28 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         if(strtotime($queue['last_sent']) != strtotime($today)) {
             if ($queue['deactivated'] == '0' && ($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today)) || ($queue['option'] == 'calc' && !$evaluateLogic)) {
-                #check repeat until option to see if we need to stop
-                if ($cron_repeat_until != 'forever' && $cron_repeat_until != '') {
-                    if ($cron_repeat_until == 'date') {
-                        if (strtotime($cron_repeat_until_field) >= strtotime($today)) {
-                            return true;
-                        } else {
-                            $this->deleteQueuedEmail($index,$queue['project_id']);
-                            return false;
+                if($cron_repeat_email == "1"){
+                    #check repeat until option to see if we need to stop
+                    if ($cron_repeat_until != 'forever' && $cron_repeat_until != '') {
+                        if ($cron_repeat_until == 'date') {
+                            if (strtotime($cron_repeat_until_field) >= strtotime($today)) {
+                                return true;
+                            } else {
+                                $this->deleteQueuedEmail($index,$queue['project_id']);
+                                return false;
+                            }
+                        } else if ($cron_repeat_until == 'cond' && $cron_repeat_until_field != "") {
+                            if ($evaluateLogic) {
+                                $this->deleteQueuedEmail($index,$queue['project_id']);
+                                return false;
+                            } else {
+                                return true;
+                            }
                         }
-                    } else if ($cron_repeat_until == 'cond' && $cron_repeat_until_field != "") {
-                        if ($evaluateLogic) {
-                            $this->deleteQueuedEmail($index,$queue['project_id']);
-                            return false;
-                        } else {
-                            return true;
-                        }
+                    } else if ($cron_repeat_until == 'forever') {
+                        return true;
                     }
-                } else if ($cron_repeat_until == 'forever') {
+                }else{
                     return true;
                 }
             }
