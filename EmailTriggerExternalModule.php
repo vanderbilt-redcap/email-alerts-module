@@ -182,6 +182,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function scheduledemails(){
         \REDCap::logEvent("scheduledEmails","Inside scheduledEmails",NULL,NULL,NULL,878);
         $email_queue =  empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
+        \REDCap::logEvent("scheduledEmails Queue",json_encode($email_queue),NULL,NULL,NULL,878);
         $queue_aux = $email_queue;
         if(!empty($email_queue)){
             $email_sent_total = 0;
