@@ -279,8 +279,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if($queue['isRepeatInstrument']){
             $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
         }
-
-        if($cron_repeat_until != 'forever' && $cron_repeat_until != '' && $cron_repeat_email == '1'){
+        if($cron_repeat_email == '0'){
+            $this->deleteQueuedEmail($index,$queue['project_id']);
+        }else if($cron_repeat_until != 'forever' && $cron_repeat_until != '' && $cron_repeat_email == '1'){
             if($cron_repeat_until == 'date'){
                 if(strtotime($cron_repeat_until_field) >= strtotime(date('Y-m-d'))){
                     $this->deleteQueuedEmail($index,$queue['project_id']);
@@ -291,8 +292,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $this->deleteQueuedEmail($index,$queue['project_id']);
                 }
             }
-        }else if($cron_repeat_email == '0'){
-            $this->deleteQueuedEmail($index,$queue['project_id']);
         }
 
     }
