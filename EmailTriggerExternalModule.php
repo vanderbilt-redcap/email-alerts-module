@@ -189,7 +189,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         while($row = db_fetch_assoc($q)){
             $project_id = $row['project_id'];
-            \REDCap::logEvent("scheduledEmails","Inside scheduledEmails",NULL,NULL,NULL,$project_id);
             $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
             $queue_aux = $email_queue;
             if(!empty($email_queue)){
@@ -198,7 +197,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if($email_sent_total < 100) {
                         if($this->sendToday($queue, $index)){
                             //SEND EMAIL
-                            $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['id'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
+                            $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
                             //If it's the last time we send, we delete the queue
                             $this->stopRepeat($queue,$index);
