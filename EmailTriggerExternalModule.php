@@ -196,7 +196,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
                         if($this->sendToday($queue, $index)){
-                            \REDCap::logEvent("sendQueuedEmail","",NULL,NULL,NULL,$project_id);
                             //SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
@@ -303,7 +302,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $queue['instrument'] = $instrument;
         $queue['instance'] = $instance;
         $queue['isRepeatInstrument'] = $isRepeatInstrument;
-        $queue['isLongitudinal'] = \REDCap::isLongitudinal();
 
         $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$alert];
         $queue['option'] = $cron_send_email_on;
@@ -728,14 +726,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             //Repeating instruments by event
             $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
         }else{
+            $project = new \Project($project_id);
             if($option == '1'){
-                if($isLongitudinal && \LogicTester::apply($var, $data[$record], null, true) == ""){
+                if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
                 }else{
-                    $logic = \LogicTester::apply($var, $data[$record], null, true);
+                    $logic = \LogicTester::apply($var, $data[$record], $project, true);
                 }
             }else{
-                if($isLongitudinal && \LogicTester::apply($var, $data[$record], null, true) == ""){
+                if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
                 }else{
                     preg_match_all("/\[[^\]]*\]/", $var, $matches);
@@ -743,7 +742,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
                         $logic = $data[$record][$event_id][$var_name];
                     }else{
-                        $logic = \LogicTester::apply($var, $data[$record], null, true);
+                        $logic = \LogicTester::apply($var, $data[$record], $project, true);
                     }
                 }
             }
