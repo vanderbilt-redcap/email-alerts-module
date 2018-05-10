@@ -74,7 +74,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
                 }
-//                die;
             }
         }
     }
@@ -173,7 +172,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $this->addQueuedEmail($id,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
                 }else{
                     #REGULAR EMAIL
-                    $this->createAndSendEmail($data,$project_id,$record,$id,$instrument,$repeat_instance,$isRepeatInstrument,$event_id);
+                    $this->createAndSendEmail($data,$project_id,$record,$id,$instrument,$repeat_instance,$isRepeatInstrument,$event_id,false);
                 }
             }
         }
@@ -187,6 +186,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             throw new \Exception($sql.': '.$error);
         }
 
+//        \REDCap::logEvent("scheduledEmails ","INSIDE scheduledEmails 878",NULL,NULL,NULL,878);
         while($row = db_fetch_assoc($q)){
             $project_id = $row['project_id'];
             $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
@@ -196,6 +196,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
                         if($this->sendToday($queue, $index)){
+                            \REDCap::logEvent("sendQueuedEmail","",NULL,NULL,NULL,$project_id);
                             //SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
@@ -302,6 +303,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $queue['instrument'] = $instrument;
         $queue['instance'] = $instance;
         $queue['isRepeatInstrument'] = $isRepeatInstrument;
+        $queue['isLongitudinal'] = \REDCap::isLongitudinal();
 
         $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$alert];
         $queue['option'] = $cron_send_email_on;
@@ -323,7 +325,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
         $data = \REDCap::getData($project_id);
-        $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id);
+        $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true);
         return $email_sent;
     }
 
@@ -361,10 +363,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         \REDCap::logEvent($action_description,$changes_made,NULL,NULL,NULL,$pid);
     }
 
-    function createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
+    function createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron){
         $email_subject = $this->getProjectSetting("email-subject", $project_id)[$id];
         $email_text = $this->getProjectSetting("email-text", $project_id)[$id];
         $datapipe_var = $this->getProjectSetting("datapipe_var", $project_id);
+        $alert_id = $this->getProjectSetting("alert-id", $project_id);
 
         //Data piping
         $email_text = $this->setDataPipping($datapipe_var, $email_text, $project_id, $data, $record, $event_id, $instrument, $instance);
