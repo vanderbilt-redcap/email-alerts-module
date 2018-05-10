@@ -186,16 +186,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             throw new \Exception($sql.': '.$error);
         }
 
-//        \REDCap::logEvent("scheduledEmails ","INSIDE scheduledEmails 878",NULL,NULL,NULL,878);
         while($row = db_fetch_assoc($q)){
             $project_id = $row['project_id'];
-            $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
+            $email_queue =  $this->getProjectSetting('email-queue',$project_id);
             $queue_aux = $email_queue;
-            if(!empty($email_queue)){
+            if($email_queue != ''){
+                \REDCap::logEvent("QUEUE NOT EMPTY ","",NULL,NULL,NULL,$project_id);
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
                         if($this->sendToday($queue, $index)){
+                            \REDCap::logEvent("Send Email ","",NULL,NULL,NULL,$project_id);
                             //SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
