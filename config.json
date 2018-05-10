@@ -199,9 +199,9 @@
 
   "crons": [
       {
-        "cron_name": "scheduledEmails",
+        "cron_name": "scheduledemails",
         "cron_description": "Cron that runs every 15 minutes to send scheduled emails",
-        "method": "scheduledEmails",
+        "method": "scheduledemails",
         "cron_frequency": "60",
         "cron_max_run_time": "60"
       }
