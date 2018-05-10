@@ -180,31 +180,40 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function scheduledemails(){
-        \REDCap::logEvent("scheduledEmails","Inside scheduledEmails",NULL,NULL,NULL,878);
-        $email_queue =  empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
-        \REDCap::logEvent("scheduledEmails Queue",json_encode($email_queue),NULL,NULL,NULL,878);
-        $queue_aux = $email_queue;
-        if(!empty($email_queue)){
-            $email_sent_total = 0;
-            foreach ($email_queue as $index=>$queue){
-                if($email_sent_total < 100) {
-                    if($this->sendToday($queue, $index)){
-                        //SEND EMAIL
-                        $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['id'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
+        $sql="SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = 'true' AND m.directory_prefix = 'vanderbilt_emailTrigger' AND s.`key` = 'enabled'";
+        $q = $this->query($sql);
 
-                        //If it's the last time we send, we delete the queue
-                        $this->stopRepeat($queue,$index);
+        if($error = db_error()){
+            throw new \Exception($sql.': '.$error);
+        }
 
-                        //If email sent save date and number of times sent
-                        if($email_sent){
-                            $queue_aux[$index]['last_sent'] = date('Y-m-d');
-                            $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
-                            $this->setProjectSetting('email-queue', $queue_aux);
-                            $email_sent_total++;
+        while($row = db_fetch_assoc($q)){
+            $project_id = $row['project_id'];
+            \REDCap::logEvent("scheduledEmails","Inside scheduledEmails",NULL,NULL,NULL,$project_id);
+            $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
+            $queue_aux = $email_queue;
+            if(!empty($email_queue)){
+                $email_sent_total = 0;
+                foreach ($email_queue as $index=>$queue){
+                    if($email_sent_total < 100) {
+                        if($this->sendToday($queue, $index)){
+                            //SEND EMAIL
+                            $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['id'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
+
+                            //If it's the last time we send, we delete the queue
+                            $this->stopRepeat($queue,$index);
+
+                            //If email sent save date and number of times sent
+                            if($email_sent){
+                                $queue_aux[$index]['last_sent'] = date('Y-m-d');
+                                $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
+                                $this->setProjectSetting('email-queue', $queue_aux,$queue['project_id']);
+                                $email_sent_total++;
+                            }
                         }
+                    }else{
+                        break;
                     }
-                }else{
-                    break;
                 }
             }
         }
@@ -212,10 +221,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function sendToday($queue, $index)
     {
-        $cron_send_email_on_field = empty($this->getProjectSetting('cron-send-email-on-field')) ? array() : $this->getProjectSetting('cron-send-email-on-field')[$index];
-        $cron_repeat_for =  empty($this->getProjectSetting('cron-repeat-for'))?array():$this->getProjectSetting('cron-repeat-for')[$index];
-        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until'))?array():$this->getProjectSetting('cron-repeat-until')[$index];
-        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field'))?array():$this->getProjectSetting('cron-repeat-until-field')[$index];
+        $cron_send_email_on_field = empty($this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])) ? array() : $this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])[$index];
+        $cron_repeat_for =  empty($this->getProjectSetting('cron-repeat-for',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$index];
+        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$index];
+        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$index];
 
         $repeat_days = $cron_repeat_for;
         if($queue['times_sent'] != 0){
@@ -239,12 +248,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         if (strtotime($cron_repeat_until_field) >= strtotime($today)) {
                             return true;
                         } else {
-                            $this->deleteQueuedEmail($index);
+                            $this->deleteQueuedEmail($index,$queue['project_id']);
                             return false;
                         }
                     } else if ($cron_repeat_until == 'cond' && $cron_repeat_until_field != "") {
                         if ($evaluateLogic) {
-                            $this->deleteQueuedEmail($index);
+                            $this->deleteQueuedEmail($index,$queue['project_id']);
                             return false;
                         } else {
                             return true;
@@ -259,9 +268,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function stopRepeat($queue,$index){
-        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email'))?array():$this->getProjectSetting('cron-repeat-email')[$index];
-        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until'))?array():$this->getProjectSetting('cron-repeat-until')[$index];
-        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field'))?array():$this->getProjectSetting('cron-repeat-until-field')[$index];
+        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$index];
+        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$index];
+        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$index];
 
         $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field, $queue['project_id'], $queue['record'], $queue['event_id']);
         if($queue['isRepeatInstrument']){
@@ -271,16 +280,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if($cron_repeat_until != 'forever' && $cron_repeat_until != '' && $cron_repeat_email == '1'){
             if($cron_repeat_until == 'date'){
                 if(strtotime($cron_repeat_until_field) >= strtotime(date('Y-m-d'))){
-                    $this->deleteQueuedEmail($index);
+                    $this->deleteQueuedEmail($index,$queue['project_id']);
                 }
             }else if($cron_repeat_until == 'cond' && $cron_repeat_until_field != ""){
 
                 if(!$evaluateLogic){
-                    $this->deleteQueuedEmail($index);
+                    $this->deleteQueuedEmail($index,$queue['project_id']);
                 }
             }
         }else if($cron_repeat_email == '0'){
-            $this->deleteQueuedEmail($index);
+            $this->deleteQueuedEmail($index,$queue['project_id']);
         }
 
     }
@@ -308,8 +317,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $this->addQueueLog($project_id,"Modifications on Scheduled Alert ".$alert,$this->getProjectSetting("cron-send-email-on", $project_id)[$alert],$this->getProjectSetting("cron-send-email-on-field", $project_id)[$alert],$this->getProjectSetting("cron-repeat-email", $project_id)[$alert],$this->getProjectSetting("cron-repeat-for", $project_id)[$alert],$this->getProjectSetting("cron-repeat-until", $project_id)[$alert],$this->getProjectSetting("cron-repeat-until-field", $project_id)[$alert]);
     }
 
-    function deleteQueuedEmail($queue){
-        $email_queue =  empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
+    function deleteQueuedEmail($queue, $project_id){
+        $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
         unset($email_queue[$queue]);
     }
 
