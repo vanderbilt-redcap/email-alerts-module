@@ -323,6 +323,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
         unset($email_queue[$queue]);
         $this->setProjectSetting('email-queue', $email_queue,$project_id);
+        $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
         \REDCap::logEvent("Deleted queue #".$queue ,json_encode($email_queue),NULL,NULL,NULL,$project_id);
     }
 
