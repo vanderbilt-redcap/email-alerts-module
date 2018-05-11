@@ -198,11 +198,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             //SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
-                            //If it's the last time we send, we delete the queue
-                            $this->stopRepeat($queue,$index);
-
-                            //If email sent save date and number of times sent
+                            //If email sent save date and number of times sent and delete queue if needed
                             if($email_sent){
+                                //If it's the last time we send, we delete the queue
+                                $this->stopRepeat($queue,$index);
+
                                 $queue_aux[$index]['last_sent'] = date('Y-m-d');
                                 $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
                                 $this->setProjectSetting('email-queue', $queue_aux,$queue['project_id']);
@@ -323,6 +323,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
         unset($email_queue[$queue]);
         $this->setProjectSetting('email-queue', $email_queue,$project_id);
+        \REDCap::logEvent("Deleted queue #".$queue ,json_encode($email_queue),NULL,NULL,NULL,$project_id);
     }
 
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
