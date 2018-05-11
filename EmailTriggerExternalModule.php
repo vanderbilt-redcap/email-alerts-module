@@ -322,6 +322,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function deleteQueuedEmail($queue, $project_id){
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
         unset($email_queue[$queue]);
+        $this->setProjectSetting('email-queue', $email_queue,$project_id);
     }
 
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
