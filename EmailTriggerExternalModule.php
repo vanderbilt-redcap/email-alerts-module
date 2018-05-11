@@ -219,11 +219,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function sendToday($queue, $index)
     {
-        $cron_send_email_on_field = empty($this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])) ? array() : $this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])[$index];
-        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$index];
-        $cron_repeat_for =  empty($this->getProjectSetting('cron-repeat-for',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$index];
-        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$index];
-        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$index];
+        $cron_send_email_on_field = empty($this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])) ? array() : $this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_for =  empty($this->getProjectSetting('cron-repeat-for',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$queue['alert']];
 
         $repeat_days = $cron_repeat_for;
         if($queue['times_sent'] != 0){
@@ -271,9 +271,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function stopRepeat($queue,$index){
-        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$index];
-        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$index];
-        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$index];
+        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$queue['alert']];
 
         $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field, $queue['project_id'], $queue['record'], $queue['event_id']);
         if($queue['isRepeatInstrument']){
