@@ -241,6 +241,17 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     else {
                         inputHtml += EMparent.getColumnHtml(setting);
                     }
+                    inputHtml += '<tr field="cron-queue-update" class="form-control-custom"><td><span class="external-modules-instance-label"> </span><label>On form re-save, delete existing<br> scheduled emails and <br>reschedule emails.<br><i>(this will update piping <br>content and also update logic.)</i></label></td>';
+                    inputHtml += '<td class="external-modules-input-td"><input type="checkbox" name="cron-queue-update" class="external-modules-input-element" value=""></td></tr>';
+                    return inputHtml;
+                }else if(isAdmin && setting.key == 'cron-repeat-until-field-update'){
+
+                    if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
+                        inputHtml += EMparent.getSettingColumns.call(this, setting, instance, header);
+                    }
+                    else {
+                        inputHtml += EMparent.getColumnHtml(setting);
+                    }
                     inputHtml += '<tr field="cron-queue-update" class="form-control-custom"><td><span class="external-modules-instance-label"> </span><label>On form re-save, delete existing scheduled emails and reschedule emails.<br><i>(this will update piping content and also update logic.)</i></label></td>';
                     inputHtml += '<td class="external-modules-input-td"><input type="checkbox" name="cron-queue-update" class="external-modules-input-element" value=""></td></tr>';
                     return inputHtml;
@@ -432,6 +443,22 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     $('[field="cron-send-email-on-field'+suffix+'"]').hide();
                 }else if($(this).val() == 'date' || $(this).val() == 'calc'){
                     $('[field="cron-send-email-on-field'+suffix+'"]').show();
+                    if($(this).val() == 'date'){
+                        $('[field="cron-send-email-on-field'+suffix+'"] td input').addClass('datepicker_aux');
+                        $('[field="cron-send-email-on-field'+suffix+'"] td input').addClass('datepicker');
+                        $(".datepicker_aux").datepicker({
+                            showOn: "button",
+                            buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                            buttonImageOnly: true,
+                            buttonText: "Select date",
+                            dateFormat: "yy-mm-dd"
+                        });
+                    }else{
+                        $('[field="cron-send-email-on-field'+suffix+'"] td input').datepicker("destroy");
+                        $('[field="cron-send-email-on-field'+suffix+'"] td input').removeClass('datepicker');
+                        $('[field="cron-send-email-on-field'+suffix+'"] td input').removeClass('datepicker_aux');
+                        $('[field="cron-send-email-on-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');;
+                    }
                 }
             });
 
@@ -462,6 +489,22 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     $('[field="cron-repeat-until-field'+suffix+'"]').hide();
                 }else if($(this).val() == 'date' || $(this).val() == 'cond'){
                     $('[field="cron-repeat-until-field'+suffix+'"]').show();
+                    if($(this).val() == 'date'){
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').addClass('datepicker_aux2');
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').addClass('datepicker');
+                        $(".datepicker_aux2").datepicker({
+                            showOn: "button",
+                            buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                            buttonImageOnly: true,
+                            buttonText: "Select date",
+                            dateFormat: "yy-mm-dd"
+                        });
+                    }else{
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').datepicker("destroy");
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('datepicker');
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('datepicker_aux2');
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
+                    }
                 }
             });
 

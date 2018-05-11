@@ -331,3 +331,14 @@ a.btn_color_surveyLink:hover{background-color: #ffd7b3 !important;}
 .popover.top>.arrow:after {
     bottom: 2px;
 }
+.datepicker{
+    width: 90% !important;
+    float: left;
+}
+.ui-datepicker-trigger{
+    width: 20px;
+    padding-top: 5px;
+}
+.code_modal_table{
+    width: 100%;
+}

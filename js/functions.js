@@ -62,6 +62,22 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
             if(cron_send_email_on == 'date' || cron_send_email_on == 'calc'){
                 $('[field="cron-send-email-on-field'+suffix+'"]').show();
                 $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-send-email-on-field'+suffix+'"]').val(cron_send_email_on_field);
+                if(cron_send_email_on == 'date'){
+                    $('[field="cron-send-email-on-field'+suffix+'"] td input').addClass('datepicker_aux');
+                    $('[field="cron-send-email-on-field'+suffix+'"] td input').addClass('datepicker');
+                    $(".datepicker_aux").datepicker({
+                        showOn: "button",
+                        buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                        buttonImageOnly: true,
+                        buttonText: "Select date",
+                        dateFormat: "yy-mm-dd"
+                    });
+                }else{
+                    $('[field="cron-send-email-on-field'+suffix+'"] td input').datepicker("destroy");
+                    $('[field="cron-send-email-on-field'+suffix+'"] td input').removeClass('datepicker');
+                    $('[field="cron-send-email-on-field'+suffix+'"] td input').removeClass('datepicker_aux');
+                    $('[field="cron-send-email-on-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
+                }
             }else{
                 $('[field="cron-send-email-on-field'+suffix+'"]').hide();
             }
@@ -82,6 +98,23 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
                     $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until'+suffix+'"][value="'+cron_repeat_until+'"]').prop('checked',true);
                     $('[field="cron-repeat-until-field'+suffix+'"]').show();
                     $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until-field'+suffix+'"]').val(cron_repeat_until_field);
+                    if(cron_repeat_until == 'date'){
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').addClass('datepicker_aux2');
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').addClass('datepicker');
+                        $(".datepicker_aux2").datepicker({
+                            showOn: "button",
+                            buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                            buttonImageOnly: true,
+                            buttonText: "Select date",
+                            dateFormat: "yy-mm-dd"
+                        });
+                    }else{
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').datepicker("destroy");
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('datepicker');
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('datepicker_aux2');
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
+                    }
+
                 }else if(cron_repeat_until == "forever" || cron_repeat_until == ""){
                     $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until'+suffix+'"][value="forever"]').prop('checked',true);
                     $('[field="cron-repeat-until-field'+suffix+'"]').hide();
