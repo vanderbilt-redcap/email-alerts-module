@@ -315,16 +315,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_queue = empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
         array_push($email_queue,$queue);
         $this->setProjectSetting('email-queue', $email_queue);
-
-        $this->addQueueLog($project_id,"Modifications on Scheduled Alert ".$alert,$this->getProjectSetting("cron-send-email-on", $project_id)[$alert],$this->getProjectSetting("cron-send-email-on-field", $project_id)[$alert],$this->getProjectSetting("cron-repeat-email", $project_id)[$alert],$this->getProjectSetting("cron-repeat-for", $project_id)[$alert],$this->getProjectSetting("cron-repeat-until", $project_id)[$alert],$this->getProjectSetting("cron-repeat-until-field", $project_id)[$alert]);
     }
 
-    function deleteQueuedEmail($queue, $project_id){
+    function deleteQueuedEmail($index, $project_id){
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
-        unset($email_queue[$queue]);
+        unset($email_queue[$index]);
         $this->setProjectSetting('email-queue', $email_queue,$project_id);
-        $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
-        \REDCap::logEvent("Deleted queue #".$queue ,json_encode($email_queue),NULL,NULL,NULL,$project_id);
+        \REDCap::logEvent("Deleted queue #".$index ,json_encode($email_queue),NULL,NULL,NULL,$project_id);
     }
 
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
