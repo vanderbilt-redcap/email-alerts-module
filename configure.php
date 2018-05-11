@@ -943,14 +943,14 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     foreach ($email_queue as $id=>$email){
                         if($email['project_id'] == $pid && $email['alert'] == $index){
                             $queue_count++;
-                            $scheduled_records_activated .= $email['record'].",";
+                            $scheduled_records_activated .= $email['record'].", ";
                         }
                     }
 
                     if($queue_count > 0){
                         $message_sent .= '<a href="#" data-toggle="popover"data-target-selector="#scheduled-activated" data-title="Scheduled Records for Alert #'.$alert.'" >Scheduled records activated:</a> '.$queue_count.'<br/>';
                         $message_sent .= '<div id="scheduled-activated" class="hidden">
-                                                <p>'.rtrim($scheduled_records_activated,",").'</p>
+                                                <p>'.rtrim($scheduled_records_activated,", ").'</p>
                                            </div>';
                     }
                 }
