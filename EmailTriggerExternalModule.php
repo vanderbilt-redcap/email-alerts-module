@@ -34,6 +34,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     while($row = db_fetch_assoc($q)){
                         if ($row['form_name'] == $form) {
+                            //Surveys are always complete
                             $isRepeatInstrument = false;
                             if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2'))){
                                 $isRepeatInstrument = true;
@@ -60,12 +61,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
                         $isLongitudinalData = true;
                     }
+
+                    $isRepeatInstrumentComplete = $this->isRepeatInstrumentComplete($data, $record, $event_id, $form, $repeat_instance);
                     $isRepeatInstrument = false;
-                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2'))){
+                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
                         $isRepeatInstrument = true;
                     }
                     $email_incomplete = $this->getProjectSetting("email-incomplete",$project_id)[$id];
-                    if($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrument || $email_incomplete == "1"){
+                    if($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrumentComplete || $email_incomplete == "1"){
                         if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
                             if ($_REQUEST['page'] == $form) {
                                 $this->setEmailTriggerRequested(true);
@@ -159,33 +162,42 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_deleted = $this->getProjectSetting("email-deleted",$project_id)[$id];
         $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id));
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
+        echo "0<br>";
+        echo "email_repetitive:".$email_repetitive."<br>";
+        echo "isEmailAlreadySentForThisSurvery:".$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance)."<br>";
+        echo "email_deactivate:".$email_deactivate."<br>";
+        echo "email_deleted:".$email_deleted."<br>";
+        echo "isRepeatInstrument:".$isRepeatInstrument."<br>";
         if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance))) && ($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             //If the condition is met or if we don't have any, we send the email
             $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record,$event_id);
             if($isRepeatInstrument){
                 $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record,$event_id, $repeat_instance, $instrument);
             }
+            echo "1<br>";
             if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && $evaluateLogic) || empty($email_condition)) {
-                $cron_repeat_email = $this->getProjectSetting("cron-repeat-email", $project_id)[$id];
-                $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
-                $cron_send_email_on_field = $this->getProjectSetting("cron-send-email-on-field", $project_id)[$id];
-
-                //To ensure it's the last module called
-                $delayedSuccessful =  $this->delayModuleExecution();
-                if($delayedSuccessful){
-                    return;
-                }
-
-                if($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field !=''))){
-                    #SCHEDULED EMAIL
-                    $this->addQueuedEmail($id,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
-                    $this->scheduledemails();
-                }else{
-                    #REGULAR EMAIL
-                    $this->createAndSendEmail($data,$project_id,$record,$id,$instrument,$repeat_instance,$isRepeatInstrument,$event_id,false);
-                }
+                echo "SEND<br>";
+//                $cron_repeat_email = $this->getProjectSetting("cron-repeat-email", $project_id)[$id];
+//                $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
+//                $cron_send_email_on_field = $this->getProjectSetting("cron-send-email-on-field", $project_id)[$id];
+//
+//                //To ensure it's the last module called
+//                $delayedSuccessful =  $this->delayModuleExecution();
+//                if($delayedSuccessful){
+//                    return;
+//                }
+//
+//                if($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field !=''))){
+//                    #SCHEDULED EMAIL
+//                    $this->addQueuedEmail($id,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
+//                    $this->scheduledemails();
+//                }else{
+//                    #REGULAR EMAIL
+//                    $this->createAndSendEmail($data,$project_id,$record,$id,$instrument,$repeat_instance,$isRepeatInstrument,$event_id,false);
+//                }
             }
         }
+        die;
     }
 
     function scheduledemails(){
@@ -689,6 +701,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         return $mail;
+    }
+
+    function isRepeatInstrumentComplete($data, $record, $event_id, $instrument, $instance){
+        if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument.'_complete'] == '2'))){
+            return true;
+        }
+        return false;
     }
 
     /**

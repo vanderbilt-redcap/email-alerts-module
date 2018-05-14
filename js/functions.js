@@ -247,7 +247,6 @@ function deleteEmailAlert(index,modal,indexmodal){
 }
 function reactivateEmailAlert(index,active){
    ajaxLoadOptionAndMessage("&index_reenable="+index+"&active="+active,_reenableform_url,"R");
-
 }
 function deactivateEmailAlert(index, status){
     $('#index_modal_deactivate').val(index);
@@ -448,7 +447,14 @@ function ajaxLoadOptionAndMessage(data, url, message){
             if(jsonAjax.message != '' && jsonAjax.message != undefined){
                 message = jsonAjax.message;
             }
-            window.location.href = gerUtlMessageParam(message);
+
+            var newUrl = gerUtlMessageParam(message);
+            if (newUrl.substring(newUrl.length-1) == "#")
+            {
+                newUrl = newUrl.substring(0, newUrl.length-1);
+            }
+
+            window.location.href = newUrl;
         }
         else {
 	        alert("An error ocurred");
