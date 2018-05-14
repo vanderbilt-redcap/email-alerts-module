@@ -971,7 +971,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                                 if(!empty($email_records_sent[$alert])){
                                     $message_sent .= '<a href="#" data-toggle="popover"data-target-selector="#records-activated" data-title="Records for Alert #'.$alert_number.'" >Records activated:</a> '.count((array)$form[$alert]).'<br/>';
                                     $message_sent .= '<div id="records-activated" class="hidden">
-                                                            <p>'.$email_records_sent[$alert].'</p>
+                                                            <p>'.$email_records_sent[$index].'</p>
                                                        </div>';
                                 }else{
                                     $message_sent .= "Records activated: ".count((array)$form[$alert])."<br/>";
