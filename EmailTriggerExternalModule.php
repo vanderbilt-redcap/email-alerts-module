@@ -234,13 +234,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $extra_days = ' + ' . $repeat_days . " days";
         $repeat_date = date('Y-m-d', strtotime($today . $extra_days));
 
+        $evaluateLogic_on = \REDCap::evaluateLogic($cron_send_email_on_field, $queue['project_id'], $queue['record'], $queue['event_id']);
         $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field, $queue['project_id'], $queue['record'], $queue['event_id']);
         if($queue['isRepeatInstrument']){
+            $evaluateLogic_on = \REDCap::evaluateLogic($cron_send_email_on_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
             $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
         }
 
-        if(strtotime($queue['last_sent']) != strtotime($today)) {
-            if ($queue['deactivated'] == '0' && ($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today)) || ($queue['option'] == 'calc' && !$evaluateLogic)) {
+        if(strtotime($queue['last_sent']) != strtotime($today)){
+            if ($queue['deactivated'] == '0' && ($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today)) || ($queue['option'] == 'calc' && $evaluateLogic_on)) {
                 if($cron_repeat_email == "1"){
                     #check repeat until option to see if we need to stop
                     if ($cron_repeat_until != 'forever' && $cron_repeat_until != '') {
