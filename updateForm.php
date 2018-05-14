@@ -53,6 +53,10 @@ if(empty($alert_id)){
         $alert_id[$index] = $index;
     }
     $module->setProjectSetting('alert-id', $alert_id);
+}else if(empty($alert_id[$index])){
+    $new_alert_id = max($alert_id) + 1;
+    array_push($alert_id,$new_alert_id);
+    $module->setProjectSetting('alert-id', $alert_id);
 }
 
 #Add logs

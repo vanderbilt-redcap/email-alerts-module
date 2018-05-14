@@ -51,6 +51,7 @@ if(empty($alert_id)){
     }
     $module->setProjectSetting('alert-id', $alert_id);
 }
+$alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
 $new_alert_id = max($alert_id) + 1;
 
 #Add new data with old

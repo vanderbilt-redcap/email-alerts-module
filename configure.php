@@ -609,19 +609,19 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
             $('#deleteUserForm').submit(function () {
                 var data = $('#deleteUserForm').serialize();
                 ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('deleteForm.php')?>',"D");
-                return false;
+                return true;
             });
 
             $('#deleteForm').submit(function () {
                 var data = $('#deleteForm').serialize();
                 ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('deleteFormAdmin.php')?>',"D");
-                return false;
+                return true;
             });
 
             $('#deactivateForm').submit(function () {
                 var data = $('#deactivateForm').serialize();
                 ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('activateDeactivateForm.php')?>',"");
-                return false;
+                return true;
             });
 
             $('#AddSurveyForm').submit(function () {
@@ -1099,8 +1099,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 $alerts .= "<td style='visibility: hidden;'>".$active_col."</td>";
                 $alerts .= "<td style='visibility: hidden;'>".$deleted_col."</td>";
                 $alerts .= "<td>".$reactivate_button."<div style='".$show_button."'><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
-                $alerts .= "<div style='".$show_button."'><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\")' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
-                $alerts .= "<div style='".$show_button."'><a onclick='duplicateEmailAlert(\"".$index."\")' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
+                $alerts .= "<div style='".$show_button."'><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\");return true;' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
+                $alerts .= "<div style='".$show_button."'><a onclick='duplicateEmailAlert(\"".$index."\");return true;' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
                 $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\",\"".$deleted_modal."\",\"".$deleted_index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >".$deleted_text."</a></div></td>";
                 $alerts .= "</tr>";
                 $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";
