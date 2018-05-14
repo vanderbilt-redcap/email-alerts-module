@@ -20,6 +20,16 @@ $email_attachment_variable =  empty($module->getProjectSetting('email-attachment
 $email_repetitive =  empty($module->getProjectSetting('email-repetitive'))?array():$module->getProjectSetting('email-repetitive');
 $email_condition =  empty($module->getProjectSetting('email-condition'))?array():$module->getProjectSetting('email-condition');
 $email_incomplete =  empty($module->getProjectSetting('email-incomplete'))?array():$module->getProjectSetting('email-incomplete');
+$alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
+
+//If first time new alert naming, update all.
+if(empty($alert_id)){
+    foreach ($form_name as $index=>$value){
+        $alert_id[$index] = $index;
+    }
+    $module->setProjectSetting('alert-id', $alert_id);
+}
+$new_alert_id = max($alert_id) + 1;
 
 #Add new data with old
 array_push($form_name,$form_name[$index]);
@@ -34,6 +44,7 @@ array_push($email_attachment_variable,"");
 array_push($email_repetitive,$email_repetitive[$index]);
 array_push($email_condition,$email_condition[$index]);
 array_push($email_incomplete,$email_incomplete[$index]);
+array_push($alert_id,$new_alert_id);
 
 #Save data
 $module->setProjectSetting('form-name', $form_name);
@@ -49,6 +60,7 @@ $module->setProjectSetting('email-repetitive', $email_repetitive);
 $module->setProjectSetting('email-condition', $email_condition);
 $module->setProjectSetting('email-condition', $email_condition);
 $module->setProjectSetting('email-incomplete', $email_incomplete);
+$module->setProjectSetting('alert-id', $alert_id);
 
 //Extra Data
 $email_sent =  empty($module->getProjectSetting('email-sent'))?array():$module->getProjectSetting('email-sent');
