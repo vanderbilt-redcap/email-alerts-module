@@ -115,9 +115,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         if($record == $record_id){
                             //Delete list of records sent
                             if(str_replace($record_id.", ","",$email_records_sent[$index], $count) == 0){
-                                $email_records_sent[$index] = str_replace($record_id,"",$email_records_sent[$index]);
-                            }else{
                                 $email_records_sent[$index] = str_replace($record_id.", ","",$email_records_sent[$index]);
+                            }else{
+                                $email_records_sent[$index] = str_replace($record_id,"",$email_records_sent[$index]);
                             }
                         }
                     }
