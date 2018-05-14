@@ -20,6 +20,12 @@ $email_attachment_variable =  empty($module->getProjectSetting('email-attachment
 $email_repetitive =  empty($module->getProjectSetting('email-repetitive'))?array():$module->getProjectSetting('email-repetitive');
 $email_condition =  empty($module->getProjectSetting('email-condition'))?array():$module->getProjectSetting('email-condition');
 $email_incomplete =  empty($module->getProjectSetting('email-incomplete'))?array():$module->getProjectSetting('email-incomplete');
+$cron_send_email_on =  empty($module->getProjectSetting('cron-send-email-on'))?array():$module->getProjectSetting('cron-send-email-on');
+$cron_send_email_on_field =  empty($module->getProjectSetting('cron-send-email-on-field'))?array():$module->getProjectSetting('cron-send-email-on-field');
+$cron_repeat_email =  empty($module->getProjectSetting('cron-repeat-email'))?array():$module->getProjectSetting('cron-repeat-email');
+$cron_repeat_for =  empty($module->getProjectSetting('cron-repeat-for'))?array():$module->getProjectSetting('ccron-repeat-for');
+$cron_repeat_until =  empty($module->getProjectSetting('cron-repeat-until'))?array():$module->getProjectSetting('cron-repeat-until');
+$cron_repeat_until_field=  empty($module->getProjectSetting('cron-repeat-until-field'))?array():$module->getProjectSetting('cron-repeat-until-field');
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
 
 //If first time new alert naming, update all.
@@ -45,6 +51,12 @@ array_push($email_attachment_variable,"");
 array_push($email_repetitive,$email_repetitive[$index]);
 array_push($email_condition,$email_condition[$index]);
 array_push($email_incomplete,$email_incomplete[$index]);
+array_push($cron_send_email_on,$cron_send_email_on[$index]);
+array_push($cron_send_email_on_field,$cron_send_email_on_field[$index]);
+array_push($cron_repeat_for,$cron_repeat_for[$index]);
+array_push($cron_repeat_until,$cron_repeat_until[$index]);
+array_push($cron_repeat_until_field,$cron_repeat_until_field[$index]);
+array_push($cron_repeat_email,$cron_repeat_email[$index]);
 array_push($alert_id,$new_alert_id);
 
 #Save data
@@ -61,6 +73,12 @@ $module->setProjectSetting('email-repetitive', $email_repetitive);
 $module->setProjectSetting('email-condition', $email_condition);
 $module->setProjectSetting('email-condition', $email_condition);
 $module->setProjectSetting('email-incomplete', $email_incomplete);
+$module->setProjectSetting('cron-send-email-on', $cron_send_email_on);
+$module->setProjectSetting('cron-send-email-on-field', $cron_send_email_on_field);
+$module->setProjectSetting('cron-repeat-email', $cron_repeat_email);
+$module->setProjectSetting('cron-repeat-for', $cron_repeat_for);
+$module->setProjectSetting('cron-repeat-until', $cron_repeat_until);
+$module->setProjectSetting('cron-repeat-until-field', $cron_repeat_until_field);
 $module->setProjectSetting('alert-id', $alert_id);
 
 //Extra Data

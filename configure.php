@@ -601,7 +601,6 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                      deleteFile(index);
                      saveFilesIfTheyExist('<?=$module->getUrl('save-file.php')?>&index='+index, files);
                      ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('updateForm.php')?>',"U");
-                     return true;
                  }
 				return false;
             });
