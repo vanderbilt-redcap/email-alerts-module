@@ -99,13 +99,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             //we don't add the deleted alert and rename the old ones.
                             if ($value == $record_id) {
                                 $one_less = 1;
-                                //Delete list of records sent
-                                if(str_replace($value.", ","",$email_records_sent[$alert], $count) == 0){
-                                    $email_records_sent[$alert] = str_replace($value,"",$email_records_sent[$alert]);
-                                }else{
-                                    $email_records_sent[$alert] = str_replace($value.", ","",$email_records_sent[$alert]);
-                                }
-                                $this->setProjectSetting('email-records-sent', $email_records_sent, $project_id);
                             }else if($record >= 0){
                                 //if the record is -1 do not add it. When copying a project sometimes it has a weird config.
                                 $jsonArray[$form][$alert][$record - $one_less] = $value;
@@ -114,6 +107,22 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
                 $this->setProjectSetting('email-repetitive-sent', json_encode($jsonArray));
+            }
+            if(!empty($email_records_sent)){
+                foreach ($email_records_sent as $index=>$sent){
+                    $records = array_map('trim', explode(',', $sent));
+                    foreach ($records as $record){
+                        if($record == $record_id){
+                            //Delete list of records sent
+                            if(str_replace($record_id.", ","",$email_records_sent[$index], $count) == 0){
+                                $email_records_sent[$index] = str_replace($record_id,"",$email_records_sent[$index]);
+                            }else{
+                                $email_records_sent[$index] = str_replace($record_id.", ","",$email_records_sent[$index]);
+                            }
+                        }
+                    }
+                }
+                $this->setProjectSetting('email-records-sent', $email_records_sent);
             }
 
             #Delete the queued emails for that record
@@ -170,6 +179,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field !=''))){
                     #SCHEDULED EMAIL
                     $this->addQueuedEmail($id,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
+                    $this->scheduledemails();
                 }else{
                     #REGULAR EMAIL
                     $this->createAndSendEmail($data,$project_id,$record,$id,$instrument,$repeat_instance,$isRepeatInstrument,$event_id,false);
