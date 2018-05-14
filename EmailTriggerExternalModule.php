@@ -195,6 +195,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
                         if($this->sendToday($queue, $index)){
+                            \REDCap::logEvent("SEND Email for Alert#".$queue['alert'],"",NULL,$queue['record'],$queue['event_id'],$queue['project_id']);
                             //SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
@@ -321,6 +322,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function deleteQueuedEmail($index, $project_id){
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
+        \REDCap::logEvent("DELETE Queue Alert#".$email_queue[$index]['alert'],"",NULL,null,null,$project_id);
         unset($email_queue[$index]);
         $this->setProjectSetting('email-queue', $email_queue,$project_id);
     }
