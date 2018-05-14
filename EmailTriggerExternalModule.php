@@ -190,12 +190,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $project_id = $row['project_id'];
             $email_queue =  $this->getProjectSetting('email-queue',$project_id);
             $queue_aux = $email_queue;
+            $delete_queue = array();
             if($email_queue != ''){
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
                         if($this->sendToday($queue, $index)){
-                            \REDCap::logEvent("SEND Email for Alert#".$queue['alert'],"",NULL,$queue['record'],$queue['event_id'],$queue['project_id']);
                             //SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
@@ -207,13 +207,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $email_sent_total++;
 
                                 //If it's the last time we send, we delete the queue
-                                $this->stopRepeat($queue,$index);
+                                $delete_queue = $this->stopRepeat($delete_queue,$queue,$index);
                             }
                         }
                     }else{
                         break;
                     }
                 }
+                \REDCap::logEvent("DELETE QUEUE",json_encode($delete_queue),NULL,null,null,$project_id);
+                $this->deleteQueuedEmail($delete_queue,$queue['project_id']);
             }
         }
     }
@@ -273,7 +275,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return false;
     }
 
-    function stopRepeat($queue,$index){
+    function stopRepeat($delete_queue,$queue,$index){
         $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$queue['alert']];
         $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$queue['alert']];
         $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$queue['alert']];
@@ -283,20 +285,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
         }
         if($cron_repeat_email == '0'){
-            $this->deleteQueuedEmail($index,$queue['project_id']);
+            array_push($delete_queue,$index);
         }else if($cron_repeat_until != 'forever' && $cron_repeat_until != '' && $cron_repeat_email == '1'){
             if($cron_repeat_until == 'date'){
                 if(strtotime($cron_repeat_until_field) >= strtotime(date('Y-m-d'))){
-                    $this->deleteQueuedEmail($index,$queue['project_id']);
+                    array_push($delete_queue,$index);
                 }
             }else if($cron_repeat_until == 'cond' && $cron_repeat_until_field != ""){
-
                 if(!$evaluateLogic){
-                    $this->deleteQueuedEmail($index,$queue['project_id']);
+                    array_push($delete_queue,$index);
                 }
             }
         }
-
+        return $delete_queue;
     }
 
     function addQueuedEmail($alert, $project_id, $record, $event_id, $instrument, $instance, $isRepeatInstrument){
@@ -322,11 +323,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function deleteQueuedEmail($index, $project_id){
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
-        \REDCap::logEvent("DELETE - BEFORE - Queue Alert#".$email_queue[$index]['alert'],json_encode($email_queue),NULL,null,null,$project_id);
-        unset($email_queue[$index]);
+        if(is_array($index)){
+            foreach ($index as $queue_index){
+                unset($email_queue[$queue_index]);
+            }
+        }else if(is_numeric($index)){
+            unset($email_queue[$index]);
+        }
+
         $this->setProjectSetting('email-queue', $email_queue,$project_id);
+//        $this->setProjectSetting('email-queue', '',$project_id);
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
-        \REDCap::logEvent("DELETE - AFTER - Queue Alert#".$email_queue[$index]['alert'],json_encode($email_queue),NULL,null,null,$project_id);
+        \REDCap::logEvent("DELETE QUEUE",json_encode($email_queue),NULL,null,null,$project_id);
     }
 
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
