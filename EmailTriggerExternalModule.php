@@ -322,9 +322,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function deleteQueuedEmail($index, $project_id){
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
-        \REDCap::logEvent("DELETE Queue Alert#".$email_queue[$index]['alert'],"",NULL,null,null,$project_id);
+        \REDCap::logEvent("DELETE - BEFORE - Queue Alert#".$email_queue[$index]['alert'],json_encode($email_queue),NULL,null,null,$project_id);
         unset($email_queue[$index]);
         $this->setProjectSetting('email-queue', $email_queue,$project_id);
+        $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
+        \REDCap::logEvent("DELETE - AFTER - Queue Alert#".$email_queue[$index]['alert'],json_encode($email_queue),NULL,null,null,$project_id);
     }
 
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
