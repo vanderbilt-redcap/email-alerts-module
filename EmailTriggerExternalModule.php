@@ -214,7 +214,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         break;
                     }
                 }
-                \REDCap::logEvent("DELETE QUEUE",json_encode($delete_queue),NULL,null,null,$project_id);
                 $this->deleteQueuedEmail($delete_queue,$queue['project_id']);
             }
         }
@@ -332,9 +331,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         $this->setProjectSetting('email-queue', $email_queue,$project_id);
-//        $this->setProjectSetting('email-queue', '',$project_id);
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
-        \REDCap::logEvent("DELETE QUEUE",json_encode($email_queue),NULL,null,null,$project_id);
     }
 
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
