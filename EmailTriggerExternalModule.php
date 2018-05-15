@@ -81,12 +81,24 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
+    /**
+     * Function that deletes information when we click on the REDCap buttons: Delete the project, Erase all data, Delete record
+     * @param null $project_id
+     */
     function hook_every_page_before_render($project_id = null){
-        if(strpos($_SERVER['REQUEST_URI'],'erase_project_data.php') !== false && $_POST['action'] == 'erase_data'){
+        if(strpos($_SERVER['REQUEST_URI'],'delete_project.php') !== false && $_POST['action'] == 'delete') {
+            #Button: Delete the project
+
+            $this->setProjectSetting('email-queue', '');
+        }else if(strpos($_SERVER['REQUEST_URI'],'erase_project_data.php') !== false && $_POST['action'] == 'erase_data'){
+            #Button: Erase all data
+
             $this->setProjectSetting('email-repetitive-sent', '');
             $this->setProjectSetting('email-records-sent', '');
             $this->setProjectSetting('email-queue', '');
         }else if($_REQUEST['route'] == 'DataEntryController:deleteRecord'){
+            #Button: Delete record
+
             $record_id = urldecode($_REQUEST['record']);
 
             #Delete email repetitive sent and the list of records before deleting all data
@@ -156,6 +168,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
        $this->email_requested =  $email_requested;
     }
 
+    /**
+     * Function that sends the email alert or schedules it in a queue to send it later
+     * @param $project_id
+     * @param $id
+     * @param $data
+     * @param $record
+     * @param $event_id
+     * @param $instrument
+     * @param $repeat_instance
+     * @param $isRepeatInstrument
+     * @throws \Exception
+     */
     function sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument){
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
@@ -191,6 +215,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
+    /**
+     * Function called by the CRON to send the schedules email alerts
+     * @throws \Exception
+     */
     function scheduledemails(){
         $sql="SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = 'true' AND m.directory_prefix = 'vanderbilt_emailTrigger' AND s.`key` = 'enabled'";
         $q = $this->query($sql);
@@ -232,6 +260,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
+    /**
+     * Function that checks if the email alert has to be sent today or not
+     * @param $queue, the email alert queue info
+     * @param $index, the queue index
+     * @return bool
+     */
     function sendToday($queue, $index)
     {
         $cron_send_email_on_field = empty($this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])) ? array() : $this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])[$queue['alert']];
@@ -288,6 +322,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return false;
     }
 
+    /**
+     * Function that checks if it has to stop sending the email alerts and delete them from the queue
+     * @param $delete_queue, array to fill up with the queue indexes to delete
+     * @param $queue, current queue
+     * @param $index, queue index
+     * @return mixed
+     */
     function stopRepeat($delete_queue,$queue,$index){
         $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$queue['alert']];
         $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$queue['alert']];
@@ -313,6 +354,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $delete_queue;
     }
 
+    /**
+     * Function that adds an email alert to the queue
+     * @param $alert, alert number
+     * @param $project_id
+     * @param $record
+     * @param $event_id
+     * @param $instrument
+     * @param $instance
+     * @param $isRepeatInstrument
+     */
     function addQueuedEmail($alert, $project_id, $record, $event_id, $instrument, $instance, $isRepeatInstrument){
         $queue = array();
         $queue['alert'] = $alert;
@@ -334,6 +385,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $this->setProjectSetting('email-queue', $email_queue);
     }
 
+    /**
+     * Function that deletes a specific queue
+     * @param $index
+     * @param $project_id
+     */
     function deleteQueuedEmail($index, $project_id){
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
         if(is_array($index)){
@@ -348,12 +404,34 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
     }
 
+    /**
+     * Function that sends a specific scheduled email from the queue
+     * @param $project_id
+     * @param $record
+     * @param $id
+     * @param $instrument
+     * @param $instance
+     * @param $isRepeatInstrument
+     * @param $event_id
+     * @return bool
+     */
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
         $data = \REDCap::getData($project_id);
         $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true);
         return $email_sent;
     }
 
+    /**
+     * Function that adds schduled info in the log
+     * @param $pid
+     * @param $action_description
+     * @param $cron_send_email_on
+     * @param $cron_send_email_on_field
+     * @param $cron_repeat_email
+     * @param $cron_repeat_for
+     * @param $cron_repeat_until
+     * @param $cron_repeat_until_field
+     */
     function addQueueLog($pid,$action_description,$cron_send_email_on,$cron_send_email_on_field,$cron_repeat_email,$cron_repeat_for,$cron_repeat_until,$cron_repeat_until_field){
         #Add logs
         if($cron_send_email_on == "now"){
@@ -388,6 +466,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         \REDCap::logEvent($action_description,$changes_made,NULL,NULL,NULL,$pid);
     }
 
+    /**
+     * Function that creates and sends an email
+     * @param $data
+     * @param $project_id
+     * @param $record
+     * @param $id
+     * @param $instrument
+     * @param $instance
+     * @param $isRepeatInstrument
+     * @param $event_id
+     * @param $isCron
+     * @return bool
+     */
     function createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron){
         $email_subject = $this->getProjectSetting("email-subject", $project_id)[$id];
         $email_text = $this->getProjectSetting("email-text", $project_id)[$id];
@@ -535,6 +626,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $email_sent_ok;
     }
 
+    /**
+     * Function that adds the email addresses into the mail.
+     * @param $mail
+     * @param $project_id
+     * @param $record
+     * @param $event_id
+     * @param $instrument
+     * @param $instance
+     * @param $data
+     * @param $id
+     * @param bool $isLongitudinal
+     * @return mixed
+     */
     function setEmailAddresses($mail, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal=false){
         $datapipeEmail_var = $this->getProjectSetting("datapipeEmail_var", $project_id);
         $email_to = $this->getProjectSetting("email-to", $project_id)[$id];
@@ -575,6 +679,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $mail;
     }
 
+    /**
+     * Function that adds the from email into the mail
+     * @param $mail
+     * @param $project_id
+     * @param $record
+     * @param $id
+     * @return mixed
+     */
     function setFrom($mail, $project_id, $record, $id){
         $email_from = $this->getProjectSetting("email-from", $project_id)[$id];
         if(!empty($email_from)){
@@ -595,6 +707,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $mail;
     }
 
+    /**
+     * function that checks for the pipped data, replaces it and returns the content
+     * @param $datapipe_var
+     * @param $email_content
+     * @param $project_id
+     * @param $data
+     * @param $record
+     * @param $event_id
+     * @param $instrument
+     * @param $instance
+     * @param $isLongitudinal
+     * @return mixed
+     */
     function setDataPipping($datapipe_var, $email_content, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
         if (!empty($datapipe_var)) {
             $datapipe = explode("\n", $datapipe_var);
@@ -614,6 +739,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $email_content;
     }
 
+    /**
+     * Function that adds the survey link into the mail content
+     * @param $email_text
+     * @param $project_id
+     * @param $record
+     * @param $event_id
+     * @param $isLongitudinal
+     * @return mixed
+     */
     function setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal){
         $surveyLink_var = $this->getProjectSetting("surveyLink_var", $project_id);
         if(!empty($surveyLink_var)) {
@@ -650,6 +784,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $email_text;
     }
 
+    /**
+     * Function that adds attachments into the mail
+     * @param $mail
+     * @param $project_id
+     * @param $id
+     * @return mixed
+     * @throws \Exception
+     */
     function setAttachments($mail, $project_id, $id){
         for($i=1; $i<6 ; $i++){
             $edoc = $this->getProjectSetting("email-attachment".$i,$project_id)[$id];
@@ -660,6 +802,20 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $mail;
     }
 
+    /**
+     * Function that adds pipped attachments into the mail
+     * @param $mail
+     * @param $project_id
+     * @param $data
+     * @param $record
+     * @param $event_id
+     * @param $instrument
+     * @param $repeat_instance
+     * @param $id
+     * @param bool $isLongitudinal
+     * @return mixed
+     * @throws \Exception
+     */
     function setAttachmentsREDCapVar($mail,$project_id,$data, $record, $event_id, $instrument, $repeat_instance, $id, $isLongitudinal=false){
         $email_attachment_variable = $this->getProjectSetting("email-attachment-variable", $project_id)[$id];
         if(!empty($email_attachment_variable)){
@@ -676,6 +832,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $mail;
     }
 
+    /**
+     * Function that attaches images into the mail
+     * @param $mail
+     * @param $project_id
+     * @param $email_text
+     * @return mixed
+     * @throws \Exception
+     */
     function setEmbeddedImages($mail,$project_id,$email_text){
         preg_match_all('/src=[\"\'](.+?)[\"\'].*?/i',$email_text, $result);
         $result = array_unique($result[1]);
@@ -694,6 +858,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $mail;
     }
 
+    /**
+     * Function that checks if an instruments os repeatables AND complete
+     * @param $data
+     * @param $record
+     * @param $event_id
+     * @param $instrument
+     * @param $instance
+     * @return bool
+     */
     function isRepeatInstrumentComplete($data, $record, $event_id, $instrument, $instance){
         if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument.'_complete'] == '2'))){
             return true;
@@ -921,7 +1094,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return string
      */
     function addJSONRecord($email_repetitive_sent, $new_record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
-//        print_array($email_repetitive_sent);
         $found_new_instrument = true;
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
@@ -968,9 +1140,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if($found_new_instrument){
             $jsonArray = $this->addNewJSONRecord($jsonArray,$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
         }
-
-        //print_array($jsonArray);
-        //die;
         return json_encode($jsonArray,JSON_FORCE_OBJECT);
     }
 
