@@ -942,7 +942,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 $deleted_text = "Delete";
                 if($projectData['settings']['email-deleted']['value'][$index] == '1'){
                     $deactivated_deleted_text = ($active_col == 'N')?'Email was INNACTIVE when deleted':'Email was ACTIVE when deleted';
-                    $message_sent .= "<span style='font-style:italic;color:red;line-height: 2;float: left;'><strong>".$deactivated_deleted_text."</strong></span>";
+                    $message_sent .= "<span style='font-style:italic;color:red;line-height: 2;float: left;'><strong>".$deactivated_deleted_text."</strong></span><br><br>";
                     $class_sent = "email_deleted";
                     $deleted_modal = "external-modules-configure-modal-delete-confirmation";
                     $deleted_index = "index_modal_delete";
