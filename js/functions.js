@@ -359,6 +359,10 @@ function letButtonAddContent(element, type){
  */
 function gerUtlMessageParam(letter){
     var url = window.location.href;
+    if (url.substring(url.length-1) == "#")
+    {
+        url = url.substring(0, url.length-1);
+    }
     if(window.location.href.match(/(&message=)([A-Z]{1})/)){
         url = window.location.href = window.location.href.replace( /(&message=)([A-Z]{1})/, "&message="+letter );
     }else{
