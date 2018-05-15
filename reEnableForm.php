@@ -30,7 +30,7 @@ if(!empty($email_queue)){
     $module->setProjectSetting('email-queue', $queue);
 
     #Add logs
-    $action_description = "Deactivated Scheduled Alert ".$index;
+    $action_description = "Re-enabled Scheduled Alert ".$index;
     $changes_made = "Record IDs re-enabled: ".rtrim($scheduled_records_changed,",");
     \REDCap::logEvent($action_description,$changes_made,NULL,NULL,NULL,$pid);
 }
