@@ -36,7 +36,7 @@ if(empty($form_name_event)){
 
 $mail = new \PHPMailer;
 
-//Email Addresses
+#Email Addresses
 $mail = $module->setEmailAddresses($mail, $project_id, $record, $form_name_event, $form_name, 1, $data, $index,\REDCap::isLongitudinal());
 
 $email_to = "";

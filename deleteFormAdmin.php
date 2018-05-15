@@ -40,7 +40,7 @@ $email_deleted =  empty($module->getProjectSetting('email-deleted'))?array():$mo
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
 $email_queue =  empty($module->getProjectSetting('email-queue'))?array():$module->getProjectSetting('email-queue');
 
-//Add some logs
+#Add some logs
 $action_description = "Deleted Alert #".$index;
 $changes_made = "[Subject]: ".$email_subject[$index].", [Message]: ".$email_text[$index];
 \REDCap::logEvent($action_description,$changes_made,NULL,NULL,NULL,NULL);
@@ -86,6 +86,8 @@ if(!empty($email_queue)){
     $changes_made = "Record IDs deleted: ".rtrim($scheduled_records_changed,",");
     \REDCap::logEvent($action_description,$changes_made,NULL,NULL,NULL,$pid);
 }
+
+
 
 
 #Delete one element in array
@@ -180,6 +182,19 @@ $module->setProjectSetting('cron-repeat-until-field', $cron_repeat_until_field);
 $module->setProjectSetting('email-records-sent', $email_records_sent);
 $module->setProjectSetting('email-deleted', $email_deleted);
 $module->setProjectSetting('alert-id', $alert_id);
+
+#we rename the alert number in the queued emails
+if(!empty($email_queue)){
+    $queue = $email_queue;
+    foreach ($email_queue as $id=>$email){
+        foreach ($alert_id as $alert=>$alert_name){
+            if($alert_name == $email['alert']){
+                $queue[$id]['alert'] = $alert;
+            }
+        }
+    }
+    $module->setProjectSetting('email-queue', $queue);
+}
 
 echo json_encode(array(
     'status' => 'success',

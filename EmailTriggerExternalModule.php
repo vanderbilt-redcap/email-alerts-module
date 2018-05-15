@@ -34,7 +34,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     while($row = db_fetch_assoc($q)){
                         if ($row['form_name'] == $form) {
-                            //Surveys are always complete
+                            #Surveys are always complete
                             $isRepeatInstrument = false;
                             if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
                                 $isRepeatInstrument = true;
@@ -128,7 +128,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $records = array_map('trim', explode(',', $sent));
                     foreach ($records as $record){
                         if($record == $record_id){
-                            //Delete list of records sent
+                            #Delete list of records sent
                             if(str_replace($record_id.", ","",$email_records_sent[$index], $count) == 0){
                                 $email_records_sent[$index] = str_replace($record_id.", ","",$email_records_sent[$index]);
                             }else{
@@ -144,7 +144,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $email_queue =  empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
             $email_queue_aux = $email_queue;
             if(!empty($email_queue)){
-                $scheduled_records_activated = "";
                 foreach ($email_queue as $id=>$email){
                     if($email['project_id'] == $project_id && $email['record'] == $record){
                         unset($email_queue_aux[$id]);
@@ -187,7 +186,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id));
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
         if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance))) && ($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
-            //If the condition is met or if we don't have any, we send the email
+            #If the condition is met or if we don't have any, we send the email
             $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record,$event_id);
             if($isRepeatInstrument){
                 $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record,$event_id, $repeat_instance, $instrument);
@@ -197,7 +196,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
                 $cron_send_email_on_field = $this->getProjectSetting("cron-send-email-on-field", $project_id)[$id];
 
-                //To ensure it's the last module called
+                #To ensure it's the last module called
                 $delayedSuccessful =  $this->delayModuleExecution();
                 if($delayedSuccessful){
                     return;
@@ -236,17 +235,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
                         if($this->sendToday($queue, $index)){
-                            //SEND EMAIL
+                            #SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
-                            //If email sent save date and number of times sent and delete queue if needed
+                            #If email sent save date and number of times sent and delete queue if needed
                             if($email_sent){
                                 $queue_aux[$index]['last_sent'] = date('Y-m-d');
                                 $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
                                 $this->setProjectSetting('email-queue', $queue_aux,$queue['project_id']);
                                 $email_sent_total++;
 
-                                //If it's the last time we send, we delete the queue
+                                #If it's the last time we send, we delete the queue
                                 $delete_queue = $this->stopRepeat($delete_queue,$queue,$index);
                             }
                         }
@@ -400,7 +399,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         $this->setProjectSetting('email-queue', $email_queue,$project_id);
-        $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
     }
 
     /**
@@ -499,22 +497,22 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $isLongitudinal = \REDCap::isLongitudinal();
         }
 
-        //Data piping
+        #Data piping
         $email_text = $this->setDataPipping($datapipe_var, $email_text, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
         $email_subject = $this->setDataPipping($datapipe_var, $email_subject, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
 
-        //Survey Link
+        #Survey Link
         $email_text = $this->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
 
         $mail = new \PHPMailer;
 
-        //Email Addresses
+        #Email Addresses
         $mail = $this->setEmailAddresses($mail, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal);
 
-        //Email From
+        #Email From
         $mail = $this->setFrom($mail, $project_id, $record, $id);
 
-        //Embedded images
+        #Embedded images
         $mail = $this->setEmbeddedImages($mail, $project_id, $email_text);
 
         $mail->CharSet = 'UTF-8';
@@ -522,13 +520,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $mail->IsHTML(true);
         $mail->Body = $email_text;
 
-        //Attachments
+        #Attachments
         $mail = $this->setAttachments($mail, $project_id, $id);
 
-        //Attchment from RedCap variable
+        #Attchment from RedCap variable
         $mail = $this->setAttachmentsREDCapVar($mail, $project_id, $data, $record, $event_id, $instrument, $instance, $id, $isLongitudinal);
 
-        //DKIM to make sure the email does not go into spam folder
+        #DKIM to make sure the email does not go into spam folder
         $privatekeyfile = 'dkim_private.key';
         //Make a new key pair
         //(2048 bits is the recommended minimum key length -
@@ -605,7 +603,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $this->setProjectSetting('email-records-sent', $email_records_sent, $project_id);
             }
 
-            //Add some logs
+            #Add some logs
             $action_description = "Email Sent - Alert ".$alert_number;
             $changes_made = "[Subject]: ".$email_subject.", [Message]: ".$email_text;
             \REDCap::logEvent($action_description,$changes_made,NULL,$record,$event_id,$project_id);
@@ -619,7 +617,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
         unlink($privatekeyfile);
 
-        // Clear all addresses and attachments for next loop
+        #Clear all addresses and attachments for next loop
         $mail->clearAddresses();
         $mail->clearAttachments();
         return $email_sent_ok;
@@ -765,7 +763,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
 
-                //only if the variable is in the text we reset the survey link status
+                #only if the variable is in the text we reset the survey link status
                 if (strpos($email_text, $var) !== false) {
                     $instrument_form = str_replace('[__SURVEYLINK_', '', $var);
                     $instrument_form = str_replace(']', '', $instrument_form);
@@ -926,10 +924,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $var_name = str_replace('[', '', $var);
         $var_name = str_replace(']', '', $var_name);
         if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name] != "") {
-            //Repeating instruments by form
+            #Repeating instruments by form
             $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
         }else if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name] != "") {
-            //Repeating instruments by event
+            #Repeating instruments by event
             $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
         }else{
             $project = new \Project($project_id);
@@ -944,7 +942,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $logic = $data[$record][$event_id][$var_name];
                 }else{
                     preg_match_all("/\[[^\]]*\]/", $var, $matches);
-                    //Special case for radio buttons
+                    #Special case for radio buttons
                     if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
                         $logic = $data[$record][$event_id][$var_name];
                     }else{
@@ -1114,9 +1112,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
 
-                    //If it's the same survey,alert and a new record, we add it
+                    #If it's the same survey,alert and a new record, we add it
                     if($sv_name == $instrument && $alert == $alertid && !$found_record) {
-                        //add new record for specific instrument
+                        #add new record for specific instrument
                         array_push($jsonVarArray, $new_record);
                     }
                     $jsonArray[$sv_name][$alert] = $jsonVarArray;
@@ -1126,7 +1124,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $found_new_instrument = false;
                 }
 
-                //NEW Alert same instrument
+                #NEW Alert same instrument
                 if(!$found_alert && $sv_name == $instrument){
                     $jsonArray = $this->addNewJSONRecord($jsonArray,$sv_name,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
                 }
@@ -1135,7 +1133,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $jsonArray = $this->addNewJSONRecord([],$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
         }
 
-        //add new record for new survey
+        #add new record for new survey
         if($found_new_instrument){
             $jsonArray = $this->addNewJSONRecord($jsonArray,$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
         }
