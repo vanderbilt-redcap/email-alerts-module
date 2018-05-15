@@ -35,7 +35,6 @@ if(!empty($email_queue)){
             $scheduled_records_changed .= $email['record'].",";
         }
     }
-    $queue = array_values($queue);
     $module->setProjectSetting('email-queue', $queue);
 
     #Add logs
