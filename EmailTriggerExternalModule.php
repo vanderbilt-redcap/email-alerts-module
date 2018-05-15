@@ -240,7 +240,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                             #If email sent save date and number of times sent and delete queue if needed
                             if($email_sent){
-                                $queue_aux[$index]['last_sent'] = date('Y-m-d');
+//                                $queue_aux[$index]['last_sent'] = date('Y-m-d');
+                                $queue_aux[$index]['last_sent'] = date("Y-m-d H:i:s");
                                 $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
                                 $this->setProjectSetting('email-queue', $queue_aux,$queue['project_id']);
                                 $email_sent_total++;
