@@ -20,7 +20,7 @@ if(!empty($email_queue)){
     $scheduled_records_changed = "";
     $queue = $email_queue;
     foreach ($email_queue as $id=>$email){
-        if($email['project_id'] == $pid && $email['alert']==$index){
+        if($email['project_id'] == $pid && $email['alert'] == $index){
             $queue[$id]['deactivated'] = 1;
             $scheduled_records_changed .= $email['record'].",";
         }
