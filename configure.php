@@ -442,6 +442,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 }
                 if($(this).val() == 'now'){
                     $('[field="cron-send-email-on-field'+suffix+'"]').hide();
+                    $('[name="cron-send-email-on-field'+suffix+'"]').val('');
                 }else if($(this).val() == 'date' || $(this).val() == 'calc'){
                     $('[field="cron-send-email-on-field'+suffix+'"]').show();
                     if($(this).val() == 'date'){

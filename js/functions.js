@@ -57,6 +57,7 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
         if(cron_send_email_on == "" || cron_send_email_on == undefined || cron_send_email_on == null){
             $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-send-email-on'+suffix+'"][value="now"]').prop('checked',true);
             $('[field="cron-send-email-on-field'+suffix+'"]').hide();
+            $('[field="cron-send-email-on-field'+suffix+'"]').val('');
         }else{
             $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-send-email-on'+suffix+'"][value="'+cron_send_email_on+'"]').prop('checked',true);
             if(cron_send_email_on == 'date' || cron_send_email_on == 'calc'){
