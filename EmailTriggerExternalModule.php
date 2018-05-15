@@ -282,6 +282,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $repeat_date = date('Y-m-d', strtotime($today . $extra_days));
         $repeat_date_now = date('Y-m-d', strtotime($queue['last_sent'] . $extra_days));
 
+        /*************************************************************************************************/
+        #Add minutes instead of days for TESTING
+        $today = date("Y-m-d H:i:s");
+        $extra_minutes = ' + ' . $repeat_days . " minutes";
+        $repeat_date = date('Y-m-d H:i:s',strtotime($extra_minutes,strtotime($today)));
+        $repeat_date_now = date('Y-m-d H:i:s',strtotime($extra_minutes,strtotime($queue['last_sent'])));
+
         $evaluateLogic_on = \REDCap::evaluateLogic($cron_send_email_on_field, $queue['project_id'], $queue['record'], $queue['event_id']);
         $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field, $queue['project_id'], $queue['record'], $queue['event_id']);
         if($queue['isRepeatInstrument']){
