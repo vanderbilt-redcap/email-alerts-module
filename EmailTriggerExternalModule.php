@@ -234,7 +234,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
-                        if($this->sendToday($queue, $index)){
+                        if($queue['deactivated'] != '1' && $this->sendToday($queue, $index)){
                             #SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
@@ -298,7 +298,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         if(strtotime($queue['last_sent']) != strtotime($today)){
-            if ($queue['deactivated'] == '0' && ($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today)) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
+            if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today)) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 if($cron_repeat_email == "1"){
                     #check repeat until option to see if we need to stop
                     if ($cron_repeat_until != 'forever' && $cron_repeat_until != '') {
