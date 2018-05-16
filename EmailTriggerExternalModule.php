@@ -35,7 +35,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     while($row = db_fetch_assoc($q)){
                         if ($row['form_name'] == $form) {
                             $isRepeatInstrument = false;
-                            if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2'))){
+                            if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
                                 $isRepeatInstrument = true;
                             }
 
@@ -64,12 +64,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
                         $isLongitudinalData = true;
                     }
+                    $isRepeatInstrumentComplete = $this->isRepeatInstrumentComplete($data, $record, $event_id, $form, $repeat_instance);
                     $isRepeatInstrument = false;
-                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] == '2'))){
+                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
                         $isRepeatInstrument = true;
                     }
                     $email_incomplete = $this->getProjectSetting("email-incomplete",$project_id)[$id];
-                    if($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrument || $email_incomplete == "1"){
+                    if($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrumentComplete || $email_incomplete == "1"){
                         if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
                             if ($_REQUEST['page'] == $form) {
                                 $this->setEmailTriggerRequested(true);
@@ -129,6 +130,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function sendEmailAlert($project_id, $id, $data, $record,$email_sent,$email_timestamp_sent,$email_repetitive_sent,$event_id,$instrument,$repeat_instance,$isRepeatInstrument){
+        //memory increase
+        ini_set('memory_limit', '512M');
+
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_deleted = $this->getProjectSetting("email-deleted",$project_id)[$id];
@@ -349,6 +353,22 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $mail->clearAttachments();
             }
         }
+    }
+
+    /**
+     * Function that checks if an instruments os repeatables AND complete
+     * @param $data
+     * @param $record
+     * @param $event_id
+     * @param $instrument
+     * @param $instance
+     * @return bool
+     */
+    function isRepeatInstrumentComplete($data, $record, $event_id, $instrument, $instance){
+        if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument.'_complete'] == '2'))){
+            return true;
+        }
+        return false;
     }
 
     /**
