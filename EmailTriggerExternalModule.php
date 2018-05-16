@@ -234,7 +234,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
-                        if($queue['deactivated'] != '1' && $this->sendToday($queue, $index)){
+                        if($queue['deactivated'] != 1 && $this->sendToday($queue, $index)){
                             #SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
