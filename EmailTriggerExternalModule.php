@@ -280,8 +280,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         $today = date('Y-m-d');
         $extra_days = ' + ' . $repeat_days . " days";
-        $repeat_date = date('Y-m-d', strtotime($today . $extra_days));
-        $repeat_date_now = date('Y-m-d', strtotime($queue['last_sent'] . $extra_days));
+        $repeat_date = date('Y-m-d', strtotime($cron_send_email_on_field . $extra_days));
+        $repeat_date_now = date('Y-m-d', strtotime($queue['last_sent'] . '+'.$cron_repeat_for.' days'));
 
 //        /*************************************************************************************************/
 //        #Add minutes instead of days for TESTING
@@ -485,6 +485,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron){
+        //memory increase
+        ini_set('memory_limit', '512M');
+
         $email_subject = $this->getProjectSetting("email-subject", $project_id)[$id];
         $email_text = $this->getProjectSetting("email-text", $project_id)[$id];
         $datapipe_var = $this->getProjectSetting("datapipe_var", $project_id);
