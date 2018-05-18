@@ -214,7 +214,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     /**
-     * Function called by the CRON to send the schedules email alerts
+     * Function called by the CRON to send the scheduled email alerts
      * @throws \Exception
      */
     function scheduledemails(){
@@ -254,6 +254,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         break;
                     }
                 }
+                #delete all queues that need to stop sending
                 $this->deleteQueuedEmail($delete_queue,$queue['project_id']);
             }
         }
