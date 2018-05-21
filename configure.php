@@ -448,6 +448,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     if($(this).val() == 'date'){
                         $('[field="cron-send-email-on-field'+suffix+'"] td input').addClass('datepicker_aux');
                         $('[field="cron-send-email-on-field'+suffix+'"] td input').addClass('datepicker');
+                        $('[field="cron-send-email-on-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
                         $(".datepicker_aux").datepicker({
                             showOn: "button",
                             buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
@@ -459,7 +460,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         $('[field="cron-send-email-on-field'+suffix+'"] td input').datepicker("destroy");
                         $('[field="cron-send-email-on-field'+suffix+'"] td input').removeClass('datepicker');
                         $('[field="cron-send-email-on-field'+suffix+'"] td input').removeClass('datepicker_aux');
-                        $('[field="cron-send-email-on-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');;
+                        $('[field="cron-send-email-on-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
+                        $('[field="cron-send-email-on-field'+suffix+'"] td input').attr('placeholder','');
                     }
                 }
             });
@@ -494,6 +496,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     if($(this).val() == 'date'){
                         $('[field="cron-repeat-until-field'+suffix+'"] td input').addClass('datepicker_aux2');
                         $('[field="cron-repeat-until-field'+suffix+'"] td input').addClass('datepicker');
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
                         $(".datepicker_aux2").datepicker({
                             showOn: "button",
                             buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
@@ -505,6 +508,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         $('[field="cron-repeat-until-field'+suffix+'"] td input').datepicker("destroy");
                         $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('datepicker');
                         $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('datepicker_aux2');
+                        $('[field="cron-repeat-until-field'+suffix+'"] td input').attr('placeholder','');
                         $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
                     }
                 }
