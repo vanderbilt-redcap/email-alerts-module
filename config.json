@@ -150,7 +150,7 @@
         },
         {
           "key": "cron-send-email-on-field",
-          "name": "Inset value",
+          "name": "Insert value",
           "required": false,
           "type":"text"
         },
@@ -188,7 +188,7 @@
         },
         {
           "key": "cron-repeat-until-field",
-          "name": "Inset value",
+          "name": "Insert value",
           "required": false,
           "type":"text"
         }
@@ -202,7 +202,7 @@
         "cron_name": "scheduledemails",
         "cron_description": "Cron that runs every 15 minutes to send scheduled emails",
         "method": "scheduledemails",
-        "cron_frequency": "60",
+        "cron_frequency": "900",
         "cron_max_run_time": "60"
       }
     ],
