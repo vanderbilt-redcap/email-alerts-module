@@ -204,11 +204,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 if($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field !=''))){
                     #SCHEDULED EMAIL
-                    $this->addQueuedEmail($id,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
+                    if($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $id)){
+                        $this->addQueuedEmail($id,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
+                    }
+
                 }else{
                     #REGULAR EMAIL
                     $this->createAndSendEmail($data,$project_id,$record,$id,$instrument,$repeat_instance,$isRepeatInstrument,$event_id,false);
                 }
+                echo "<br><br>";
             }
         }
     }
@@ -319,6 +323,51 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         return false;
+    }
+
+    /**
+     * Function that checks if the repeatable option has met the condition if yes, then we don't add the email to the queue
+     * @param $project_id
+     * @param $record
+     * @param $event_id
+     * @param $instance
+     * @param $instrument
+     * @param $isRepeatInstrument
+     * @param $id
+     * @return bool
+     */
+    function addEmailToQueue($project_id, $record, $event_id, $instance, $instrument, $isRepeatInstrument, $id){
+        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$project_id))?array():$this->getProjectSetting('cron-repeat-email',$project_id)[$id];
+        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$project_id))?array():$this->getProjectSetting('cron-repeat-until',$project_id)[$id];
+        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$project_id))?array():$this->getProjectSetting('cron-repeat-until-field',$project_id)[$id];
+
+        $today = date('Y-m-d');
+        $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field, $project_id, $record, $event_id);
+        if($isRepeatInstrument){
+            $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field,  $project_id, $record, $event_id, $instance, $instrument);
+        }
+
+        if($cron_repeat_email == "1"){
+            if ($cron_repeat_until != 'forever' && $cron_repeat_until != '') {
+                if ($cron_repeat_until == 'date') {
+                    if (strtotime($cron_repeat_until_field) >= strtotime($today)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else if ($cron_repeat_until == 'cond' && $cron_repeat_until_field != "") {
+                    if ($evaluateLogic) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            } else if ($cron_repeat_until == 'forever') {
+                return true;
+            }
+        }
+        return true;
+
     }
 
     /**
