@@ -29,6 +29,7 @@ $email_sent =  empty($module->getProjectSetting('email-sent'))?array():$module->
 $email_timestamp_sent =  empty($module->getProjectSetting('email-timestamp-sent'))?array():$module->getProjectSetting('email-timestamp-sent');
 $email_deactivate =  empty($module->getProjectSetting('email-deactivate'))?array():$module->getProjectSetting('email-deactivate');
 $email_incomplete =  empty($module->getProjectSetting('email-incomplete'))?array():$module->getProjectSetting('email-incomplete');
+$email_deleted =  empty($module->getProjectSetting('email-deleted'))?array():$module->getProjectSetting('email-deleted');
 
 //Add some logs
 $action_description = "Deleted Alert #".$index;
@@ -80,6 +81,7 @@ unset($email_sent[$index]);
 unset($email_timestamp_sent[$index]);
 unset($email_deactivate[$index]);
 unset($email_incomplete[$index]);
+unset($email_deleted[$index]);
 
 #Rearrange the indexes
 $form_name = array_values($form_name);
@@ -102,6 +104,7 @@ $email_sent = array_values($email_sent);
 $email_timestamp_sent = array_values($email_timestamp_sent);
 $email_deactivate = array_values($email_deactivate);
 $email_incomplete = array_values($email_incomplete);
+$email_deleted = array_values($email_deleted);
 
 #Save data
 $module->setProjectSetting('form-name', $form_name);
@@ -124,6 +127,7 @@ $module->setProjectSetting('email-sent', $email_sent);
 $module->setProjectSetting('email-timestamp-sent', $email_timestamp_sent);
 $module->setProjectSetting('email-deactivate', $email_deactivate);
 $module->setProjectSetting('email-incomplete', $email_incomplete);
+$module->setProjectSetting('email-deleted', $email_deleted);
 
 echo json_encode(array(
     'status' => 'success',
