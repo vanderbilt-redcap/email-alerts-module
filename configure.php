@@ -1086,7 +1086,9 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                                 $msg .= $alerts_from.'<span>'.$configRow['value'][$index] . '</span><br/>';
                             }else if ($configRow['key'] == 'email-text'){
                                 $msg .= '<span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview Message</a></span>';
-                                $msg .= '<span><a onclick="previewEmailAlertRecord('.$index.')" style="cursor:pointer" >Preview Message by Record</a></span>';
+                                if($isAdmin) {
+                                    $msg .= '<span><a onclick="previewEmailAlertRecord(' . $index . ')" style="cursor:pointer" >Preview Message by Record</a></span>';
+                                }
                             }else if ($configRow['key'] == 'email-condition' && $configRow['value'][$index] != ""){
                                 $redcapLogic = '<br>REDCap Logic: <strong>'.$configRow['value'][$index].'</strong>';
                             }
