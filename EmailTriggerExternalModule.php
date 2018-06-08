@@ -626,11 +626,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     foreach ($email_repetitive_sent[$instrument][$id] as $record_key => $record_id) {
                         if(is_array($record_id)){
                             foreach ($record_id as $survey_key => $survey){
-                                $email_records_sent[$id] .= $survey_key.", ";
+                                $email_records_sent[$id] = $email_records_sent[$id].$survey_key.", ";
                                 break;
                             }
                         }else{
-                            $email_records_sent[$id] .= $record_id.", ";
+                            $email_records_sent[$id] = $email_records_sent[$id].$record_id.", ";
                         }
                     }
                     $email_records_sent[$id] = rtrim($email_records_sent[$id],', ');
