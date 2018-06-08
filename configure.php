@@ -393,7 +393,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         var matches = pipeName[0].match(/\[(.*?)\]/g);
 
                         if (isLongitudinal && matches && matches.length >1) {
-                            if(trim(matches[1]).substring(0, 1) != "[" || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]" || trim(matches[1]).substring(trim(result[i]).length-14, trim(matches[1]).length) != "[__SURVEYLINK_" || trim(matches[0]).substring(0, 1) != "[" || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"){
+
+                            if(trim(matches[1]).substring(0, 1) != "[" || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]" || trim(matches[1]).substring(0, 14) != "[__SURVEYLINK_" || trim(matches[0]).substring(0, 1) != "[" || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"){
                                 errMsg.push('<strong>Longitudinal Survey Link field</strong> must be follow the format: <i>[event_name][__SURVEYLINK_variable_name],label</i> .');
                             }
                         }
@@ -424,10 +425,10 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     return false;
                 }else{
                     if ($('#surveyLink_var').val() != "" && $('#surveyLink_var').val() != "0") {
-                        checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$module->getUrl('check_survey_save_return_AJAX.php')?>','<?=$module->getUrl('configureAJAX.php')?>');
+                        checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$module->getUrl('check_survey_save_return_AJAX.php')?>//','<?=$module->getUrl('configureAJAX.php')?>//');
                     }else{
                         var data = $('#mainForm').serialize();
-                        ajaxLoadOptionAndMessage(data, '<?=$module->getUrl('configureAJAX.php')?>', "C");
+                        ajaxLoadOptionAndMessage(data, '<?=$module->getUrl('configureAJAX.php')?>//', "C");
                         return true;
                     }
                 }
