@@ -425,10 +425,10 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     return false;
                 }else{
                     if ($('#surveyLink_var').val() != "" && $('#surveyLink_var').val() != "0") {
-                        checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$module->getUrl('check_survey_save_return_AJAX.php')?>//','<?=$module->getUrl('configureAJAX.php')?>//');
+                        checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$module->getUrl('check_survey_save_return_AJAX.php')?>','<?=$module->getUrl('configureAJAX.php')?>');
                     }else{
                         var data = $('#mainForm').serialize();
-                        ajaxLoadOptionAndMessage(data, '<?=$module->getUrl('configureAJAX.php')?>//', "C");
+                        ajaxLoadOptionAndMessage(data, '<?=$module->getUrl('configureAJAX.php')?>', "C");
                         return true;
                     }
                 }
