@@ -530,14 +530,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         \REDCap::logEvent("TEST","createAndSendEmail",NULL,$record,$event_id,$project_id);
         //memory increase
         ini_set('memory_limit', '512M');
-        \REDCap::logEvent("TEST","after memory_limit",NULL,$record,$event_id,$project_id);
 
         $email_subject = $this->getProjectSetting("email-subject", $project_id)[$id];
         $email_text = $this->getProjectSetting("email-text", $project_id)[$id];
         $datapipe_var = $this->getProjectSetting("datapipe_var", $project_id);
         $alert_id = $this->getProjectSetting("alert-id", $project_id);
 
-        \REDCap::logEvent("TEST","before isCron",NULL,$record,$event_id,$project_id);
         $isLongitudinal = false;
         if($isCron){
             $sql = "SELECT count(e.event_id) as number_events FROM redcap_projects p, redcap_events_metadata e, redcap_events_arms a WHERE p.project_id='".$project_id."' AND p.repeatforms='1' AND a.arm_id = e.arm_id AND p.project_id=a.project_id";
@@ -779,12 +777,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function setDataPipping($datapipe_var, $email_content, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
         if (!empty($datapipe_var)) {
             $datapipe = explode("\n", $datapipe_var);
+            \REDCap::logEvent("TEST","datapipe: ".$datapipe,NULL,$record,$event_id,$project_id);
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
+                    \REDCap::logEvent("TEST","var: ".$var,NULL,$record,$event_id,$project_id);
                     //Repeatable instruments
                     $logic = $this->isRepeatingInstrument($project_id, $data, $record, $event_id, $instrument, $instance, $var,0, $isLongitudinal);
+                    \REDCap::logEvent("TEST","logic: ".$logic,NULL,$record,$event_id,$project_id);
                     $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance));
+                    \REDCap::logEvent("TEST","label: ".$label,NULL,$record,$event_id,$project_id);
                     if(!empty($label)){
                         $logic = $label;
                     }
