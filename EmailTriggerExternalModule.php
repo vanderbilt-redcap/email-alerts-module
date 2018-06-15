@@ -49,6 +49,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
+        \REDCap::logEvent("TEST","hook_save_record",NULL,$record,$event_id,$project_id);
         $data = \REDCap::getData($project_id);
         $this->setEmailTriggerRequested(false);
         if(isset($project_id)){
@@ -180,6 +181,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     function sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument){
+        \REDCap::logEvent("TEST","sendEmailAlert",NULL,$record,$event_id,$project_id);
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_deleted = $this->getProjectSetting("email-deleted",$project_id)[$id];
@@ -210,6 +212,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 }else{
                     #REGULAR EMAIL
+                    \REDCap::logEvent("TEST","REGULAR EMAIL",NULL,$record,$event_id,$project_id);
                     $this->createAndSendEmail($data,$project_id,$record,$id,$instrument,$repeat_instance,$isRepeatInstrument,$event_id,false);
                 }
                 echo "<br><br>";
@@ -527,8 +530,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron){
+        \REDCap::logEvent("TEST","createAndSendEmail",NULL,$record,$event_id,$project_id);
         //memory increase
         ini_set('memory_limit', '512M');
+        \REDCap::logEvent("TEST","after memory_limit",NULL,$record,$event_id,$project_id);
 
         $email_subject = $this->getProjectSetting("email-subject", $project_id)[$id];
         $email_text = $this->getProjectSetting("email-text", $project_id)[$id];
@@ -553,21 +558,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         #Data piping
         $email_text = $this->setDataPipping($datapipe_var, $email_text, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
         $email_subject = $this->setDataPipping($datapipe_var, $email_subject, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
-
+        \REDCap::logEvent("TEST","Data piping",NULL,$record,$event_id,$project_id);
         #Survey Link
         $email_text = $this->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
-
+        \REDCap::logEvent("TEST","Survey Link",NULL,$record,$event_id,$project_id);
         $mail = new \PHPMailer;
 
         #Email Addresses
         $mail = $this->setEmailAddresses($mail, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal);
-
+        \REDCap::logEvent("TEST","Email Addresses",NULL,$record,$event_id,$project_id);
         #Email From
         $mail = $this->setFrom($mail, $project_id, $record, $id);
-
+        \REDCap::logEvent("TEST","From",NULL,$record,$event_id,$project_id);
         #Embedded images
         $mail = $this->setEmbeddedImages($mail, $project_id, $email_text);
-
+        \REDCap::logEvent("TEST","Images",NULL,$record,$event_id,$project_id);
         $mail->CharSet = 'UTF-8';
         $mail->Subject = $email_subject;
         $mail->IsHTML(true);
@@ -575,10 +580,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         #Attachments
         $mail = $this->setAttachments($mail, $project_id, $id);
-
+        \REDCap::logEvent("TEST","Attachment",NULL,$record,$event_id,$project_id);
         #Attchment from RedCap variable
         $mail = $this->setAttachmentsREDCapVar($mail, $project_id, $data, $record, $event_id, $instrument, $instance, $id, $isLongitudinal);
-
+        \REDCap::logEvent("TEST","attachment variable",NULL,$record,$event_id,$project_id);
         #DKIM to make sure the email does not go into spam folder
         $privatekeyfile = 'dkim_private.key';
         //Make a new key pair
@@ -601,6 +606,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $alert_number = $alert_id[$id];
         }
 
+        \REDCap::logEvent("TEST","SEND!",NULL,$record,$event_id,$project_id);
         $email_sent_ok = false;
         if (!$mail->send()) {
             $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error:".$mail->ErrorInfo." in Project: ".$project_id.", Record: ".$record." Alert #".$alert_number);
