@@ -93,6 +93,13 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var endPos = 0;
 
         $(function(){
+            //Fix to make code source editable with a modal
+            $(document).on('focusin', function(e) {
+                if ($(e.target).closest(".mce-window").length) {
+                    e.stopImmediatePropagation();
+                }
+            });
+
             jQuery('[data-toggle="popover"]').popover({
                 html : true,
                 content: function() {
