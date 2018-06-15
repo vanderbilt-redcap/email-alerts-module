@@ -527,7 +527,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron){
-        \REDCap::logEvent("TEST","createAndSendEmail",NULL,$record,$event_id,$project_id);
         //memory increase
         ini_set('memory_limit', '512M');
 
@@ -551,26 +550,24 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $isLongitudinal = \REDCap::isLongitudinal();
         }
 
-        \REDCap::logEvent("TEST","before Data piping",NULL,$record,$event_id,$project_id);
         #Data piping
         $email_text = $this->setDataPipping($datapipe_var, $email_text, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
-        \REDCap::logEvent("TEST","Data piping 1",NULL,$record,$event_id,$project_id);
         $email_subject = $this->setDataPipping($datapipe_var, $email_subject, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
-        \REDCap::logEvent("TEST","Data piping 2",NULL,$record,$event_id,$project_id);
+
         #Survey Link
         $email_text = $this->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
-        \REDCap::logEvent("TEST","Survey Link",NULL,$record,$event_id,$project_id);
+
         $mail = new \PHPMailer;
 
         #Email Addresses
         $mail = $this->setEmailAddresses($mail, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal);
-        \REDCap::logEvent("TEST","Email Addresses",NULL,$record,$event_id,$project_id);
+
         #Email From
         $mail = $this->setFrom($mail, $project_id, $record, $id);
-        \REDCap::logEvent("TEST","From",NULL,$record,$event_id,$project_id);
+
         #Embedded images
         $mail = $this->setEmbeddedImages($mail, $project_id, $email_text);
-        \REDCap::logEvent("TEST","Images",NULL,$record,$event_id,$project_id);
+
         $mail->CharSet = 'UTF-8';
         $mail->Subject = $email_subject;
         $mail->IsHTML(true);
@@ -578,10 +575,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         #Attachments
         $mail = $this->setAttachments($mail, $project_id, $id);
-        \REDCap::logEvent("TEST","Attachment",NULL,$record,$event_id,$project_id);
+
         #Attchment from RedCap variable
         $mail = $this->setAttachmentsREDCapVar($mail, $project_id, $data, $record, $event_id, $instrument, $instance, $id, $isLongitudinal);
-        \REDCap::logEvent("TEST","attachment variable",NULL,$record,$event_id,$project_id);
+
         #DKIM to make sure the email does not go into spam folder
         $privatekeyfile = 'dkim_private.key';
         //Make a new key pair
@@ -604,7 +601,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $alert_number = $alert_id[$id];
         }
 
-        \REDCap::logEvent("TEST","SEND!",NULL,$record,$event_id,$project_id);
         $email_sent_ok = false;
         if (!$mail->send()) {
             $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error:".$mail->ErrorInfo." in Project: ".$project_id.", Record: ".$record." Alert #".$alert_number);
@@ -777,16 +773,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function setDataPipping($datapipe_var, $email_content, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
         if (!empty($datapipe_var)) {
             $datapipe = explode("\n", $datapipe_var);
-            \REDCap::logEvent("TEST","datapipe: ".$datapipe,NULL,$record,$event_id,$project_id);
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
-                    \REDCap::logEvent("TEST","var: ".$var,NULL,$record,$event_id,$project_id);
                     //Repeatable instruments
                     $logic = $this->isRepeatingInstrument($project_id, $data, $record, $event_id, $instrument, $instance, $var,0, $isLongitudinal);
-                    \REDCap::logEvent("TEST","logic: ".$logic,NULL,$record,$event_id,$project_id);
                     $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance));
-                    \REDCap::logEvent("TEST","label: ".$label,NULL,$record,$event_id,$project_id);
                     if(!empty($label)){
                         $logic = $label;
                     }
