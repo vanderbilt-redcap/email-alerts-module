@@ -49,7 +49,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
-        \REDCap::logEvent("TEST","hook_save_record",NULL,$record,$event_id,$project_id);
         $data = \REDCap::getData($project_id);
         $this->setEmailTriggerRequested(false);
         if(isset($project_id)){
@@ -181,7 +180,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     function sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument){
-        \REDCap::logEvent("TEST","sendEmailAlert",NULL,$record,$event_id,$project_id);
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_deleted = $this->getProjectSetting("email-deleted",$project_id)[$id];
@@ -212,7 +210,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 }else{
                     #REGULAR EMAIL
-                    \REDCap::logEvent("TEST","REGULAR EMAIL",NULL,$record,$event_id,$project_id);
                     $this->createAndSendEmail($data,$project_id,$record,$id,$instrument,$repeat_instance,$isRepeatInstrument,$event_id,false);
                 }
                 echo "<br><br>";
@@ -540,6 +537,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $datapipe_var = $this->getProjectSetting("datapipe_var", $project_id);
         $alert_id = $this->getProjectSetting("alert-id", $project_id);
 
+        \REDCap::logEvent("TEST","before isCron",NULL,$record,$event_id,$project_id);
         $isLongitudinal = false;
         if($isCron){
             $sql = "SELECT count(e.event_id) as number_events FROM redcap_projects p, redcap_events_metadata e, redcap_events_arms a WHERE p.project_id='".$project_id."' AND p.repeatforms='1' AND a.arm_id = e.arm_id AND p.project_id=a.project_id";
@@ -555,10 +553,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $isLongitudinal = \REDCap::isLongitudinal();
         }
 
+        \REDCap::logEvent("TEST","before Data piping",NULL,$record,$event_id,$project_id);
         #Data piping
         $email_text = $this->setDataPipping($datapipe_var, $email_text, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
+        \REDCap::logEvent("TEST","Data piping 1",NULL,$record,$event_id,$project_id);
         $email_subject = $this->setDataPipping($datapipe_var, $email_subject, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
-        \REDCap::logEvent("TEST","Data piping",NULL,$record,$event_id,$project_id);
+        \REDCap::logEvent("TEST","Data piping 2",NULL,$record,$event_id,$project_id);
         #Survey Link
         $email_text = $this->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
         \REDCap::logEvent("TEST","Survey Link",NULL,$record,$event_id,$project_id);
