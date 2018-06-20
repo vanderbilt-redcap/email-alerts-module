@@ -694,7 +694,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     $('html,body').scrollTop(0);
                     return false;
                 }else{
-                    var form_alert = '[__FORMLINK_'+$('#form_form_name').val()+'],'+$('#form_label').val();
+                    var form_alert = '[__FORMLINK_'+$('#form_form_name').val()+']';
                     var event_arm = $('[name=form-name-event] option:selected').attr('event_name');
                     if(isLongitudinal && event_arm != "" && event_arm != undefined){
                         form_alert = '['+event_arm+']'+form_alert;
@@ -703,6 +703,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     if ($('[name=form-name-instance]').is(":visible")) {
                         form_alert = form_alert+'['+$('[name=form_instance]').val()+']';
                     }
+
+                    form_alert = form_alert+','+$('#form_label').val();
 
                     if($('#formLink_var').val() == ''){
                         $('#formLink_var').val(form_alert);
