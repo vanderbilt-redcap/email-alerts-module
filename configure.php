@@ -88,6 +88,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var _preview_record_url = '<?=$module->getUrl('previewRecordForm.php')?>';
         var _edoc_name_url = '<?=$module->getUrl('get-edoc-name.php')?>';
         var _longitudinal_url = '<?=$module->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
+        var _repeating_url = '<?=$module->getUrl('isRepeatingForm_AJAX.php')?>';
         var _getProjectList_url = '<?=$module->getUrl('get-project-list.php')?>';
         var lastClick = null;
         var startPos = 0;
@@ -699,6 +700,10 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         form_alert = '['+event_arm+']'+form_alert;
                     }
 
+                    if ($('[name=form-name-instance]:visible').visible()) {
+                        form_alert = form_alert+'['+$('[name=form_instance]').val()+']';
+                    }
+
                     if($('#formLink_var').val() == ''){
                         $('#formLink_var').val(form_alert);
                     }else{
@@ -1237,6 +1242,14 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                                 </td>
                             </tr>
                             <tr name="form-name-event" class="form-control-custom" style="display:none"></tr>
+                            <tr name="form-name-instance" class="form-control-custom" style="display:none">
+                                <td></td>
+                                <td><select class='external-modules-input-element' id='form_instance' name='form_instance'>
+                                    <option value='next-instance' selected>New instance</option>
+                                    <option value='first-instance'>First instance</option>
+                                    <option value='last-instance'>Last instance</option>
+                                </select></td>
+                            </tr>
 
                             <tr class="form-control-custom">
                                 <td>Label:</td>

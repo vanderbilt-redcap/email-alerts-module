@@ -533,6 +533,9 @@ function uploadLongitudinalEvent(data,field){
             jsonAjax = jQuery.parseJSON(returnData);
             if(jsonAjax.status == 'success'){
                 $(field).html(jsonAjax.event);
+                $('#form_event').change(function() {
+                    showIfRepeatingForm(data+'&event_id='+$('#form_event').val(), '[name=form-name-instance]');
+                });
                 $(field).show();
             }
             else {
@@ -540,4 +543,19 @@ function uploadLongitudinalEvent(data,field){
             }
         });
     }
+}
+
+function showIfRepeatingForm(data, field){
+    $(field).hide();
+    $.post(_repeating_url, data, function(returnData) {
+        jsonAjax = jQuery.parseJSON(returnData);
+        if (jsonAjax.status == 'success') {
+            if (jsonAjax.repeating) {
+                $(field).show();
+            }
+        }
+        else {
+            alert("An error occurred");
+        }
+    });
 }

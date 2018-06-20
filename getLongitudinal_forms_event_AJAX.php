@@ -29,7 +29,7 @@ if(!empty($form) && !empty($project_id)){
         }
 
         $event_selector = '<td><span class="external-modules-instance-label"> </span><label>REDCap Instrument Event:</label></td>';
-        $event_selector .= '<td class="external-modules-input-td"><select class="external-modules-input-element" name="form-name-event"><option value=""></option>';
+        $event_selector .= '<td class="external-modules-input-td"><select class="external-modules-input-element" id="form_event" name="form-name-event"><option value=""></option>';
         foreach ($events_array as $id){
             $event_unique_name = \REDCap::getEventNames("true","",$id);
             if($selected_event == $id){
