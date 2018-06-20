@@ -700,7 +700,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         form_alert = '['+event_arm+']'+form_alert;
                     }
 
-                    if ($('[name=form-name-instance]:visible').visible()) {
+                    if ($('[name=form-name-instance]').is(":visible())) {
                         form_alert = form_alert+'['+$('[name=form_instance]').val()+']';
                     }
 
