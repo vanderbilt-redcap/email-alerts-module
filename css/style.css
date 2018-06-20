@@ -258,9 +258,9 @@ a.btn_color_datapipe:hover{background-color: #a6a6a6  !important;}
 .btn_color_datapipeEmail{border:1px solid #cce7ff !important;}
 a.btn_color_datapipeEmail:hover{background-color: #99cfff !important;}
 
-.btn_color_formLink{background-color: #ff8c26 !important;color: #000000;}
-.btn_color_formLink{border:1px solid #ff7800 !important;}
-a.btn_color_formLink:hover{background-color: #ff7800 !important;}
+.btn_color_formLink{background-color: #ffffcc !important;color: #000000;}
+.btn_color_formLink{border:1px solid #f3f1c0 !important;}
+a.btn_color_formLink:hover{background-color: #f3f1c0 !important;}
 
 .btn_color_surveyLink{background-color: #fff2e6 !important;color: #000000;}
 .btn_color_surveyLink{border:1px solid #ffd7b3 !important;}
