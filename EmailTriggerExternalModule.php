@@ -551,11 +551,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         #Data piping
-        $email_text = $this->setDataPipping($datapipe_var, $email_text, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
-        $email_subject = $this->setDataPipping($datapipe_var, $email_subject, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
+        $email_text = $this->setDataPiping($datapipe_var, $email_text, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
+        $email_subject = $this->setDataPiping($datapipe_var, $email_subject, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
 
-        #Survey Link
+        #Survey and Data-Form Links
         $email_text = $this->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
+        $email_text = $this->setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
 
         $mail = new \PHPMailer;
 
@@ -758,7 +759,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     /**
-     * function that checks for the pipped data, replaces it and returns the content
+     * function that checks for the piped data, replaces it and returns the content
      * @param $datapipe_var
      * @param $email_content
      * @param $project_id
@@ -770,7 +771,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $isLongitudinal
      * @return mixed
      */
-    function setDataPipping($datapipe_var, $email_content, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
+    function setDataPiping($datapipe_var, $email_content, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
         if (!empty($datapipe_var)) {
             $datapipe = explode("\n", $datapipe_var);
             foreach ($datapipe as $emailvar) {
@@ -787,6 +788,51 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         return $email_content;
+    }
+
+    /**
+     * Function that adds the data form link into the mail content
+     * @param $email_text
+     * @param $project_id
+     * @param $record
+     * @param $event_id
+     * @param $isLongitudinal
+     * @return mixed
+     */
+    function setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal){
+        $formLink_var = $this->getProjectSetting("formLink_var", $project_id);
+        if(!empty($formLink_var)) {
+            $dataform = explode("\n", $formLink_var);
+            foreach ($dataform as $formlink) {
+                $var = preg_split("/[;,]+/", $formlink)[0];
+
+                $form_event_id = $event_id;
+                if($isLongitudinal) {
+                    preg_match_all("/\[[^\]]*\]/", $var, $matches);
+                    if (sizeof($matches[0]) > 1) {
+                        $var = $matches[0][1];
+                        $form_name = str_replace('[', '', $matches[0][0]);
+                        $form_name = str_replace(']', '', $form_name);
+                        $form_event_id = \REDCap::getEventIdFromUniqueEvent($form_name);
+                    }
+                }
+
+                if (strpos($email_text, $var) !== false) {
+                    $instrument_form = str_replace('[__FORMLINK_', '', $var);
+                    $instrument_form = str_replace(']', '', $instrument_form);
+
+                    # get rid of extra /'s
+                    $dir = preg_replace("/\/$/", "", APP_PATH_WEBROOT_FULL.preg_replace("/^\//", "", APP_PATH_WEBROOT));
+                    if ( preg_match("/redcap_v[\d\.]+/", APP_PATH_WEBROOT, $matches)) {
+                        $dir = APP_PATH_WEBROOT_FULL.$matches[0];
+                    }
+                    $url = $dir . "/DataEntry/index.php?pid=".$project_id."&event_id=".$form_event_id."&page=".$instrument_form."&id=".$record;
+                    $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
+                    $email_text = str_replace( preg_split("/[;,]+/", $formlink)[0], $link, $email_text);
+                }
+            }
+        }
+        return $email_text;
     }
 
     /**
@@ -853,7 +899,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     /**
-     * Function that adds pipped attachments into the mail
+     * Function that adds piped attachments into the mail
      * @param $mail
      * @param $project_id
      * @param $data

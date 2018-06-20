@@ -65,8 +65,8 @@ if($email_bcc != ''){
     $preview = "<tr><td>BCC:</td><td>".str_replace(',',', ',preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', rtrim($email_bcc,', ')))."</td></tr>";
 }
 
-$email_text = $module->setDataPipping($datapipe_var, $email_text, $project_id, $data, $record, $form_name_event, $form_name, 1,\REDCap::isLongitudinal());
-$email_subject = $module->setDataPipping($datapipe_var, $email_subject, $project_id, $data, $record, $form_name_event, $form_name, 1,\REDCap::isLongitudinal());
+$email_text = $module->setDataPiping($datapipe_var, $email_text, $project_id, $data, $record, $form_name_event, $form_name, 1,\REDCap::isLongitudinal());
+$email_subject = $module->setDataPiping($datapipe_var, $email_subject, $project_id, $data, $record, $form_name_event, $form_name, 1,\REDCap::isLongitudinal());
 
 $preview .= "<tr><td>Subject:</td><td>".$email_subject."</td></tr>";
 $preview .= "<tr><td>Message:</td><td>".$email_text."</td></tr></table>";

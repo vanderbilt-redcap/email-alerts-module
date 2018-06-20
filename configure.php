@@ -78,6 +78,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var emailSender_var = <?=json_encode($module->getProjectSetting('emailSender_var'))?>;
         var datapipeEmail_var = <?=json_encode($module->getProjectSetting('datapipeEmail_var'))?>;
         var surveyLink_var = <?=json_encode($module->getProjectSetting('surveyLink_var'))?>;
+        var formLink_var = <?=json_encode($module->getProjectSetting('formLink_var'))?>;
 
         //Url
         var pid = '<?=$pid?>';
@@ -167,7 +168,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 
                 //We customize depending on the field type
                 if (setting.type == 'rich-text') {
-                    //We add the Data Pipping buttons
+                    //We add the Data Piping buttons
 					if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
 						var inputHtml = EMparent.getSettingColumns.call(this, setting, instance, header);
 					}
@@ -175,7 +176,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 						var inputHtml = EMparent.getColumnHtml(setting);
 					}
                     var buttonsHtml = "";
-                    if ((datapipeEmail_var != '' && datapipeEmail_var != null) || (datapipe_var != '' && datapipe_var != null) || (surveyLink_var != '' && surveyLink_var != null)) {
+                    if ((datapipeEmail_var != '' && datapipeEmail_var != null) || (datapipe_var != '' && datapipe_var != null) || (surveyLink_var != '' && surveyLink_var != null) || (formLink_var != '' && formLink_var != null)) {
                         if (datapipe_var != '' && datapipe_var != null) {
                             var pipeVar = datapipe_var.split("\n");
                             for (var i = 0; i < pipeVar.length; i++) {
@@ -202,9 +203,19 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                             }
                         }
 
+                        if (formLink_var != '' && formLink_var != null) {
+                            var pipeVar = formLink_var.split("\n");
+                            for (var i = 0; i < pipeVar.length; i++) {
+                                var pipeName = pipeVar[i].split(",");
+                                buttonsHtml += "<a class='btn btn_datapiping btn-sm btn_color_formLink btn_piping' onclick='insertAtCursorTinyMCE(\"" + trim(pipeName[0]) + "\",2);'>" + trim(pipeName[1]) + "</a>";
+                            }
+                        }
+
                         var buttonLegend = "<div style=''><div class='btn_legend'><div class='btn_color_square btn_color_datapipe'></div>Data variable</div>";
                         buttonLegend += "<div class='btn_legend'><div class='btn_color_square btn_color_datapipeEmail'></div>Email address</div>";
-                        buttonLegend += "<div class='btn_legend'><div class='btn_color_square btn_color_surveyLink'></div>Survey link</div><div>";
+                        buttonLegend += "<div class='btn_legend'><div class='btn_color_square btn_color_surveyLink'></div>Survey link</div>";
+                        buttonLegend += "<div class='btn_legend'><div class='btn_color_square btn_color_formLink'></div>Data-Form link</div>";
+                        buttonLegend += "<div>";
 
                         inputHtml = inputHtml.replace("<td class='external-modules-input-td'>", "<td class='external-modules-input-td'>" + buttonLegend + "<div>" + buttonsHtml + "<div>");
                     }
@@ -393,20 +404,35 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     }
                 }
 
-                if ($('#surveyLink_var').val() != "" && $('#surveyLink_var').val() != "0") {
-                    var pipeVar = $('#surveyLink_var').val().split("\n");
-                    for (var i = 0; i < pipeVar.length; i++) {
-                        var pipeName = pipeVar[i].split(",");
-                        var matches = pipeName[0].match(/\[(.*?)\]/g);
+                var pipeVarLocs = { "#surveyLink_var" :
+                                                          {
+                                                              "prefix" : "[__SURVEYLINK_", 
+                                                              "type" : "Survey"
+                                                          },
+                                    "#formLink_var" :
+                                                          {
+                                                              "prefix" : "[__FORMLINK_",
+                                                              "type" : "Data-Form"
+                                                          }
+                                  }
+                for (var pipeVarLoc in pipeVarLocs) {
+                    var prefix = pipeVarLocs[pipeVarLoc]['prefix'];
+                    var type = pipeVarLocs[pipeVarLoc]['type'];
+                    if ($(pipeVarLoc).val() != "" && $(pipeVarLoc).val() != "0") {
+                        var pipeVar = $(pipeVarLoc).val().split("\n");
+                        for (var i = 0; i < pipeVar.length; i++) {
+                            var pipeName = pipeVar[i].split(",");
+                            var matches = pipeName[0].match(/\[(.*?)\]/g);
 
-                        if (isLongitudinal && matches && matches.length >1) {
+                            if (isLongitudinal && matches && matches.length >1) {
 
-                            if(trim(matches[1]).substring(0, 1) != "[" || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]" || trim(matches[1]).substring(0, 14) != "[__SURVEYLINK_" || trim(matches[0]).substring(0, 1) != "[" || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"){
-                                errMsg.push('<strong>Longitudinal Survey Link field</strong> must be follow the format: <i>[event_name][__SURVEYLINK_variable_name],label</i> .');
+                                if(trim(matches[1]).substring(0, 1) != "[" || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]" || trim(matches[1]).substring(0, prefix.length) != prefix || trim(matches[0]).substring(0, 1) != "[" || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"){
+                                    errMsg.push('<strong>Longitudinal '+type+' Link field</strong> must be follow the format: <i>[event_name]['+prefix+'_variable_name],label</i> .');
+                                }
                             }
-                        }
-                        else if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]" || trim(pipeName[0]).substring(0, 14) != "[__SURVEYLINK_"){
-                            errMsg.push('<strong>Survey Link field</strong> must be follow the format: <i>[__SURVEYLINK_variable_name],label</i> .');
+                            else if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]" || trim(pipeName[0]).substring(0, prefix.length) != prefix){
+                                errMsg.push('<strong>Link '+type+' field</strong> must be follow the format: <i>'+prefix+'variable_name],label</i> .');
+                            }
                         }
                     }
                 }
@@ -536,6 +562,10 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[field=form-name-event]');
             });
 
+            $('[name=form_form_name]').on('change', function(e){
+                uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[name=form-name-event]');
+            });
+
             $('[name=survey_form_name]').on('change', function(e){
                 uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[name=survey-name-event]');
             });
@@ -636,6 +666,51 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 return true;
             });
 
+            $('#AddFormForm').submit(function () {
+                $('#errMsgModalContainer').hide();
+                var errMsg = [];
+
+                if($('#form_form_name').val() == '') {
+                    errMsg.push('Please insert a form name.');
+                    $('#form_form_name').addClass('alert');
+                }else{
+                    $('#form_form_name').removeClass('alert');
+                }
+
+                if($('#form_label').val() == ''){
+                    errMsg.push('Please insert a label name.');
+                    $('#form_label').addClass('alert');
+                }else{
+                    $('#form_label').removeClass('alert');
+                }
+
+                if (errMsg.length > 0) {
+                    $('#errMsgModalContainer').empty();
+                    $.each(errMsg, function (i, e) {
+                        $('#errMsgModalContainer').append('<div>' + e + '</div>');
+                    });
+                    $('#errMsgModalContainer').show();
+                    $('html,body').scrollTop(0);
+                    return false;
+                }else{
+                    var form_alert = '[__FORMLINK_'+$('#form_form_name').val()+'],'+$('#form_label').val();
+                    var event_arm = $('[name=form-name-event] option:selected').attr('event_name');
+                    if(isLongitudinal && event_arm != "" && event_arm != undefined){
+                        form_alert = '['+event_arm+']'+form_alert;
+                    }
+
+                    if($('#formLink_var').val() == ''){
+                        $('#formLink_var').val(form_alert);
+                    }else{
+                        $('#formLink_var').val($('#formLink_var').val()+'\n'+form_alert);
+                        $('#form_form_name').val('');
+                        $('#form_label').val('');
+                    }
+                    $('#addFormLink').modal('toggle');
+                }
+                return false;
+            });
+
             $('#AddSurveyForm').submit(function () {
                 $('#errMsgModalContainer').hide();
                 var errMsg = [];
@@ -675,8 +750,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         $('#surveyLink_var').val($('#surveyLink_var').val()+'\n'+form_alert);
                         $('#survey_form_name').val('');
                         $('#survey_label').val('');
-                        $('#addLink').modal('toggle');
                     }
+                    $('#addSurveyLink').modal('toggle');
                 }
                 return false;
             });
@@ -854,12 +929,21 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         </td>
                     </tr>
                     <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content</span><div class="description_config">Allows REDCap survey links for any survey-enabled form to be inserted into email messages.</div></td>
+                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content</span><div class="description_config">Allows links to REDCap surveys for any survey-enabled form to be inserted into email messages.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
                             <span class="table_example">Example: [__SURVEYLINK_form_name], name ...</span><br/>
-                            <a id="addLinkBtn" onclick="javascript:$('#addLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
+                            <a id="addLinkBtn" onclick="javascript:$('#addSurveyLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
                             <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[__SURVEYLINK_form_name], name ..." value="<?=$module->getProjectSetting('surveyLink_var');?>"><?=$module->getProjectSetting('surveyLink_var');?></textarea>
                             <div class="btn_color_square btn_color_surveyLink"></div>Survey link button (orange)
+                        </td>
+                    </tr>
+                    <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
+                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data-Form Links</strong> in email content</span><div class="description_config">Allows REDCap links to REDCap Data-Entry Forms to be inserted into email messages.</div></td>
+                        <td style="width: 25%;padding: 10px 30px;">
+                            <span class="table_example">Example: [__FORMLINK_form_name], name ...</span><br/>
+                            <a id="addLinkBtn" onclick="javascript:$('#addFormLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_formLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
+                            <textarea type="text"  name="formLink_var" id="formLink_var" style="width: 100%;height: 100px;" placeholder="[__FORMLINK_form_name], name ..." value="<?=$module->getProjectSetting('formLink_var');?>"><?=$module->getProjectSetting('formLink_var');?></textarea>
+                            <div class="btn_color_square btn_color_formLink"></div>Form link button (dark orange)
                         </td>
                     </tr>
 
@@ -1126,7 +1210,51 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         </table>
     </div>
 
-    <div class="modal fade" id="addLink" tabindex="-1" role="dialog" aria-labelledby="Codes">
+    <div class="modal fade" id="addFormLink" tabindex="-1" role="dialog" aria-labelledby="Codes">
+        <form class="form-horizontal" action="" method="post" id='AddFormForm'>
+            <div class="modal-dialog" role="document" style="width: 500px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Add a data-form link</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id='errMsgModalContainer' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>
+                        <div><i>Once the data-form link is added, remember to click on <strong>Save Settings</strong> button to save the changes.</i></div>
+                        <br/>
+                        <table class="code_modal_table">
+                            <tr class="form-control-custom">
+                                <td>Form name:</td>
+                                <td>
+                                    <select class="external-modules-input-element" name="form_form_name" id="form_form_name">
+                                        <option value=""></option>
+                                        <?php
+                                        foreach ($simple_config['email-dashboard-settings'][0]['choices'] as $choice){
+                                            echo '<option value="'.$choice['value'].'">'.$choice['name'].'</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr name="form-name-event" class="form-control-custom" style="display:none"></tr>
+
+                            <tr class="form-control-custom">
+                                <td>Label:</td>
+                                <td><input type="text" name="form_label" id="form_label" placeholder="Name"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
+                        <button type="submit" form="AddFormForm" class="btn btn-default btn_color_formLink" id='btnModalAddFormForm'>Add data-form link</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="addSurveyLink" tabindex="-1" role="dialog" aria-labelledby="Codes">
         <form class="form-horizontal" action="" method="post" id='AddSurveyForm'>
             <div class="modal-dialog" role="document" style="width: 500px">
                 <div class="modal-content">
