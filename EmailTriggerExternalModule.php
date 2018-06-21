@@ -810,14 +810,33 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $form_event_id = $event_id;
                 if($isLongitudinal) {
                     preg_match_all("/\[[^\]]*\]/", $var, $matches);
-                    if (sizeof($matches[0]) > 1) {
+                    $var = "";
+                    $ev = "";
+                    $smartInstance = "";
+                    if (sizeof($matches[0]) > 2) {
                         $var = $matches[0][1];
+                        $ev = $matches[0][0];
+                        $smartInstance = $matches[0][2];
+                    }
+                    if (sizeof($matches[0]) == 2) {
+                        $smarts = array("[new-instance]", "[last-instance]", "[first-instance]");
+                        if (in_array($matches[0][1], $smarts)) {
+                             $var = $matches[0][0];
+                             $smartInstance = $matches[0][1];
+                        } else {
+                             $var = $matches[0][1];
+                             $ev = $matches[0][0];
+                        }
+                    }
+                    if (sizeof($matches[0]) == 1) {
+                        $var = $matches[0][0];
+                    }
+                    if ($ev) {
                         $form_name = str_replace('[', '', $matches[0][0]);
                         $form_name = str_replace(']', '', $form_name);
                         $form_event_id = \REDCap::getEventIdFromUniqueEvent($form_name);
                     }
-                    if (count($matches) > 2) {
-                        $smartInstance = $matches[0][2];
+                    if (count($matches[0]) > 2) {
                         $instanceMin = 1;
                         $sql = "SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = $project_id AND record = '".db_real_escape_string($record)."' ORDER BY instance DESC";
                         $q = db_query($sql);
