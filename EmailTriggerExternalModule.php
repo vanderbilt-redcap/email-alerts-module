@@ -806,14 +806,56 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             foreach ($dataform as $formlink) {
                 $var = preg_split("/[;,]+/", $formlink)[0];
 
+                $instance = 1;
                 $form_event_id = $event_id;
                 if($isLongitudinal) {
                     preg_match_all("/\[[^\]]*\]/", $var, $matches);
-                    if (sizeof($matches[0]) > 1) {
+                    $var = "";
+                    $ev = "";
+                    $smartInstance = "";
+                    if (sizeof($matches[0]) > 2) {
                         $var = $matches[0][1];
+                        $ev = $matches[0][0];
+                        $smartInstance = $matches[0][2];
+                    }
+                    if (sizeof($matches[0]) == 2) {
+                        $smarts = array("[new-instance]", "[last-instance]", "[first-instance]");
+                        if (in_array($matches[0][1], $smarts)) {
+                             $var = $matches[0][0];
+                             $smartInstance = $matches[0][1];
+                        } else {
+                             $var = $matches[0][1];
+                             $ev = $matches[0][0];
+                        }
+                    }
+                    if (sizeof($matches[0]) == 1) {
+                        $var = $matches[0][0];
+                    }
+                    if ($ev) {
                         $form_name = str_replace('[', '', $matches[0][0]);
                         $form_name = str_replace(']', '', $form_name);
                         $form_event_id = \REDCap::getEventIdFromUniqueEvent($form_name);
+                    }
+                    if (count($matches[0]) > 2) {
+                        $instanceMin = 1;
+                        $sql = "SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = $project_id AND record = '".db_real_escape_string($record)."' ORDER BY instance DESC";
+                        $q = db_query($sql);
+                        $instanceMax = 1;
+                        $instanceNew = 1;
+                        if ($row = db_fetch_assoc($q)) {
+                            $instanceMax = $row['instance'];
+                            $instanceNew = $instanceMax + 1;
+                        }
+
+                        if ($smartInstance == '[new-instance]') {
+                            $instance = $instanceNew;
+                        }
+                        else if ($smartInstance == '[last-instance]') {
+                            $instance = $instanceMax;
+                        }
+                        else if ($smartInstance == '[first-instance]') {
+                            $instance = $instanceMin;
+                        }
                     }
                 }
 
@@ -826,7 +868,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if ( preg_match("/redcap_v[\d\.]+/", APP_PATH_WEBROOT, $matches)) {
                         $dir = APP_PATH_WEBROOT_FULL.$matches[0];
                     }
-                    $url = $dir . "/DataEntry/index.php?pid=".$project_id."&event_id=".$form_event_id."&page=".$instrument_form."&id=".$record;
+                    $url = $dir . "/DataEntry/index.php?pid=".$project_id."&event_id=".$form_event_id."&page=".$instrument_form."&id=".$record."&instance=".$instance;
                     $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
                     $email_text = str_replace( preg_split("/[;,]+/", $formlink)[0], $link, $email_text);
                 }
