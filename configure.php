@@ -40,7 +40,7 @@ foreach($simple_config['email-dashboard-settings'] as $configKey => $configRow) 
 $message="";
 $message_text = array('C'=>'<strong>Success!</strong> The configuration has been saved.','A'=>'<strong>Success!</strong> New Email Added.','U'=>'<strong>Success!</strong> Email Updated.',
     'D'=>'<strong>Success!</strong> Email Deleted.','T'=>'<strong>Success!</strong> Email Activated.','E'=>'<strong>Success!</strong> Email Deactivated.',
-    'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.',);
+    'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.');
 
 if(array_key_exists('message', $_REQUEST)){
     $message=$message_text[$_REQUEST['message']];
