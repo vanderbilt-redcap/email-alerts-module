@@ -950,7 +950,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                             <span class="table_example">Example: [__FORMLINK_form_name], name ...</span><br/>
                             <a id="addLinkBtn" onclick="javascript:$('#addFormLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_formLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
                             <textarea type="text"  name="formLink_var" id="formLink_var" style="width: 100%;height: 100px;" placeholder="[__FORMLINK_form_name], name ..." value="<?=$module->getProjectSetting('formLink_var');?>"><?=$module->getProjectSetting('formLink_var');?></textarea>
-                            <div class="btn_color_square btn_color_formLink"></div>Form link button (dark orange)
+                            <div class="btn_color_square btn_color_formLink"></div>Form link button (yellow)
                         </td>
                     </tr>
 
