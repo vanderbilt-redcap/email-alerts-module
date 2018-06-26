@@ -18,7 +18,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 	}
 
 	function hook_survey_complete ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
-        $data = \REDCap::getData($project_id);
+        $data = \REDCap::getData($project_id,"array",$record);
         $this->setEmailTriggerRequested(false);
         if(isset($project_id)){
             #Form Complete
@@ -49,7 +49,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
-        $data = \REDCap::getData($project_id);
+        $data = \REDCap::getData($project_id,"array",$record);
         $this->setEmailTriggerRequested(false);
         if(isset($project_id)){
             #Form Complete
@@ -463,7 +463,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
-        $data = \REDCap::getData($project_id);
+        $data = \REDCap::getData($project_id,"array",$record);
         $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true);
         return $email_sent;
     }
