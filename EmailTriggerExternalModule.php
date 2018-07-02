@@ -776,13 +776,23 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
+
+                    preg_match_all("/\\[(.*?)\\]/", $var, $matches);
+
+                    $var_replace = $var;
+                    //For arms and different events
+                    if(count($matches[1]) > 1){
+                        $event_id = \REDCap::getEventIdFromUniqueEvent($matches[1][0]);
+                        $var = $matches[1][1];
+                    }
+
                     //Repeatable instruments
                     $logic = $this->isRepeatingInstrument($project_id, $data, $record, $event_id, $instrument, $instance, $var,0, $isLongitudinal);
                     $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance));
                     if(!empty($label)){
                         $logic = $label;
                     }
-                    $email_content = str_replace($var, $logic, $email_content);
+                    $email_content = str_replace($var_replace, $logic, $email_content);
                 }
             }
         }
