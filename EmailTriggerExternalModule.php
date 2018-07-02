@@ -212,7 +212,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     #REGULAR EMAIL
                     $this->createAndSendEmail($data,$project_id,$record,$id,$instrument,$repeat_instance,$isRepeatInstrument,$event_id,false);
                 }
-                echo "<br><br>";
             }
         }
     }
@@ -608,7 +607,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }else{
             $email_sent = $this->getProjectSetting("email-sent",$project_id);
             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-            $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id));
+            $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id),true);
             $email_records_sent = $this->getProjectSetting("email-records-sent",$project_id);
             $email_sent_ok = true;
 
@@ -1245,20 +1244,61 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
 
                     $found_record = false;
+                    $exists_repeatinstance = false;
                     foreach ($alert_value as $sv_number => $survey_record){
-                        array_push($jsonVarArray,$survey_record);
+                        if($isRepeatInstrument){
+                            if ($sv_number === "repeat_instances") {
+                                $exists_repeatinstance = true;
+                                foreach ($alert_value['repeat_instances'] as $survey_record_repeat =>$survey_instances){
+                                    $jsonVarArray[$instrument][$alertid]['repeat_instances'][$new_record] = array();
+                                    if($survey_record_repeat == $new_record){
+                                        $found_record = true;
+                                    }
 
-                        if($survey_record == $new_record){
-                            $found_record = true;
+                                    $found_instance = false;
+                                    foreach ($survey_instances as $index =>$instance){
+                                        array_push($jsonVarArray[$instrument][$alertid]['repeat_instances'][$new_record], $instance);
+                                        if($instance == $repeat_instance){
+                                            $found_instance = true;
+                                        }
+                                    }
+                                }
+                            }else {
+                                array_push($jsonVarArray[$instrument][$alertid],$survey_record);
+                            }
+
+                        }else{
+                            if($survey_record == $new_record){
+                                $found_record = true;
+                            }
+                            array_push($jsonVarArray,$survey_record);
                         }
                     }
 
-                    #If it's the same survey,alert and a new record, we add it
-                    if($sv_name == $instrument && $alert == $alertid && !$found_record) {
-                        #add new record for specific instrument
-                        array_push($jsonVarArray, $new_record);
+                    if($isRepeatInstrument){
+                        if($sv_name == $instrument && $alert == $alertid) {
+                            if($found_record){
+                                #If it's the same survey, alert,record and a new instance, we add it
+                                if(!$found_instance){
+                                    array_push($jsonVarArray[$instrument][$alertid]['repeat_instances'][$new_record], $repeat_instance);
+                                }
+                                $jsonArray = $jsonVarArray;
+                            }else if(!$exists_repeatinstance){
+                                $jsonVarArray[$instrument] = $survey_records;
+                                $jsonVarArray[$instrument][$alertid]['repeat_instances'][$new_record] = array();
+                                array_push($jsonVarArray[$instrument][$alertid]['repeat_instances'][$new_record], $repeat_instance);
+                                $jsonArray = $jsonVarArray;
+
+                            }
+                        }
+                    }else{
+                        #If it's the same survey, alert and a new record, we add it
+                        if($sv_name == $instrument && $alert == $alertid && !$found_record){
+                            #add new record for specific instrument
+                            array_push($jsonVarArray, $new_record);
+                            $jsonArray[$sv_name][$alert] = $jsonVarArray;
+                        }
                     }
-                    $jsonArray[$sv_name][$alert] = $jsonVarArray;
                 }
 
                 if($sv_name == $instrument){
