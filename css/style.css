@@ -324,14 +324,21 @@ a.btn_color_surveyLink:hover{background-color: #ffd7b3 !important;}
 #modal_message_preview td:nth-child(1),#modal_message_record_preview td:nth-child(1){
     font-weight: bold;
 }
-#modal_message_preview td,#modal_message_record_preview td{
+#modal_message_preview td,#modal_message_record_preview td,#modal_message_queue td{
     vertical-align: 5px;
     padding: 10px;
 }
-#modal_message_preview tr,#modal_message_record_preview tr{
+#modal_message_preview tr,#modal_message_record_preview tr,#modal_message_queue tr{
     border: 1px solid #dddddd;
 }
-
+#modal_message_queue td{
+    border: 1px solid #dddddd;
+    text-align: center;
+}
+#modal_message_queue thead{
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
 .popover.top>.arrow:after {
     bottom: 2px;
 }

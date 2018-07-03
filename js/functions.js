@@ -24,6 +24,23 @@ function previewEmailAlertRecord(index){
     $('#external-modules-configure-modal-record').modal('show');
 }
 
+function previewEmailAlertQueue(index){
+    var data = "&index_modal_queue="+index;
+    $.ajax({
+        type: "POST",
+        url: _preview_queue_url,
+        data: data,
+        error: function (xhr, status, error) {
+            alert(xhr.responseText);
+        },
+        success: function (result) {
+            // console.log(result)
+            $('#modal_message_queue').html(result);
+            $('#external-modules-configure-modal-queue').modal('show');
+        }
+    });
+}
+
 function loadPreviewEmailAlertRecord(data){
     $.ajax({
         type: "POST",

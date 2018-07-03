@@ -85,6 +85,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var _duplicateform_url = '<?=$module->getUrl('duplicateForm.php')?>';
         var _reenableform_url = '<?=$module->getUrl('reEnableForm.php')?>';
         var _preview_url = '<?=$module->getUrl('previewForm.php')?>';
+        var _preview_queue_url = '<?=$module->getUrl('previewQueue.php')?>';
         var _preview_record_url = '<?=$module->getUrl('previewRecordForm.php')?>';
         var _edoc_name_url = '<?=$module->getUrl('get-edoc-name.php')?>';
         var _longitudinal_url = '<?=$module->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
@@ -1187,6 +1188,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                                 $msg .= '<span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview Message</a></span>';
                                 if($isAdmin) {
                                     $msg .= '<span><a onclick="previewEmailAlertRecord(' . $index . ')" style="cursor:pointer" >Preview Message by Record</a></span>';
+                                    $msg .= '<span><a onclick="previewEmailAlertQueue(' . $index . ')" style="cursor:pointer" >Preview Queued Emails</a></span>';
                                 }
                             }else if ($configRow['key'] == 'email-condition' && $configRow['value'][$index] != ""){
                                 $redcapLogic = '<br>REDCap Logic: <strong>'.$configRow['value'][$index].'</strong>';
@@ -1451,6 +1453,26 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="external-modules-configure-modal-queue" tabindex="-1" role="dialog" aria-labelledby="Codes">
+        <form class="form-horizontal" action="" method="post" id='selectPreviewQueue'>
+            <div class="modal-dialog" role="document" style="width: 800px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Preview Queue</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="modal_message_queue"></div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
