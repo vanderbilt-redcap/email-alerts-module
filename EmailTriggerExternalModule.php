@@ -241,10 +241,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
                         if($queue['deactivated'] != 1 && $this->sendToday($queue, $index)){
-                            error_log("scheduledemails PID: ".$queue['project_id']." - SEND EMAIL!");
+                            error_log("scheduledemails PID: ".$queue['project_id']." - SEND EMAIL! ".date("Y-m-d H:i:s"));
                             #SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
-
+                            error_log("scheduledemails PID: ".$queue['project_id']." - SEND EMAIL!");
                             #If email sent save date and number of times sent and delete queue if needed
                             if($email_sent){
                                 $queue_aux[$index]['last_sent'] = date('Y-m-d');
