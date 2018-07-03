@@ -253,7 +253,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         while($row = db_fetch_assoc($q)){
-            $project_id = $row['project_id'];
+           /* $project_id = $row['project_id'];
             $email_queue =  $this->getProjectSetting('email-queue',$project_id);
             $queue_aux = $email_queue;
             $delete_queue = array();
@@ -282,7 +282,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
                 #delete all queues that need to stop sending
                 $this->deleteQueuedEmail($delete_queue,$project_id);
-            }
+            }*/
         }
     }
 
