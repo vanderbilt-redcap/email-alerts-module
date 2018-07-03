@@ -691,7 +691,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('addQueue.php')?>',"Q");
                 }
 
-                return true;
+                return false;
             });
 
             $('#AddFormForm').submit(function () {

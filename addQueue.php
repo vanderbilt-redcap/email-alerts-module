@@ -10,7 +10,7 @@ $project_id = $_GET['pid'];
 $index =  $_REQUEST['index_modal_queue'];
 $queue_ids = $_POST['queue_ids'];
 
-if(!isset($_POST['already_sent'])){
+if($_POST['already_sent'] == "false"){
     $already_sent = "0";
 }else{
     $already_sent = "1";
