@@ -261,7 +261,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
                 #delete all queues that need to stop sending
-                $this->deleteQueuedEmail($delete_queue,$queue['project_id']);
+                $this->deleteQueuedEmail($delete_queue,$project_id);
             }
         }
     }
