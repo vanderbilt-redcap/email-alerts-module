@@ -390,7 +390,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             array_push($delete_queue,$index);
         }else if($cron_repeat_until != 'forever' && $cron_repeat_until != '' && $cron_repeat_email == '1'){
             if($cron_repeat_until == 'date'){
-                if(strtotime($cron_repeat_until_field) >= strtotime(date('Y-m-d'))){
+                if(strtotime($cron_repeat_until_field) <= strtotime(date('Y-m-d'))){
                     error_log("scheduledemails PID: ".$queue['project_id']." ".$cron_repeat_until_field." >= today");
                     array_push($delete_queue,$index);
                 }
