@@ -794,7 +794,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if(count($matches[1]) > 1){
                         error_log("scheduledemails PID: ".$project_id." - inside matches");
                         $project = new \Project($project_id);
-                        $event_id = $project->getEventIdFromUniqueEvent($matches[1][0]);
+//                        $event_id = $project->getEventIdFromUniqueEvent($matches[1][0]);
+                        $event_id = $project->getEventIdUsingUniqueEventName($matches[1][0]);
                         error_log("scheduledemails PID: ".$project_id." - NEW event_id:".$event_id);
                         $var = $matches[1][1];
                     }
