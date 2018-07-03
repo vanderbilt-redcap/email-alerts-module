@@ -1238,7 +1238,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 $alerts .= "<div style='".$show_button."'><a onclick='duplicateEmailAlert(\"".$index."\");return true;' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
                 if($isAdmin) {
                     $alerts .= "<div><a onclick='addQueue(\"".$index."\");return true;' type='button' class='btn btn-warning btn-new-email' >Add Queue</a></div>";
-                    $alerts .= "<div><a onclick='updateQueueData(\"".$index."\");return true;' type='button' class='btn btn-warning btn-new-email' >Update Queue</a></div>";
+//                    $alerts .= "<div><a onclick='updateQueueData(\"".$index."\");return true;' type='button' class='btn btn-warning btn-new-email' >Update Queue</a></div>";
 
                 }
                 $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\",\"".$deleted_modal."\",\"".$deleted_index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >".$deleted_text."</a></div></td>";
