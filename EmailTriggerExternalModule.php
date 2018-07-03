@@ -789,11 +789,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function setDataPiping($datapipe_var, $email_content, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
         if (!empty($datapipe_var)) {
+            error_log("scheduledemails PID: ".$project_id." - datapipe_var:".$datapipe_var);
             $datapipe = explode("\n", $datapipe_var);
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
-
+                    error_log("scheduledemails PID: ".$project_id." - var:".$var);
                     preg_match_all("/\\[(.*?)\\]/", $var, $matches);
 
                     $var_replace = $var;
@@ -806,14 +807,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     //Repeatable instruments
                     $logic = $this->isRepeatingInstrument($project_id, $data, $record, $event_id, $instrument, $instance, $var,0, $isLongitudinal);
+                    error_log("scheduledemails PID: ".$project_id." - logic:".$logic);
                     $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance));
+                    error_log("scheduledemails PID: ".$project_id." - label:".$label);
                     if(!empty($label)){
                         $logic = $label;
                     }
+                    error_log("scheduledemails PID: ".$project_id." - logic final:".$logic);
                     $email_content = str_replace($var_replace, $logic, $email_content);
                 }
             }
         }
+        error_log("scheduledemails PID: ".$project_id." - return email content");
         return $email_content;
     }
 
