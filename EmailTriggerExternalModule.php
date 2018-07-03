@@ -940,14 +940,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 #only if the variable is in the text we reset the survey link status
                 if (strpos($email_text, $var_replace) !== false) {
-                    $instrument_form = str_replace('[__SURVEYLINK_', '', $var);
-                    $instrument_form = str_replace(']', '', $instrument_form);
+                    $instrument_form = str_replace('__SURVEYLINK_', '', $var);
                     $passthruData = $this->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
 
                     $returnCode = $passthruData['return_code'];
                     $hash = $passthruData['hash'];
 
-                    $url = $this->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&NOAUTH";
+                    $url = $this->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&event=".$form_event_id."&NOAUTH";
                     $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
                     $email_text = str_replace( $var_replace, $link, $email_text);
                 }

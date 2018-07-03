@@ -6,7 +6,7 @@ use ExternalModules\ExternalModules;
 
 require_once 'EmailTriggerExternalModule.php';
 
-$passthruData = $module->resetSurveyAndGetCodes($_REQUEST['pid'], $_REQUEST['record'], $_REQUEST['instrument']);
+$passthruData = $module->resetSurveyAndGetCodes($_REQUEST['pid'], $_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']);
 
 $returnCode = $passthruData['return_code'];
 $hash = $passthruData['hash'];
