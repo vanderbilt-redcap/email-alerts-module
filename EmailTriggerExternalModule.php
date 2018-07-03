@@ -474,6 +474,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
+        error_log("scheduledemails PID: ".$project_id." - sendQueuedEmail");
         $data = \REDCap::getData($project_id,"array",$record);
         $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true);
         return $email_sent;
@@ -538,6 +539,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron){
+        error_log("scheduledemails PID: ".$project_id." - createAndSendEmail");
         //memory increase
         ini_set('memory_limit', '512M');
 
@@ -560,26 +562,26 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }else{
             $isLongitudinal = \REDCap::isLongitudinal();
         }
-
+        error_log("scheduledemails PID: ".$project_id." - before Data piping");
         #Data piping
         $email_text = $this->setDataPiping($datapipe_var, $email_text, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
         $email_subject = $this->setDataPiping($datapipe_var, $email_subject, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
-
+        error_log("scheduledemails PID: ".$project_id." - Data piping");
         #Survey and Data-Form Links
         $email_text = $this->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
         $email_text = $this->setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
-
+        error_log("scheduledemails PID: ".$project_id." - Survey");
         $mail = new \PHPMailer;
 
         #Email Addresses
         $mail = $this->setEmailAddresses($mail, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal);
-
+        error_log("scheduledemails PID: ".$project_id." - Addresses");
         #Email From
         $mail = $this->setFrom($mail, $project_id, $record, $id);
-
+        error_log("scheduledemails PID: ".$project_id." - From");
         #Embedded images
         $mail = $this->setEmbeddedImages($mail, $project_id, $email_text);
-
+        error_log("scheduledemails PID: ".$project_id." - Embedded images");
         $mail->CharSet = 'UTF-8';
         $mail->Subject = $email_subject;
         $mail->IsHTML(true);
@@ -587,10 +589,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         #Attachments
         $mail = $this->setAttachments($mail, $project_id, $id);
-
+        error_log("scheduledemails PID: ".$project_id." - Attachments");
         #Attchment from RedCap variable
         $mail = $this->setAttachmentsREDCapVar($mail, $project_id, $data, $record, $event_id, $instrument, $instance, $id, $isLongitudinal);
-
+        error_log("scheduledemails PID: ".$project_id." - Attchment from RedCap variable");
         #DKIM to make sure the email does not go into spam folder
         $privatekeyfile = 'dkim_private.key';
         //Make a new key pair
@@ -615,8 +617,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         $email_sent_ok = false;
         if (!$mail->send()) {
+            error_log("scheduledemails PID: ".$project_id." - NOT SENT!");
+            error_log("scheduledemails PID: ".$project_id." Mailer Error:".$mail->ErrorInfo);
             $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error:".$mail->ErrorInfo." in Project: ".$project_id.", Record: ".$record." Alert #".$alert_number);
         }else{
+            error_log("scheduledemails PID: ".$project_id." - Email was sent!");
             $email_sent = $this->getProjectSetting("email-sent",$project_id);
             $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
             $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id),true);
