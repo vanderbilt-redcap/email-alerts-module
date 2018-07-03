@@ -221,7 +221,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     function scheduledemails(){
-        error_log("scheduledemails INSIDE", 0);
+        error_log("scheduledemails INSIDE");
         $sql="SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = 'true' AND m.directory_prefix = 'vanderbilt_emailTrigger' AND s.`key` = 'enabled'";
         $q = $this->query($sql);
 
@@ -234,14 +234,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $email_queue =  $this->getProjectSetting('email-queue',$project_id);
             $queue_aux = $email_queue;
             $delete_queue = array();
-            error_log("scheduledemails PID: ".$project_id, 0);
+            error_log("scheduledemails PID: ".$project_id);
             if($email_queue != ''){
-                error_log("scheduledemails PID: ".$project_id." - Has queued emails", 0);
+                error_log("scheduledemails PID: ".$project_id." - Has queued emails");
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
                         if($queue['deactivated'] != 1 && $this->sendToday($queue, $index)){
-                            error_log("scheduledemails PID: ".$queue['project_id']." - SEND EMAIL!", 0);
+                            error_log("scheduledemails PID: ".$queue['project_id']." - SEND EMAIL!");
                             #SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
 
@@ -297,24 +297,24 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
         }
 
-        error_log("scheduledemails PID: ".$queue['project_id']." - sendToday", 0);
-        error_log("scheduledemails PID: ".$queue['project_id']." - last_sent:".strtotime($queue['last_sent']).", today: ".strtotime($today), 0);
+        error_log("scheduledemails PID: ".$queue['project_id']." - sendToday");
+        error_log("scheduledemails PID: ".$queue['project_id']." - last_sent:".strtotime($queue['last_sent']).", today: ".strtotime($today));
         if(strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == ""){
             error_log("scheduledemails PID: ".$queue['project_id']." - cron_send_email_on_field:".$cron_send_email_on_field.", repeat_date: ".$repeat_date.", today:".$today, 0);
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today)) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 if($cron_repeat_email == "1"){
-                    error_log("scheduledemails PID: ".$queue['project_id']." - Repeat option activated", 0);
+                    error_log("scheduledemails PID: ".$queue['project_id']." - Repeat option activated");
                     #check repeat until option to see if we need to stop
                     if ($cron_repeat_until != 'forever' && $cron_repeat_until != '') {
                         if ($cron_repeat_until == 'date') {
-                            error_log("scheduledemails PID: ".$queue['project_id']." - Repeat UNTIL DATE: ".$cron_repeat_until_field, 0);
-                            error_log("scheduledemails PID: ".$queue['project_id']." - ".strtotime($cron_repeat_until_field)." >= ".strtotime($today), 0);
+                            error_log("scheduledemails PID: ".$queue['project_id']." - Repeat UNTIL DATE: ".$cron_repeat_until_field);
+                            error_log("scheduledemails PID: ".$queue['project_id']." - ".strtotime($cron_repeat_until_field)." >= ".strtotime($today));
                             if (strtotime($cron_repeat_until_field) >= strtotime($today)) {
-                                error_log("scheduledemails PID: ".$queue['project_id']." - TRUE", 0);
+                                error_log("scheduledemails PID: ".$queue['project_id']." - TRUE");
                                 return true;
                             } else {
                                 $this->deleteQueuedEmail($index,$queue['project_id']);
-                                error_log("scheduledemails PID: ".$queue['project_id']." - FALSE", 0);
+                                error_log("scheduledemails PID: ".$queue['project_id']." - FALSE");
                                 return false;
                             }
                         } else if ($cron_repeat_until == 'cond' && $cron_repeat_until_field != "") {
