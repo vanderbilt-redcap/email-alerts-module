@@ -1100,7 +1100,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         foreach ($form as $alert =>$value){
                             if($alert == $index){
                                 if(!empty($email_records_sent[$alert])){
-                                    $message_sent .= '<a href="#" data-toggle="popover"data-target-selector="#records-activated'.$index.'" data-title="Records for Alert #'.$alert_number.'" >Records activated:</a> '.count((array)$form[$alert]).'<br/>';
+                                    $total_activated = count(explode(',',$email_records_sent[$index]));
+                                    $message_sent .= '<a href="#" data-toggle="popover"data-target-selector="#records-activated'.$index.'" data-title="Records for Alert #'.$alert_number.'" >Records activated:</a> '.$total_activated.'<br/>';
                                     $message_sent .= '<div id="records-activated'.$index.'" class="hidden">
                                                             <p>'.$email_records_sent[$index].'</p>
                                                        </div>';
