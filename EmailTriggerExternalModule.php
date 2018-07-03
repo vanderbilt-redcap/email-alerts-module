@@ -799,7 +799,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $var_replace = $var;
                     //For arms and different events
                     if(count($matches[1]) > 1){
-                        $event_id = \REDCap::getEventIdFromUniqueEvent($matches[1][0]);
+                        $project = new \Project($project_id);
+                        $event_id = $project->getEventIdFromUniqueEvent($matches[1][0]);
                         $var = $matches[1][1];
                     }
 
