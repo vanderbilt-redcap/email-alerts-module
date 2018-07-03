@@ -687,7 +687,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     return false;
                 }
                 else {
-                    var data = "&queue_ids="+$('#queue_ids').val()+"&index_modal_queue="+$('#index_modal_queue').val()+"&already_sent="+$('#already_sent').val();
+                    var data = "&queue_ids="+$('#queue_ids').val()+"&index_modal_queue="+$('#index_modal_queue').val()+"&already_sent="+$('#already_sent').is(':checked');
                     ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('addQueue.php')?>',"Q");
                 }
 
