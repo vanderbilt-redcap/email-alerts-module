@@ -221,7 +221,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     function scheduledemails(){
-        error_log("scheduledemails INSIDE");
+        error_log("scheduledemails INSIDE ".date("Y-m-d H:i:s"));
         $sql="SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = 'true' AND m.directory_prefix = 'vanderbilt_emailTrigger' AND s.`key` = 'enabled'";
         $q = $this->query($sql);
 
@@ -800,8 +800,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $var_replace = $var;
                     //For arms and different events
                     if(count($matches[1]) > 1){
+                        error_log("scheduledemails PID: ".$project_id." - inside matches");
                         $project = new \Project($project_id);
                         $event_id = $project->getEventIdFromUniqueEvent($matches[1][0]);
+                        error_log("scheduledemails PID: ".$project_id." - NEW event_id:".$event_id);
                         $var = $matches[1][1];
                     }
 
