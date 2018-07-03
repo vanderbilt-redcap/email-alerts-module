@@ -950,9 +950,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                 $var_replace = $var;
                 //For arms and different events
+                \REDCap::logEvent("Survey testing ","Old event id:".$event_id,NULL,NULL,NULL,$project_id);
+
                 if(count($matches[1]) > 1){
                     $project = new \Project($project_id);
                     $form_event_id = $project->getEventIdUsingUniqueEventName($matches[1][0]);
+                    \REDCap::logEvent("Survey testing ","New event id:".$form_event_id,NULL,NULL,NULL,$project_id);
+                    \REDCap::logEvent("Survey testing ","matches:".$matches[1][0],NULL,NULL,NULL,$project_id);
                     $var = $matches[1][1];
                 }
 
