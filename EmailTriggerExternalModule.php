@@ -899,10 +899,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal){
         $surveyLink_var = $this->getProjectSetting("surveyLink_var", $project_id);
-        error_log("scheduledemails PID: ".$project_id." - surveyLink_var:".$surveyLink_var);
         if(!empty($surveyLink_var)) {
             $datasurvey = explode("\n", $surveyLink_var);
-            error_log("scheduledemails PID: ".$project_id." - datasurvey:".$datasurvey);
             foreach ($datasurvey as $surveylink) {
                 $var = preg_split("/[;,]+/", $surveylink)[0];
 
