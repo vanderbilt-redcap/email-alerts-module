@@ -561,8 +561,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         error_log("scheduledemails PID: ".$project_id." - Data piping");
         #Survey and Data-Form Links
         $email_text = $this->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
+        error_log("scheduledemails PID: ".$project_id." - setSurveyLink");
         $email_text = $this->setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
-        error_log("scheduledemails PID: ".$project_id." - Survey");
+        error_log("scheduledemails PID: ".$project_id." - setFormLink");
         $mail = new \PHPMailer;
 
         #Email Addresses
@@ -781,39 +782,30 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function setDataPiping($datapipe_var, $email_content, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
         if (!empty($datapipe_var)) {
-            error_log("scheduledemails PID: ".$project_id." - datapipe_var:".$datapipe_var);
             $datapipe = explode("\n", $datapipe_var);
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
-                    error_log("scheduledemails PID: ".$project_id." - var:".$var);
                     preg_match_all("/\\[(.*?)\\]/", $var, $matches);
 
                     $var_replace = $var;
                     //For arms and different events
                     if(count($matches[1]) > 1){
-                        error_log("scheduledemails PID: ".$project_id." - inside matches");
                         $project = new \Project($project_id);
-//                        $event_id = $project->getEventIdFromUniqueEvent($matches[1][0]);
                         $event_id = $project->getEventIdUsingUniqueEventName($matches[1][0]);
-                        error_log("scheduledemails PID: ".$project_id." - NEW event_id:".$event_id);
                         $var = $matches[1][1];
                     }
 
                     //Repeatable instruments
                     $logic = $this->isRepeatingInstrument($project_id, $data, $record, $event_id, $instrument, $instance, $var,0, $isLongitudinal);
-                    error_log("scheduledemails PID: ".$project_id." - logic:".$logic);
                     $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance));
-                    error_log("scheduledemails PID: ".$project_id." - label:".$label);
                     if(!empty($label)){
                         $logic = $label;
                     }
-                    error_log("scheduledemails PID: ".$project_id." - logic final:".$logic);
                     $email_content = str_replace($var_replace, $logic, $email_content);
                 }
             }
         }
-        error_log("scheduledemails PID: ".$project_id." - return email content");
         return $email_content;
     }
 
@@ -861,7 +853,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if ($ev) {
                         $form_name = str_replace('[', '', $matches[0][0]);
                         $form_name = str_replace(']', '', $form_name);
-                        $form_event_id = \REDCap::getEventIdFromUniqueEvent($form_name);
+                        $project = new \Project($project_id);
+                        $form_event_id = $project->getEventIdUsingUniqueEventName($form_name);
                     }
                     if (count($matches[0]) > 2) {
                         $instanceMin = 1;
@@ -915,8 +908,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal){
         $surveyLink_var = $this->getProjectSetting("surveyLink_var", $project_id);
+        error_log("scheduledemails PID: ".$project_id." - surveyLink_var:".$surveyLink_var);
         if(!empty($surveyLink_var)) {
             $datasurvey = explode("\n", $surveyLink_var);
+            error_log("scheduledemails PID: ".$project_id." - datasurvey:".$datasurvey);
             foreach ($datasurvey as $surveylink) {
                 $var = preg_split("/[;,]+/", $surveylink)[0];
 
@@ -927,7 +922,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $var = $matches[0][1];
                         $form_name = str_replace('[', '', $matches[0][0]);
                         $form_name = str_replace(']', '', $form_name);
-                        $form_event_id = \REDCap::getEventIdFromUniqueEvent($form_name);
+                        $project = new \Project($project_id);
+                        $form_event_id = $project->getEventIdUsingUniqueEventName($form_name);
                     }
                 }
 
