@@ -404,23 +404,20 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$queue['alert']];
         $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$queue['alert']];
         $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$queue['alert']];
-        error_log("scheduledemails PID: ".$queue['project_id']." stopRepeat");
+
         $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field, $queue['project_id'], $queue['record'], $queue['event_id']);
         if($queue['isRepeatInstrument']){
             $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
         }
         if($cron_repeat_email == '0'){
-            error_log("scheduledemails PID: ".$queue['project_id']." delete cron_repeat_email = 0");
             array_push($delete_queue,$index);
         }else if($cron_repeat_until != 'forever' && $cron_repeat_until != '' && $cron_repeat_email == '1'){
             if($cron_repeat_until == 'date'){
                 if(strtotime($cron_repeat_until_field) <= strtotime(date('Y-m-d'))){
-                    error_log("scheduledemails PID: ".$queue['project_id']." ".$cron_repeat_until_field." >= today");
                     array_push($delete_queue,$index);
                 }
             }else if($cron_repeat_until == 'cond' && $cron_repeat_until_field != ""){
                 if(!$evaluateLogic){
-                    rror_log("scheduledemails PID: ".$queue['project_id']." evaluateLogic: ".$evaluateLogic);
                     array_push($delete_queue,$index);
                 }
             }
