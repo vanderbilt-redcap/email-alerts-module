@@ -40,7 +40,7 @@ foreach($simple_config['email-dashboard-settings'] as $configKey => $configRow) 
 $message="";
 $message_text = array('C'=>'<strong>Success!</strong> The configuration has been saved.','A'=>'<strong>Success!</strong> New Email Added.','U'=>'<strong>Success!</strong> Email Updated.',
     'D'=>'<strong>Success!</strong> Email Deleted.','T'=>'<strong>Success!</strong> Email Activated.','E'=>'<strong>Success!</strong> Email Deactivated.',
-    'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.');
+    'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.','Q'=>'<strong>Success!</strong> New Queued Email Added.');
 
 if(array_key_exists('message', $_REQUEST)){
     $message=$message_text[$_REQUEST['message']];
@@ -679,33 +679,16 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 }
 
                 if (errMsg.length > 0) {
-                    $('#errMsgContainer').empty();
+                    $('#errMsgContainer_modal').empty();
                     $.each(errMsg, function (i, e) {
-                        $('#errMsgContainer').append('<div>' + e + '</div>');
+                        $('#errMsgContainer_modal').append('<div>' + e + '</div>');
                     });
-                    $('#errMsgContainer').show();
+                    $('#errMsgContainer_modal').show();
                     return false;
                 }
                 else {
-                    var data = "&queue_ids="+$('#queue_ids').val();
-
-                    var url = <?=json_encode($module->getUrl('addQueue.php'))?>;
-                    $('#succMsgContainer').hide();
-                    $.ajax({
-                        type: "POST",
-                        url: url,
-                        data:data
-                        ,
-                        error: function (xhr, status, error) {
-                            alert(xhr.responseText);
-                        },
-                        success: function (result) {
-                            jsonAjax = jQuery.parseJSON(result);
-//                            console.log(JSON.stringify(result))
-                            if(jsonAjax.status == 'success') {
-                            }
-                        }
-                    });
+                    var data = "&queue_ids="+$('#queue_ids').val()+"&index_modal_queue="+$('#index_modal_queue').val()+"&already_sent="+$('#already_sent').val();
+                    ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('addQueue.php')?>',"Q");
                 }
 
                 return true;
@@ -1535,6 +1518,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                         <h4 class="modal-title" id="myModalLabel">Add a Queue Email</h4>
                     </div>
                     <div class="modal-body">
+                        <div id='errMsgContainer_modal' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>
                         <div style="padding: 20px;">
                             <div class="form-group">
                                 <label for="exampleFormControlTextarea1" style="font-weight: normal;padding-left: 15px;padding-right: 15px">Have the emails already been sent?(It will not send on the current date but on the repeat date)</label>
@@ -1555,7 +1539,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" form="" class="btn btn-default btn-delete" id='btnModalAddQueue'>Add Queue</button>
+                        <button type="submit" form="addQueue" class="btn btn-default btn-delete" id='btnModalAddQueue'>Add Queue</button>
                         <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
                     </div>
                 </div>

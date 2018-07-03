@@ -216,31 +216,28 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
-    function addQueueEmailFromInterface($project_id, $alert,$record,$already_sent){
-        /*$form_name = $this->getProjectSetting("form-name",$project_id)[$alert];
-        $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$alert];
-        $email_incomplete = $this->getProjectSetting("email-incomplete",$project_id)[$alert];
+    /**
+     * Function to add queued emails from the user interface
+     * @param $project_id
+     * @param $alert
+     * @param $record
+     * @param $times_sent
+     */
+    function addQueueEmailFromInterface($project_id, $alert, $record, $times_sent){
+        $data = \REDCap::getData($project_id,"array",$record);
 
-        $isLongitudinalData = false;
-        if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
-            $isLongitudinalData = true;
-        }
+        $instrument = $this->getProjectSetting("form-name",$project_id)[$alert];
+        $event_id = $this->getProjectSetting("form-name-event", $project_id)[$alert];
+        $repeat_instance = "1";
+
         $isRepeatInstrument = false;
-        if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
+        if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$instrument.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$instrument.'_complete'] != ''))){
             $isRepeatInstrument = true;
         }
 
-        if($data[$record][$event_id][$form.'_complete'] == '2'  || $email_incomplete == "1"){
-            if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
-                if ($_REQUEST['page'] == $form) {
-                    $this->sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
-                }
-            }
-        }
-
         if($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $alert)){
-            $this->addQueuedEmail($alert,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
-        }*/
+            $this->addQueuedEmail($alert,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument,$times_sent);
+        }
     }
 
     /**
@@ -441,7 +438,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $instance
      * @param $isRepeatInstrument
      */
-    function addQueuedEmail($alert, $project_id, $record, $event_id, $instrument, $instance, $isRepeatInstrument){
+    function addQueuedEmail($alert, $project_id, $record, $event_id, $instrument, $instance, $isRepeatInstrument,$times_sent=""){
         $queue = array();
         $queue['alert'] = $alert;
         $queue['record'] = $record;
@@ -454,7 +451,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$alert];
         $queue['option'] = $cron_send_email_on;
         $queue['deactivated'] = 0;
-        $queue['times_sent'] = 0;
+        $queue['times_sent'] = $times_sent;
         $queue['last_sent'] = '';
 
         $email_queue = empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
@@ -933,30 +930,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $datasurvey = explode("\n", $surveyLink_var);
             foreach ($datasurvey as $surveylink) {
                 $var = preg_split("/[;,]+/", $surveylink)[0];
-
+                $var_replace = $var;
                 $form_event_id = $event_id;
-//                if($isLongitudinal) {
-//                    preg_match_all("/\[[^\]]*\]/", $var, $matches);
-//                    if (sizeof($matches[0]) > 1) {
-//                        $var = $matches[0][1];
-//                        $form_name = str_replace('[', '', $matches[0][0]);
-//                        $form_name = str_replace(']', '', $form_name);
-//                        $project = new \Project($project_id);
-//                        $form_event_id = $project->getEventIdUsingUniqueEventName($form_name);
-//                    }
-//                }
 
                 preg_match_all("/\\[(.*?)\\]/", $var, $matches);
-
-                $var_replace = $var;
                 //For arms and different events
-                \REDCap::logEvent("Survey testing ","Old event id:".$event_id,NULL,NULL,NULL,$project_id);
-
                 if(count($matches[1]) > 1){
                     $project = new \Project($project_id);
                     $form_event_id = $project->getEventIdUsingUniqueEventName($matches[1][0]);
-                    \REDCap::logEvent("Survey testing ","New event id:".$form_event_id,NULL,NULL,NULL,$project_id);
-                    \REDCap::logEvent("Survey testing ","matches:".$matches[1][0],NULL,NULL,NULL,$project_id);
                     $var = $matches[1][1];
                 }
 

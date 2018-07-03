@@ -18,7 +18,6 @@ if(!isset($_POST['already_sent'])){
 
 $message = "";
 
-
 if (strpos($queue_ids, ";") !== false) {
     $record = explode(";", $queue_ids);
 } else if (strpos($queue_ids, ",") !== false) {
@@ -34,7 +33,7 @@ if (strpos($queue_ids, ";") !== false) {
 
 if ($record != "") {
     foreach ($record as $id) {
-        $module->addQueueEmailFromInterface($project_id, $index, $record, $already_sent);
+        $module->addQueueEmailFromInterface($project_id, $index, $id, $already_sent);
     }
 }
 
