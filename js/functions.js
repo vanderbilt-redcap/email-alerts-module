@@ -280,20 +280,20 @@ function duplicateEmailAlert(index){
 function addQueue(index){
     $('#external-modules-configure-modal-addQueue').modal('show');
     $('#index_modal_queue').val(index);
-    // var data = "&index_modal_queue="+index;
-    // $.ajax({
-    //     type: "POST",
-    //     url: _preview_queue_url,
-    //     data: data,
-    //     error: function (xhr, status, error) {
-    //         alert(xhr.responseText);
-    //     },
-    //     success: function (result) {
-    //         // console.log(result)
-    //         $('#modal_message_queue').html(result);
-    //         $('#external-modules-configure-modal-queue').modal('show');
-    //     }
-    // });
+}
+
+function updateQueueData(index){
+    var data = "&index_modal_queue="+index;
+    $.ajax({
+        type: "POST",
+        url: _update_queue_url,
+        data: data,
+        error: function (xhr, status, error) {
+            alert(xhr.responseText);
+        },
+        success: function (result) {
+        }
+    });
 }
 
 /**

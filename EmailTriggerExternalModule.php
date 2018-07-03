@@ -236,7 +236,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         if($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $alert)){
-            $this->addQueuedEmail($alert,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument,$times_sent);
+            $this->addQueuedEmail($alert,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument,$times_sent,date('Y-m-d'));
         }
     }
 
@@ -253,7 +253,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         while($row = db_fetch_assoc($q)){
-           /* $project_id = $row['project_id'];
+            $project_id = $row['project_id'];
             $email_queue =  $this->getProjectSetting('email-queue',$project_id);
             $queue_aux = $email_queue;
             $delete_queue = array();
@@ -282,7 +282,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
                 #delete all queues that need to stop sending
                 $this->deleteQueuedEmail($delete_queue,$project_id);
-            }*/
+            }
         }
     }
 
@@ -435,7 +435,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $instance
      * @param $isRepeatInstrument
      */
-    function addQueuedEmail($alert, $project_id, $record, $event_id, $instrument, $instance, $isRepeatInstrument,$times_sent=""){
+    function addQueuedEmail($alert, $project_id, $record, $event_id, $instrument, $instance, $isRepeatInstrument,$times_sent="",$last_sent=''){
         $queue = array();
         $queue['alert'] = $alert;
         $queue['record'] = $record;
@@ -449,7 +449,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $queue['option'] = $cron_send_email_on;
         $queue['deactivated'] = 0;
         $queue['times_sent'] = $times_sent;
-        $queue['last_sent'] = '';
+        $queue['last_sent'] = $last_sent;
 
         $email_queue = empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
         array_push($email_queue,$queue);

@@ -85,6 +85,7 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
         var _duplicateform_url = '<?=$module->getUrl('duplicateForm.php')?>';
         var _reenableform_url = '<?=$module->getUrl('reEnableForm.php')?>';
         var _preview_url = '<?=$module->getUrl('previewForm.php')?>';
+        var _update_queue_url = '<?=$module->getUrl('updateQueue.php')?>';
         var _preview_queue_url = '<?=$module->getUrl('previewQueue.php')?>';
         var _preview_record_url = '<?=$module->getUrl('previewRecordForm.php')?>';
         var _edoc_name_url = '<?=$module->getUrl('get-edoc-name.php')?>';
@@ -1236,7 +1237,8 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 $alerts .= "<div style='".$show_button."'><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\");return true;' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='duplicateEmailAlert(\"".$index."\");return true;' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
                 if($isAdmin) {
-                    $alerts .= "<div><a onclick='addQueue(\"".$index."\");return true;' type='button' class='btn btn-warning btn-new-email' >Add Queue</a></div>";
+//                    $alerts .= "<div><a onclick='addQueue(\"".$index."\");return true;' type='button' class='btn btn-warning btn-new-email' >Add Queue</a></div>";
+//                    $alerts .= "<div><a onclick='updateQueueData(\"".$index."\");return true;' type='button' class='btn btn-warning btn-new-email' >Update Queue</a></div>";
 
                 }
                 $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\",\"".$deleted_modal."\",\"".$deleted_index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >".$deleted_text."</a></div></td>";
