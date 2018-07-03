@@ -293,7 +293,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
         }
 
-        if(strtotime($queue['last_sent']) != strtotime($today)){
+        if(strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == ""){
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today)) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 if($cron_repeat_email == "1"){
                     #check repeat until option to see if we need to stop
