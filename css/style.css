@@ -57,6 +57,11 @@
 .email_reactivate:hover{
     color:#000 !important;
 }
+.email_queue_button_color{
+    background-color: #ffffcc;
+    border-color: #808080;
+    color: #fff;
+}
 .email_forms_button_color{
     background-color: #a6a6a6;
     border-color: #808080;

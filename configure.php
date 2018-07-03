@@ -668,6 +668,49 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 return true;
             });
 
+            $('#addQueue').submit(function () {
+                var data = $('#addQueue').serialize();
+
+                var errMsg = [];
+                $('errMsgContainer').hide();
+
+                if($('#queue_ids').val() == ""){
+                    errMsg.push('Please enter a record.');
+                }
+
+                if (errMsg.length > 0) {
+                    $('#errMsgContainer').empty();
+                    $.each(errMsg, function (i, e) {
+                        $('#errMsgContainer').append('<div>' + e + '</div>');
+                    });
+                    $('#errMsgContainer').show();
+                    return false;
+                }
+                else {
+                    var data = "&queue_ids="+$('#queue_ids').val();
+
+                    var url = <?=json_encode($module->getUrl('addQueue.php'))?>;
+                    $('#succMsgContainer').hide();
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data:data
+                        ,
+                        error: function (xhr, status, error) {
+                            alert(xhr.responseText);
+                        },
+                        success: function (result) {
+                            jsonAjax = jQuery.parseJSON(result);
+//                            console.log(JSON.stringify(result))
+                            if(jsonAjax.status == 'success') {
+                            }
+                        }
+                    });
+                }
+
+                return true;
+            });
+
             $('#AddFormForm').submit(function () {
                 $('#errMsgModalContainer').hide();
                 var errMsg = [];
@@ -980,9 +1023,9 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 <?PHP require('codes_modal.php');?>
 <!-- ALERTS TABLE -->
 <div style="padding-top:50px" class="col-md-12">
-    <div>
+    <div style="padding-left: 15px;">
         <a href="" id='btnViewCodes' type="button" class="btn btn-info pull-left email_forms_button_color email_forms_button open-codesModal" style="font-size:14px;color:#fff;margin-top: 0;margin-bottom: 10px;">Add New Email</a>
-        <div style="float:right;margin-top: 5px;">
+       <div style="float:right;margin-top: 5px;">
             <input value="" id="concept_active" checked class="auto-submit" type="checkbox" name="concept_active"> Active only
         </div>
         <?php if($isAdmin){?>
@@ -1208,6 +1251,10 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 $alerts .= "<td>".$reactivate_button."<div style='".$show_button."'><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\");return true;' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='duplicateEmailAlert(\"".$index."\");return true;' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
+                if($isAdmin) {
+                    $alerts .= "<div><a onclick='addQueue(\"".$index."\");return true;' type='button' class='btn btn-warning btn-new-email' >Add Queue</a></div>";
+
+                }
                 $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\",\"".$deleted_modal."\",\"".$deleted_index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >".$deleted_text."</a></div></td>";
                 $alerts .= "</tr>";
                 $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";
@@ -1473,6 +1520,43 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal fade" id="external-modules-configure-modal-addQueue" tabindex="-1" role="dialog" aria-labelledby="Codes">
+        <form class="form-horizontal" action="" method="post" id='addQueue'>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Add a Queue Email</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div style="padding: 20px;">
+                            <div class="form-group">
+                                <label for="exampleFormControlTextarea1" style="font-weight: normal;padding-left: 15px;padding-right: 15px">Have the emails already been sent?(It will not send on the current date but on the repeat date)</label>
+                                <div  style="padding-left: 15px;">
+                                    <input type="checkbox" name="already_sent" id="already_sent" style="width: 15px;height: 20px;"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleFormControlTextarea1" style="font-weight: normal;padding-left: 15px;">Insert the <strong>Record ID's</strong> to automatically Add the Queues Emails.<br/>
+                                    <em>ID's can be separated by comma, semicolon or line break (not mixed).</em></label>
+                            </div>
+                            <div class="form-group">
+                                <textarea class="form-control" id="queue_ids" rows="6"></textarea>
+                            </div>
+                        </div>
+                        <span id="index_modal_message"></span>
+                        <input type="hidden" value="" id="index_modal_queue" name="index_modal_queue">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" form="" class="btn btn-default btn-delete" id='btnModalAddQueue'>Add Queue</button>
+                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
             </div>

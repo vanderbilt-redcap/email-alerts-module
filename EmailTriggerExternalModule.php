@@ -216,6 +216,33 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
+    function addQueueEmailFromInterface($project_id, $alert,$record,$already_sent){
+        /*$form_name = $this->getProjectSetting("form-name",$project_id)[$alert];
+        $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$alert];
+        $email_incomplete = $this->getProjectSetting("email-incomplete",$project_id)[$alert];
+
+        $isLongitudinalData = false;
+        if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
+            $isLongitudinalData = true;
+        }
+        $isRepeatInstrument = false;
+        if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
+            $isRepeatInstrument = true;
+        }
+
+        if($data[$record][$event_id][$form.'_complete'] == '2'  || $email_incomplete == "1"){
+            if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
+                if ($_REQUEST['page'] == $form) {
+                    $this->sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
+                }
+            }
+        }
+
+        if($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $alert)){
+            $this->addQueuedEmail($alert,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
+        }*/
+    }
+
     /**
      * Function called by the CRON to send the scheduled email alerts
      * @throws \Exception
@@ -908,19 +935,29 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $var = preg_split("/[;,]+/", $surveylink)[0];
 
                 $form_event_id = $event_id;
-                if($isLongitudinal) {
-                    preg_match_all("/\[[^\]]*\]/", $var, $matches);
-                    if (sizeof($matches[0]) > 1) {
-                        $var = $matches[0][1];
-                        $form_name = str_replace('[', '', $matches[0][0]);
-                        $form_name = str_replace(']', '', $form_name);
-                        $project = new \Project($project_id);
-                        $form_event_id = $project->getEventIdUsingUniqueEventName($form_name);
-                    }
+//                if($isLongitudinal) {
+//                    preg_match_all("/\[[^\]]*\]/", $var, $matches);
+//                    if (sizeof($matches[0]) > 1) {
+//                        $var = $matches[0][1];
+//                        $form_name = str_replace('[', '', $matches[0][0]);
+//                        $form_name = str_replace(']', '', $form_name);
+//                        $project = new \Project($project_id);
+//                        $form_event_id = $project->getEventIdUsingUniqueEventName($form_name);
+//                    }
+//                }
+
+                preg_match_all("/\\[(.*?)\\]/", $var, $matches);
+
+                $var_replace = $var;
+                //For arms and different events
+                if(count($matches[1]) > 1){
+                    $project = new \Project($project_id);
+                    $form_event_id = $project->getEventIdUsingUniqueEventName($matches[1][0]);
+                    $var = $matches[1][1];
                 }
 
                 #only if the variable is in the text we reset the survey link status
-                if (strpos($email_text, $var) !== false) {
+                if (strpos($email_text, $var_replace) !== false) {
                     $instrument_form = str_replace('[__SURVEYLINK_', '', $var);
                     $instrument_form = str_replace(']', '', $instrument_form);
                     $passthruData = $this->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
@@ -930,7 +967,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     $url = $this->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&NOAUTH";
                     $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
-                    $email_text = str_replace( preg_split("/[;,]+/", $surveylink)[0], $link, $email_text);
+                    $email_text = str_replace( $var_replace, $link, $email_text);
                 }
             }
         }
