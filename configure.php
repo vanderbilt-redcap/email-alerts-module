@@ -50,8 +50,9 @@ if(array_key_exists('message', $_REQUEST)){
 $indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
 
 #User rights
+$UserRights = \REDCap::getUserRights(USERID)[USERID];
 $isAdmin = false;
-if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
+if($UserRights['user_rights'] == '1'){
     $isAdmin = true;
 }
 ?>
@@ -1236,11 +1237,6 @@ if(\REDCap::getUserRights(USERID)[USERID]['user_rights'] == '1'){
                 $alerts .= "<td>".$reactivate_button."<div style='".$show_button."'><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\");return true;' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='duplicateEmailAlert(\"".$index."\");return true;' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
-                if($isAdmin) {
-//                    $alerts .= "<div><a onclick='addQueue(\"".$index."\");return true;' type='button' class='btn btn-warning btn-new-email' >Add Queue</a></div>";
-//                    $alerts .= "<div><a onclick='updateQueueData(\"".$index."\");return true;' type='button' class='btn btn-warning btn-new-email' >Update Queue</a></div>";
-
-                }
                 $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\",\"".$deleted_modal."\",\"".$deleted_index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >".$deleted_text."</a></div></td>";
                 $alerts .= "</tr>";
                 $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";
