@@ -95,7 +95,7 @@ if($schedule_changed){
 
 #Already scheduled emails need to be updated
 if(isset($_REQUEST['cron-queue-update'])){
-    if($email_repetitive[$index] == '0' && ($cron_repeat_email[$index] == '1' || ($cron_send_email_on[$index] != 'now' && $cron_send_email_on[$index] != '' && $cron_send_email_on_field[$index] !=''))){
+    if(($email_repetitive[$index] == '0' && ($cron_repeat_email[$index] == '1' || ($cron_send_email_on[$index] != 'now' && $cron_send_email_on[$index] != '' && $cron_send_email_on_field[$index] !=''))) || $cron_send_email_on[$index] == 'now'){
         $email_queue =  empty($module->getProjectSetting('email-queue'))?array():$module->getProjectSetting('email-queue');
         if(!empty($email_queue)){
             $scheduled_records_changed = "";
