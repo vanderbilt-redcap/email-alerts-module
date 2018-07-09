@@ -262,7 +262,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100) {
                         if($queue['deactivated'] != 1 && $this->sendToday($queue, $index)){
-                            error_log("scheduledemails PID: ".$project_id." - Has queued emails to send today ".date("Y-m-d H:i:s"));
+                            error_log("scheduledemails PID: ".$project_id."/ ".$queue['project_id']." - Has queued emails to send today ".date("Y-m-d H:i:s"));
                             #SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
                             #If email sent save date and number of times sent and delete queue if needed
@@ -941,12 +941,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 #only if the variable is in the text we reset the survey link status
                 if (strpos($email_text, $var_replace) !== false) {
                     $instrument_form = str_replace('__SURVEYLINK_', '', $var);
-                    $passthruData = $this->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
+					$passthruData = $this->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
 
                     $returnCode = $passthruData['return_code'];
                     $hash = $passthruData['hash'];
 
-                    $url = $this->getUrl('surveyPassthru.php') . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&event=".$form_event_id."&NOAUTH";
+					## getUrl doesn't append a pid when accessed through the cron, add pid if it's not there already
+					$baseUrl = $this->getUrl('surveyPassthru.php');
+					if(!preg_match("/[\&\?]pid=/", $baseUrl)) {
+						$baseUrl .= "&pid=".$project_id;
+					}
+
+                    $url = $baseUrl . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&event=".$form_event_id."&NOAUTH";
                     $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
                     $email_text = str_replace( $var_replace, $link, $email_text);
                 }
