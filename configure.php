@@ -694,6 +694,9 @@ if(USERID != "") {
                 if($('#queue_ids').val() == ""){
                     errMsg.push('Please enter a record.');
                 }
+                if($('#queue_event_select').val() == ""){
+                    errMsg.push('Please select an event.');
+                }
 
                 if (errMsg.length > 0) {
                     $('#errMsgContainer_modal').empty();
