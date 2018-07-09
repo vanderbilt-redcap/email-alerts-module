@@ -277,9 +277,32 @@ function duplicateEmailAlert(index){
     ajaxLoadOptionAndMessage("&index_duplicate="+index,_duplicateform_url,"P");
 }
 
-function addQueue(index){
+function addQueue(index,form){
     $('#external-modules-configure-modal-addQueue').modal('show');
     $('#index_modal_queue').val(index);
+    $('#last_sent').addClass('datepicker_queue');
+    $(".datepicker_queue").datepicker({
+        showOn: "button",
+        buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+        buttonImageOnly: true,
+        buttonText: "Select date",
+        dateFormat: "yy-mm-dd"
+    });
+    $(".ui-datepicker-trigger").attr('style',' padding-bottom: 10px !important;');
+    var data = "index="+index+"&project_id="+project_id+"&form="+form+"&queue=1";
+    $.ajax({
+        type: "POST",
+        url: _longitudinal_url,
+        data: data,
+        error: function (xhr, status, error) {
+            alert(xhr.responseText);
+        },
+        success: function (result) {
+            jsonAjax = jQuery.parseJSON(result);
+            console.log(jsonAjax)
+            $('#event_queue').html(jsonAjax.event);
+        }
+    });
 }
 
 function updateQueueData(index){
@@ -499,6 +522,29 @@ function ajaxLoadOptionAndMessage(data, url, message){
         }
         else {
 	        alert("An error ocurred");
+        }
+    });
+}
+
+function ajaxLoadOptionAndMessageQueue(data, url, message){
+    $.post(url, data, function(returnData){
+        jsonAjax = jQuery.parseJSON(returnData);
+        if(jsonAjax.status == 'success'){
+            //refresh page to show changes
+            if(jsonAjax.failed_records != '' && jsonAjax.failed_records != undefined){
+                alert("Couldn't add these records in the queue: "+jsonAjax.failed_records+"\nPlease check if they already exist or that the information is correct.");
+            }
+
+            var newUrl = gerUtlMessageParam(message);
+            if (newUrl.substring(newUrl.length-1) == "#")
+            {
+                newUrl = newUrl.substring(0, newUrl.length-1);
+            }
+
+             window.location.href = newUrl;
+        }
+        else {
+            alert("An error ocurred");
         }
     });
 }

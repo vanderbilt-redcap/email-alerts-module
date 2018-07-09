@@ -223,11 +223,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $record
      * @param $times_sent
      */
-    function addQueueEmailFromInterface($project_id, $alert, $record, $times_sent){
+    function addQueueEmailFromInterface($project_id, $alert, $record, $times_sent, $event_id, $last_sent,$instance){
         $data = \REDCap::getData($project_id,"array",$record);
 
         $instrument = $this->getProjectSetting("form-name",$project_id)[$alert];
-        $event_id = $this->getProjectSetting("form-name-event", $project_id)[$alert];
         $repeat_instance = "1";
 
         $isRepeatInstrument = false;
@@ -235,9 +234,25 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $isRepeatInstrument = true;
         }
 
-        if($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $alert)){
-            $this->addQueuedEmail($alert,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument,$times_sent,date('Y-m-d'));
+        if($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $alert) && !$this->isAlreadyInQueue($alert, $project_id, $record,$instance)){
+            $this->addQueuedEmail($alert,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument,$times_sent,$last_sent);
+        }else{
+            return $record;
         }
+        return "";
+    }
+
+    function isAlreadyInQueue($alert, $project_id, $record, $instance){
+        $email_queue = empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
+        $found = false;
+        foreach ($email_queue as $index=>$queue){
+            if($alert == $queue['alert'] && $project_id == $queue['project_id'] && $record == $queue['record'] && $queue['instance'] == $instance){
+                $found = true;
+                break;
+            }
+        }
+
+        return $found;
     }
 
     /**

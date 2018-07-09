@@ -43,7 +43,7 @@ $message_text = array('C'=>'<strong>Success!</strong> The configuration has been
     'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.','Q'=>'<strong>Success!</strong> New Queued Email Added.');
 
 if(array_key_exists('message', $_REQUEST)){
-    $message=$message_text[$_REQUEST['message']];
+    $message = $message_text[$_REQUEST['message']];
 }
 
 #get number of instances
@@ -54,6 +54,21 @@ $UserRights = \REDCap::getUserRights(USERID)[USERID];
 $isAdmin = false;
 if($UserRights['user_rights'] == '1'){
     $isAdmin = true;
+}
+
+$super_user = false;
+if(USERID != "") {
+    $sql = "SELECT i.user_email, i.user_firstname, i.user_lastname, i.super_user, i.allow_create_db
+					FROM redcap_user_information i
+					WHERE i.username = '".USERID."'";
+    $query = db_query($sql);
+    if(!$query) throw new \Exception("Error looking up user information", self::$SQL_ERROR);
+
+    if($row = db_fetch_assoc($query)) {
+        if($row["super_user"] == 1){
+            $super_user = true;
+        }
+    }
 }
 ?>
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/style.css')?>">
@@ -689,8 +704,9 @@ if($UserRights['user_rights'] == '1'){
                     return false;
                 }
                 else {
-                    var data = "&queue_ids="+$('#queue_ids').val()+"&index_modal_queue="+$('#index_modal_queue').val()+"&already_sent="+$('#already_sent').is(':checked');
-                    ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('addQueue.php')?>',"Q");
+                    var data = "&queue_ids="+$('#queue_ids').val()+"&index_modal_queue="+$('#index_modal_queue').val()+"&times_sent="+$('#times_sent').val()+"&last_sent="+$('#last_sent').val()+"&queue_event_select="+$('#queue_event_select').val();
+                    ajaxLoadOptionAndMessageQueue(data,'<?=$module->getUrl('addQueue.php')?>',"Q");
+                    return true;
                 }
 
                 return false;
@@ -858,7 +874,7 @@ if($UserRights['user_rights'] == '1'){
             } );
         });
 
-        function saveFilesIfTheyExist(url, files) {
+    function saveFilesIfTheyExist(url, files) {
             var lengthOfFiles = 0;
             var formData = new FormData();
             for (var name in files) {
@@ -905,6 +921,7 @@ if($UserRights['user_rights'] == '1'){
         $tr_class = '';
     }
 ?>
+
 <!-- CONFIGURATION TABLE -->
 <form class="form-inline" action="" method="post" id='mainForm'>
     <div class="container-fluid wiki">
@@ -1068,6 +1085,11 @@ if($UserRights['user_rights'] == '1'){
                 }else{
                     $deactivate = "Deactivate";
                     $active_col = "Y";
+                }
+
+                $show_queue = "";
+                if($projectData['settings']['email-repetitive']['value'][$index] == '1'){
+                    $show_queue = "display:none;";
                 }
 
                 //DELETE
@@ -1237,6 +1259,9 @@ if($UserRights['user_rights'] == '1'){
                 $alerts .= "<td>".$reactivate_button."<div style='".$show_button."'><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\");return true;' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='duplicateEmailAlert(\"".$index."\");return true;' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
+                if($super_user) {
+                    $alerts .= "<div><a onclick='addQueue(\"".$index."\",\"".$info_modal[$index]['form-name']."\");return true;' style='".$show_queue."' id='addQueueBtn' type='button' class='btn btn-warning btn-new-email' >Add Queue</a></div>";
+                }
                 $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\",\"".$deleted_modal."\",\"".$deleted_index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >".$deleted_text."</a></div></td>";
                 $alerts .= "</tr>";
                 $alerts .= "<script>$('#emailRow$index').click(function() { editEmailAlert(".json_encode($info_modal[$index]).",".$index."); });</script>";
@@ -1520,10 +1545,19 @@ if($UserRights['user_rights'] == '1'){
                         <div id='errMsgContainer_modal' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>
                         <div style="padding: 20px;">
                             <div class="form-group">
-                                <label for="exampleFormControlTextarea1" style="font-weight: normal;padding-left: 15px;padding-right: 15px">Have the emails already been sent?(It will not send on the current date but on the repeat date)</label>
-                                <div  style="padding-left: 15px;">
-                                    <input type="checkbox" name="already_sent" id="already_sent" style="width: 15px;height: 20px;"/>
-                                </div>
+                                <div style="float: left;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px;color:red">*This is to add records that are not in the queue or that have been deleted.</label></div>
+                            </div>
+                            <div class="form-group">
+                                <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Event ID</label></div>
+                                <div id='event_queue'></div>
+                            </div>
+                            <div class="form-group">
+                                <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Date record was last sent via the queue<br><span style="color:red">*This value only needs to be entered if record was previously in queue</span></label></div>
+                                <div><input type="text" id='last_sent' class="external-modules-input-element" placeholder="YYYY-MM-DD"></div>
+                            </div>
+                            <div class="form-group">
+                                <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Number of times the email has been sent already</label></div>
+                                <div><input type="text" id='times_sent' value="0"></div>
                             </div>
                             <div class="form-group">
                                 <label for="exampleFormControlTextarea1" style="font-weight: normal;padding-left: 15px;">Insert the <strong>Record ID's</strong> to automatically Add the Queues Emails.<br/>
