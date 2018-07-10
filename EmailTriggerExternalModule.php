@@ -183,9 +183,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_deleted = $this->getProjectSetting("email-deleted",$project_id)[$id];
-        $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id));
+        $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id),true);
+        $email_records_sent = $this->getProjectSetting("email-records-sent",$project_id);
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
-        if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance))) && ($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
+
+        if((($email_repetitive == "1") || ($email_repetitive == '0' && !$this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id], $record, $instrument,$id,$isRepeatInstrument,$repeat_instance))) && ($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             #If the condition is met or if we don't have any, we send the email
             $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record,$event_id);
             if($isRepeatInstrument){
@@ -657,7 +659,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id);
             $this->setProjectSetting('email-sent', $email_sent, $project_id);
 
-            $email_repetitive_sent = $this->addJSONRecord($email_repetitive_sent,$record,$instrument,$id,$isRepeatInstrument,$instance);
+            $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$id,$isRepeatInstrument,$instance);
             $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
 
             $email_repetitive_sent = json_decode($email_repetitive_sent,true);
@@ -1075,7 +1077,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $alertid, the email alert
      * @return bool
      */
-    function isEmailAlreadySentForThisSurvery($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
+    function isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent, $email_records_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
                 if($sv_name == $instrument) {
@@ -1093,22 +1095,39 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                                 }
                                             }
                                         }
+                                    }else if($record == $sv_number && $repeat_instance == "1"){
+                                       //Project was changed and record already existed
+                                        $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$alertid,$isRepeatInstrument,$repeat_instance);
+                                        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                                        return true;
                                     }
-                                }else if ($record == $survey_record) {
-                                    return true;
-                                }else  if($sv_number == 'repeat_instances'){
-                                    //Not repeatable but was at some point and this record was sent
-                                    foreach ($survey_record as $record_repeat => $record_value) {
-                                        if ($record == $record_repeat) {
-                                            foreach ($record_value as $instance => $instance_value) {
-                                                if ($repeat_instance == $instance_value) {
-                                                    return true;
+                                }else{
+                                    if ($record == $sv_number) {
+                                        return true;
+                                    }else if($sv_number == 'repeat_instances'){
+                                        //Project was changed and record already existed
+                                        foreach ($survey_record as $record_repeat => $record_value) {
+                                            if ($record == $record_repeat) {
+                                                foreach ($record_value as $instance => $instance_value) {
+                                                    if ($repeat_instance == $instance_value) {
+                                                        $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$alertid,$isRepeatInstrument,$repeat_instance);
+                                                        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                                                        return true;
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
+                            //Empty or no records found but are recorded
+                            if($this->recordExistsInRegisteredRecords($email_records_sent,$record)){
+                                $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$alertid,$isRepeatInstrument,$repeat_instance);
+                                $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                                return true;
+                            }
+
+
                         }
                     }
                 }
@@ -1116,6 +1135,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
         return false;
     }
+
+    function recordExistsInRegisteredRecords($email_records_sent,$record){
+        $records_registered = array_map('trim', explode(',', $email_records_sent));
+        foreach ($records_registered as $record_registered){
+            if($record == $record_registered){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Function that checks that returns the logic depending on if it's a repeating instrument
@@ -1297,8 +1327,93 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $alertid, the email alert
      * @return string
      */
-    function addJSONRecord($email_repetitive_sent, $new_record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
+    function addRecordSent($email_repetitive_sent, $new_record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
+        $email_repetitive_sent_aux = $email_repetitive_sent;
+        if(!empty($email_repetitive_sent)) {
+            $found_new_instrument = true;
+            foreach ($email_repetitive_sent as $sv_name => $survey_records) {
+                if($sv_name == $instrument) {
+                    $found_new_instrument = false;
+                    $found_new_alert = true;
+                    foreach ($survey_records as $alert => $alert_value) {
+                        if ($alert == $alertid) {
+                            $found_new_alert = false;
+                            $found_new_record = true;
+                            $found_is_repeat = false;
+                            if(!empty($alert_value)){
+                                foreach ($alert_value as $sv_number => $survey_record) {
+                                    if ($sv_number === "repeat_instances") {
+                                        $found_is_repeat = true;
+                                        if($isRepeatInstrument){
+                                            foreach ($alert_value['repeat_instances'] as $survey_record_repeat =>$survey_instances){
+                                                if($survey_record_repeat == $new_record){
+                                                    $found_new_record = false;
+                                                    foreach ($survey_instances as $index =>$instance){
+                                                        if($instance != $repeat_instance){
+                                                            #NEW REPEAT INSTANCE
+                                                            array_push($email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record], $repeat_instance);
+                                                            return json_encode($email_repetitive_sent_aux);
+                                                        }
+                                                    }
+                                                }else{
+                                                    #NEW REPEAT RECORD
+                                                    $email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record] = array();
+                                                    array_push($email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record], $repeat_instance);
+                                                    return json_encode($email_repetitive_sent_aux);
+                                                }
+                                            }
+                                        }
+                                    }else if($sv_number == $new_record){
+                                        $found_new_record = false;
+                                        if($isRepeatInstrument){
+                                            $email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record] = array();
+                                            array_push($email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record], $repeat_instance);
+                                            return json_encode($email_repetitive_sent_aux);
+                                        }
+                                    }
+
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+            if($found_new_instrument){
+                return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,false);
+            }else if($found_new_alert){
+                return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,false);
+            }else if($found_new_record){
+                return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$found_is_repeat);
+            }else if(!$found_new_record && !$found_is_repeat){
+                return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,true);
+            }
+            return json_encode($email_repetitive_sent_aux);
+        }else{
+            return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,false);
+        }
+
+    }
+
+    function addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$found_is_repeat){
+        if($isRepeatInstrument){
+            #NEW REPEAT INSTANCE
+            if(!$found_is_repeat){
+                $email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record] = array();
+                array_push($email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record], $repeat_instance);
+            }else{
+                $email_repetitive_sent_aux[$instrument][$alertid] = array();
+                array_push($email_repetitive_sent_aux[$instrument][$alertid], $new_record);
+            }
+        }else{
+            $email_repetitive_sent_aux[$instrument][$alertid][$new_record] = "1";
+        }
+        return json_encode($email_repetitive_sent_aux);
+    }
+
+    /*function addJSONRecord($email_repetitive_sent, $new_record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
         $found_new_instrument = true;
+        $email_repetitive_sent_aux = $email_repetitive_sent;
         if(!empty($email_repetitive_sent)){
             foreach ($email_repetitive_sent as $sv_name => $survey_records){
                 $found_alert = false;
@@ -1335,12 +1450,22 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             }
 
                         }else{
+                            if ($sv_number === "repeat_instances") {
+                                echo "REPEAT<br>";
+                                $jsonVarArray[$instrument][$alert]['repeat_instances'] = $email_repetitive_sent_aux[$instrument][$alert]['repeat_instances'];
+                            }else{
+                                array_push($jsonVarArray,$survey_record);
+                            }
+
                             if($survey_record == $new_record){
                                 $found_record = true;
                             }
-                            array_push($jsonVarArray,$survey_record);
+
+
+//                            print_array($jsonVarArray);
                         }
                     }
+                    print_array($jsonVarArray);
 
                     if($isRepeatInstrument){
                         if($sv_name == $instrument && $alert == $alertid) {
@@ -1366,6 +1491,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $jsonArray[$sv_name][$alert] = $jsonVarArray;
                         }
                     }
+                    print_array($jsonVarArray);
+                    echo "__________<br>";
                 }
 
                 if($sv_name == $instrument){
@@ -1386,7 +1513,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $jsonArray = $this->addNewJSONRecord($jsonArray,$instrument,$alertid,$new_record,$isRepeatInstrument,$repeat_instance);
         }
         return json_encode($jsonArray,JSON_FORCE_OBJECT);
-    }
+    }*/
 
     /**
      * Function that adds a new record in the JSON
@@ -1396,7 +1523,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $new_record
      * @return mixed
      */
-    function addNewJSONRecord($jsonArray, $instrument, $alertid, $new_record,$isRepeatInstrument,$repeat_instance){
+    /*function addNewJSONRecord($jsonArray, $instrument, $alertid, $new_record,$isRepeatInstrument,$repeat_instance){
         if($isRepeatInstrument){
             $jsonArray[$instrument][$alertid]['repeat_instances'][$new_record] = array();
             $jsonVarArray = array();
@@ -1410,7 +1537,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         return $jsonArray;
-    }
+    }*/
 }
 
 
