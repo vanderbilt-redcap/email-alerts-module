@@ -1096,6 +1096,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     }
                                 }else if ($record == $survey_record) {
                                     return true;
+                                }else  if($sv_number == 'repeat_instances'){
+                                    //Not repeatable but was at some point and this record was sent
+                                    foreach ($survey_record as $record_repeat => $record_value) {
+                                        if ($record == $record_repeat) {
+                                            foreach ($record_value as $instance => $instance_value) {
+                                                if ($repeat_instance == $instance_value) {
+                                                    return true;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
