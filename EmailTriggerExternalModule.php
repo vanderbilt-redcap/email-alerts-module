@@ -1131,6 +1131,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             }
                                         }
                                     }
+                                    if(array_key_exists($record, $alert_value)){
+                                        $record_found = true;
+                                        echo "__Record found3!<br>";
+                                        if(array_key_exists($event_id, $survey_record)){
+                                            return true;
+                                        }
+                                    }
                                 }else{
                                     echo "__NOT RepeatInstrument found!<br>";
                                     if(array_key_exists($record, $alert_value)){
@@ -1139,7 +1146,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         if(array_key_exists($event_id, $survey_record)){
                                             return true;
                                         }
-                                    }else if(array_key_exists('repeat_instances', $alert_value)){
+                                    }
+                                    if(array_key_exists('repeat_instances', $alert_value)){
                                         #In case they have changed the project to non repeatable
                                         if(array_key_exists($event_id, $survey_record[$record])){
                                             if(!in_array($repeat_instance, $survey_record[$record][$event_id])){
