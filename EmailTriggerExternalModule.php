@@ -1125,19 +1125,23 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 if($isRepeatInstrument){
                                     echo "__isRepeatInstrument found!<br>";
                                     if(array_key_exists('repeat_instances', $alert_value)){
-                                        if(array_key_exists($event_id, $survey_record[$record])){
-                                            if(in_array($repeat_instance, $survey_record[$record][$event_id])){
+                                        if(array_key_exists($record, $alert_value['repeat_instances']) && array_key_exists($event_id, $alert_value['repeat_instances'][$record])){
+                                            if(in_array($repeat_instance, $alert_value['repeat_instances'][$record][$event_id])){
                                                 return true;
                                             }
                                         }
                                     }
+
                                     if(array_key_exists($record, $alert_value)){
                                         $record_found = true;
-                                        echo "__Record found3!<br>";
                                         if(array_key_exists($event_id, $survey_record)){
-                                            return true;
+                                            echo "__Record found4!<br>";
+                                            if(in_array($repeat_instance,$alert_value[$record][$event_id])){
+                                                return true;
+                                            }
                                         }
                                     }
+
                                 }else{
                                     echo "__NOT RepeatInstrument found!<br>";
                                     if(array_key_exists($record, $alert_value)){
@@ -1160,9 +1164,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             //Empty or no records found but are recorded
                             if($this->recordExistsInRegisteredRecords($email_records_sent,$record) && !$record_found){
                                 echo "__RECORD EXIST IN REGISTERED!<br>";
-                                $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$alertid,$isRepeatInstrument,$repeat_instance,$event_id);
+//                                $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$alertid,$isRepeatInstrument,$repeat_instance,$event_id);
 //                                $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
-                                return true;
+//                                return true;
                             }
 
 
