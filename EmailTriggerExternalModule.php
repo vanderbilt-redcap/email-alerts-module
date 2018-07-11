@@ -181,7 +181,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     function sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument){
-//        $id=9;
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_deleted = $this->getProjectSetting("email-deleted",$project_id)[$id];
@@ -1089,35 +1088,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent, $email_records_sent,$event_id, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
-        $isLongitudinal = \REDCap::isLongitudinal();
-//    $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$alertid,$isRepeatInstrument,$repeat_instance,$event_id);
-//    echo "AFTER PRINT<br>";
-//    print_array(json_decode($email_repetitive_sent,true));
-//        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
-
-
-//        $alertid = 9;
-//        $record = 10;
-//        $event_id = 125;
-//        $isLongitudinal = false;
-//        $isRepeatInstrument = true;
-//        $repeat_instance = 1;
-//        $instrument = "my_first_instrument_2";
-
         echo "Alert: ".$alertid."<br>";
         echo "Record: ".$record."<br>";
         echo "Instrument: ".$instrument."<br>";
         echo "Instance: ".$repeat_instance."<br>";
         echo "Event_id: ".$event_id."<br>";
         echo "isRepeatInstrument: ".$isRepeatInstrument."<br>";
-        echo "isLongitudinal: ".$isLongitudinal."<br>";
 
         print_array($email_repetitive_sent);
         if(!empty($email_repetitive_sent)){
             if(array_key_exists($instrument,$email_repetitive_sent)){
                 if(array_key_exists($alertid,$email_repetitive_sent[$instrument])){
                     if($isRepeatInstrument){
-                        echo "__isRepeatInstrument found!<br>";
                         if(array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
                             if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances']) && array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
                                 if(in_array($repeat_instance, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$event_id])){
@@ -1127,7 +1109,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                         if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
                             if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
-                                echo "__Record found4!<br>";
                                 if(in_array($repeat_instance,$email_repetitive_sent[$instrument][$alertid][$record][$event_id])){
                                     return true;
                                 }
@@ -1135,28 +1116,31 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
 
                     }else{
-                        echo "__NOT RepeatInstrument found!<br>";
                         if(array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
-                            echo "__repeat found!<br>";
                             #In case they have changed the project to non repeatable
                             if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
-                                echo "__event found!<br>";
                                 if(in_array($repeat_instance,  $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$event_id])){
                                     return true;
                                 }
                             }
                         }
                         if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
-                            echo "__Record found!<br>";
                             if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
                                 return true;
                             }
                         }
 
                     }
+                    #If the record is registered as sent but it's not in the old repetitive sent structure
+                    if($this->recordExistsInRegisteredRecords($email_records_sent,$record) && (!array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances']) && !array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]))){
+                        $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
+                        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                        return true;
+                    }
                 }
             }
         }
+
         return false;
     }
 
@@ -1352,25 +1336,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return string
      */
     function addRecordSent($email_repetitive_sent, $new_record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id){
-
-//        $alertid = 9;
-//        $new_record = 10;
-//        $event_id = 125;
-//        $isLongitudinal = false;
-//        $isRepeatInstrument = true;
-//        $repeat_instance = 1;
-//        $instrument = "my_first_instrument_2";
-
-        echo "Alert: ".$alertid."<br>";
-        echo "Record: ".$new_record."<br>";
-        echo "Instrument: ".$instrument."<br>";
-        echo "Instance: ".$repeat_instance."<br>";
-        echo "Event_id: ".$event_id."<br>";
-        echo "isRepeatInstrument: ".$isRepeatInstrument."<br>";
-//        echo "isLongitudinal: ".$isLongitudinal."<br>";
-        print_array($email_repetitive_sent);
-//        $this->setProjectSetting('email-repetitive-sent', json_encode($email_repetitive_sent), 86);
-
         $email_repetitive_sent_aux = $email_repetitive_sent;
         if(!empty($email_repetitive_sent)) {
             $found_new_instrument = true;
@@ -1378,17 +1343,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if($sv_name == $instrument) {
                     $found_new_instrument = false;
                     $found_new_alert = true;
-                    echo "__Instrument found<br>";
                     foreach ($survey_records as $alert => $alert_value) {
                         if ($alert == $alertid) {
-                            echo "__Alert found<br>";
                             $found_new_alert = false;
                             $found_new_record = true;
                             $found_is_repeat = false;
                             if(!empty($alert_value)){
                                 foreach ($alert_value as $sv_number => $survey_record) {
                                     if ($sv_number === "repeat_instances") {
-                                        echo "__Repeat_instances found<br>";
                                         $found_is_repeat = true;
                                         if($isRepeatInstrument){
                                             foreach ($alert_value['repeat_instances'] as $survey_record_repeat =>$survey_instances){
@@ -1396,7 +1358,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             }
                                         }
                                     }else if($sv_number == $new_record){
-                                        echo "__Record found<br>";
                                         $found_new_record = false;
                                         if($isRepeatInstrument){
                                             return  $this->addArrayInfo(true,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id);
@@ -1420,13 +1381,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
             }
             if($found_new_instrument){
-                echo "__NEW Instrument<br>";
                 return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id,false);
             }else if($found_new_alert){
-                echo "__NEW Alert<br>";
                 return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id,false);
             }else if($found_new_record){
-                echo "__NEW Record<br>";
                 return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id,$found_is_repeat);
             }else if(!$found_new_record && !$found_is_repeat){
                 return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id,true);
