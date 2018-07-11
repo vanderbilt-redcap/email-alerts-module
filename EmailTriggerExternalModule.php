@@ -1114,63 +1114,45 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         print_array($email_repetitive_sent);
         if(!empty($email_repetitive_sent)){
-            foreach ($email_repetitive_sent as $sv_name => $survey_records){
-                if($sv_name == $instrument) {
-                    echo "__Instrument found!<br>";
-                    foreach ($survey_records as $alert => $alert_value) {
-                        if($alertid == $alert) {
-                            echo "__Alert found!<br>";
-                            $record_found = false;
-                            foreach ($alert_value as $sv_number => $survey_record) {
-                                if($isRepeatInstrument){
-                                    echo "__isRepeatInstrument found!<br>";
-                                    if(array_key_exists('repeat_instances', $alert_value)){
-                                        if(array_key_exists($record, $alert_value['repeat_instances']) && array_key_exists($event_id, $alert_value['repeat_instances'][$record])){
-                                            if(in_array($repeat_instance, $alert_value['repeat_instances'][$record][$event_id])){
-                                                return true;
-                                            }
-                                        }
-                                    }
-
-                                    if(array_key_exists($record, $alert_value)){
-                                        $record_found = true;
-                                        if(array_key_exists($event_id, $survey_record)){
-                                            echo "__Record found4!<br>";
-                                            if(in_array($repeat_instance,$alert_value[$record][$event_id])){
-                                                return true;
-                                            }
-                                        }
-                                    }
-
-                                }else{
-                                    echo "__NOT RepeatInstrument found!<br>";
-                                    if(array_key_exists($record, $alert_value)){
-                                        $record_found = true;
-                                        echo "__Record found!<br>";
-                                        if(array_key_exists($event_id, $survey_record)){
-                                            return true;
-                                        }
-                                    }
-                                    if(array_key_exists('repeat_instances', $alert_value)){
-                                        #In case they have changed the project to non repeatable
-                                        if(array_key_exists($event_id, $survey_record[$record])){
-                                            if(!in_array($repeat_instance, $survey_record[$record][$event_id])){
-                                                return true;
-                                            }
-                                        }
-                                    }
+            if(array_key_exists($instrument,$email_repetitive_sent)){
+                if(array_key_exists($alertid,$email_repetitive_sent[$instrument])){
+                    if($isRepeatInstrument){
+                        echo "__isRepeatInstrument found!<br>";
+                        if(array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
+                            if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances']) && array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
+                                if(in_array($repeat_instance, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$event_id])){
+                                    return true;
                                 }
                             }
-                            //Empty or no records found but are recorded
-                            if($this->recordExistsInRegisteredRecords($email_records_sent,$record) && !$record_found){
-                                echo "__RECORD EXIST IN REGISTERED!<br>";
-//                                $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$alertid,$isRepeatInstrument,$repeat_instance,$event_id);
-//                                $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
-//                                return true;
-                            }
-
-
                         }
+                        if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
+                            if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
+                                echo "__Record found4!<br>";
+                                if(in_array($repeat_instance,$email_repetitive_sent[$instrument][$alertid][$record][$event_id])){
+                                    return true;
+                                }
+                            }
+                        }
+
+                    }else{
+                        echo "__NOT RepeatInstrument found!<br>";
+                        if(array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
+                            echo "__repeat found!<br>";
+                            #In case they have changed the project to non repeatable
+                            if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
+                                echo "__event found!<br>";
+                                if(in_array($repeat_instance,  $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$event_id])){
+                                    return true;
+                                }
+                            }
+                        }
+                        if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
+                            echo "__Record found!<br>";
+                            if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
+                                return true;
+                            }
+                        }
+
                     }
                 }
             }
