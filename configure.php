@@ -14,6 +14,10 @@ $prefix = $_GET['prefix'];
 $pid = $_GET['pid'];
 $from_default = empty($module->getProjectSetting('email-sender'))?array():$module->getProjectSetting('email-sender').',"'.$module->getProjectSetting('emailSender_var').'"';
 
+//print_array(json_decode('{"my_first_instrument":{"2":[{"1":[1]},"1"]}}',true));
+print_array(json_decode('{"my_first_instrument":{"3":[{"1":[1]},"1"]}}',true));
+//$module->setProjectSetting('email-repetitive-sent', '{"my_first_instrument":{"3":[{"1":[1]},"1"]}}', $pid);
+
 $projectData= (array(
     'status' => 'success',
     'settings' => $module->getProjectSettings($pid)));

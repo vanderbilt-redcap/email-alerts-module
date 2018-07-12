@@ -189,6 +189,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
         error_log("isEmailAlreadySentForThisSurvery ".$project_id.": email_repetitive_sent json:".json_encode($email_repetitive_sent));
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance);
+        error_log("isEmailAlreadySentForThisSurvery ".$project_id." after: email_repetitive_sent Value:".$isEmailAlreadySentForThisSurvery);
+        error_log("isEmailAlreadySentForThisSurvery - Instance: ".$repeat_instance);
+        error_log("isEmailAlreadySentForThisSurvery - Record: ".$record);
+        error_log("isEmailAlreadySentForThisSurvery - email_repetitive: ".$email_repetitive);
+        error_log("isEmailAlreadySentForThisSurvery - email_deactivate: ".$email_deactivate);
+        error_log("isEmailAlreadySentForThisSurvery - email_deleted: ".$email_deleted);
         error_log("isEmailAlreadySentForThisSurvery ".$project_id." after: email_repetitive_sent json:".json_encode($email_repetitive_sent));
 //        echo "Alert: ".$id."<br>";
 //        echo "email_repetitive: ".$email_repetitive."<br>";
@@ -1106,6 +1112,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         echo "isRepeatInstrument: ".$isRepeatInstrument."<br>";
 
         print_array($email_repetitive_sent);
+
         if($alertid == 3){
 //            $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
 //            print_array(json_decode($email_repetitive_sent,true));
@@ -1137,17 +1144,22 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
                     if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
+                        echo "Record<br>";
                         if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
                             return true;
-                        }else if($email_repetitive_sent[$instrument][$alertid][$record] == "1"){
-                            #Add the event in the new structure
-                            $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
+                        }else{
+                            #Old structure
+                            if($email_repetitive_sent[$instrument][$alertid][$record] == "1"){
+                                #Add the event in the new structure
+                                $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                             $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
-                            return true;
+                                return true;
+                            }
                         }
                     }
                     #If the record is registered as sent but it's not in the old repetitive sent structure
                     if($this->recordExistsInRegisteredRecords($email_records_sent,$record) && (!array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances']) && !array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]))){
+                        echo "Old Record<br>";
                         $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                         $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
                         return true;
