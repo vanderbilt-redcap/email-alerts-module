@@ -1116,7 +1116,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 //            print_array(json_decode($email_repetitive_sent,true));
 //        }
 
-
         if(!empty($email_repetitive_sent)){
             if(array_key_exists($instrument,$email_repetitive_sent)){
                 if(array_key_exists($alertid,$email_repetitive_sent[$instrument])){
@@ -1129,9 +1128,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     }
                                 }else{
                                     //Old structure
-                                    foreach ($email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record] as $instance){
+                                    foreach ($email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record] as $index=>$instance){
                                         if($instance == $repeat_instance){
-                                            echo "Old<br>";
+                                            #delete the old instance and add a the new structure
+                                            unset($email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$index]);
                                             $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                                             $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
                                             return true;
@@ -1160,6 +1160,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     //Old structure
                                     foreach ($email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record] as $instance){
                                         if($instance == $repeat_instance){
+                                            #delete the old instance and add a the new structure
+                                            unset($email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$index]);
                                             $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                                             $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
                                             return true;
