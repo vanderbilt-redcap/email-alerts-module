@@ -187,58 +187,48 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id),true);
         $email_records_sent = $this->getProjectSetting("email-records-sent",$project_id);
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
-        error_log("isEmailAlreadySentForThisSurvery ".$project_id.": email_repetitive_sent json:".json_encode($email_repetitive_sent));
-        $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance);
-        error_log("isEmailAlreadySentForThisSurvery ".$project_id." after: email_repetitive_sent Value:".$isEmailAlreadySentForThisSurvery);
-        error_log("isEmailAlreadySentForThisSurvery - Instance: ".$repeat_instance);
-        error_log("isEmailAlreadySentForThisSurvery - Record: ".$record);
-        error_log("isEmailAlreadySentForThisSurvery - email_repetitive: ".$email_repetitive);
-        error_log("isEmailAlreadySentForThisSurvery - email_deactivate: ".$email_deactivate);
-        error_log("isEmailAlreadySentForThisSurvery - email_deleted: ".$email_deleted);
-        error_log("isEmailAlreadySentForThisSurvery ".$project_id." after: email_repetitive_sent json:".json_encode($email_repetitive_sent));
-//        echo "Alert: ".$id."<br>";
-//        echo "email_repetitive: ".$email_repetitive."<br>";
-        echo "isEmailAlreadySentForThisSurvery: ".$isEmailAlreadySentForThisSurvery."<br><br><br>";
-//        echo "email_deleted: ".$email_deleted."<br>";
-//        echo "email_deactivate: ".$email_deactivate."<br>";
-//        echo "email_repetitive: ".$email_repetitive."<br>";
+        if(($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
+            error_log("isEmailAlreadySentForThisSurvery ".$project_id.": email_repetitive_sent json:".json_encode($email_repetitive_sent));
+            error_log("isEmailAlreadySentForThisSurvery ".$project_id." - Instance: ".$repeat_instance);
+            error_log("isEmailAlreadySentForThisSurvery ".$project_id." - Record: ".$record);
+            error_log("isEmailAlreadySentForThisSurvery ".$project_id." - Alert: ".$record);
+            error_log("isEmailAlreadySentForThisSurvery ".$project_id." - email_repetitive: ".$email_repetitive);
+            error_log("isEmailAlreadySentForThisSurvery ".$project_id." - email_deactivate: ".$email_deactivate);
+            error_log("isEmailAlreadySentForThisSurvery ".$project_id." - email_deleted: ".$email_deleted);
+            $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance);
+            error_log("isEmailAlreadySentForThisSurvery ".$project_id." isEmailAlreadySentForThisSurvery Value:".$isEmailAlreadySentForThisSurvery);
+            error_log("isEmailAlreadySentForThisSurvery ".$project_id." after: email_repetitive_sent json:".json_encode($email_repetitive_sent));
+            error_log("isEmailAlreadySentForThisSurvery ".$project_id." **********************************************");
+            if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery))) {
+                echo "SEND!<br><br><br><br><br>";
+                error_log("******** isEmailAlreadySentForThisSurvery " . $project_id . " - SENT!: " . $id);
 
-
-        if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery)) && ($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
-            echo "SEND!<br><br><br><br><br>";
-            error_log("isEmailAlreadySentForThisSurvery - Alert: ".$id);
-            error_log("isEmailAlreadySentForThisSurvery - PID: ".$project_id);
-            error_log("isEmailAlreadySentForThisSurvery - Record: ".$record);
-            error_log("isEmailAlreadySentForThisSurvery - Instrument: ".$instrument);
-            error_log("isEmailAlreadySentForThisSurvery - Instance: ".$repeat_instance);
-            error_log("isEmailAlreadySentForThisSurvery - Event_id: ".$event_id);
-            error_log("isEmailAlreadySentForThisSurvery: ".$isEmailAlreadySentForThisSurvery);
-
-            #If the condition is met or if we don't have any, we send the email
-            $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record,$event_id);
-            if($isRepeatInstrument){
-                $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record,$event_id, $repeat_instance, $instrument);
-            }
-            if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && $evaluateLogic) || empty($email_condition)) {
-                $cron_repeat_email = $this->getProjectSetting("cron-repeat-email", $project_id)[$id];
-                $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
-                $cron_send_email_on_field = $this->getProjectSetting("cron-send-email-on-field", $project_id)[$id];
-
-                #To ensure it's the last module called
-                $delayedSuccessful =  $this->delayModuleExecution();
-                if($delayedSuccessful){
-                    return;
+                #If the condition is met or if we don't have any, we send the email
+                $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record, $event_id);
+                if ($isRepeatInstrument) {
+                    $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record, $event_id, $repeat_instance, $instrument);
                 }
+                if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && $evaluateLogic) || empty($email_condition)) {
+                    $cron_repeat_email = $this->getProjectSetting("cron-repeat-email", $project_id)[$id];
+                    $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
+                    $cron_send_email_on_field = $this->getProjectSetting("cron-send-email-on-field", $project_id)[$id];
 
-                if($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field !=''))){
-                    #SCHEDULED EMAIL
-                    if($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $id)){
-                        $this->addQueuedEmail($id,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
+                    #To ensure it's the last module called
+                    $delayedSuccessful = $this->delayModuleExecution();
+                    if ($delayedSuccessful) {
+                        return;
                     }
 
-                }else{
-                    #REGULAR EMAIL
-                    $this->createAndSendEmail($data,$project_id,$record,$id,$instrument,$repeat_instance,$isRepeatInstrument,$event_id,false);
+                    if ($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field != ''))) {
+                        #SCHEDULED EMAIL
+                        if ($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $id)) {
+                            $this->addQueuedEmail($id, $project_id, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument);
+                        }
+
+                    } else {
+                        #REGULAR EMAIL
+                        $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $repeat_instance, $isRepeatInstrument, $event_id, false);
+                    }
                 }
             }
         }
