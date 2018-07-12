@@ -1116,10 +1116,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(array_key_exists($alertid,$email_repetitive_sent[$instrument])){
                     if(array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
                         #In case they have changed the project to non repeatable
-                        $newStructureEventFound = false;
                         if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'])){
                             if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
-                                $newStructureEventFound = true;
                                 if(in_array($repeat_instance, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$event_id])){
                                     return true;
                                 }
@@ -1143,7 +1141,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             return true;
                         }else{
                             #Old structure
-                            if($email_repetitive_sent[$instrument][$alertid][$record] == "1" && !$newStructureEventFound){
+                            if($email_repetitive_sent[$instrument][$alertid][$record] == "1" && !$isRepeatInstrument){
                                 #Add the event in the new structure
                                 $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                                 $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
