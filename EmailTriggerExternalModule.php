@@ -1178,7 +1178,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     #If the record is registered as sent but it's not in the old repetitive sent structure
                     if($this->recordExistsInRegisteredRecords($email_records_sent,$record) && (!array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances']) && !array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]))){
                         $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
-//                        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
                         return true;
                     }
                 }
