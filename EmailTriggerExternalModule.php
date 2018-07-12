@@ -198,6 +198,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery)) && ($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             echo "SEND!<br><br><br><br><br>";
+            error_log("isEmailAlreadySentForThisSurvery - Alert: ".$id);
+            error_log("isEmailAlreadySentForThisSurvery - Record: ".$record);
+            error_log("isEmailAlreadySentForThisSurvery - Instrument: ".$instrument);
+            error_log("isEmailAlreadySentForThisSurvery - Instance: ".$repeat_instance);
+            error_log("isEmailAlreadySentForThisSurvery - Event_id: ".$event_id);
+            error_log("isEmailAlreadySentForThisSurvery: ".$isEmailAlreadySentForThisSurvery);
+            error_log("isEmailAlreadySentForThisSurvery: email_repetitive_sent:".print_r($email_repetitive_sent, TRUE));
+
             #If the condition is met or if we don't have any, we send the email
             $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record,$event_id);
             if($isRepeatInstrument){
@@ -1094,6 +1102,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         echo "Instance: ".$repeat_instance."<br>";
         echo "Event_id: ".$event_id."<br>";
         echo "isRepeatInstrument: ".$isRepeatInstrument."<br>";
+
 
         print_array($email_repetitive_sent);
         if(!empty($email_repetitive_sent)){
