@@ -196,16 +196,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 //        echo "email_deactivate: ".$email_deactivate."<br>";
 //        echo "email_repetitive: ".$email_repetitive."<br>";
 
+        error_log("isEmailAlreadySentForThisSurvery ".$project_id.": email_repetitive_sent json:".json_encode($email_repetitive_sent));
+
         if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery)) && ($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             echo "SEND!<br><br><br><br><br>";
             error_log("isEmailAlreadySentForThisSurvery - Alert: ".$id);
+            error_log("isEmailAlreadySentForThisSurvery - PID: ".$project_id);
             error_log("isEmailAlreadySentForThisSurvery - Record: ".$record);
             error_log("isEmailAlreadySentForThisSurvery - Instrument: ".$instrument);
             error_log("isEmailAlreadySentForThisSurvery - Instance: ".$repeat_instance);
             error_log("isEmailAlreadySentForThisSurvery - Event_id: ".$event_id);
             error_log("isEmailAlreadySentForThisSurvery: ".$isEmailAlreadySentForThisSurvery);
-            error_log("isEmailAlreadySentForThisSurvery: email_repetitive_sent json:".json_encode($email_repetitive_sent));
-            error_log("isEmailAlreadySentForThisSurvery: email_repetitive_sent:".print_r($email_repetitive_sent, TRUE));
 
             #If the condition is met or if we don't have any, we send the email
             $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record,$event_id);
@@ -1105,11 +1106,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         echo "isRepeatInstrument: ".$isRepeatInstrument."<br>";
 
         print_array($email_repetitive_sent);
-//        if($alertid == 3){
+        if($alertid == 3){
 //            $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
 //            print_array(json_decode($email_repetitive_sent,true));
 //            $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
-//        }
+        }
 
         if(!empty($email_repetitive_sent)){
             if(array_key_exists($instrument,$email_repetitive_sent)){
