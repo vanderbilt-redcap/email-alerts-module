@@ -77,7 +77,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
                 }
-                die;
+//                die;
             }
         }
     }
