@@ -187,8 +187,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id),true);
         $email_records_sent = $this->getProjectSetting("email-records-sent",$project_id);
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
+        error_log("isEmailAlreadySentForThisSurvery ".$project_id.": email_repetitive_sent json:".json_encode($email_repetitive_sent));
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance);
-
+        error_log("isEmailAlreadySentForThisSurvery ".$project_id." after: email_repetitive_sent json:".json_encode($email_repetitive_sent));
 //        echo "Alert: ".$id."<br>";
 //        echo "email_repetitive: ".$email_repetitive."<br>";
         echo "isEmailAlreadySentForThisSurvery: ".$isEmailAlreadySentForThisSurvery."<br><br><br>";
@@ -196,7 +197,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 //        echo "email_deactivate: ".$email_deactivate."<br>";
 //        echo "email_repetitive: ".$email_repetitive."<br>";
 
-        error_log("isEmailAlreadySentForThisSurvery ".$project_id.": email_repetitive_sent json:".json_encode($email_repetitive_sent));
 
         if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery)) && ($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             echo "SEND!<br><br><br><br><br>";
