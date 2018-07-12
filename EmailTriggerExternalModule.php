@@ -200,6 +200,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             error_log("isEmailAlreadySentForThisSurvery ".$project_id." isEmailAlreadySentForThisSurvery Value:".$isEmailAlreadySentForThisSurvery);
             error_log("isEmailAlreadySentForThisSurvery ".$project_id." after: email_repetitive_sent json:".json_encode($email_repetitive_sent));
             error_log("isEmailAlreadySentForThisSurvery ".$project_id." **********************************************");
+            echo "isEmailAlreadySentForThisSurvery: ".$isEmailAlreadySentForThisSurvery."<br>";
             if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery))) {
                 echo "SEND!<br><br><br><br><br>";
                 error_log("******** isEmailAlreadySentForThisSurvery " . $project_id . " - SENT!: " . $id);
@@ -1115,8 +1116,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(array_key_exists($alertid,$email_repetitive_sent[$instrument])){
                     if(array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
                         #In case they have changed the project to non repeatable
+                        $newStructureEventFound = false;
                         if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'])){
                             if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
+                                $newStructureEventFound = true;
                                 if(in_array($repeat_instance, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$event_id])){
                                     return true;
                                 }
@@ -1140,7 +1143,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             return true;
                         }else{
                             #Old structure
-                            if($email_repetitive_sent[$instrument][$alertid][$record] == "1"){
+                            if($email_repetitive_sent[$instrument][$alertid][$record] == "1" && !$newStructureEventFound){
                                 #Add the event in the new structure
                                 $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                                 $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
@@ -1151,7 +1154,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                     #If the record is registered as sent but it's not in the old repetitive sent structure
                     if($this->recordExistsInRegisteredRecords($email_records_sent,$record) && (!array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances']) && !array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]))){
-                        echo "Old Record<br>";
                         $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                         $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
                         error_log("isEmailAlreadySentForThisSurvery ".$project_id." - Records missed: ".$repeat_instance);
