@@ -77,7 +77,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
                 }
-//                die;
+                die;
             }
         }
     }
@@ -229,7 +229,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     } else {
                         #REGULAR EMAIL
-                        $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $repeat_instance, $isRepeatInstrument, $event_id, false);
+                        $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $repeat_instance, $isRepeatInstrument, $event_id, false,$isEmailAlreadySentForThisSurvery);
                     }
                 }
             }
@@ -522,7 +522,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
         $data = \REDCap::getData($project_id,"array",$record);
-        $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true);
+        $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id),true);
+        $email_records_sent = $this->getProjectSetting("email-records-sent",$project_id);
+        $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$instance);
+        $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true,$isEmailAlreadySentForThisSurvery);
         return $email_sent;
     }
 
@@ -584,7 +587,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $isCron
      * @return bool
      */
-    function createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron){
+    function createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron,$isEmailAlreadySentForThisSurvery=false){
         //memory increase
         ini_set('memory_limit', '512M');
 
@@ -677,8 +680,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id);
             $this->setProjectSetting('email-sent', $email_sent, $project_id);
 
-            $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$id,$isRepeatInstrument,$instance,$event_id);
-            $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+            if(!$isEmailAlreadySentForThisSurvery){
+                $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$id,$isRepeatInstrument,$instance,$event_id);
+                $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+            }
 
             $email_repetitive_sent = json_decode($email_repetitive_sent,true);
             if($email_records_sent[$id] == ''){
@@ -1103,7 +1108,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         echo "Event_id: ".$event_id."<br>";
         echo "isRepeatInstrument: ".$isRepeatInstrument."<br>";
 
-        print_array($email_repetitive_sent);
+//        print_array($email_repetitive_sent);
 
         if($alertid == 3){
 //            $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
