@@ -1570,7 +1570,6 @@ if(USERID != "") {
                                 <textarea class="form-control" id="queue_ids" rows="6"></textarea>
                             </div>
                         </div>
-                        <span id="index_modal_message"></span>
                         <input type="hidden" value="" id="index_modal_queue" name="index_modal_queue">
                     </div>
 
