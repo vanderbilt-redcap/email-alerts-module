@@ -1133,7 +1133,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         if($instance == $repeat_instance){
                                             echo "Old<br>";
                                             $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
-//                                            $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                                            $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
                                             return true;
                                         }
                                     }
@@ -1160,6 +1160,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     //Old structure
                                     foreach ($email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record] as $instance){
                                         if($instance == $repeat_instance){
+                                            $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
+                                            $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
                                             return true;
                                         }
                                     }
