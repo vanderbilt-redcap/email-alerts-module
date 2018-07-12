@@ -187,6 +187,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id),true);
         $email_records_sent = $this->getProjectSetting("email-records-sent",$project_id);
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
+
         if(($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             error_log("isEmailAlreadySentForThisSurvery ".$project_id.": email_repetitive_sent json:".json_encode($email_repetitive_sent));
             error_log("isEmailAlreadySentForThisSurvery ".$project_id." - Instance: ".$repeat_instance);
@@ -1127,6 +1128,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         unset($email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$index]);
                                         $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                                         $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                                        error_log("isEmailAlreadySentForThisSurvery ".$project_id." - Old Structure repeat instance: ".$repeat_instance);
                                         return true;
                                     }
                                 }
@@ -1134,7 +1136,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
                     if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
-                        echo "Record<br>";
                         if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
                             return true;
                         }else{
@@ -1142,7 +1143,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             if($email_repetitive_sent[$instrument][$alertid][$record] == "1"){
                                 #Add the event in the new structure
                                 $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
-                            $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                                $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                                error_log("isEmailAlreadySentForThisSurvery ".$project_id." - Old Structure record: ".$repeat_instance);
                                 return true;
                             }
                         }
@@ -1152,6 +1154,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         echo "Old Record<br>";
                         $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                         $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                        error_log("isEmailAlreadySentForThisSurvery ".$project_id." - Records missed: ".$repeat_instance);
                         return true;
                     }
                 }
