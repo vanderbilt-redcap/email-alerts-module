@@ -1559,8 +1559,15 @@ if(USERID != "") {
                                 <div><input type="text" id='last_sent' class="external-modules-input-element" placeholder="YYYY-MM-DD"></div>
                             </div>
                             <div class="form-group">
-                                <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Number of times the email has been sent already</label></div>
+                                <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Number of times the email has previously been sent for the records added below.<br><span style="color:red">*0 if you want to send it right now, otherwise enter a number.</span></div>
                                 <div><input type="text" id='times_sent' value="0"></div>
+                            </div>
+                            <div class="form-group">
+                                <div>
+                                    <label style="font-weight: normal;padding-left: 15px;padding-right: 15px">
+                                        <span style="color:red">Example of use:<br>Date the email will be sent = Alert date + (Alert repeating days * <b>Times Sent</b>)<br>2018-07-15 = 2018-07-09 + (3 * 2)</span>
+                                    </label>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="exampleFormControlTextarea1" style="font-weight: normal;padding-left: 15px;">Insert the <strong>Record ID's</strong> to automatically Add the Queues Emails.<br/>
