@@ -102,11 +102,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $record_id = urldecode($_REQUEST['record']);
 
             #Delete email repetitive sent and the list of records before deleting all data
-            $email_repetitive_sent =  empty($this->getProjectSetting('email-repetitive-sent'))?array():$this->getProjectSetting('email-repetitive-sent');
+            $email_repetitive_sent =  $this->getProjectSetting('email-repetitive-sent');
             $email_repetitive_sent = json_decode($email_repetitive_sent,true);
-            $email_records_sent =  empty($this->getProjectSetting('email-records-sent'))?array():$this->getProjectSetting('email-records-sent');
+            $email_records_sent =  $this->getProjectSetting('email-records-sent');
 
-            if(!empty($email_repetitive_sent)) {
+            if($email_repetitive_sent) {
                 foreach ($email_repetitive_sent as $form => $form_value) {
                     foreach ($form_value as $alert => $alert_value) {
                         $one_less = 0;
@@ -123,7 +123,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
                 $this->setProjectSetting('email-repetitive-sent', json_encode($jsonArray));
             }
-            if(!empty($email_records_sent)){
+            if($email_records_sent){
                 foreach ($email_records_sent as $index=>$sent){
                     $records = array_map('trim', explode(',', $sent));
                     foreach ($records as $record){
@@ -141,9 +141,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
 
             #Delete the queued emails for that record
-            $email_queue =  empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
+            $email_queue = $this->getProjectSetting('email-queue');
             $email_queue_aux = $email_queue;
-            if(!empty($email_queue)){
+            if($email_queue){
                 foreach ($email_queue as $id=>$email){
                     if($email['project_id'] == $project_id && $email['record'] == $record){
                         unset($email_queue_aux[$id]);
