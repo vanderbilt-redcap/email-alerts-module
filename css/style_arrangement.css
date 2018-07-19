@@ -46,3 +46,9 @@
 .glyphicon-triangle-top:before {
     content: "\e253";
 }
+@media (min-width: 576px){
+    .modal-dialog {
+        max-width: 800px;
+    }
+}
+

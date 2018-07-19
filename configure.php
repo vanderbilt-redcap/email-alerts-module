@@ -1024,7 +1024,7 @@ if(USERID != "") {
             </div>
         </div>
     </div>
-    <div width="100%">
+    <div style="width:100%">
         <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Save Settings</button>
     </div>
 </form>
