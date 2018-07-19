@@ -71,13 +71,9 @@ if(USERID != "") {
     }
 }
 ?>
-    <!DOCTYPE html>
-    <html lang="en">
-<head>
-    <link type='text/css' href='<?=$module->getUrl('css/bootstrap.min.css')?>' rel='stylesheet' media='screen' />
-    <link type='text/css' href='<?=$module->getUrl('css/bootstrap-theme.min.css')?>' rel='stylesheet' media='screen' />
+
     <link type='text/css' href='<?=$module->getUrl('css/font-awesome.min.css')?>' rel='stylesheet' media='screen' />
-    <script type="text/javascript" src="<?=$module->getUrl('js/bootstrap.min.js')?>"></script>
+    <link type='text/css' href='<?=$module->getUrl('css/redcap_old_style.css')?>' rel='stylesheet' media='screen' />
 
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/jquery.flexdatalist.min.css')?>">
@@ -925,7 +921,6 @@ if(USERID != "") {
             });
         };
     </script>
-    </head>
 <?php
     $tr_class = 'in';
     if($indexSubSet>0) {
