@@ -73,7 +73,7 @@ if(USERID != "") {
 ?>
 
     <link type='text/css' href='<?=$module->getUrl('css/font-awesome.min.css')?>' rel='stylesheet' media='screen' />
-    <link type='text/css' href='<?=$module->getUrl('css/style_arrangement.min.css')?>' rel='stylesheet' media='screen' />
+    <link type='text/css' href='<?=$module->getUrl('css/style_arrangement.css')?>' rel='stylesheet' media='screen' />
 
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/jquery.flexdatalist.min.css')?>">
