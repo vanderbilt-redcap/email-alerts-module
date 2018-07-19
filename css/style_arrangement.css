@@ -18,7 +18,7 @@
     background-color: #5bc0de;
     border-color: #46b8da;
 }
-a {
-    color: #337ab7;
+#customizedAlertsPreview a {
+    color: #337ab7 !important;
     text-decoration: none;
 }
