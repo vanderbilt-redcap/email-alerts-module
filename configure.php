@@ -71,6 +71,9 @@ if(USERID != "") {
     }
 }
 ?>
+    <!DOCTYPE html>
+    <html lang="en">
+<head>
     <link type='text/css' href='<?=$module->getUrl('css/bootstrap.min.css')?>' rel='stylesheet' media='screen' />
     <link type='text/css' href='<?=$module->getUrl('css/bootstrap-theme.min.css')?>' rel='stylesheet' media='screen' />
     <link type='text/css' href='<?=$module->getUrl('css/font-awesome.min.css')?>' rel='stylesheet' media='screen' />
@@ -922,6 +925,7 @@ if(USERID != "") {
             });
         };
     </script>
+    </head>
 <?php
     $tr_class = 'in';
     if($indexSubSet>0) {
