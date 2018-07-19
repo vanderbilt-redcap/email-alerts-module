@@ -1,3 +1,20 @@
 [type=reset], [type=submit], button, html [type=button] {
     -webkit-appearance: button-bevel;
 }
+.btn-warning{
+    background-color: #f0ad4e;
+    border-color: #eea236;
+}
+.btn-info{
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
+
+.btn-success{
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+}
+.btn-info {
+    background-color: #5bc0de;
+    border-color: #46b8da;
+}
