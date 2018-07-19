@@ -299,7 +299,7 @@ function addQueue(index,form){
         },
         success: function (result) {
             jsonAjax = jQuery.parseJSON(result);
-            console.log(jsonAjax)
+            // console.log(jsonAjax)
             $('#event_queue').html(jsonAjax.event);
         }
     });

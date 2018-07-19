@@ -228,7 +228,7 @@
     background-color: #ddd !important;
     color: #000000 !important;
 }
-.btn_datapiping:hover{
+.btn_datapiping:hover,a:hover{
     background-color: #a6a6a6 !important;
     font-size: 12px !important;
 }
