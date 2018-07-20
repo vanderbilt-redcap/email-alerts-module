@@ -1513,7 +1513,7 @@ if(USERID != "") {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -1542,7 +1542,7 @@ if(USERID != "") {
 
     <div class="modal fade" id="external-modules-configure-modal-addQueue" tabindex="-1" role="dialog" aria-labelledby="Codes">
         <form class="form-horizontal" action="" method="post" id='addQueue'>
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-dialog-queue" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -1554,19 +1554,19 @@ if(USERID != "") {
                             <div class="form-group">
                                 <div style="float: left;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px;color:red">*This is to add records that are not in the queue or that have been deleted.</label></div>
                             </div>
-                            <div class="form-group">
-                                <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Event ID</label></div>
-                                <div id='event_queue'></div>
+                            <div class="form-group" style="display: inline-block;">
+                                <div style="float:left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Event ID</label></div>
+                                <div id='event_queue' class="float-left"></div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="display: inline-block;">
                                 <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Date record was last sent via the queue<br><span style="color:red">*This value only needs to be entered if record was previously in queue</span></label></div>
-                                <div><input type="text" id='last_sent' class="external-modules-input-element" placeholder="YYYY-MM-DD"></div>
+                                <div class="float-left"><input type="text" id='last_sent' class="external-modules-input-element" placeholder="YYYY-MM-DD"></div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="display: inline-block;">
                                 <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Number of times the email has previously been sent for the records added below.<br><span style="color:red">*0 if you want to send it right now, otherwise enter a number.</span></div>
-                                <div><input type="text" id='times_sent' value="0"></div>
+                                <div class="float-left"><input type="text" id='times_sent' value="0"></div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="display: inline-block;">
                                 <div>
                                     <label style="font-weight: normal;padding-left: 15px;padding-right: 15px">
                                         <span style="color:red">Example of use:<br>Date the email will be sent = Alert date + (Alert repeating days * <b>Times Sent</b>)<br>2018-07-15 = 2018-07-09 + (3 * 2)</span>

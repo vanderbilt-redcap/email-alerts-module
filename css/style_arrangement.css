@@ -47,8 +47,14 @@
     content: "\e253";
 }
 @media (min-width: 576px){
-    .modal-dialog {
-        max-width: 800px;
+    .modal-dialog-queue {
+        max-width: 600px !important;
+    }
+    #external-modules-configure-modal-record .modal-dialog {
+        max-width: 600px !important;
+    }
+    .modal-dialog:not(.modal-dialog-queue){
+        max-width:800px;
     }
 }
 .close{
@@ -58,4 +64,7 @@
     position: absolute;
     top: 20px;
     right: 20px;
+}
+.float-left{
+    float: left !important;
 }
