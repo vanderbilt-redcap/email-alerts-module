@@ -68,3 +68,6 @@
 .float-left{
     float: left !important;
 }
+.popover{
+    max-width:300px;
+}

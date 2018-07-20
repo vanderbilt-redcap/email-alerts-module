@@ -137,11 +137,21 @@ if(USERID != "") {
                 jQuery(this).parent().find('div.popover .close').on('click', function(e){
                     popover.popover('hide');
                 });
+                $('div.popover .close').on('click', function(e){
+                    popover.popover('hide');
+                });
+
             });
             //We add this or the second time we click it won't work. It's a bug in bootstrap
             $('[data-toggle="popover"]').on("hidden.bs.popover", function() {
-                $(this).data("bs.popover").inState.click = false
-            })
+                if($(this).data("bs.popover").inState == undefined){
+                    //BOOTSTRAP 4
+                    $(this).data("bs.popover")._activeTrigger.click = false;
+                }else{
+                    //BOOTSTRAP 3
+                    $(this).data("bs.popover").inState.click = false;
+                }
+            });
 
             //For Entries
             var rtable = $('#customizedAlertsPreview').DataTable({"pageLength": 50});
@@ -1585,8 +1595,8 @@ if(USERID != "") {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" form="addQueue" class="btn btn-default btn-delete" id='btnModalAddQueue'>Add Queue</button>
                         <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                        <button type="submit" form="addQueue" class="btn btn-default btn-delete" id='btnModalAddQueue'>Add Queue</button>
                     </div>
                 </div>
             </div>
