@@ -17,9 +17,6 @@ $instance = $_POST['instance'];
 if($instance == "")
     $instance = "1";
 
-if($last_sent == "")
-    $last_sent = date("Y-m-d");
-
 if($event_id == '')
 //    $event_id = $this->getProjectSetting("form-name-event", $project_id)[$index];
 
