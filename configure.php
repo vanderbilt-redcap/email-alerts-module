@@ -40,7 +40,7 @@ foreach($simple_config['email-dashboard-settings'] as $configKey => $configRow) 
 $message="";
 $message_text = array('C'=>'<strong>Success!</strong> The configuration has been saved.','A'=>'<strong>Success!</strong> New Email Added.','U'=>'<strong>Success!</strong> Email Updated.',
     'D'=>'<strong>Success!</strong> Email Deleted.','T'=>'<strong>Success!</strong> Email Activated.','E'=>'<strong>Success!</strong> Email Deactivated.',
-    'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.','Q'=>'<strong>Success!</strong> New Queued Email Added.');
+    'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.','Q'=>'<strong>Success!</strong> New Queued Email Added.','O'=>'<strong>Success!</strong> Queue Deleted.');
 
 if(array_key_exists('message', $_REQUEST)){
     $message = $message_text[$_REQUEST['message']];
@@ -106,6 +106,7 @@ if(USERID != "") {
         var _reenableform_url = '<?=$module->getUrl('reEnableForm.php')?>';
         var _preview_url = '<?=$module->getUrl('previewForm.php')?>';
         var _update_queue_url = '<?=$module->getUrl('updateQueue.php')?>';
+        var _delete_queue_url = '<?=$module->getUrl('deleteQueue.php')?>';
         var _preview_queue_url = '<?=$module->getUrl('previewQueue.php')?>';
         var _preview_record_url = '<?=$module->getUrl('previewRecordForm.php')?>';
         var _edoc_name_url = '<?=$module->getUrl('get-edoc-name.php')?>';
@@ -1532,7 +1533,7 @@ if(USERID != "") {
 
     <div class="modal fade" id="external-modules-configure-modal-queue" tabindex="-1" role="dialog" aria-labelledby="Codes">
         <form class="form-horizontal" action="" method="post" id='selectPreviewQueue'>
-            <div class="modal-dialog" role="document" style="width: 800px">
+            <div class="modal-dialog modal-dialog-preview-queue" role="document" style="width: 950px">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>

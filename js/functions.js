@@ -40,6 +40,9 @@ function previewEmailAlertQueue(index){
         }
     });
 }
+function deleteEmailAlertQueue(index){
+    ajaxLoadOptionAndMessage("&index_modal_queue="+index+"&pid="+project_id,_delete_queue_url,"O");
+}
 
 function loadPreviewEmailAlertRecord(data){
     $.ajax({

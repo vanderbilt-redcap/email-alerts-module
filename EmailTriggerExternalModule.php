@@ -463,6 +463,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $queue['instrument'] = $instrument;
         $queue['instance'] = $instance;
         $queue['isRepeatInstrument'] = $isRepeatInstrument;
+        $queue['creation_date'] = date('Y-m-d');
 
         $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$alert];
         $queue['option'] = $cron_send_email_on;

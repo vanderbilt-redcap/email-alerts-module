@@ -50,10 +50,14 @@
     .modal-dialog-queue {
         max-width: 600px !important;
     }
+    .modal-dialog-preview-queue {
+        max-width: 950px !important;
+        font-size:11px !important;
+    }
     #external-modules-configure-modal-record .modal-dialog {
         max-width: 600px !important;
     }
-    .modal-dialog:not(.modal-dialog-queue){
+    .modal-dialog:not(.modal-dialog-queue,.modal-dialog-preview-queue){
         max-width:800px;
     }
 }
