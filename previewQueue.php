@@ -44,7 +44,7 @@ if($email_queue != '') {
             $queued_emails = true;
             $preview .= "<tr><td>".$queue['creation_date']."</td><td>".$queue['times_sent']."</td><td>".$queue['last_sent']."</td><td>".$queue['record']."</td><td>".$queue['event_id']."</td><td>".$queue['instrument']."</td><td>".$queue['instance']."</td><td>".$queue['isRepeatInstrument']."</td><td>".$queue['option']."</td><td>".$queue['deactivated']."</td>";
             if($super_user) {
-                $preview .= "<td><i class=\"far fa-trash-alt\" style='cursor:pointer' onclick='deleteEmailAlertQueue(\"".$id."\")'></i>";
+                $preview .= "<td><i class=\"far fa-trash-alt\" style='cursor:pointer' onclick='deleteEmailAlertQueue(\"".$id."\",\"".$index."\")'></i>";
             }
             $preview .= "</td></tr>";
         }

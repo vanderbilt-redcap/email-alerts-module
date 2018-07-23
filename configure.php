@@ -283,7 +283,7 @@ if(USERID != "") {
                     }
                     inputHtml += '<tr field="form-name-event" class="form-control-custom" style="display:none"></tr>';
                     return inputHtml;
-                }else if(!isAdmin && (setting.key == 'cron-send-email-on' || setting.key == 'cron-send-email-on-field' || setting.key == 'cron-repeat-email' || setting.key == 'cron-repeat-until' || setting.key == 'cron-repeat-until-field' || setting.key == 'cron-repeat-for' || setting.key == 'cron-send-email-on-update' || setting.key == 'cron-send-email-on-field-update' || setting.key == 'cron-repeat-email-update' || setting.key == 'cron-repeat-until-update' || setting.key == 'cron-repeat-until-field-update' || setting.key == 'cron-repeat-for-update')){
+                }else if(!isAdmin && (setting.key == 'cron-send-email-on' || setting.key == 'cron-send-email-on-field' || setting.key == 'cron-queue-expiration-date' || setting.key == 'cron-queue-expiration-date-field' || setting.key == 'cron-repeat-email' || setting.key == 'cron-repeat-until' || setting.key == 'cron-repeat-until-field' || setting.key == 'cron-repeat-for' || setting.key == 'cron-send-email-on-update' || setting.key == 'cron-send-email-on-field-update' || setting.key == 'cron-repeat-email-update' || setting.key == 'cron-repeat-until-update' || setting.key == 'cron-repeat-until-field-update' || setting.key == 'cron-repeat-for-update')){
                     //if it's not admin we don't show the Schedule editing
                 }else if(isAdmin && setting.key == 'cron-repeat-until-field-update'){
 
@@ -386,11 +386,27 @@ if(USERID != "") {
                 $('[name="email-from"]').val(from_default);
 
                 $('[name="cron-send-email-on"][value="now"').prop('checked',true);
+                $('[name="cron-queue-expiration-date"][value="date"').prop('checked',true);
                 $('[name="cron-repeat-until"][value="forever"').prop('checked',true);
-                $('[field="cron-send-email-on-field"]').hide();
                 $('[field="cron-repeat-for"]').hide();
                 $('[field="cron-repeat-until"]').hide();
                 $('[field="cron-repeat-until-field"]').hide();
+
+                //Add calendar on expiration by default
+                var suffix='-update';
+                $('[field="cron-queue-expiration-date-field"] td input').addClass('datepicker_aux_expire');
+                $('[field="cron-queue-expiration-date-field"] td input').addClass('datepicker');
+                $('[field="cron-queue-expiration-date-field"] td input').attr('placeholder','YYYY-MM-DD');
+                $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker_aux_expire');
+                $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker');
+                $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
+                $(".datepicker_aux_expire").datepicker({
+                    showOn: "button",
+                    buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                    buttonImageOnly: true,
+                    buttonText: "Select date",
+                    dateFormat: "yy-mm-dd"
+                });
 
                 //Clean up values
                 $('#email-to').val("");
@@ -533,6 +549,32 @@ if(USERID != "") {
                     }
                 }
             });
+            $('[name="cron-queue-expiration-date"],[name="cron-queue-expiration-date-update"]').on('click', function(e){
+                var suffix = '';
+                if($(this).attr('name').includes("-update")){
+                    suffix = '-update';
+                }
+
+                if($(this).val() == 'date'){
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker_aux_expire');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
+                    $(".datepicker_aux_expire").datepicker({
+                        showOn: "button",
+                        buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                        buttonImageOnly: true,
+                        buttonText: "Select date",
+                        dateFormat: "yy-mm-dd"
+                    });
+                }else{
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').datepicker("destroy");
+                    $('[field="ccron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker_aux_expire');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','');
+                }
+
+            });
 
             $('[name="cron-repeat-email"],[name="cron-repeat-email-update"]').on('click', function(e){
                 var suffix = '';
@@ -588,7 +630,7 @@ if(USERID != "") {
                 if($(this).attr('name').includes("-update")){
                     suffix = '-update';
                 }
-                checkSchedule($(this).is(':checked'),suffix,$('[name=cron-send-email-on'+suffix+']:checked').val(),$('[name=cron-send-email-on-field'+suffix+']').val(),$('[name=cron-repeat-email'+suffix+']').is(':checked'),$('[name=cron-repeat-for'+suffix+']').val(),$('[name=cron-repeat-until'+suffix+']:checked').val(),$('[name=cron-repeat-until-field'+suffix+']').val());
+                checkSchedule($(this).is(':checked'),suffix,$('[name=cron-send-email-on'+suffix+']:checked').val(),$('[name=cron-send-email-on-field'+suffix+']').val(),$('[name=cron-repeat-email'+suffix+']').is(':checked'),$('[name=cron-repeat-for'+suffix+']').val(),$('[name=cron-repeat-until'+suffix+']:checked').val(),$('[name=cron-repeat-until-field'+suffix+']').val(),$('[name=cron-queue-expiration-date'+suffix+']:checked').val(),$('[name=cron-queue-expiration-date-field'+suffix+']:checked').val());
             });
 
             /***LONGITUDINAL***/
@@ -1184,7 +1226,7 @@ if(USERID != "") {
                 $redcapLogic = '<br>REDCap Logic: <strong>None</strong>';
                 $isRepeatCron = false;
                 foreach ($config['email-dashboard-settings'] as $configKey => $configRow) {
-                    if ($configRow['key'] == 'cron-send-email-on' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-repeat-email' || $configRow['key'] == 'cron-repeat-until' || $configRow['key'] == 'cron-repeat-until-field' || $configRow['key'] == 'cron-repeat-for') {
+                    if ($configRow['key'] == 'cron-send-email-on' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-repeat-email' || $configRow['key'] == 'cron-repeat-until' || $configRow['key'] == 'cron-repeat-until-field' || $configRow['key'] == 'cron-repeat-for' || $configRow['key'] == 'cron-queue-expiration-date' || $configRow['key'] == 'cron-queue-expiration-date-field') {
                         //SHCEDULE EMAIL INFO
                         if($configRow['key'] == 'cron-send-email-on'){
                             if($configRow['value'][$index] == "now" || $configRow['value'][$index] == ""){
@@ -1216,6 +1258,17 @@ if(USERID != "") {
                         }
                         if($configRow['key'] == 'cron-repeat-until-field' && $configRow['value'][$index] != '' && $isRepeatCron){
                             $scheduled_email .= $configRow['value'][$index];
+                        }
+                        if($configRow['key'] == "cron-queue-expiration-date" && $configRow['value'][$index] != "" && $configRow['value'][$index] != null){
+                            $scheduled_email .= "<br> Expires on ";
+                            if($configRow['value'][$index] == "date"){
+                                $scheduled_email .= "date";
+                            }else if($configRow['value'][$index] == "cond"){
+                                $scheduled_email .= "condition";
+                            }
+                        }
+                        if($configRow['key'] == "cron-queue-expiration-date-field" && $configRow['value'][$index] != ""){
+                            $scheduled_email .= ": ".$configRow['value'][$index]."";
                         }
                     }else{
                         //NORMAL EMAIL

@@ -436,7 +436,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     array_push($delete_queue,$index);
                 }
             }else if($cron_repeat_until == 'cond' && $cron_repeat_until_field != ""){
-                if(!$evaluateLogic){
+                if($evaluateLogic){
                     array_push($delete_queue,$index);
                 }
             }
@@ -525,14 +525,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $cron_repeat_until
      * @param $cron_repeat_until_field
      */
-    function addQueueLog($pid,$action_description,$cron_send_email_on,$cron_send_email_on_field,$cron_repeat_email,$cron_repeat_for,$cron_repeat_until,$cron_repeat_until_field){
+    function addQueueLog($pid,$action_description,$cron_send_email_on,$cron_send_email_on_field,$cron_repeat_email,$cron_repeat_for,$cron_repeat_until,$cron_repeat_until_field,$cron_queue_expiration_date,$cron_queue_expiration_date_field){
         #Add logs
         if($cron_send_email_on == "now"){
             $scheduled_email = "Send ".$cron_send_email_on."";
         }else if($cron_send_email_on == "date"){
             $scheduled_email = "Send on ".$cron_send_email_on;
         }else if($cron_send_email_on == "calc"){
-            $scheduled_email = "Send on calculation";
+            $scheduled_email = "Send on condition";
         }
         if($cron_send_email_on_field != ""){
             $scheduled_email .= ": ".$cron_send_email_on_field."";
@@ -553,6 +553,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             if($cron_repeat_until_field != ''){
                 $scheduled_email .= $cron_repeat_until_field;
             }
+        }
+
+        $scheduled_email .= "\n Expires on ";
+        if($cron_queue_expiration_date == "date"){
+            $scheduled_email = "date";
+        }else if($cron_queue_expiration_date == "calc"){
+            $scheduled_email = "condition";
+        }
+        if($cron_queue_expiration_date_field != ""){
+            $scheduled_email .= ": ".$cron_queue_expiration_date_field."";
         }
 
         $changes_made = $scheduled_email;

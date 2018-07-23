@@ -26,6 +26,8 @@ $cron_repeat_email =  empty($module->getProjectSetting('cron-repeat-email'))?arr
 $cron_repeat_for =  empty($module->getProjectSetting('cron-repeat-for'))?array():$module->getProjectSetting('cron-repeat-for');
 $cron_repeat_until =  empty($module->getProjectSetting('cron-repeat-until'))?array():$module->getProjectSetting('cron-repeat-until');
 $cron_repeat_until_field=  empty($module->getProjectSetting('cron-repeat-until-field'))?array():$module->getProjectSetting('cron-repeat-until-field');
+$cron_queue_expiration_date =  empty($module->getProjectSetting('cron-queue-expiration-date'))?array():$module->getProjectSetting('cron-queue-expiration-date');
+$cron_queue_expiration_date_field =  empty($module->getProjectSetting('cron-queue-expiration-date-field'))?array():$module->getProjectSetting('cron-queue-expiration-date-field');
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
 
 #checkboxes
@@ -64,9 +66,9 @@ $action_description = "Modifications on Scheduled Alert ".$index;
 $schedule_changed = false;
 if($cron_send_email_on[$index] != $_REQUEST['cron-send-email-on-update'] || $cron_send_email_on_field[$index] != $_REQUEST['cron-send-email-on-field-update'] ||
     $cron_repeat_email[$index] != $cron_repeat || $cron_repeat_for[$index] != $_REQUEST['cron-repeat-for-update'] ||
-    $cron_repeat_until[$index] != $_REQUEST['cron-repeat-until-update'] || $cron_repeat_until_field[$index] != $_REQUEST['cron-repeat-until-field-update']){
+    $cron_queue_expiration_date[$index] != $_REQUEST['cron-queue-expiration-date-update'] || $cron_queue_expiration_date_field[$index] != $_REQUEST['cron-queue-expiration-date-field-update']){
     $schedule_changed = true;
-    $module->addQueueLog($pid, $action_description." - Old Settings", $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_email[$index], $cron_repeat_for[$index], $cron_repeat_until[$index], $cron_repeat_until_field[$index]);
+    $module->addQueueLog($pid, $action_description." - Old Settings", $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_email[$index], $cron_repeat_for[$index], $cron_repeat_until[$index], $cron_repeat_until_field[$index], $cron_queue_expiration_date[$index], $cron_queue_expiration_date_field[$index]);
 }
 
 #Replace new data with old
@@ -88,9 +90,11 @@ $cron_repeat_email[$index] = $cron_repeat;
 $cron_repeat_for[$index] = $_REQUEST['cron-repeat-for-update'];
 $cron_repeat_until[$index] = $_REQUEST['cron-repeat-until-update'];
 $cron_repeat_until_field[$index] = $_REQUEST['cron-repeat-until-field-update'];
+$cron_queue_expiration_date[$index] = $_REQUEST['cron-queue-expiration-date-update'];
+$cron_queue_expiration_date_field[$index] = $_REQUEST['cron-queue-expiration-date-field-update'];
 
 if($schedule_changed){
-    $module->addQueueLog($pid, $action_description, $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_email[$index], $cron_repeat_for[$index], $cron_repeat_until[$index], $cron_repeat_until_field[$index]);
+    $module->addQueueLog($pid, $action_description, $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_email[$index], $cron_repeat_for[$index], $cron_repeat_until[$index], $cron_repeat_until_field[$index], $cron_queue_expiration_date[$index], $cron_queue_expiration_date_field[$index]);
 }
 
 #Already scheduled emails need to be updated
@@ -134,9 +138,12 @@ $module->setProjectSetting('cron-repeat-email', $cron_repeat_email);
 $module->setProjectSetting('cron-repeat-for', $cron_repeat_for);
 $module->setProjectSetting('cron-repeat-until', $cron_repeat_until);
 $module->setProjectSetting('cron-repeat-until-field', $cron_repeat_until_field);
+$module->setProjectSetting('cron-queue-expiration-date', $cron_queue_expiration_date);
+$module->setProjectSetting('cron-queue-expiration-date-field', $cron_queue_expiration_date_field);
 
 echo json_encode(array(
     'status' => 'success',
+    'cron_queue_expiration_date_field' => json_encode($cron_queue_expiration_date_field),
     'message' => ''
 ));
 
