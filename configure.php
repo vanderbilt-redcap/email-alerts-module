@@ -573,7 +573,7 @@ if(USERID != "") {
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','');
                 }
-
+                checkSchduleExpireVSRepeat($("[name='cron-repeat-until"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date-field"+suffix+"']").val(),suffix);
             });
 
             $('[name="cron-repeat-email"],[name="cron-repeat-email-update"]').on('click', function(e){
@@ -586,6 +586,8 @@ if(USERID != "") {
                     $('[field="cron-repeat-until'+suffix+'"]').show();
                     if($('[name=cron-repeat-until'+suffix+']:checked').val() == "forever" || $('[name=cron-repeat-until'+suffix+']:checked').val() == "" || $('[name=cron-repeat-until'+suffix+']:checked').val() == undefined) {
                         $('[name=external-modules-configure-modal' + suffix + '] input[name="cron-repeat-until' + suffix + '"][value="forever"]').prop('checked', true);
+                    }else{
+                        $('[field="cron-repeat-until-field'+suffix+'"]').show();
                     }
                 }else{
                     $('[field="cron-repeat-for'+suffix+'"]').hide();
@@ -621,6 +623,8 @@ if(USERID != "") {
                         $('[field="cron-repeat-until-field'+suffix+'"] td input').attr('placeholder','');
                         $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
                     }
+
+                    checkSchduleExpireVSRepeat($("[name='cron-repeat-until"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date-field"+suffix+"']").val(),suffix);
                 }
             });
 

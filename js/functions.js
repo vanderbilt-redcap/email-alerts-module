@@ -173,6 +173,13 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
     }
 }
 
+function checkSchduleExpireVSRepeat(cron_repeat_until,cron_expiration_date,cron_expiration_date_field,suffix){
+    //Expire vs Repeat logic
+    if((cron_repeat_until == "date" && cron_expiration_date == "date") || (cron_repeat_until == "cond" && cron_expiration_date == "cond")){
+        $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until-field'+suffix+'"]').val(cron_expiration_date_field);
+    }
+}
+
 /**
  * Function that shows the modal with the alert information to modify it
  * @param modal, array with the data from a specific aler
@@ -214,7 +221,7 @@ function editEmailAlert(modal, index){
     $('[name=external-modules-configure-modal-update] input[name="email-condition-update"]').val(modal['email-condition']);
     $('[name=external-modules-configure-modal-update] input[name="email-incomplete-update"]').val(modal['email-incomplete']);
     $('[name=external-modules-configure-modal-update] input[name="cron-queue-update"]').val(modal['cron-queue-update']);
-    console.log(modal)
+
     checkSchedule(modal['email-repetitive'],'-update',modal['cron-send-email-on'],modal['cron-send-email-on-field'],modal['cron-repeat-email'],modal['cron-repeat-for'],modal['cron-repeat-until'],modal['cron-repeat-until-field'],modal['cron-queue-expiration-date'],modal['cron-queue-expiration-date-field']);
 
     uploadLongitudinalEvent('project_id='+project_id+'&form='+modal['form-name']+'&index='+index,'[field=form-name-event]');
@@ -508,6 +515,15 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
         errMsg.push('Please insert an <strong>email sender</strong>.');
         $('[name=external-modules-configure-modal'+suffix+'] input[name=email-from'+suffix+']').addClass('alert');
     }else{ $('[name=external-modules-configure-modal'+suffix+'] input[name=email-from'+suffix+']').removeClass('alert');}
+
+    if (($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until'+suffix+']:checked').val() == "date" && $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date'+suffix+']:checked').val() == "date") || ($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until'+suffix+']:checked').val() == "cond" && $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date'+suffix+']:checked').val() == "cond")) {
+        if($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until-field'+suffix+']').val() != $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date-field'+suffix+']').val()){
+            errMsg.push('If the Expiration is the same type as the Repeat Until, their values have to be the same.');
+            $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until-field'+suffix+']').addClass('alert');
+            $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date-field'+suffix+']').addClass('alert');
+        }
+    }else{ $('[name=external-modules-configure-modal'+suffix+'] select[name=form-name'+suffix+']').removeClass('alert');}
+
 
     var editor_text = tinymce.activeEditor.getContent();
     if(editor_text == ""){
