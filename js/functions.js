@@ -670,6 +670,18 @@ function uploadLongitudinalEvent(data,field){
     }
 }
 
+function uploadRepeatableInstances(data){
+    $.post(_repeatable_url, data, function(returnData){
+        jsonAjax = jQuery.parseJSON(returnData);
+        if (jsonAjax.status == 'success') {
+            $('#addQueueInstance').html(jsonAjax.instance);
+        }
+        else {
+            alert("An error occurred");
+        }
+    });
+}
+
 function showIfRepeatingForm(data, field){
     $(field).hide();
     $.post(_repeating_url, data, function(returnData) {

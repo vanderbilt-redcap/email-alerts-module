@@ -231,15 +231,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $data = \REDCap::getData($project_id,"array",$record);
 
         $instrument = $this->getProjectSetting("form-name",$project_id)[$alert];
-        $repeat_instance = "1";
 
         $isRepeatInstrument = false;
-        if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$instrument.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$instrument.'_complete'] != ''))){
+        if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$instrument.'_complete'] != ''))){
             $isRepeatInstrument = true;
         }
 
-        if($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $alert) && !$this->isAlreadyInQueue($alert, $project_id, $record,$instance)){
-            $this->addQueuedEmail($alert,$project_id,$record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument,$times_sent,$last_sent);
+        if($this->addEmailToQueue($project_id, $record, $event_id, $instance, $instrument, $isRepeatInstrument, $alert) && !$this->isAlreadyInQueue($alert, $project_id, $record,$instance)){
+            $this->addQueuedEmail($alert,$project_id,$record,$event_id,$instrument,$instance,$isRepeatInstrument,$times_sent,$last_sent);
         }else{
             return $record;
         }
@@ -279,7 +278,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             if($email_queue != ''){
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
-                if($email_sent_total < 100 && !$this->hasQueueExpired($queue,$index,$project_id)) {
+                if($email_sent_total < 100 && !$this->hasQueueExpired($queue,$index)) {
                         if($queue['deactivated'] != 1 && $this->sendToday($queue, $index)){
                             error_log("scheduledemails PID: ".$project_id."/ ".$queue['project_id']." - Has queued emails to send today ".date("Y-m-d H:i:s"));
                             #SEND EMAIL
@@ -446,7 +445,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     /**
-     * Function that checks and deletes the queues that are expired
+     * Function that delete
      * @param $queue
      * @param $index
      * @param $project_id
