@@ -23,7 +23,7 @@ if($queue_instances == "") {
 } else if (strpos($queue_instances, "\n") !== false) {
     $instance = explode("\n", $queue_instances);
 }else{
-    $instance = $queue_instances;
+    $instance = "1";
 }
 
 
