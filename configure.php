@@ -1264,15 +1264,13 @@ if(USERID != "") {
                             $scheduled_email .= $configRow['value'][$index];
                         }
                         if($configRow['key'] == "cron-queue-expiration-date" && $configRow['value'][$index] != "" && $configRow['value'][$index] != null){
-                            $scheduled_email .= "<br> Expires on ";
-                            if($configRow['value'][$index] == "date"){
-                                $scheduled_email .= "date";
-                            }else if($configRow['value'][$index] == "cond"){
-                                $scheduled_email .= "condition";
+                            $scheduled_email .= "<br><br> Expires on ";
+                            if($configRow['value'][$index] == "cond"){
+                                $scheduled_email .= "condition: ";
                             }
                         }
                         if($configRow['key'] == "cron-queue-expiration-date-field" && $configRow['value'][$index] != ""){
-                            $scheduled_email .= ": ".$configRow['value'][$index]."";
+                            $scheduled_email .= $configRow['value'][$index]."";
                         }
                     }else{
                         //NORMAL EMAIL
