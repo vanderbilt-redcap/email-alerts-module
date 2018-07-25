@@ -69,8 +69,8 @@
 }
 /***EMAIL PREVIEW***/
 .email_forms_button_color:hover,.email_forms_button_color:active{
-    background-color: #d9d9d9;
-    border-color: #e6e6e6;
+    background-color: #d9d9d9 !important;
+    border-color: #e6e6e6 !important;
     color: #000000 !important;
 }
 .email_preview_forms_table th{

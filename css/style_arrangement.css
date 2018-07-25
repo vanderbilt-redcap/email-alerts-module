@@ -1,6 +1,9 @@
 [type=reset], [type=submit], button, html [type=button] {
     -webkit-appearance: button-bevel;
 }
+.btn:not(:disabled):not(.disabled):active:focus,.btn:not(:disabled):not(.disabled):focus{
+    box-shadow:none !important;
+}
 .btn-warning{
     background-color: #f0ad4e;
     border-color: #eea236;
@@ -9,24 +12,27 @@
     background-color: #5bc0de;
     border-color: #46b8da;
 }
-
 .btn-success{
     background-color: #5cb85c;
     border-color: #4cae4c;
 }
-.btn-info {
+.btn-info{
     background-color: #5bc0de;
     border-color: #46b8da;
+}
+.btn-info:focus{
+    box-shadow:none;
 }
 .btn-default{
     background-color: #fff;
     border-color: #fff;
 }
-.btn-default:hover {
+.btn-default:hover,.btn-default:active {
     color: #333;
     background-color: #e6e6e6;
     border-color: #adadad;
 }
+
 #addFormLink button,#addSurveyLink button{
     font-size: 13px;
 }
