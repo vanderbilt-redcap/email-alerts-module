@@ -276,12 +276,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $queue_aux = $email_queue;
             $delete_queue = array();
             if($email_queue != ''){
-                error_log("\nscheduledemails PID: ".$project_id." FOUND ".date("Y-m-d H:i:s"));
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
-                    error_log("scheduledemails PID: ".$project_id." - hasQueueExpired queue:".$index." Alert#".$queue['alert']." Record#".$queue['record']."? ");
                     if($email_sent_total < 100 && !$this->hasQueueExpired($queue,$index)) {
-                        error_log("scheduledemails PID: ".$project_id." - has not expired today ".date("Y-m-d H:i:s"));
                         if($queue['deactivated'] != 1 && $this->sendToday($queue, $index)){
                             error_log("scheduledemails PID: ".$project_id." - Has queued emails to send today ".date("Y-m-d H:i:s"));
                             #SEND EMAIL
@@ -292,9 +289,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
                                 $this->setProjectSetting('email-queue', $queue_aux,$queue['project_id']);
                                 $email_sent_total++;
-
-                                #If it's the last time we send, we delete the queue
-//                                $delete_queue = $this->stopRepeat($delete_queue,$queue,$index);
                             }
                         }
                         #Check if we need to delete the queue
@@ -455,7 +449,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function hasQueueExpired($queue,$index){
-        error_log("scheduledemails PID: ".$queue['project_id']." - Inside hasQueueExpired");
         $cron_queue_expiration_date =  empty($this->getProjectSetting('cron-queue-expiration-date',$queue['project_id']))?array():$this->getProjectSetting('cron-queue-expiration-date',$queue['project_id'])[$queue['alert']];
         $cron_queue_expiration_date_field =  empty($this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id']))?array():$this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id'])[$queue['alert']];
 
@@ -467,18 +460,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if($cron_queue_expiration_date == 'date' && $cron_queue_expiration_date_field != ""){
             if(strtotime($cron_queue_expiration_date_field) <= strtotime(date('Y-m-d'))){
                 $this->deleteQueuedEmail($index,$queue['project_id']);
-                error_log("scheduledemails PID: ".$queue['project_id']." - Delete date Expired queue ".$index." Alert#".$queue['alert']);
                 return true;
             }
         }else if($cron_queue_expiration_date == 'cond' && $cron_queue_expiration_date_field != ""){
             if($evaluateLogic){
                 $this->deleteQueuedEmail($index,$queue['project_id']);
-                error_log("scheduledemails PID: ".$queue['project_id']." - Delete cond Expired queue ".$index." Alert#".$queue['alert']);
                 return true;
             }
         }
 
-        error_log("scheduledemails PID: ".$queue['project_id']." - Delete Expired FALSE queue ".$index." Alert#".$queue['alert']);
         return false;
     }
 
