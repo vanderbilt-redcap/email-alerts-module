@@ -456,14 +456,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function hasQueueExpired($queue,$index,$project_id){
+        error_log("scheduledemails PID: ".$project_id." - Inside hasQueueExpired");
         $cron_queue_expiration_date =  empty($this->getProjectSetting('cron-queue-expiration-date',$queue['project_id']))?array():$this->getProjectSetting('cron-queue-expiration-date',$queue['project_id'])[$queue['alert']];
         $cron_queue_expiration_date_field =  empty($this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id']))?array():$this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id'])[$queue['alert']];
 
+        error_log("scheduledemails PID: ".$project_id." - Before eval logic");
         $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $queue['project_id'], $queue['record'], $queue['event_id']);
         if($queue['isRepeatInstrument']){
             $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
         }
 
+        error_log("scheduledemails PID: ".$project_id." - after eval logic");
         if($cron_queue_expiration_date == 'date' && $cron_queue_expiration_date_field != ""){
             if(strtotime($cron_queue_expiration_date_field) <= strtotime(date('Y-m-d'))){
                 $this->deleteQueuedEmail($index,$project_id);
