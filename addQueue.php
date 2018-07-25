@@ -22,8 +22,8 @@ if($queue_instances == "") {
     $instance = explode(",", $queue_instances);
 } else if (strpos($queue_instances, "\n") !== false) {
     $instance = explode("\n", $queue_instances);
-}else{
-    $instance = "1";
+}else if ($queue_instances != ""){
+    $instance = $queue_instances;
 }
 
 
