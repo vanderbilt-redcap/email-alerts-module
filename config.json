@@ -154,6 +154,28 @@
           "required": false,
           "type":"text"
         },
+		{
+			"key": "cron-queue-expiration-date",
+			"name": "Email expires on",
+			"required": false,
+			"choices": [
+				{
+					"name": "Date",
+					"value": "date"
+				},
+				{
+					"name": "Conditional",
+					"value": "cond"
+				}
+			],
+			"type":"radio"
+		},
+		{
+          "key": "cron-queue-expiration-date-field",
+          "name": "Insert value",
+          "required": false,
+          "type":"text"
+        },
         {
           "key": "cron-repeat-email",
           "name": "Do you want to repeat this email?",

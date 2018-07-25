@@ -40,7 +40,7 @@ foreach($simple_config['email-dashboard-settings'] as $configKey => $configRow) 
 $message="";
 $message_text = array('C'=>'<strong>Success!</strong> The configuration has been saved.','A'=>'<strong>Success!</strong> New Email Added.','U'=>'<strong>Success!</strong> Email Updated.',
     'D'=>'<strong>Success!</strong> Email Deleted.','T'=>'<strong>Success!</strong> Email Activated.','E'=>'<strong>Success!</strong> Email Deactivated.',
-    'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.','Q'=>'<strong>Success!</strong> New Queued Email Added.');
+    'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.','Q'=>'<strong>Success!</strong> New Queued Email Added.','O'=>'<strong>Success!</strong> Queue Deleted.');
 
 if(array_key_exists('message', $_REQUEST)){
     $message = $message_text[$_REQUEST['message']];
@@ -71,6 +71,10 @@ if(USERID != "") {
     }
 }
 ?>
+
+    <link type='text/css' href='<?=$module->getUrl('css/font-awesome.min.css')?>' rel='stylesheet' media='screen' />
+    <link type='text/css' href='<?=$module->getUrl('css/style_arrangement.css')?>' rel='stylesheet' media='screen' />
+
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/jquery.flexdatalist.min.css')?>">
 
@@ -102,6 +106,7 @@ if(USERID != "") {
         var _reenableform_url = '<?=$module->getUrl('reEnableForm.php')?>';
         var _preview_url = '<?=$module->getUrl('previewForm.php')?>';
         var _update_queue_url = '<?=$module->getUrl('updateQueue.php')?>';
+        var _delete_queue_url = '<?=$module->getUrl('deleteQueue.php')?>';
         var _preview_queue_url = '<?=$module->getUrl('previewQueue.php')?>';
         var _preview_record_url = '<?=$module->getUrl('previewRecordForm.php')?>';
         var _edoc_name_url = '<?=$module->getUrl('get-edoc-name.php')?>';
@@ -133,11 +138,21 @@ if(USERID != "") {
                 jQuery(this).parent().find('div.popover .close').on('click', function(e){
                     popover.popover('hide');
                 });
+                $('div.popover .close').on('click', function(e){
+                    popover.popover('hide');
+                });
+
             });
             //We add this or the second time we click it won't work. It's a bug in bootstrap
             $('[data-toggle="popover"]').on("hidden.bs.popover", function() {
-                $(this).data("bs.popover").inState.click = false
-            })
+                if($(this).data("bs.popover").inState == undefined){
+                    //BOOTSTRAP 4
+                    $(this).data("bs.popover")._activeTrigger.click = false;
+                }else{
+                    //BOOTSTRAP 3
+                    $(this).data("bs.popover").inState.click = false;
+                }
+            });
 
             //For Entries
             var rtable = $('#customizedAlertsPreview').DataTable({"pageLength": 50});
@@ -268,7 +283,7 @@ if(USERID != "") {
                     }
                     inputHtml += '<tr field="form-name-event" class="form-control-custom" style="display:none"></tr>';
                     return inputHtml;
-                }else if(!isAdmin && (setting.key == 'cron-send-email-on' || setting.key == 'cron-send-email-on-field' || setting.key == 'cron-repeat-email' || setting.key == 'cron-repeat-until' || setting.key == 'cron-repeat-until-field' || setting.key == 'cron-repeat-for' || setting.key == 'cron-send-email-on-update' || setting.key == 'cron-send-email-on-field-update' || setting.key == 'cron-repeat-email-update' || setting.key == 'cron-repeat-until-update' || setting.key == 'cron-repeat-until-field-update' || setting.key == 'cron-repeat-for-update')){
+                }else if(!isAdmin && (setting.key == 'cron-send-email-on' || setting.key == 'cron-send-email-on-field' || setting.key == 'cron-queue-expiration-date' || setting.key == 'cron-queue-expiration-date-field' || setting.key == 'cron-repeat-email' || setting.key == 'cron-repeat-until' || setting.key == 'cron-repeat-until-field' || setting.key == 'cron-repeat-for' || setting.key == 'cron-send-email-on-update' || setting.key == 'cron-send-email-on-field-update' || setting.key == 'cron-repeat-email-update' || setting.key == 'cron-repeat-until-update' || setting.key == 'cron-repeat-until-field-update' || setting.key == 'cron-repeat-for-update')){
                     //if it's not admin we don't show the Schedule editing
                 }else if(isAdmin && setting.key == 'cron-repeat-until-field-update'){
 
@@ -371,11 +386,27 @@ if(USERID != "") {
                 $('[name="email-from"]').val(from_default);
 
                 $('[name="cron-send-email-on"][value="now"').prop('checked',true);
+                $('[name="cron-queue-expiration-date"][value="date"').prop('checked',true);
                 $('[name="cron-repeat-until"][value="forever"').prop('checked',true);
-                $('[field="cron-send-email-on-field"]').hide();
                 $('[field="cron-repeat-for"]').hide();
                 $('[field="cron-repeat-until"]').hide();
                 $('[field="cron-repeat-until-field"]').hide();
+
+                //Add calendar on expiration by default
+                var suffix='-update';
+                $('[field="cron-queue-expiration-date-field"] td input').addClass('datepicker_aux_expire');
+                $('[field="cron-queue-expiration-date-field"] td input').addClass('datepicker');
+                $('[field="cron-queue-expiration-date-field"] td input').attr('placeholder','YYYY-MM-DD');
+                $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker_aux_expire');
+                $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker');
+                $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
+                $(".datepicker_aux_expire").datepicker({
+                    showOn: "button",
+                    buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                    buttonImageOnly: true,
+                    buttonText: "Select date",
+                    dateFormat: "yy-mm-dd"
+                });
 
                 //Clean up values
                 $('#email-to').val("");
@@ -518,6 +549,32 @@ if(USERID != "") {
                     }
                 }
             });
+            $('[name="cron-queue-expiration-date"],[name="cron-queue-expiration-date-update"]').on('click', function(e){
+                var suffix = '';
+                if($(this).attr('name').includes("-update")){
+                    suffix = '-update';
+                }
+
+                if($(this).val() == 'date'){
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker_aux_expire');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
+                    $(".datepicker_aux_expire").datepicker({
+                        showOn: "button",
+                        buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                        buttonImageOnly: true,
+                        buttonText: "Select date",
+                        dateFormat: "yy-mm-dd"
+                    });
+                }else{
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').datepicker("destroy");
+                    $('[field="ccron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker_aux_expire');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','');
+                }
+                checkSchduleExpireVSRepeat($("[name='cron-repeat-until"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date-field"+suffix+"']").val(),suffix);
+            });
 
             $('[name="cron-repeat-email"],[name="cron-repeat-email-update"]').on('click', function(e){
                 var suffix = '';
@@ -529,6 +586,8 @@ if(USERID != "") {
                     $('[field="cron-repeat-until'+suffix+'"]').show();
                     if($('[name=cron-repeat-until'+suffix+']:checked').val() == "forever" || $('[name=cron-repeat-until'+suffix+']:checked').val() == "" || $('[name=cron-repeat-until'+suffix+']:checked').val() == undefined) {
                         $('[name=external-modules-configure-modal' + suffix + '] input[name="cron-repeat-until' + suffix + '"][value="forever"]').prop('checked', true);
+                    }else{
+                        $('[field="cron-repeat-until-field'+suffix+'"]').show();
                     }
                 }else{
                     $('[field="cron-repeat-for'+suffix+'"]').hide();
@@ -564,6 +623,8 @@ if(USERID != "") {
                         $('[field="cron-repeat-until-field'+suffix+'"] td input').attr('placeholder','');
                         $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
                     }
+
+                    checkSchduleExpireVSRepeat($("[name='cron-repeat-until"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date-field"+suffix+"']").val(),suffix);
                 }
             });
 
@@ -573,7 +634,7 @@ if(USERID != "") {
                 if($(this).attr('name').includes("-update")){
                     suffix = '-update';
                 }
-                checkSchedule($(this).is(':checked'),suffix,$('[name=cron-send-email-on'+suffix+']:checked').val(),$('[name=cron-send-email-on-field'+suffix+']').val(),$('[name=cron-repeat-email'+suffix+']').is(':checked'),$('[name=cron-repeat-for'+suffix+']').val(),$('[name=cron-repeat-until'+suffix+']:checked').val(),$('[name=cron-repeat-until-field'+suffix+']').val());
+                checkSchedule($(this).is(':checked'),suffix,$('[name=cron-send-email-on'+suffix+']:checked').val(),$('[name=cron-send-email-on-field'+suffix+']').val(),$('[name=cron-repeat-email'+suffix+']').is(':checked'),$('[name=cron-repeat-for'+suffix+']').val(),$('[name=cron-repeat-until'+suffix+']:checked').val(),$('[name=cron-repeat-until-field'+suffix+']').val(),$('[name=cron-queue-expiration-date'+suffix+']:checked').val(),$('[name=cron-queue-expiration-date-field'+suffix+']:checked').val());
             });
 
             /***LONGITUDINAL***/
@@ -586,7 +647,7 @@ if(USERID != "") {
             });
 
             $('[name=survey_form_name]').on('change', function(e){
-                uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[name=survey-name-event]');
+                // uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[name=survey-name-event]');
             });
 
             //we call first the flexalist function to create the options for the email
@@ -1020,7 +1081,7 @@ if(USERID != "") {
             </div>
         </div>
     </div>
-    <div>
+    <div style="width:100%">
         <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Save Settings</button>
     </div>
 </form>
@@ -1169,7 +1230,7 @@ if(USERID != "") {
                 $redcapLogic = '<br>REDCap Logic: <strong>None</strong>';
                 $isRepeatCron = false;
                 foreach ($config['email-dashboard-settings'] as $configKey => $configRow) {
-                    if ($configRow['key'] == 'cron-send-email-on' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-repeat-email' || $configRow['key'] == 'cron-repeat-until' || $configRow['key'] == 'cron-repeat-until-field' || $configRow['key'] == 'cron-repeat-for') {
+                    if ($configRow['key'] == 'cron-send-email-on' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-repeat-email' || $configRow['key'] == 'cron-repeat-until' || $configRow['key'] == 'cron-repeat-until-field' || $configRow['key'] == 'cron-repeat-for' || $configRow['key'] == 'cron-queue-expiration-date' || $configRow['key'] == 'cron-queue-expiration-date-field') {
                         //SHCEDULE EMAIL INFO
                         if($configRow['key'] == 'cron-send-email-on'){
                             if($configRow['value'][$index] == "now" || $configRow['value'][$index] == ""){
@@ -1201,6 +1262,17 @@ if(USERID != "") {
                         }
                         if($configRow['key'] == 'cron-repeat-until-field' && $configRow['value'][$index] != '' && $isRepeatCron){
                             $scheduled_email .= $configRow['value'][$index];
+                        }
+                        if($configRow['key'] == "cron-queue-expiration-date" && $configRow['value'][$index] != "" && $configRow['value'][$index] != null){
+                            $scheduled_email .= "<br> Expires on ";
+                            if($configRow['value'][$index] == "date"){
+                                $scheduled_email .= "date";
+                            }else if($configRow['value'][$index] == "cond"){
+                                $scheduled_email .= "condition";
+                            }
+                        }
+                        if($configRow['key'] == "cron-queue-expiration-date-field" && $configRow['value'][$index] != ""){
+                            $scheduled_email .= ": ".$configRow['value'][$index]."";
                         }
                     }else{
                         //NORMAL EMAIL
@@ -1509,7 +1581,7 @@ if(USERID != "") {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -1518,7 +1590,7 @@ if(USERID != "") {
 
     <div class="modal fade" id="external-modules-configure-modal-queue" tabindex="-1" role="dialog" aria-labelledby="Codes">
         <form class="form-horizontal" action="" method="post" id='selectPreviewQueue'>
-            <div class="modal-dialog" role="document" style="width: 800px">
+            <div class="modal-dialog modal-dialog-preview-queue" role="document" style="width: 950px">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -1538,7 +1610,7 @@ if(USERID != "") {
 
     <div class="modal fade" id="external-modules-configure-modal-addQueue" tabindex="-1" role="dialog" aria-labelledby="Codes">
         <form class="form-horizontal" action="" method="post" id='addQueue'>
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-dialog-queue" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -1550,17 +1622,24 @@ if(USERID != "") {
                             <div class="form-group">
                                 <div style="float: left;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px;color:red">*This is to add records that are not in the queue or that have been deleted.</label></div>
                             </div>
-                            <div class="form-group">
-                                <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Event ID</label></div>
-                                <div id='event_queue'></div>
+                            <div class="form-group" style="display: inline-block;">
+                                <div style="float:left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Event ID</label></div>
+                                <div id='event_queue' class="float-left"></div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" style="display: inline-block;">
                                 <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Date record was last sent via the queue<br><span style="color:red">*This value only needs to be entered if record was previously in queue</span></label></div>
-                                <div><input type="text" id='last_sent' class="external-modules-input-element" placeholder="YYYY-MM-DD"></div>
+                                <div class="float-left"><input type="text" id='last_sent' class="external-modules-input-element" placeholder="YYYY-MM-DD"></div>
                             </div>
-                            <div class="form-group">
-                                <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Number of times the email has been sent already</label></div>
-                                <div><input type="text" id='times_sent' value="0"></div>
+                            <div class="form-group" style="display: inline-block;">
+                                <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Number of times the email has previously been sent for the records added below.<br><span style="color:red">*0 if you want to send it right now, otherwise enter a number.</span></div>
+                                <div class="float-left"><input type="text" id='times_sent' value="0"></div>
+                            </div>
+                            <div class="form-group" style="display: inline-block;">
+                                <div>
+                                    <label style="font-weight: normal;padding-left: 15px;padding-right: 15px">
+                                        <span style="color:red">Example of use:<br>Date the email will be sent = Alert date + (Alert repeating days * <b>Times Sent</b>)<br>2018-07-15 = 2018-07-09 + (3 * 2)</span>
+                                    </label>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="exampleFormControlTextarea1" style="font-weight: normal;padding-left: 15px;">Insert the <strong>Record ID's</strong> to automatically Add the Queues Emails.<br/>
@@ -1570,13 +1649,12 @@ if(USERID != "") {
                                 <textarea class="form-control" id="queue_ids" rows="6"></textarea>
                             </div>
                         </div>
-                        <span id="index_modal_message"></span>
                         <input type="hidden" value="" id="index_modal_queue" name="index_modal_queue">
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" form="addQueue" class="btn btn-default btn-delete" id='btnModalAddQueue'>Add Queue</button>
                         <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                        <button type="submit" form="addQueue" class="btn btn-default btn-delete" id='btnModalAddQueue'>Add Queue</button>
                     </div>
                 </div>
             </div>

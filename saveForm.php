@@ -23,6 +23,8 @@ $cron_repeat_email =  empty($module->getProjectSetting('cron-repeat-email'))?arr
 $cron_repeat_for =  empty($module->getProjectSetting('cron-repeat-for'))?array():$module->getProjectSetting('cron-repeat-for');
 $cron_repeat_until =  empty($module->getProjectSetting('cron-repeat-until'))?array():$module->getProjectSetting('cron-repeat-until');
 $cron_repeat_until_field =  empty($module->getProjectSetting('cron-repeat-until-field'))?array():$module->getProjectSetting('cron-repeat-until-field');
+$cron_queue_expiration_date =  empty($module->getProjectSetting('cron-queue-expiration-date'))?array():$module->getProjectSetting('cron-queue-expiration-date');
+$cron_queue_expiration_date_field =  empty($module->getProjectSetting('cron-queue-expiration-date-field'))?array():$module->getProjectSetting('cron-queue-expiration-date-field');
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
 
 #checkboxes
@@ -72,6 +74,8 @@ array_push($cron_send_email_on_field,$_REQUEST['cron-send-email-on-field']);
 array_push($cron_repeat_for,$_REQUEST['cron-repeat-for']);
 array_push($cron_repeat_until,$_REQUEST['cron-repeat-until']);
 array_push($cron_repeat_until_field,$_REQUEST['cron-repeat-until-field']);
+array_push($cron_queue_expiration_date,$_REQUEST['cron-queue-expiration-date']);
+array_push($cron_queue_expiration_date_field,$_REQUEST['cron-queue-expiration-date-field']);
 array_push($cron_repeat_email,$cron_repeat);
 array_push($alert_id,$new_alert_id);
 
@@ -94,6 +98,8 @@ $module->setProjectSetting('cron-repeat-email', $cron_repeat_email);
 $module->setProjectSetting('cron-repeat-for', $cron_repeat_for);
 $module->setProjectSetting('cron-repeat-until', $cron_repeat_until);
 $module->setProjectSetting('cron-repeat-until-field', $cron_repeat_until_field);
+$module->setProjectSetting('cron-queue-expiration-date', $cron_queue_expiration_date);
+$module->setProjectSetting('cron-queue-expiration-date-field', $cron_queue_expiration_date_field);
 $module->setProjectSetting('alert-id', $alert_id);
 
 //Extra Data

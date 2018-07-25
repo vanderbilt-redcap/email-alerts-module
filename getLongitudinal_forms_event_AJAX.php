@@ -30,14 +30,16 @@ if(!empty($form) && !empty($project_id)){
         }
 
         $selector_id = "form_event";
+        $selector_name = "form-name-event";
         if($queue != "1"){
             $event_selector = '<td><span class="external-modules-instance-label"> </span><label>REDCap Instrument Event:</label></td><td class="external-modules-input-td">';
         }else{
             $event_selector = '<div>';
             $selector_id = "queue_event_select";
+            $selector_name = "queue_event_select";
         }
 
-        $event_selector .= '<select class="external-modules-input-element" id="'.$selector_id.'" name="'.$selector_id.'"><option value=""></option>';
+        $event_selector .= '<select class="external-modules-input-element" id="'.$selector_id.'" name="'.$selector_name.'"><option value=""></option>';
         foreach ($events_array as $id){
             $event_unique_name = \REDCap::getEventNames("true","",$id);
             if($selected_event == $id){

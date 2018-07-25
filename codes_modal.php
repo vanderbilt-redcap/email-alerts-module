@@ -47,9 +47,10 @@ require_once 'EmailTriggerExternalModule.php';
         <div class="modal-dialog" role="document" style="width: 800px">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Configure Email Alerts</h4>
+                    <h4 class="modal-title float-left" id="myModalLabel">Configure Email Alerts</h4>
+                        <button type="button" class="close closeCustomModal float-right" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 </div>
+
                 <div class="modal-body">
                     <div id='errMsgContainerModal' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>
                     <table class="code_modal_table" id="code_modal_table"></table>
