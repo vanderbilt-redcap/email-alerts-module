@@ -279,8 +279,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 error_log("\nscheduledemails PID: ".$project_id." FOUND ".date("Y-m-d H:i:s"));
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
-                    error_log("scheduledemails PID: ".$project_id." - hasQueueExpired ".$index." Alert#".$queue['alert']."? ");
-                    error_log("scheduledemails PID: ".$project_id." - hasQueueExpired: ".$this->hasQueueExpired($queue,$index)." .... ".date("Y-m-d H:i:s"));
+                    error_log("scheduledemails PID: ".$project_id." - hasQueueExpired queue:".$index." Alert#".$queue['alert']."? ");
+                    $expired = $this->hasQueueExpired($queue,$index);
+                    error_log("scheduledemails PID: ".$project_id." - hasQueueExpired: ".$expired." .... ".date("Y-m-d H:i:s"));
                     if($email_sent_total < 100 && !$this->hasQueueExpired($queue,$index)) {
                         error_log("scheduledemails PID: ".$project_id." - has not expired today ".date("Y-m-d H:i:s"));
                         if($queue['deactivated'] != 1 && $this->sendToday($queue, $index)){
