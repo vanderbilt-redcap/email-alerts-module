@@ -1160,7 +1160,7 @@ if(USERID != "") {
                 }
 
                 $show_queue = "";
-                if($projectData['settings']['email-repetitive']['value'][$index] == '1'){
+                if($projectData['settings']['email-repetitive']['value'][$index] == '1' || $projectData['settings']['email-deactivate']['value'][$index] == '1' || $projectData['settings']['email-deleted']['value'][$index] == '1'){
                     $show_queue = "display:none;";
                 }
 
