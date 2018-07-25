@@ -1469,7 +1469,7 @@ if(USERID != "") {
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" id='btnCloseCodesModal' data-dismiss="modal">Cancel</button>
-                            <a href="" data-toggle="modal"  class="btn btn-default save" id='btnModalUpdateForm' style="padding: 7px 13px;">Save</a>
+                            <a href="" data-toggle="modal"  class="btn btn-default save" id='btnModalUpdateForm' style="padding: 8px 13px;">Save</a>
                         </div>
                     </div>
                 </div>

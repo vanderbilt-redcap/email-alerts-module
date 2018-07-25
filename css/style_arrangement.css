@@ -18,6 +18,18 @@
     background-color: #5bc0de;
     border-color: #46b8da;
 }
+.btn-default{
+    background-color: #fff;
+    border-color: #fff;
+}
+.btn-default:hover {
+    color: #333;
+    background-color: #e6e6e6;
+    border-color: #adadad;
+}
+#addFormLink button,#addSurveyLink button{
+    font-size: 13px;
+}
 #customizedAlertsPreview span a{
     color: #337ab7 !important;
     text-decoration: none;
