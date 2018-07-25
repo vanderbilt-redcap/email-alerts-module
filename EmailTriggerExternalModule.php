@@ -279,7 +279,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 error_log("\nscheduledemails PID: ".$project_id." FOUND ".date("Y-m-d H:i:s"));
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
-                    error_log("scheduledemails PID: ".$project_id." - hasQueueExpired? ");
+                    error_log("scheduledemails PID: ".$project_id." - hasQueueExpired ".$index." Alert#".$queue['alert']."? ");
                     error_log("scheduledemails PID: ".$project_id." - hasQueueExpired: ".$this->hasQueueExpired($queue,$index)." .... ".date("Y-m-d H:i:s"));
                     if($email_sent_total < 100 && !$this->hasQueueExpired($queue,$index)) {
                         error_log("scheduledemails PID: ".$project_id." - has not expired today ".date("Y-m-d H:i:s"));
@@ -467,15 +467,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if($cron_queue_expiration_date == 'date' && $cron_queue_expiration_date_field != ""){
             if(strtotime($cron_queue_expiration_date_field) <= strtotime(date('Y-m-d'))){
                 $this->deleteQueuedEmail($index,$project_id);
+                error_log("scheduledemails PID: ".$project_id." - Delete date Expired queue ".$index." Alert#".$queue['alert']);
                 return true;
             }
         }else if($cron_queue_expiration_date == 'cond' && $cron_queue_expiration_date_field != ""){
             if($evaluateLogic){
                 $this->deleteQueuedEmail($index,$project_id);
+                error_log("scheduledemails PID: ".$project_id." - Delete cond Expired queue ".$index." Alert#".$queue['alert']);
                 return true;
             }
         }
 
+        error_log("scheduledemails PID: ".$project_id." - Delete Expired FALSE queue ".$index." Alert#".$queue['alert']);
         return false;
     }
 
