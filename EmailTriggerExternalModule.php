@@ -458,7 +458,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function hasQueueExpired($queue,$index,$project_id){
         error_log("scheduledemails PID: ".$project_id." - Inside hasQueueExpired");
-        $cron_queue_expiration_date =  empty($this->getProjectSetting('cron-queue-expiration-date',$queue['project_id']))?array():$this->getProjectSetting('cron-queue-expiration-date',$queue['project_id'])[$queue['alert']];
+        /*$cron_queue_expiration_date =  empty($this->getProjectSetting('cron-queue-expiration-date',$queue['project_id']))?array():$this->getProjectSetting('cron-queue-expiration-date',$queue['project_id'])[$queue['alert']];
         $cron_queue_expiration_date_field =  empty($this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id']))?array():$this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id'])[$queue['alert']];
 
         error_log("scheduledemails PID: ".$project_id." - Before eval logic");
@@ -482,7 +482,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
 
-        error_log("scheduledemails PID: ".$project_id." - Delete Expired FALSE queue ".$index." Alert#".$queue['alert']);
+        error_log("scheduledemails PID: ".$project_id." - Delete Expired FALSE queue ".$index." Alert#".$queue['alert']);*/
         return false;
     }
 
