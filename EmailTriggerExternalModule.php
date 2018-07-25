@@ -297,8 +297,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $delete_queue = $this->stopRepeat($delete_queue,$queue,$index);
                             }
                         }
-                    }else{
-                        break;
                     }
                 }
                 #delete all queues that need to stop sending
