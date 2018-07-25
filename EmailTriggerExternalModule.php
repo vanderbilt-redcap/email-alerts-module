@@ -276,6 +276,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $queue_aux = $email_queue;
             $delete_queue = array();
             if($email_queue != ''){
+                error_log("<br>scheduledemails PID: ".$project_id." FOUND");
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
                     error_log("scheduledemails PID: ".$project_id." -hasQueueExpired: ".$this->hasQueueExpired($queue,$index)." .... ".date("Y-m-d H:i:s"));
