@@ -516,14 +516,16 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
         $('[name=external-modules-configure-modal'+suffix+'] input[name=email-from'+suffix+']').addClass('alert');
     }else{ $('[name=external-modules-configure-modal'+suffix+'] input[name=email-from'+suffix+']').removeClass('alert');}
 
-    if (($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until'+suffix+']:checked').val() == "date" && $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date'+suffix+']:checked').val() == "date") || ($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until'+suffix+']:checked').val() == "cond" && $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date'+suffix+']:checked').val() == "cond")) {
-        if($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until-field'+suffix+']').val() != $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date-field'+suffix+']').val()){
-            errMsg.push('If the Expiration is the same type as the Repeat Until, their values have to be the same.');
-            $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until-field'+suffix+']').addClass('alert');
-            $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date-field'+suffix+']').addClass('alert');
-        }
-    }else{ $('[name=external-modules-configure-modal'+suffix+'] select[name=form-name'+suffix+']').removeClass('alert');}
-
+    if(!$('[name=external-modules-configure-modal'+suffix+'] input[name=email-repetitive-update'+suffix+']').is(':checked') && $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-email'+suffix+']').is(':checked')){
+        console.log("1")
+        if (($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until'+suffix+']:checked').val() == "date" && $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date'+suffix+']:checked').val() == "date") || ($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until'+suffix+']:checked').val() == "cond" && $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date'+suffix+']:checked').val() == "cond")) {
+            if($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until-field'+suffix+']').val() != $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date-field'+suffix+']').val()){
+                errMsg.push('If the Expiration is the same type as the Repeat Until, their values have to be the same.');
+                $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until-field'+suffix+']').addClass('alert');
+                $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date-field'+suffix+']').addClass('alert');
+            }
+        }else{ $('[name=external-modules-configure-modal'+suffix+'] select[name=form-name'+suffix+']').removeClass('alert');}
+    }
 
     var editor_text = tinymce.activeEditor.getContent();
     if(editor_text == ""){
@@ -668,6 +670,18 @@ function uploadLongitudinalEvent(data,field){
             }
         });
     }
+}
+
+function uploadRepeatableInstances(data){
+    $.post(_repeatable_url, data, function(returnData){
+        jsonAjax = jQuery.parseJSON(returnData);
+        if (jsonAjax.status == 'success') {
+            $('#addQueueInstance').html(jsonAjax.instance);
+        }
+        else {
+            alert("An error occurred");
+        }
+    });
 }
 
 function showIfRepeatingForm(data, field){

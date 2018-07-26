@@ -12,13 +12,20 @@ $times_sent =  $_REQUEST['times_sent'];
 $last_sent =  $_REQUEST['last_sent'];
 $queue_ids = $_POST['queue_ids'];
 $event_id = $_POST['queue_event_select'];
-$instance = $_POST['instance'];
+$queue_instances = $_POST['queue_instances'];
 
-if($instance == "")
+if($queue_instances == "") {
     $instance = "1";
+}if (strpos($queue_instances, ";") !== false) {
+    $instance = explode(";", $queue_instances);
+} else if (strpos($queue_instances, ",") !== false) {
+    $instance = explode(",", $queue_instances);
+} else if (strpos($queue_instances, "\n") !== false) {
+    $instance = explode("\n", $queue_instances);
+}else if ($queue_instances != ""){
+    $instance = $queue_instances;
+}
 
-if($event_id == '')
-//    $event_id = $this->getProjectSetting("form-name-event", $project_id)[$index];
 
 $failed_records = array();
 
@@ -29,9 +36,18 @@ if (strpos($queue_ids, ";") !== false) {
 } else if (strpos($queue_ids, "\n") !== false) {
     $record = explode("\n", $queue_ids);
 } else if ($queue_ids != "") {
-    $failed = $module->addQueueEmailFromInterface($project_id, $index, $queue_ids, $times_sent, $event_id, $last_sent, $instance);
-    if($failed != ""){
-        array_push($failed_records,$failed);
+    if(is_array($instance)){
+        foreach ($instance as $one_instance){
+            $failed = $module->addQueueEmailFromInterface($project_id, $index, $queue_ids, $times_sent, $event_id, $last_sent, $one_instance);
+            if($failed != ""){
+                array_push($failed_records,$failed);
+            }
+        }
+    }else{
+        $failed = $module->addQueueEmailFromInterface($project_id, $index, $queue_ids, $times_sent, $event_id, $last_sent, $instance);
+        if($failed != ""){
+            array_push($failed_records,$failed);
+        }
     }
 } else {
     //ERROR
@@ -40,9 +56,19 @@ if (strpos($queue_ids, ";") !== false) {
 
 if ($record != "") {
     foreach ($record as $id) {
-        $failed = $module->addQueueEmailFromInterface($project_id, $index, $id, $times_sent, $event_id, $last_sent, $instance);
-        if($failed != ""){
-            array_push($failed_records,$failed);
+
+        if(is_array($instance)){
+            foreach ($instance as $one_instance){
+                $failed = $module->addQueueEmailFromInterface($project_id, $index, $id, $times_sent, $event_id, $last_sent, $one_instance);
+                if($failed != ""){
+                    array_push($failed_records,$failed);
+                }
+            }
+        }else{
+            $failed = $module->addQueueEmailFromInterface($project_id, $index, $id, $times_sent, $event_id, $last_sent, $instance);
+            if($failed != ""){
+                array_push($failed_records,$failed);
+            }
         }
     }
 }

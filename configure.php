@@ -60,12 +60,12 @@ $super_user = false;
 if(USERID != "") {
     $sql = "SELECT i.user_email, i.user_firstname, i.user_lastname, i.super_user, i.allow_create_db
 					FROM redcap_user_information i
-					WHERE i.username = '".USERID."'";
+					WHERE i.username = '" . USERID . "'";
     $query = db_query($sql);
-    if(!$query) throw new \Exception("Error looking up user information", self::$SQL_ERROR);
+    if (!$query) throw new \Exception("Error looking up user information", self::$SQL_ERROR);
 
-    if($row = db_fetch_assoc($query)) {
-        if($row["super_user"] == 1){
+    if ($row = db_fetch_assoc($query)) {
+        if ($row["super_user"] == 1) {
             $super_user = true;
         }
     }
@@ -111,6 +111,7 @@ if(USERID != "") {
         var _preview_record_url = '<?=$module->getUrl('previewRecordForm.php')?>';
         var _edoc_name_url = '<?=$module->getUrl('get-edoc-name.php')?>';
         var _longitudinal_url = '<?=$module->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
+        var _repeatable_url = '<?=$module->getUrl('getRepeatableInstances_AJAX.php')?>';
         var _repeating_url = '<?=$module->getUrl('isRepeatingForm_AJAX.php')?>';
         var _getProjectList_url = '<?=$module->getUrl('get-project-list.php')?>';
         var lastClick = null;
@@ -637,6 +638,10 @@ if(USERID != "") {
                 checkSchedule($(this).is(':checked'),suffix,$('[name=cron-send-email-on'+suffix+']:checked').val(),$('[name=cron-send-email-on-field'+suffix+']').val(),$('[name=cron-repeat-email'+suffix+']').is(':checked'),$('[name=cron-repeat-for'+suffix+']').val(),$('[name=cron-repeat-until'+suffix+']:checked').val(),$('[name=cron-repeat-until-field'+suffix+']').val(),$('[name=cron-queue-expiration-date'+suffix+']:checked').val(),$('[name=cron-queue-expiration-date-field'+suffix+']:checked').val());
             });
 
+            $('#addQueue .close').on('click', function () {
+                $('#addQueueInstance').html('');
+            });
+
             /***LONGITUDINAL***/
             $('[name=form-name],[name=form-name-update]').on('change', function(e){
                 uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[field=form-name-event]');
@@ -768,7 +773,7 @@ if(USERID != "") {
                     return false;
                 }
                 else {
-                    var data = "&queue_ids="+$('#queue_ids').val()+"&index_modal_queue="+$('#index_modal_queue').val()+"&times_sent="+$('#times_sent').val()+"&last_sent="+$('#last_sent').val()+"&queue_event_select="+$('#queue_event_select').val();
+                    var data = "&queue_ids="+$('#queue_ids').val()+"&index_modal_queue="+$('#index_modal_queue').val()+"&times_sent="+$('#times_sent').val()+"&last_sent="+$('#last_sent').val()+"&queue_event_select="+$('#queue_event_select').val()+"&queue_instances="+$('#queue_instances').val();
                     ajaxLoadOptionAndMessageQueue(data,'<?=$module->getUrl('addQueue.php')?>',"Q");
                     return true;
                 }
@@ -938,7 +943,10 @@ if(USERID != "") {
             } );
         });
 
-    function saveFilesIfTheyExist(url, files) {
+        function getInstances(element){
+            uploadRepeatableInstances('project_id='+project_id+'&event='+element.value+'&index_modal_queue='+$('#index_modal_queue').val());
+        }
+        function saveFilesIfTheyExist(url, files) {
             var lengthOfFiles = 0;
             var formData = new FormData();
             for (var name in files) {
@@ -1152,7 +1160,7 @@ if(USERID != "") {
                 }
 
                 $show_queue = "";
-                if($projectData['settings']['email-repetitive']['value'][$index] == '1'){
+                if($projectData['settings']['email-repetitive']['value'][$index] == '1' || $projectData['settings']['email-deactivate']['value'][$index] == '1' || $projectData['settings']['email-deleted']['value'][$index] == '1'){
                     $show_queue = "display:none;";
                 }
 
@@ -1264,15 +1272,13 @@ if(USERID != "") {
                             $scheduled_email .= $configRow['value'][$index];
                         }
                         if($configRow['key'] == "cron-queue-expiration-date" && $configRow['value'][$index] != "" && $configRow['value'][$index] != null){
-                            $scheduled_email .= "<br> Expires on ";
-                            if($configRow['value'][$index] == "date"){
-                                $scheduled_email .= "date";
-                            }else if($configRow['value'][$index] == "cond"){
-                                $scheduled_email .= "condition";
+                            $scheduled_email .= "<br><br> Expires on ";
+                            if($configRow['value'][$index] == "cond"){
+                                $scheduled_email .= "condition: ";
                             }
                         }
                         if($configRow['key'] == "cron-queue-expiration-date-field" && $configRow['value'][$index] != ""){
-                            $scheduled_email .= ": ".$configRow['value'][$index]."";
+                            $scheduled_email .= $configRow['value'][$index]."";
                         }
                     }else{
                         //NORMAL EMAIL
@@ -1463,7 +1469,7 @@ if(USERID != "") {
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" id='btnCloseCodesModal' data-dismiss="modal">Cancel</button>
-                            <a href="" data-toggle="modal"  class="btn btn-default save" id='btnModalUpdateForm' style="padding: 7px 13px;">Save</a>
+                            <a href="" data-toggle="modal"  class="btn btn-default save" id='btnModalUpdateForm' style="padding: 8px 13px;">Save</a>
                         </div>
                     </div>
                 </div>
@@ -1626,6 +1632,7 @@ if(USERID != "") {
                                 <div style="float:left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Event ID</label></div>
                                 <div id='event_queue' class="float-left"></div>
                             </div>
+                            <div class="form-group" style="display: inline-block;" id="addQueueInstance"></div>
                             <div class="form-group" style="display: inline-block;">
                                 <div style="float: left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Date record was last sent via the queue<br><span style="color:red">*This value only needs to be entered if record was previously in queue</span></label></div>
                                 <div class="float-left"><input type="text" id='last_sent' class="external-modules-input-element" placeholder="YYYY-MM-DD"></div>
