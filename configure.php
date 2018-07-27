@@ -652,7 +652,7 @@ if(USERID != "") {
             });
 
             $('[name=survey_form_name]').on('change', function(e){
-                // uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[name=survey-name-event]');
+                uploadLongitudinalEvent('project_id='+project_id+'&form='+$(this).val(),'[name=survey-name-event]');
             });
 
             //we call first the flexalist function to create the options for the email
