@@ -275,7 +275,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $email_queue =  $this->getProjectSetting('email-queue',$project_id);
             $queue_aux = $email_queue;
             $delete_queue = array();
-            if($email_queue != ''){
+			if($email_queue != ''){
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
                     if($email_sent_total < 100 && !$this->hasQueueExpired($queue,$index)) {
@@ -332,7 +332,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
         }
 
-        if(strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == ""){
+		if(strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == ""){
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 if($cron_repeat_email == "1"){
                     #check repeat until option to see if we need to stop
@@ -656,6 +656,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $mail->Subject = $email_subject;
         $mail->IsHTML(true);
         $mail->Body = $email_text;
+
+		if($this->getSystemSetting("logEmails") == 1) {
+			error_log("Email Module: ".$email_text);
+		}
 
         #Attachments
         $mail = $this->setAttachments($mail, $project_id, $id);
@@ -987,7 +991,20 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal){
         $surveyLink_var = $this->getProjectSetting("surveyLink_var", $project_id);
         if(!empty($surveyLink_var)) {
+			## Sort survey links by reverse string lengths to prevent shorter links from
+			## overwriting longer links containing the shorter links
             $datasurvey = explode("\n", $surveyLink_var);
+			usort($datasurvey,function($a,$b) {
+				$aLen = strlen($a);
+				$bLen = strlen($b);
+				if($aLen > $bLen) {
+					return -1;
+				}
+				else if($aLen == $bLen) {
+					return 0;
+				}
+				return 1;
+			});
             foreach ($datasurvey as $surveylink) {
                 $var = preg_split("/[;,]+/", $surveylink)[0];
                 $var_replace = $var;
