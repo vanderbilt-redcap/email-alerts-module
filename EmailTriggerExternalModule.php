@@ -96,7 +96,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $this->setProjectSetting('email-repetitive-sent', '');
             $this->setProjectSetting('email-records-sent', '');
             $this->setProjectSetting('email-queue', '');
-        }else if($_REQUEST['route'] == 'DataEntryController:deleteRecord'){
+        }else if($_REQUEST['route'] == 'DataEntryController:deleteRecord' && $_REQUEST['record'] != ""){
             #Button: Delete record
 
             $record_id = urldecode($_REQUEST['record']);
