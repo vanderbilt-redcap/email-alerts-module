@@ -13,9 +13,9 @@ require_once 'EmailTriggerExternalModule.php';
             var data = $('#AddNewForm').serialize();
             var editor_text = tinymce.activeEditor.getContent();
             data += "&email-text-editor="+encodeURIComponent(editor_text);
-            data += "&email-to="+$('#email-to').val();
-            data += "&email-cc="+$('#email-cc').val();
-            data += "&email-bcc="+$('#email-bcc').val();
+            data += "&email-to="+encodeURIComponent($('#email-to').val());
+            data += "&email-cc="+encodeURIComponent($('#email-cc').val());
+            data += "&email-bcc="+encodeURIComponent($('#email-bcc').val());
 
             var files = {};
             $('#AddNewForm').find('input, select, textarea').each(function(index, element){

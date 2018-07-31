@@ -700,9 +700,9 @@ if(USERID != "") {
                 var data = $('#updateForm').serialize();
                 var editor_text = tinymce.activeEditor.getContent();
                 data += "&email-text-update-editor="+encodeURIComponent(editor_text);
-                data += "&email-to-update="+$('#email-to-update').val();
-                data += "&email-cc-update="+$('#email-cc-update').val();
-                data += "&email-bcc-update="+$('#email-bcc-update').val();
+                data += "&email-to-update="+ encodeURIComponent($('#email-to-update').val());
+                data += "&email-cc-update="+encodeURIComponent($('#email-cc-update').val());
+                data += "&email-bcc-update="+encodeURIComponent(+$('#email-bcc-update').val());
 
                 var files = {};
                 $('#updateForm').find('input, select, textarea').each(function(index, element){
@@ -720,8 +720,7 @@ if(USERID != "") {
                         });
                     }
                 });
-
-                 if(checkRequiredFieldsAndLoadOption('-update','Update')){
+                if(checkRequiredFieldsAndLoadOption('-update','Update')){
                      //close confirmation modal
                      $('#external-modules-configure-modal-schedule-confirmation').modal('hide');
                      $('#external-modules-configure-modal').modal('hide');
