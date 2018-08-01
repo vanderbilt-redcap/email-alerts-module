@@ -278,8 +278,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 			if($email_queue != ''){
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
-                    if($email_sent_total < 100 && !$this->hasQueueExpired($queue,$index)) {
-                        if($queue['deactivated'] != 1 && $this->sendToday($queue, $index)){
+                    if($queue['deactivated'] != 1 && $email_sent_total < 100 && !$this->hasQueueExpired($queue,$index)) {
+                        if( $this->sendToday($queue, $index)){
                             error_log("scheduledemails PID: ".$project_id." - Has queued emails to send today ".date("Y-m-d H:i:s"));
                             #SEND EMAIL
                             $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
@@ -309,11 +309,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function sendToday($queue, $index)
     {
-        $cron_send_email_on_field = empty($this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])) ? array() : $this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])[$queue['alert']];
-        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$queue['alert']];
-        $cron_repeat_for =  empty($this->getProjectSetting('cron-repeat-for',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
-        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$queue['alert']];
-        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$queue['alert']];
+        $cron_send_email_on_field = $this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_email =  $this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_until =  $this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_until_field =  $this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$queue['alert']];
 
         $repeat_days = $cron_repeat_for;
         if($queue['times_sent'] != 0){
@@ -375,9 +375,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function addEmailToQueue($project_id, $record, $event_id, $instance, $instrument, $isRepeatInstrument, $id){
-        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$project_id))?array():$this->getProjectSetting('cron-repeat-email',$project_id)[$id];
-        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$project_id))?array():$this->getProjectSetting('cron-repeat-until',$project_id)[$id];
-        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$project_id))?array():$this->getProjectSetting('cron-repeat-until-field',$project_id)[$id];
+        $cron_repeat_email =  $this->getProjectSetting('cron-repeat-email',$project_id)[$id];
+        $cron_repeat_until =  $this->getProjectSetting('cron-repeat-until',$project_id)[$id];
+        $cron_repeat_until_field =  $this->getProjectSetting('cron-repeat-until-field',$project_id)[$id];
 
         $today = date('Y-m-d');
         $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field, $project_id, $record, $event_id);
@@ -416,9 +416,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      */
     function stopRepeat($delete_queue,$queue,$index){
-        $cron_repeat_email =  empty($this->getProjectSetting('cron-repeat-email',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$queue['alert']];
-        $cron_repeat_until =  empty($this->getProjectSetting('cron-repeat-until',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$queue['alert']];
-        $cron_repeat_until_field =  empty($this->getProjectSetting('cron-repeat-until-field',$queue['project_id']))?array():$this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_email = $this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_until =  $this->getProjectSetting('cron-repeat-until',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_until_field =  $this->getProjectSetting('cron-repeat-until-field',$queue['project_id'])[$queue['alert']];
 
         $evaluateLogic = \REDCap::evaluateLogic($cron_repeat_until_field, $queue['project_id'], $queue['record'], $queue['event_id']);
         if($queue['isRepeatInstrument']){
@@ -449,26 +449,27 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function hasQueueExpired($queue,$index){
-        $cron_queue_expiration_date =  empty($this->getProjectSetting('cron-queue-expiration-date',$queue['project_id']))?array():$this->getProjectSetting('cron-queue-expiration-date',$queue['project_id'])[$queue['alert']];
-        $cron_queue_expiration_date_field =  empty($this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id']))?array():$this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id'])[$queue['alert']];
+        $cron_queue_expiration_date =  $this->getProjectSetting('cron-queue-expiration-date',$queue['project_id'])[$queue['alert']];
+        $cron_queue_expiration_date_field =  $this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id'])[$queue['alert']];
 
-        $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $queue['project_id'], $queue['record'], $queue['event_id']);
-        if($queue['isRepeatInstrument']){
-            $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
-        }
-
-        if($cron_queue_expiration_date == 'date' && $cron_queue_expiration_date_field != ""){
-            if(strtotime($cron_queue_expiration_date_field) <= strtotime(date('Y-m-d'))){
-                $this->deleteQueuedEmail($index,$queue['project_id']);
-                return true;
+        if($cron_queue_expiration_date_field != "") {
+            $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $queue['project_id'], $queue['record'], $queue['event_id']);
+            if ($queue['isRepeatInstrument']) {
+                $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
             }
-        }else if($cron_queue_expiration_date == 'cond' && $cron_queue_expiration_date_field != ""){
-            if($evaluateLogic){
-                $this->deleteQueuedEmail($index,$queue['project_id']);
-                return true;
+
+            if ($cron_queue_expiration_date == 'date' && $cron_queue_expiration_date_field != "") {
+                if (strtotime($cron_queue_expiration_date_field) <= strtotime(date('Y-m-d'))) {
+                    $this->deleteQueuedEmail($index, $queue['project_id']);
+                    return true;
+                }
+            } else if ($cron_queue_expiration_date == 'cond' && $cron_queue_expiration_date_field != "") {
+                if ($evaluateLogic) {
+                    $this->deleteQueuedEmail($index, $queue['project_id']);
+                    return true;
+                }
             }
         }
-
         return false;
     }
 
