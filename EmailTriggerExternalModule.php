@@ -278,7 +278,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 			if($email_queue != ''){
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
-                    if($queue['deactivated'] != 1 && $email_sent_total < 100 && !$this->hasQueueExpired($queue,$index)) {
+                    if($email_sent_total < 100 && !$this->hasQueueExpired($queue,$index) && $queue['deactivated'] != 1) {
                         if( $this->sendToday($queue, $index)){
                             error_log("scheduledemails PID: ".$project_id." - Has queued emails to send today ".date("Y-m-d H:i:s"));
                             #SEND EMAIL
