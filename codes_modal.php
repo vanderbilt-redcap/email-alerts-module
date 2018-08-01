@@ -9,6 +9,9 @@ require_once 'EmailTriggerExternalModule.php';
 
 <script>
     $(function(){
+        $('#btnModalAddForm').click(function () {
+            $('#AddNewForm').submit();
+        });
         $('#AddNewForm').submit(function () {
             var data = $('#AddNewForm').serialize();
             var editor_text = tinymce.activeEditor.getContent();
@@ -57,8 +60,8 @@ require_once 'EmailTriggerExternalModule.php';
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id='btnCloseCodesModal' data-dismiss="modal">Cancel</button>
-                    <button type="submit" form="AddNewForm" class="btn btn-default saveFormButton" id='btnModalAddForm'>Save</button>
+                    <a class="btn btn-default btn-cancel" id='btnCloseCodesModal' data-dismiss="modal">Cancel</a>
+                    <a class="btn btn-default save" id='btnModalAddForm'>Save</a>
                 </div>
             </div>
         </div>

@@ -694,7 +694,7 @@ if(USERID != "") {
                 //clean up
                 $('[name=preview_record_id]').val('');
                 $('#modal_message_record_preview').html('');
-            })
+            });
 
             $('#updateForm').submit(function () {
                 var data = $('#updateForm').serialize();
@@ -702,7 +702,7 @@ if(USERID != "") {
                 data += "&email-text-update-editor="+encodeURIComponent(editor_text);
                 data += "&email-to-update="+ encodeURIComponent($('#email-to-update').val());
                 data += "&email-cc-update="+encodeURIComponent($('#email-cc-update').val());
-                data += "&email-bcc-update="+encodeURIComponent(+$('#email-bcc-update').val());
+                data += "&email-bcc-update="+encodeURIComponent($('#email-bcc-update').val());
 
                 var files = {};
                 $('#updateForm').find('input, select, textarea').each(function(index, element){
@@ -1467,8 +1467,8 @@ if(USERID != "") {
                         </div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default" id='btnCloseCodesModal' data-dismiss="modal">Cancel</button>
-                            <a href="" data-toggle="modal"  class="btn btn-default save" id='btnModalUpdateForm' style="padding: 8px 13px;">Save</a>
+                            <a class="btn btn-default btn-cancel" id='btnCloseCodesModal' data-dismiss="modal">Cancel</a>
+                            <a href="" data-toggle="modal" class="btn btn-default save" id='btnModalUpdateForm'>Save</a>
                         </div>
                     </div>
                 </div>
@@ -1489,7 +1489,7 @@ if(USERID != "") {
 
                             <div class="modal-footer">
                                 <button type="submit" form="updateForm" class="btn btn-default btn-delete" id='btnModalRescheduleForm'>Reschedule</button>
-                                <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                                <a class="btn btn-default btn-cancel" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</a>
                             </div>
                         </div>
                     </div>
@@ -1514,7 +1514,7 @@ if(USERID != "") {
 
                     <div class="modal-footer">
                         <button type="submit" form="deleteUserForm" class="btn btn-default btn-delete" id='btnModalDeleteForm'>Delete</button>
-                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-default btn-cancel" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -1539,7 +1539,7 @@ if(USERID != "") {
 
                     <div class="modal-footer">
                         <button type="submit" form="deleteForm" class="btn btn-default btn-delete" id='btnModalDeleteForm'>Delete</button>
-                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-default btn-cancel" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -1659,7 +1659,7 @@ if(USERID != "") {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-default btn-cancel" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</a>
                         <button type="submit" form="addQueue" class="btn btn-default btn-delete" id='btnModalAddQueue'>Add Queue</button>
                     </div>
                 </div>
@@ -1683,7 +1683,7 @@ if(USERID != "") {
 
                     <div class="modal-footer">
                         <button type="submit" form="deactivateForm" class="btn btn-default btn-delete" id='btnModalDeactivateForm'></button>
-                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-default btn-cancel" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</a>
                     </div>
                 </div>
             </div>

@@ -12,9 +12,21 @@
     background-color: #5bc0de;
     border-color: #46b8da;
 }
+.save{
+    border:1px solid #5cb85c !important;
+    background-color: #5cb85c;
+    color: #fff !important;
+}
 .btn-success{
     background-color: #5cb85c;
     border-color: #4cae4c;
+}
+.btn-cancel{
+    background-color: #fff !important;
+    border-color: #ccc !important;
+}
+.btn-cancel:hover,.save{
+    font-size: 14px !important;
 }
 .btn-info{
     background-color: #5bc0de;
@@ -27,10 +39,10 @@
     background-color: #fff;
     border-color: #fff;
 }
-.btn-default:hover,.btn-default:active {
-    color: #333;
-    background-color: #e6e6e6;
-    border-color: #adadad;
+.btn-default:hover,.btn-default:active, .btn:hover{
+    color: #333 !important;
+    background-color: #e6e6e6 !important;
+    border-color: #adadad !important;
 }
 
 #addFormLink button,#addSurveyLink button{
