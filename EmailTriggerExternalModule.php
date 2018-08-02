@@ -1020,29 +1020,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
 
                 #only if the variable is in the text we reset the survey link status
-                /*if (strpos($email_text, $var_replace) !== false) {
+                if (strpos($email_text, $var) !== false) {
                     $instrument_form = str_replace('__SURVEYLINK_', '', $var);
 					$instrument_form = str_replace(['[',']'], '', $instrument_form);
-					$passthruData = $this->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
-
-                    $returnCode = $passthruData['return_code'];
-                    $hash = $passthruData['hash'];
-
-					## getUrl doesn't append a pid when accessed through the cron, add pid if it's not there already
-					$baseUrl = $this->getUrl('surveyPassthru.php');
-					if(!preg_match("/[\&\?]pid=/", $baseUrl)) {
-						$baseUrl .= "&pid=".$project_id;
-					}
-
-                    $url = $baseUrl . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&event=".$form_event_id."&NOAUTH";
-                    $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
-                    $email_text = str_replace( $var_replace, $link, $email_text);
-                }*/
-
-                #only if the variable is in the text we reset the survey link status
-                if (strpos($email_text, $var) !== false) {
-                    $instrument_form = str_replace('[__SURVEYLINK_', '', $var);
-                    $instrument_form = str_replace(']', '', $instrument_form);
                     $passthruData = $this->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
 
                     $returnCode = $passthruData['return_code'];
