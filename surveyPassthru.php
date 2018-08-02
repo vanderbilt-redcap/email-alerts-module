@@ -31,4 +31,7 @@ if($returnCode == $_REQUEST['returnCode']){
     </script>
     </body>
     </html>
-<?php } ?>
+<?php }
+else {
+	echo "Error: Incorrect return code specified";
+}?>
