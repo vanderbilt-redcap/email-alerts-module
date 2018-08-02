@@ -1327,9 +1327,9 @@ if(USERID != "") {
                                 }
                             }else if($configRow['key'] == 'email-to') {
                                 $to_text = substr($configRow['value'][$index], 0, 20) . '...';
-                                $msg .= '<span>'.$to_text . '</span><br/>';
+                                $msg .= '<div><span>Send to: '.$to_text . '</span></div>';
                             }else if($configRow['key'] == 'email-subject') {
-                                $msg .= '<span>'.$configRow['value'][$index] . '</span><br/>';
+                                $msg .= '<div><span>'.$configRow['value'][$index] . '</span></div><br>';
                             }else if ($configRow['key'] == 'email-text'){
                                 $msg .= '<span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview Message</a></span>';
                                 if($isAdmin) {
