@@ -859,7 +859,7 @@ if(USERID != "") {
                     return false;
                 }else{
                     var form_alert = '[__SURVEYLINK_'+$('#survey_form_name').val()+'],'+$('#survey_label').val();
-                    var event_arm = $('[name=form_event] option:selected').attr('event_name');
+                    var event_arm = $('#form_event option:selected').attr('event_name');
                     if(isLongitudinal && event_arm != "" && event_arm != undefined){
                         form_alert = '['+event_arm+']'+form_alert;
                     }
