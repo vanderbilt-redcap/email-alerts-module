@@ -160,6 +160,10 @@
 			"required": false,
 			"choices": [
 				{
+					"name": "Never",
+					"value": "never"
+				},
+				{
 					"name": "Date",
 					"value": "date"
 				},

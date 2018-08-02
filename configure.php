@@ -294,7 +294,7 @@ if(USERID != "") {
                     else {
                         inputHtml += EMparent.getColumnHtml(setting);
                     }
-                    inputHtml += '<tr field="cron-queue-update" class="form-control-custom"><td><span class="external-modules-instance-label"> </span><label>On form re-save, delete existing<br> scheduled emails and <br>reschedule emails.<br><i>(this will update piping <br>content and also update logic.)</i></label></td>';
+                    inputHtml += '<tr field="cron-queue-update" class="form-control-custom"><td><span class="external-modules-instance-label"> </span><label>Select this if <i>Send email on</i> parameters<br> have changed and you would like<br> to update the queue</label></td>';
                     inputHtml += '<td class="external-modules-input-td"><input type="checkbox" name="cron-queue-update" class="external-modules-input-element" value=""></td></tr>';
                     return inputHtml;
                 }else if(isAdmin && setting.key == 'cron-repeat-until-field-update'){
@@ -305,7 +305,7 @@ if(USERID != "") {
                     else {
                         inputHtml += EMparent.getColumnHtml(setting);
                     }
-                    inputHtml += '<tr field="cron-queue-update" class="form-control-custom"><td><span class="external-modules-instance-label"> </span><label>On form re-save, delete existing scheduled emails and reschedule emails.<br><i>(this will update piping content and also update logic.)</i></label></td>';
+                    inputHtml += '<tr field="cron-queue-update" class="form-control-custom"><td><span class="external-modules-instance-label"> </span><label>Select this if <i>Send email on</i> parameters<br> have changed and you would like<br> to update the queue</label></td>';
                     inputHtml += '<td class="external-modules-input-td"><input type="checkbox" name="cron-queue-update" class="external-modules-input-element" value=""></td></tr>';
                     return inputHtml;
                 }else {
@@ -387,11 +387,12 @@ if(USERID != "") {
                 $('[name="email-from"]').val(from_default);
 
                 $('[name="cron-send-email-on"][value="now"').prop('checked',true);
-                $('[name="cron-queue-expiration-date"][value="date"').prop('checked',true);
+                $('[name="cron-queue-expiration-date"][value="never"').prop('checked',true);
                 $('[name="cron-repeat-until"][value="forever"').prop('checked',true);
                 $('[field="cron-repeat-for"]').hide();
                 $('[field="cron-repeat-until"]').hide();
                 $('[field="cron-repeat-until-field"]').hide();
+                $('[field="cron-queue-expiration-date-field"]').hide();
 
                 //Add calendar on expiration by default
                 var suffix='-update';
@@ -557,6 +558,7 @@ if(USERID != "") {
                 }
 
                 if($(this).val() == 'date'){
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"]').show();
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker_aux_expire');
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker');
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
@@ -567,12 +569,16 @@ if(USERID != "") {
                         buttonText: "Select date",
                         dateFormat: "yy-mm-dd"
                     });
-                }else{
+                }else if($(this).val() == 'cond'){
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"]').show();
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').datepicker("destroy");
                     $('[field="ccron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker');
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker_aux_expire');
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','');
+                }else{
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"]').hide();
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"]').val("");
                 }
                 checkSchduleExpireVSRepeat($("[name='cron-repeat-until"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date-field"+suffix+"']").val(),suffix);
             });
@@ -1147,15 +1153,17 @@ if(USERID != "") {
                 if($projectData['settings']['email-deactivate']['value'][$index] == '1'){
                     //Only show when message is not deleted
                     if($projectData['settings']['email-deleted']['value'][$index] != '1'){
-                        $message_sent .= "<span style='display:block;font-style:italic'>Email deactivated</span>";
+                        $message_sent .= "<span style='display:block;font-style:italic;color:red;'>Email deactivated</span>";
                     }
 
                     $class_sent = "email_deactivated";
                     $deactivate = "Activate";
                     $active_col = "N";
+                    $show_button_active = "display:none;";
                 }else{
                     $deactivate = "Deactivate";
                     $active_col = "Y";
+                    $show_button_active = "";
                 }
 
                 $show_queue = "";
@@ -1173,7 +1181,7 @@ if(USERID != "") {
                     $deleted_index = "index_modal_delete";
                     $deleted_col = "Y";
                     $deleted_text = "Permanently Delete";
-                    $show_button = "display:none";
+                    $show_button = "display:none;";
                     $reactivate_button = "<div><a onclick='reactivateEmailAlert(\"".$index."\",$(\"#concept_active\").is(\":checked\"));' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate'>Re-Enable</a></div>";
                 }else{
                     $deleted_modal = "external-modules-configure-modal-delete-user-confirmation";
@@ -1271,9 +1279,13 @@ if(USERID != "") {
                             $scheduled_email .= $configRow['value'][$index];
                         }
                         if($configRow['key'] == "cron-queue-expiration-date" && $configRow['value'][$index] != "" && $configRow['value'][$index] != null){
-                            $scheduled_email .= "<br><br> Expires on ";
+                            $scheduled_email .= " ";
                             if($configRow['value'][$index] == "cond"){
-                                $scheduled_email .= "condition: ";
+                                $scheduled_email .= "<br><br>Expires on condition: ";
+                            }else if($configRow['value'][$index] == "date"){
+                                $scheduled_email .= "<br><br> Expires on: ";
+                            }else{
+                                $scheduled_email .= "<br><br><b>Never</b> Expires";
                             }
                         }
                         if($configRow['key'] == "cron-queue-expiration-date-field" && $configRow['value'][$index] != ""){
@@ -1313,8 +1325,11 @@ if(USERID != "") {
                                         $attachmentVar .= '- '.$var.'<br/>';
                                     }
                                 }
+                            }else if($configRow['key'] == 'email-to') {
+                                $to_text = substr($configRow['value'][$index], 0, 20) . '...';
+                                $msg .= '<span>'.$to_text . '</span><br/>';
                             }else if($configRow['key'] == 'email-subject') {
-                                $msg .= $alerts_from.'<span>'.$configRow['value'][$index] . '</span><br/>';
+                                $msg .= '<span>'.$configRow['value'][$index] . '</span><br/>';
                             }else if ($configRow['key'] == 'email-text'){
                                 $msg .= '<span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview Message</a></span>';
                                 if($isAdmin) {
@@ -1336,7 +1351,7 @@ if(USERID != "") {
                 $alerts .= "<td>".$checkboxes.$redcapLogic."</td>";
                 $alerts .= "<td style='visibility: hidden;'>".$active_col."</td>";
                 $alerts .= "<td style='visibility: hidden;'>".$deleted_col."</td>";
-                $alerts .= "<td>".$reactivate_button."<div style='".$show_button."'><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
+                $alerts .= "<td>".$reactivate_button."<div style='".$show_button.$show_button_active."'><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\");return true;' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='duplicateEmailAlert(\"".$index."\");return true;' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
                 if($super_user) {

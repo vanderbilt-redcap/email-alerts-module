@@ -108,7 +108,11 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
             }
         }
 
-        if(cron_expiration_date == "" || cron_expiration_date == undefined || cron_expiration_date == null || cron_expiration_date == 'date'){
+        if(cron_expiration_date == "" || cron_expiration_date == undefined || cron_expiration_date == null || cron_expiration_date == 'never') {
+            $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-queue-expiration-date'+suffix+'"][value="never"]').prop('checked',true);
+            $('[field="cron-queue-expiration-date-field'+suffix+'"]').hide();
+        }else if(cron_expiration_date == 'date'){
+            $('[field="cron-queue-expiration-date-field'+suffix+'"]').show();
             $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-queue-expiration-date'+suffix+'"][value="date"]').prop('checked',true);
             $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker_aux');
             $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker');
@@ -120,6 +124,7 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
                 dateFormat: "yy-mm-dd"
             });
         }else{
+            $('[field="cron-queue-expiration-date-field'+suffix+'"]').show();
             $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-queue-expiration-date'+suffix+'"][value="cond"]').prop('checked',true);
             $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').datepicker("destroy");
             $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker');
@@ -517,7 +522,6 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
     }else{ $('[name=external-modules-configure-modal'+suffix+'] input[name=email-from'+suffix+']').removeClass('alert');}
 
     if(!$('[name=external-modules-configure-modal'+suffix+'] input[name=email-repetitive-update'+suffix+']').is(':checked') && $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-email'+suffix+']').is(':checked')){
-        console.log("1")
         if (($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until'+suffix+']:checked').val() == "date" && $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date'+suffix+']:checked').val() == "date") || ($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until'+suffix+']:checked').val() == "cond" && $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date'+suffix+']:checked').val() == "cond")) {
             if($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-until-field'+suffix+']').val() != $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date-field'+suffix+']').val()){
                 errMsg.push('If the Expiration is the same type as the Repeat Until, their values have to be the same.');

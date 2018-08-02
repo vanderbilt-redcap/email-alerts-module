@@ -39,7 +39,7 @@
     background-color: #fff;
     border-color: #fff;
 }
-.btn-default:hover,.btn-default:active, .btn:hover{
+.btn-default:hover,.btn-default:active, .btn:not(.btn-warning):not(.btn-success):not(.btn-info):hover{
     color: #333 !important;
     background-color: #e6e6e6 !important;
     border-color: #adadad !important;

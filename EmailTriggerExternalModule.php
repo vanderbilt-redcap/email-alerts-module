@@ -442,7 +442,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     /**
-     * Function that delete
+     * Function that if the queue never expires, it checks the other options and delete the expired queues
      * @param $queue
      * @param $index
      * @param $project_id
@@ -452,7 +452,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $cron_queue_expiration_date =  $this->getProjectSetting('cron-queue-expiration-date',$queue['project_id'])[$queue['alert']];
         $cron_queue_expiration_date_field =  $this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id'])[$queue['alert']];
 
-        if($cron_queue_expiration_date_field != "") {
+        if($cron_queue_expiration_date_field != "" && $cron_queue_expiration_date != '' && $cron_queue_expiration_date != 'never') {
             $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $queue['project_id'], $queue['record'], $queue['event_id']);
             if ($queue['isRepeatInstrument']) {
                 $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
