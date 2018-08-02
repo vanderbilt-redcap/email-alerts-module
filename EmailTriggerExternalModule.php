@@ -584,11 +584,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
 
-        $scheduled_email .= "\n Expires on ";
         if($cron_queue_expiration_date == "date"){
-            $scheduled_email = "date";
+            $scheduled_email .= "\nExpires on date";
         }else if($cron_queue_expiration_date == "calc"){
-            $scheduled_email = "condition";
+            $scheduled_email .= "\nExpires oncondition";
+        }else if($cron_queue_expiration_date == "calc"){
+            $scheduled_email .= "\nNever expires";
         }
         if($cron_queue_expiration_date_field != ""){
             $scheduled_email .= ": ".$cron_queue_expiration_date_field."";

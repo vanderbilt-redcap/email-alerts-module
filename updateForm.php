@@ -33,8 +33,14 @@ $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getP
 #checkboxes
 if(!isset($_REQUEST['email-repetitive-update'])){
     $repetitive = "0";
+    $deactivated = 0;
+    $deactivated_text_changes = "activated";
+    $deactivated_text_action = "Deactivated";
 }else{
     $repetitive = "1";
+    $deactivated = 1;
+    $deactivated_text_changes = "deactivated";
+    $deactivated_text_action = "Activated";
 }
 
 if(!isset($_REQUEST['email-incomplete-update'])){
@@ -71,6 +77,25 @@ if($cron_send_email_on[$index] != $_REQUEST['cron-send-email-on-update'] || $cro
     $module->addQueueLog($pid, $action_description." - Old Settings", $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_email[$index], $cron_repeat_for[$index], $cron_repeat_until[$index], $cron_repeat_until_field[$index], $cron_queue_expiration_date[$index], $cron_queue_expiration_date_field[$index]);
 }
 
+#Change from non re-send to re-send we need to deactivate queued emails
+if($email_repetitive[$index] == "0" && $repetitive == "1" || $email_repetitive[$index] == "1" && $repetitive == "0"){
+    $email_queue =  empty($module->getProjectSetting('email-queue'))?array():$module->getProjectSetting('email-queue');
+    if(!empty($email_queue)){
+        $scheduled_records_changed = "";
+        $queue = $email_queue;
+        foreach ($email_queue as $id=>$email){
+            if($email['project_id'] == $pid && $email['alert'] == $index){
+                $queue[$id]['deactivated'] = $deactivated;
+                $scheduled_records_changed .= $email['record'].",";
+            }
+        }
+        $module->setProjectSetting('email-queue', $queue);
+        #Add logs
+        $changes_made = "Record IDs ".$deactivated_text_changes.": ".rtrim($scheduled_records_changed,",");
+        \REDCap::logEvent($action_description." - Records","Re-send ".$deactivated_text_action." with queued emails.\n".$changes_made,NULL,NULL,NULL,$pid);
+    }
+}
+
 #Replace new data with old
 $form_name[$index] = $_REQUEST['form-name-update'];
 $form_name_event[$index] = $_REQUEST['form-name-event'];
@@ -105,7 +130,7 @@ if(isset($_REQUEST['cron-queue-update'])){
             $scheduled_records_changed = "";
             $queue = $email_queue;
             foreach ($email_queue as $id=>$email){
-                if($email['project_id'] == $pid && $email['alert']==$index){
+                if($email['project_id'] == $pid && $email['alert'] == $index){
                     $queue[$id]['option'] = $cron_send_email_on[$index];
                     $scheduled_records_changed .= $email['record'].",";
                 }
