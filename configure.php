@@ -1326,7 +1326,12 @@ if(USERID != "") {
                                     }
                                 }
                             }else if($configRow['key'] == 'email-to') {
-                                $to_text = substr($configRow['value'][$index], 0, 30) . '...';
+                                $attchVar = preg_split("/[;,]+/",  $configRow['value'][$index]);
+                                $dots = "";
+                                if(count($attchVar) >= 2){
+                                    $dots = "...";
+                                }
+                                $to_text = substr($configRow['value'][$index], 0, 30) . $dots;
                                 $msg .= '<div><span>Send to: '.$to_text . '</span></div>';
                             }else if($configRow['key'] == 'email-subject') {
                                 $msg .= '<div><span>'.$configRow['value'][$index] . '</span></div><br>';
