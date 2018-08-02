@@ -274,7 +274,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $project_id = $row['project_id'];
             $email_queue =  $this->getProjectSetting('email-queue',$project_id);
             $queue_aux = $email_queue;
-            $delete_queue = array();
+            $delete_queue = "";
 			if($email_queue != ''){
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
@@ -295,8 +295,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $delete_queue = $this->stopRepeat($delete_queue,$queue,$index);
                     }
                 }
-                #delete all queues that need to stop sending
-                $this->deleteQueuedEmail($delete_queue,$project_id);
+                if($delete_queue != ""){
+                    #delete all queues that need to stop sending
+                    $this->deleteQueuedEmail($delete_queue,$project_id);
+                }
             }
         }
     }
