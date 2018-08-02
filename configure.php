@@ -1005,7 +1005,7 @@ if(USERID != "") {
         <div class='row' style=''>
             <div class="col-md-12 page_title">Configure Email Alerts</div>
             <div id='errMsgContainer' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>
-            <div class="alert alert-success fade in col-md-12" style="border-color: #b2dba1 !important;display: none;" id="succMsgContainer"></div>
+            <div class="alert alert-success col-md-12" style="border-color: #b2dba1 !important;display: none;" id="succMsgContainer"></div>
               <div class="col-md-12">
                 <table class="table table-bordered table-hover" style="margin-bottom: 0">
                     <tr class="table_header">
