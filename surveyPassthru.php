@@ -33,5 +33,5 @@ if($returnCode == $_REQUEST['returnCode']){
     </html>
 <?php }
 else {
-	echo "Error: Incorrect return code specified";
+	echo "Error: Incorrect return code specified.<br /><br />This error can also be caused by using an outdated version of the External Modules framework with a longitudinal study project. You may be able to correct this error by updating to a version of REDCap above 8.7.0";
 }?>
