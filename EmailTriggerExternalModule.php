@@ -471,6 +471,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     return true;
                 }
             }
+        }else if($cron_queue_expiration_date == 'never'){
+            #If the email has been sent and is non repeat, we delete it
+            $cron_repeat_email = $this->getProjectSetting('cron-repeat-email',$queue['project_id'])[$queue['alert']];
+            if($cron_repeat_email == '0' && $queue['times_sent'] >= 1){
+                $this->deleteQueuedEmail($index, $queue['project_id']);
+                return true;
+            }
         }
         return false;
     }
