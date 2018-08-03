@@ -27,6 +27,7 @@
 .btn-cancel{
     background-color: #fff !important;
     border-color: #ccc !important;
+    font-size: 14px;
 }
 .btn-cancel:hover,.save{
     font-size: 14px !important;
