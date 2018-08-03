@@ -1,3 +1,6 @@
+.form-control-custom td:nth-child(1) {
+    width: 170px;
+}
 [type=reset], [type=submit], button, html [type=button] {
     -webkit-appearance: button-bevel;
 }
