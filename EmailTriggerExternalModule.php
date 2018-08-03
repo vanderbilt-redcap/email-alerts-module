@@ -951,7 +951,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                     if (count($matches[0]) > 2) {
                         $instanceMin = 1;
-                        $sql = "SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = $project_id AND record = '".db_real_escape_string($record)."' ORDER BY instance DESC";
+                        $sql = "SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = $project_id AND event_id = '$form_event_id' AND record = '" . db_real_escape_string($record) . "' ORDER BY instance DESC";
                         $q = db_query($sql);
                         $instanceMax = 1;
                         $instanceNew = 1;
