@@ -492,7 +492,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $instance
      * @param $isRepeatInstrument
      */
-    function addQueuedEmail($alert, $project_id, $record, $event_id, $instrument, $instance, $isRepeatInstrument,$times_sent="",$last_sent=''){
+    function addQueuedEmail($alert, $project_id, $record, $event_id, $instrument, $instance, $isRepeatInstrument,$times_sent=0,$last_sent=''){
         $queue = array();
         $queue['alert'] = $alert;
         $queue['record'] = $record;
