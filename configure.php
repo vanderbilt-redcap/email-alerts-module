@@ -39,7 +39,7 @@ foreach($simple_config['email-dashboard-settings'] as $configKey => $configRow) 
 
 $message="";
 $message_text = array('C'=>'<strong>Success!</strong> The configuration has been saved.','A'=>'<strong>Success!</strong> New Email Added.','U'=>'<strong>Success!</strong> Email Updated.',
-    'D'=>'<strong>Success!</strong> Email Deleted.','T'=>'<strong>Success!</strong> Email Activated.','E'=>'<strong>Success!</strong> Email Deactivated.',
+    'D'=>'<strong>Success!</strong> Email Deleted.','B'=>'<strong>Success!</strong> Email Permanently Deleted.','T'=>'<strong>Success!</strong> Email Activated.','E'=>'<strong>Success!</strong> Email Deactivated.',
     'P'=>'<strong>Success!</strong> Email Duplicated.','R'=>'<strong>Success!</strong> Email Re-Enabled.','N'=>'<strong>Success!</strong> Email Re-Enabled.','Q'=>'<strong>Success!</strong> New Queued Email Added.','O'=>'<strong>Success!</strong> Queue Deleted.');
 
 if(array_key_exists('message', $_REQUEST)){
@@ -741,13 +741,13 @@ if(USERID != "") {
             $('#deleteUserForm').submit(function () {
                 var data = $('#deleteUserForm').serialize();
                 ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('deleteForm.php')?>',"D");
-                return true;
+                return false;
             });
 
             $('#deleteForm').submit(function () {
                 var data = $('#deleteForm').serialize();
-                ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('deleteFormAdmin.php')?>',"D");
-                return true;
+                ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('deleteFormAdmin.php')?>',"B");
+                return false;
             });
 
             $('#deactivateForm').submit(function () {
@@ -1205,9 +1205,9 @@ if(USERID != "") {
                                 if(!empty($email_records_sent[$alert])){
                                     $total_activated = count(explode(',',$email_records_sent[$index]));
                                     $message_sent .= '<a href="#" data-toggle="popover"data-target-selector="#records-activated'.$index.'" data-title="Records for Alert #'.$alert_number.'" >Records activated:</a> '.$total_activated.'<br/>';
-                                    $message_sent .= '<div id="records-activated'.$index.'" class="hidden">
+                                    $message_sent .= '<div class="modal-body"><div id="records-activated'.$index.'" class="hidden" style="position:relative">
                                                             <p>'.$email_records_sent[$index].'</p>
-                                                       </div>';
+                                                       </div></div>';
                                 }else{
                                     $message_sent .= "Records activated: ".count((array)$form[$alert])."<br/>";
                                 }
@@ -1554,7 +1554,6 @@ if(USERID != "") {
                         <br/>
                         <span style="color:red;font-weight: bold">*This will permanently delete the email.</span>
                         <input type="hidden" value="" id="index_modal_delete" name="index_modal_delete">
-                        <input type="hidden" value="<?=$module->getUrl('deleteFormAdmin.php')?>" id="url_modal_delete" name="url_modal_delete">
                     </div>
 
                     <div class="modal-footer">
