@@ -164,6 +164,7 @@ if(USERID != "") {
 
             //For Entries
             var rtable = $('#customizedAlertsPreview').DataTable({"pageLength": 50});
+
             //So it adds the X in the search in DataTables
             $('div.dataTables_filter input').addClass('clearable');
             function tog(v){
@@ -1356,7 +1357,7 @@ if(USERID != "") {
                     $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
                 }
                 $alerts .= "<tr>";
-                $alerts .= "<td class='".$class_sent."'>".$formName."</td>";
+                $alerts .= "<td data-order='".$alert_number."' class='".$class_sent."'>".$formName."</td>";
                 $alerts .= "<td>".$scheduled_email."</td>";
                 $alerts .= "<td>".$msg."</td>";
                 $alerts .= "<td><span style='text-align: center;width: 200px;'><strong>" . $fileAttachments . " files</strong><br/></span>".$attachmentVar.$attachmentFile."</td>";
