@@ -476,7 +476,7 @@ if(USERID != "") {
                                                           }
                                   }
                 for (var pipeVarLoc in pipeVarLocs) {
-                    var prefix = pipeVarLocs[pipeVarLoc]['prefix'];
+                    var formPrefix = pipeVarLocs[pipeVarLoc]['prefix'];
                     var type = pipeVarLocs[pipeVarLoc]['type'];
                     if ($(pipeVarLoc).val() != "" && $(pipeVarLoc).val() != "0") {
                         var pipeVar = $(pipeVarLoc).val().split("\n");
@@ -486,12 +486,12 @@ if(USERID != "") {
 
                             if (isLongitudinal && matches && matches.length >1) {
 
-                                if(trim(matches[1]).substring(0, 1) != "[" || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]" || trim(matches[1]).substring(0, prefix.length) != prefix || trim(matches[0]).substring(0, 1) != "[" || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"){
-                                    errMsg.push('<strong>Longitudinal '+type+' Link field</strong> must be follow the format: <i>[event_name]['+prefix+'_variable_name],label</i> .');
+                                if(trim(matches[1]).substring(0, 1) != "[" || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]" || trim(matches[1]).substring(0, formPrefix.length) != formPrefix || trim(matches[0]).substring(0, 1) != "[" || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"){
+                                    errMsg.push('<strong>Longitudinal '+type+' Link field</strong> must be follow the format: <i>[event_name]['+formPrefix+'_variable_name],label</i> .');
                                 }
                             }
-                            else if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]" || trim(pipeName[0]).substring(0, prefix.length) != prefix){
-                                errMsg.push('<strong>Link '+type+' field</strong> must be follow the format: <i>'+prefix+'variable_name],label</i> .');
+                            else if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]" || trim(pipeName[0]).substring(0, formPrefix.length) != formPrefix){
+                                errMsg.push('<strong>Link '+type+' field</strong> must be follow the format: <i>'+formPrefix+'variable_name],label</i> .');
                             }
                         }
                     }
