@@ -1145,10 +1145,8 @@ if(USERID != "") {
             $email_queue = $projectData['settings']['email-queue']['value'];
             for ($index = 0; $index < $indexSubSet; $index++) {
                 $email_sent = $projectData['settings']['email-sent']['value'][$index];
-                $class_sent = "";
                 $message_sent = "";
                 if($email_sent == "1"){
-                    $class_sent = "email_sent";
                     if(!empty($projectData['settings']['email-timestamp-sent']['value'][$index])){
                         $message_sent = "<span style='display:block;font-style:italic'>Most recently activated on: ".$projectData['settings']['email-timestamp-sent']['value'][$index]."</span>";
                     }else{
@@ -1183,7 +1181,7 @@ if(USERID != "") {
                 $deleted_text = "Delete";
                 if($projectData['settings']['email-deleted']['value'][$index] == '1'){
                     $deactivated_deleted_text = ($active_col == 'N')?'Email was INNACTIVE when deleted':'Email was ACTIVE when deleted';
-                    $message_sent .= "<span style='font-style:italic;color:red;line-height: 2;float: left;'><strong>".$deactivated_deleted_text."</strong></span><br><br>";
+                    $message_sent .= "<div><span style='font-style:italic;color:red;line-height: 2;float: left;'>".$deactivated_deleted_text."</span></div><br><br>";
                     $class_sent = "email_deleted";
                     $deleted_modal = "external-modules-configure-modal-delete-confirmation";
                     $deleted_index = "index_modal_delete";
@@ -1245,7 +1243,6 @@ if(USERID != "") {
                 $fileAttachments = 0;
                 $attachmentVar ='';
                 $attachmentFile ='';
-                $alerts_from = '';
                 $scheduled_email = '';
                 $checkboxes = '';
                 $formName = '';
@@ -1324,7 +1321,18 @@ if(USERID != "") {
                             $checkboxes .= '<span>' .$configRow['name'].' <strong>'. $value . '</strong></span>';
                         } else {
                             if($configRow['key'] == 'form-name') {
-                                $formName .= '<span><i>Alert #'.$alert_number.'</i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                if($projectData['settings']['email-deleted']['value'][$index] == '1'){
+                                    if($email_sent == "1"){
+                                        $formName .= '<span class="email_deleted"><i>Alert #'.$alert_number.'</i> <i class="fa fa-check email_sent" aria-hidden="true"></i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                    }else{
+                                        $formName .= '<span class="email_deleted"><i>Alert #'.$alert_number.'</i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                    }
+                                }else if($email_sent == "1"){
+                                    $formName .= '<span class="email_sent"><i>Alert #'.$alert_number.'</i> <i class="fa fa-check" aria-hidden="true"></i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                }else{
+                                    $formName .= '<span><i>Alert #'.$alert_number.'</i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                }
+
                             }else if($configRow['key'] == 'email-attachment-variable'){
                                 $attchVar = preg_split("/[;,]+/",  $configRow['value'][$index]);
                                 foreach ($attchVar as $var){
@@ -1357,7 +1365,7 @@ if(USERID != "") {
                     $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
                 }
                 $alerts .= "<tr>";
-                $alerts .= "<td data-order='".$alert_number."' class='".$class_sent."'>".$formName."</td>";
+                $alerts .= "<td data-order='".$alert_number."'>".$formName."</td>";
                 $alerts .= "<td>".$scheduled_email."</td>";
                 $alerts .= "<td>".$msg."</td>";
                 $alerts .= "<td><span style='text-align: center;width: 200px;'><strong>" . $fileAttachments . " files</strong><br/></span>".$attachmentVar.$attachmentFile."</td>";

@@ -79,20 +79,24 @@
     text-align: center;
     font-weight: bold;
 }
+.email_sent{
+    color: #5cb85c !important;
+}
+.email_preview_forms_table tr.odd{
+    background-color: #fff !important;
+}
+.email_preview_forms_table tr.even{
+    background-color: #f4f4fd !important;
+}
 .email_preview_forms_table tr:hover{
-    background-color: #ffffe6 !important;
+    background-color: #f2f2f2 !important;
 }
-.email_preview_forms_table tr.odd {
-    background-color: #fff;
-}
-.email_preview_forms_table td.email_sent{
-    background-color: #e6ffe6 !important;
-}
+
 .email_preview_forms_table tr.email_deactivated{
     background-color: #ffe6e6 !important;
 }
 .email_deleted{
-    background-color: #ffe6e6 !important;
+    color: red !important;
 }
 .dataTables_length label{
     float:left;
@@ -104,6 +108,9 @@
 }
 .dataTables_filter input{
     margin-left: 10px;
+}
+table.dataTable{
+    border-collapse: collapse !important;
 }
 /*PAGINATION*/
 .dataTables_wrapper .dataTables_paginate .paginate_button {
