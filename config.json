@@ -23,7 +23,7 @@
 		"project": [
 			{
 				"name": "Configure Email Alerts",
-				"icon": "report",
+				"icon": "email",
 				"url": "configure.php"
 			}
 		]
