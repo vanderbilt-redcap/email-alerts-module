@@ -1210,12 +1210,12 @@ if(USERID != "") {
                             if($alert == $index){
                                 if(!empty($email_records_sent[$alert])){
                                     $total_activated = count(explode(',',$email_records_sent[$index]));
-                                    $message_sent .= '<a href="#" rel="popover" data-toggle="popover" data-target-selector="#records-activated'.$index.'" data-title="Records for Alert #'.$alert_number.'" style="float:left">Records activated:</a> '.$total_activated.'<br/>';
+                                    $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-target-selector="#records-activated'.$index.'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
                                     $message_sent .= '<div id="records-activated'.$index.'" class="hidden">
                                                             <p>'.$email_records_sent[$index].'</p>
                                                        </div>';
                                 }else{
-                                    $message_sent .= "Records activated: ".count((array)$form[$alert])."<br/>";
+                                    $message_sent .= "<div style='float:left'>Records activated: ".count((array)$form[$alert])."</div><br/>";
                                 }
                             }
                         }
@@ -1233,7 +1233,7 @@ if(USERID != "") {
                     }
 
                     if($queue_count > 0){
-                        $message_sent .= '<a href="#" rel="popover" data-toggle="popover" data-target-selector="#scheduled-activated'.$index.'" data-title="Scheduled Records for Alert #'.$alert_number.'" style="float:left">Scheduled records activated:</a> '.$queue_count.'<br/>';
+                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-target-selector="#scheduled-activated'.$index.'" data-title="Scheduled Records for Alert #'.$alert_number.'">Scheduled records activated:</a> '.$queue_count.'</div><br/>';
                         $message_sent .= '<div id="scheduled-activated'.$index.'" class="hidden">
                                                 <p>'.rtrim($scheduled_records_activated,", ").'</p>
                                            </div>';
