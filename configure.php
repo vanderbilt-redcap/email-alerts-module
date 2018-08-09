@@ -1323,12 +1323,12 @@ if(USERID != "") {
                             if($configRow['key'] == 'form-name') {
                                 if($projectData['settings']['email-deleted']['value'][$index] == '1'){
                                     if($email_sent == "1"){
-                                        $formName .= '<span class="email_deleted"><i>Alert #'.$alert_number.'</i> <i class="fa fa-check email_sent" aria-hidden="true"></i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                        $formName .= '<span class="email_deleted"><i>Alert #'.$alert_number.'</i> <i class="fas fa-check email_sent" aria-hidden="true"></i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
                                     }else{
                                         $formName .= '<span class="email_deleted"><i>Alert #'.$alert_number.'</i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
                                     }
                                 }else if($email_sent == "1"){
-                                    $formName .= '<span class="email_sent"><i>Alert #'.$alert_number.'</i> <i class="fa fa-check" aria-hidden="true"></i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                    $formName .= '<span class="email_sent"><i>Alert #'.$alert_number.'</i> <i class="fas fa-check" aria-hidden="true"></i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
                                 }else{
                                     $formName .= '<span><i>Alert #'.$alert_number.'</i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
                                 }
