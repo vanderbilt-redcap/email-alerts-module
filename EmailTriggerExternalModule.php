@@ -25,24 +25,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $forms_name = $this->getProjectSetting("form-name",$project_id);
             if(!empty($forms_name) && $record != NULL){
                 foreach ($forms_name as $id => $form){
-                    $sql="SELECT s.form_name FROM redcap_surveys_participants as sp LEFT JOIN redcap_surveys s ON (sp.survey_id = s.survey_id ) where s.project_id =".$project_id." AND sp.hash='".$_REQUEST['s']."'";
-                    $q = $this->query($sql);
 
-                    if($error = db_error()){
-                        throw new \Exception($sql.': '.$error);
+                    $isRepeatInstrument = false;
+                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
+                        $isRepeatInstrument = true;
                     }
 
-                    while($row = db_fetch_assoc($q)){
-                        if ($row['form_name'] == $form) {
-                            #Surveys are always complete
-                            $isRepeatInstrument = false;
-                            if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
-                                $isRepeatInstrument = true;
-                            }
-                            $this->setEmailTriggerRequested(true);
-                            $this->sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
-                        }
-                    }
+                    $this->sendEmailFromSurveyCode($_REQUEST['s'], $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument, $form);
                 }
             }
         }
@@ -73,10 +62,28 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             if ($_REQUEST['page'] == $form) {
                                 $this->setEmailTriggerRequested(true);
                                 $this->sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
+                            }else if($_REQUEST['page'] == "" && $_REQUEST['s'] != ""){
+                                $this->sendEmailFromSurveyCode($_REQUEST['s'], $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrumentComplete, $form);
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    function sendEmailFromSurveyCode($surveyCode, $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrumentComplete, $form){
+        $sql="SELECT s.form_name FROM redcap_surveys_participants as sp LEFT JOIN redcap_surveys s ON (sp.survey_id = s.survey_id ) where s.project_id =".$project_id." AND sp.hash='".$surveyCode."'";
+        $q = $this->query($sql);
+
+        if($error = db_error()){
+            throw new \Exception($sql.': '.$error);
+        }
+
+        while($row = db_fetch_assoc($q)){
+            if ($row['form_name'] == $form) {
+                $this->setEmailTriggerRequested(true);
+                $this->sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrumentComplete);
             }
         }
     }
