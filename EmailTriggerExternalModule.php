@@ -735,7 +735,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
             }
 
-            print_array($email_repetitive_sent);
             $email_repetitive_sent = json_decode($email_repetitive_sent,true);
             if($email_records_sent[$id] == '' && !$isRepetitiveEmpty){
                 if(!empty($email_repetitive_sent[$instrument][$id])) {
@@ -752,7 +751,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_records_sent[$id] = rtrim($email_records_sent[$id],', ');
                     $this->setProjectSetting('email-records-sent', $email_records_sent, $project_id);
                 }
-                print_array($email_records_sent);
             }
 
             $records = array_map('trim', explode(',', $email_records_sent[$id]));
@@ -771,7 +769,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_records_sent[$id] = $email_records_sent[$id].", ".$record;
                 }
                 $this->setProjectSetting('email-records-sent', $email_records_sent, $project_id);
-                print_array($email_records_sent);
             }
 
             #Add some logs
