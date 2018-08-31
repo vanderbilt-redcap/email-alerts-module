@@ -725,13 +725,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id);
             $this->setProjectSetting('email-sent', $email_sent, $project_id);
 
+            $isRepetitiveEmpty = false;
+            if($email_repetitive_sent == ''){
+                $isRepetitiveEmpty = true;
+            }
+
             if(!$isEmailAlreadySentForThisSurvery){
                 $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$id,$isRepeatInstrument,$instance,$event_id);
                 $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
             }
 
+            print_array($email_repetitive_sent);
             $email_repetitive_sent = json_decode($email_repetitive_sent,true);
-            if($email_records_sent[$id] == ''){
+            if($email_records_sent[$id] == '' && !$isRepetitiveEmpty){
                 if(!empty($email_repetitive_sent[$instrument][$id])) {
                     foreach ($email_repetitive_sent[$instrument][$id] as $record_key => $record_id) {
                         if(is_array($record_id)){
@@ -746,6 +752,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_records_sent[$id] = rtrim($email_records_sent[$id],', ');
                     $this->setProjectSetting('email-records-sent', $email_records_sent, $project_id);
                 }
+                print_array($email_records_sent);
             }
 
             $records = array_map('trim', explode(',', $email_records_sent[$id]));
@@ -764,6 +771,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_records_sent[$id] = $email_records_sent[$id].", ".$record;
                 }
                 $this->setProjectSetting('email-records-sent', $email_records_sent, $project_id);
+                print_array($email_records_sent);
             }
 
             #Add some logs
@@ -1430,7 +1438,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             }
                                         }
                                     }else if($sv_number == $new_record){
-                                        $found_new_record = false;
                                         if($isRepeatInstrument){
                                             return  $this->addArrayInfo(true,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id);
                                         }else{
