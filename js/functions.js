@@ -36,6 +36,7 @@ function previewEmailAlertQueue(index){
         success: function (result) {
             // console.log(result)
             $('#modal_message_queue').html(result);
+            $('#modalQueueNumber').text("- Alert #"+index);
             $('#external-modules-configure-modal-queue').modal('show');
         }
     });

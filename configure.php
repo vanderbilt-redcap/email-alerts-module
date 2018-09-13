@@ -1634,7 +1634,7 @@ if(USERID != "") {
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Preview Queue</h4>
+                        <h4 class="modal-title" id="myModalLabel">Preview Queued Emails <span id="modalQueueNumber"></span></h4>
                     </div>
                     <div class="modal-body">
                         <div id="modal_message_queue"></div>
