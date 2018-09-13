@@ -14,7 +14,7 @@ $module->deleteQueuedEmail($index, $project_id);
 
 #Add logs
 $changes_made = "Queue #".$index." from Alert #".$alertid." manually deleted by ".USERID;
-\REDCap::logEvent("Queue deleted - Alert ".$alertid,$changes_made,NULL,NULL,NULL,$project_id);
+\REDCap::logEvent("Queue deleted - Alert ".$alertid,$changes_made,null,null,null,$project_id);
 
 echo json_encode(array(
     'status' => 'success'

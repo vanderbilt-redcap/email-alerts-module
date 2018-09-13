@@ -17,13 +17,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		$this->disableUserBasedSettingPermissions();
 	}
 
-    function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
+    function hook_save_record ($project_id,$record = null,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         $data = \REDCap::getData($project_id,"array",$record);
         $this->setEmailTriggerRequested(false);
         if(isset($project_id)){
             #Form Complete
             $forms_name = $this->getProjectSetting("form-name",$project_id);
-            if(!empty($forms_name) && $record != NULL){
+            if(!empty($forms_name) && $record != null){
                 foreach ($forms_name as $id => $form){
                     $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
                     $isLongitudinalData = false;
@@ -592,7 +592,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         $changes_made = $scheduled_email;
-        \REDCap::logEvent($action_description,$changes_made,NULL,NULL,NULL,$pid);
+        \REDCap::logEvent($action_description,$changes_made,null,null,null,$pid);
     }
 
     /**
@@ -733,14 +733,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             #Add some logs
             $action_description = "Email Sent - Alert ".$alert_number;
             $changes_made = "[Subject]: ".$email_subject.", [Message]: ".$email_text;
-            \REDCap::logEvent($action_description,$changes_made,NULL,$record,$event_id,$project_id);
+            \REDCap::logEvent($action_description,$changes_made,null,$record,$event_id,$project_id);
 
             $action_description = "Email Sent To - Alert ".$alert_number;
             $email_list = '';
             foreach ($mail->getAllRecipientAddresses() as $email=>$value){
                 $email_list .= $email.";";
             }
-            \REDCap::logEvent($action_description,$email_list,NULL,$record,$event_id,$project_id);
+            \REDCap::logEvent($action_description,$email_list,null,$record,$event_id,$project_id);
         }
         unlink($privatekeyfile);
 

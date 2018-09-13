@@ -45,10 +45,10 @@ $email_queue =  empty($module->getProjectSetting('email-queue'))?array():$module
 #Add some logs
 $action_description = "Deleted Alert #".$index;
 $changes_made = "[Subject]: ".$email_subject[$index].", [Message]: ".$email_text[$index];
-\REDCap::logEvent($action_description,$changes_made,NULL,NULL,NULL,NULL);
+\REDCap::logEvent($action_description,$changes_made,null,null,null,null);
 
 $action_description = "Deleted Alert #".$index." To";
-\REDCap::logEvent($action_description,$email_to[$index].$email_cc[$index].$email_bcc[$index],NULL,NULL,NULL,NULL,NULL);
+\REDCap::logEvent($action_description,$email_to[$index].$email_cc[$index].$email_bcc[$index],null,null,null,null,null);
 
 #Delete email repetitive sent from JSON before deleting all data
 $email_repetitive_sent =  empty($module->getProjectSetting('email-repetitive-sent'))?array():$module->getProjectSetting('email-repetitive-sent');
@@ -86,7 +86,7 @@ if(!empty($email_queue)){
     #Add logs
     $action_description = "Deleted Scheduled Alert ".$index;
     $changes_made = "Record IDs deleted: ".rtrim($scheduled_records_changed,",");
-    \REDCap::logEvent($action_description,$changes_made,NULL,NULL,NULL,$pid);
+    \REDCap::logEvent($action_description,$changes_made,null,null,null,$pid);
 }
 
 

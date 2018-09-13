@@ -92,7 +92,7 @@ if($email_repetitive[$index] == "0" && $repetitive == "1" || $email_repetitive[$
         $module->setProjectSetting('email-queue', $queue);
         #Add logs
         $changes_made = "Record IDs ".$deactivated_text_changes.": ".rtrim($scheduled_records_changed,",");
-        \REDCap::logEvent($action_description." - Records","Re-send ".$deactivated_text_action." with queued emails.\n".$changes_made,NULL,NULL,NULL,$pid);
+        \REDCap::logEvent($action_description." - Records","Re-send ".$deactivated_text_action." with queued emails.\n".$changes_made,null,null,null,$pid);
     }
 }
 
@@ -140,7 +140,7 @@ if(isset($_REQUEST['cron-queue-update'])){
 
         #Add logs
         $changes_made = "Record IDs changed: ".rtrim($scheduled_records_changed,",");
-        \REDCap::logEvent($action_description." - Records",$changes_made,NULL,NULL,NULL,$pid);
+        \REDCap::logEvent($action_description." - Records",$changes_made,null,null,null,$pid);
     }
 }
 

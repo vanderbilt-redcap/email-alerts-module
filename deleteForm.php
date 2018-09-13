@@ -30,7 +30,7 @@ if(!empty($email_queue)){
     #Add logs
     $action_description = "Deactivated (deleted) Scheduled Alert ".$index;
     $changes_made = "Record IDs deactivated: ".rtrim($scheduled_records_changed,",");
-    \REDCap::logEvent($action_description,$changes_made,NULL,NULL,NULL,$pid);
+    \REDCap::logEvent($action_description,$changes_made,null,null,null,$pid);
 }
 
 
