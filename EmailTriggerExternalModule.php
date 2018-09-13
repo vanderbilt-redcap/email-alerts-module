@@ -530,7 +530,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function deleteQueuedEmail($index, $project_id){
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
-        error_log("scheduledemails PID: ".$project_id." - Delete QUEUE before: ".json_encode($email_queue));
+        error_log("scheduledemails PID: ".$project_id." - Delete QUEUE ".$index." before: ".json_encode($email_queue[$index]));
         if(is_array($index)){
             foreach ($index as $queue_index){
                 unset($email_queue[$queue_index]);
@@ -539,7 +539,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             unset($email_queue[$index]);
         }
 
-        error_log("scheduledemails PID: ".$project_id." - Delete QUEUE after: ".json_encode($email_queue));
+        error_log("scheduledemails PID: ".$project_id." - Delete QUEUE ".$index." after: ".json_encode($email_queue[$index]));
         $this->setProjectSetting('email-queue', $email_queue,$project_id);
     }
 
