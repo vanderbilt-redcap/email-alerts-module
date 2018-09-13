@@ -467,6 +467,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
             }
 
+            error_log("scheduledemails PID: ".$queue['project_id']." - Has expired? Type: ".$cron_queue_expiration_date." Value: ".$cron_queue_expiration_date_field);
+
             if ($cron_queue_expiration_date == 'date' && $cron_queue_expiration_date_field != "") {
                 if (strtotime($cron_queue_expiration_date_field) <= strtotime(date('Y-m-d'))) {
                     $this->deleteQueuedEmail($index, $queue['project_id']);
@@ -528,6 +530,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function deleteQueuedEmail($index, $project_id){
         $email_queue =  empty($this->getProjectSetting('email-queue',$project_id))?array():$this->getProjectSetting('email-queue',$project_id);
+        error_log("scheduledemails PID: ".$project_id." - Delete QUEUE before: ".json_encode($email_queue));
         if(is_array($index)){
             foreach ($index as $queue_index){
                 unset($email_queue[$queue_index]);
@@ -536,6 +539,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             unset($email_queue[$index]);
         }
 
+        error_log("scheduledemails PID: ".$project_id." - Delete QUEUE after: ".json_encode($email_queue));
         $this->setProjectSetting('email-queue', $email_queue,$project_id);
     }
 
