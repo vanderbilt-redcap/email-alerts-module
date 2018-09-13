@@ -214,7 +214,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     if ($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field != ''))) {
                         #SCHEDULED EMAIL
+                        error_log("scheduledemails PID: ".$project_id." - SCHEDULED EMAIL");
                         if ($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $id)) {
+                            error_log("scheduledemails PID: ".$project_id." - ADD SCHEDULED EMAIL record: ".$record);
                             $this->addQueuedEmail($id, $project_id, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument);
                         }
 
