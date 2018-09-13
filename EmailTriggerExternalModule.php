@@ -216,7 +216,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         #SCHEDULED EMAIL
                         error_log("scheduledemails PID: ".$project_id." - SCHEDULED EMAIL ALERT#".$id);
                         if ($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $id)) {
-                            error_log("scheduledemails PID: ".$project_id." - ADD SCHEDULED EMAIL record: ".$record);
+                            error_log("scheduledemails PID: ".$project_id." - ADD SCHEDULED EMAIL record: ".$record." event:".$event_id);
                             $this->addQueuedEmail($id, $project_id, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument);
                         }
 
@@ -519,7 +519,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $queue['last_sent'] = $last_sent;
 
         $email_queue = empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
+        error_log("scheduledemails PID: ".$project_id." - QUEUE ".json_encode($email_queue));
         array_push($email_queue,$queue);
+        error_log("scheduledemails PID: ".$project_id." - QUEUE2 ".json_encode($email_queue));
         $this->setProjectSetting('email-queue', $email_queue);
     }
 
