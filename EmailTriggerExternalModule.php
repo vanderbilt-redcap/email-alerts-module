@@ -747,6 +747,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }else{
                     $email_records_sent[$id] = $email_records_sent[$id].", ".$record;
                 }
+
+                #Check if there are duplicates and remove them before saving the data
+                $email_records_sent_alert = array_map('trim', explode(',', $email_records_sent[$id]));
+                $email_records_sent_alert = array_unique($email_records_sent_alert);
+                $email_records_sent_alert = implode(",",$email_records_sent_alert);
+                $email_records_sent[$id] = $email_records_sent_alert;
+
                 $this->setProjectSetting('email-records-sent', $email_records_sent, $project_id);
             }
 
