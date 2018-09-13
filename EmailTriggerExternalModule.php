@@ -17,26 +17,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		$this->disableUserBasedSettingPermissions();
 	}
 
-	function hook_survey_complete ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
-        $data = \REDCap::getData($project_id,"array",$record);
-        $this->setEmailTriggerRequested(false);
-        if(isset($project_id)){
-            #Form Complete
-            $forms_name = $this->getProjectSetting("form-name",$project_id);
-            if(!empty($forms_name) && $record != NULL){
-                foreach ($forms_name as $id => $form){
-
-                    $isRepeatInstrument = false;
-                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
-                        $isRepeatInstrument = true;
-                    }
-
-                    $this->sendEmailFromSurveyCode($_REQUEST['s'], $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument, $form);
-                }
-            }
-        }
-    }
-
     function hook_save_record ($project_id,$record = NULL,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         $data = \REDCap::getData($project_id,"array",$record);
         $this->setEmailTriggerRequested(false);
@@ -214,9 +194,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     if ($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field != ''))) {
                         #SCHEDULED EMAIL
-                        error_log("scheduledemails PID: ".$project_id." - SCHEDULED EMAIL ALERT#".$id);
                         if ($this->addEmailToQueue($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $id)) {
-                            error_log("scheduledemails PID: ".$project_id." - ADD SCHEDULED EMAIL record: ".$record." event:".$event_id);
                             $this->addQueuedEmail($id, $project_id, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument);
                         }
 
@@ -519,9 +497,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $queue['last_sent'] = $last_sent;
 
         $email_queue = empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
-        error_log("scheduledemails PID: ".$project_id." - QUEUE ".json_encode($email_queue));
         array_push($email_queue,$queue);
-        error_log("scheduledemails PID: ".$project_id." - QUEUE2 ".json_encode($email_queue));
         $this->setProjectSetting('email-queue', $email_queue);
     }
 
