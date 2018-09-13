@@ -33,7 +33,7 @@ $preview = "";
 $queued_emails = false;
 if($email_queue != '') {
     $preview = "<table style='margin:0 auto;width:100%;border: 1px;'>";
-    $preview .= "<thead><tr><td>Created on</td><td>Times Sent</td><td>Last Sent</td><td>Record</td><td>Event</td><td>Instrument</td><td>Instance</td><td>Repeat Instrument</td><td>Option</td><td>Deactivated</td>";
+    $preview .= "<thead><tr><td>Created on</td><td>Times Sent</td><td>Last Sent</td><td>Alert</td><td>Record</td><td>Event</td><td>Instrument</td><td>Instance</td><td>Repeat Instrument</td><td>Option</td><td>Deactivated</td>";
     if($super_user) {
         $preview .= "<td>Delete</td>";
     }
@@ -42,7 +42,7 @@ if($email_queue != '') {
     foreach ($email_queue as $id=>$queue) {
         if($queue['project_id'] == $project_id && $queue['alert'] == $index){
             $queued_emails = true;
-            $preview .= "<tr><td>".$queue['creation_date']."</td><td>".$queue['times_sent']."</td><td>".$queue['last_sent']."</td><td>".$queue['record']."</td><td>".$queue['event_id']."</td><td>".$queue['instrument']."</td><td>".$queue['instance']."</td><td>".$queue['isRepeatInstrument']."</td><td>".$queue['option']."</td><td>".$queue['deactivated']."</td>";
+            $preview .= "<tr><td>".$queue['creation_date']."</td><td>".$queue['times_sent']."</td><td>".$queue['last_sent']."</td><td>".$queue['alert']."</td><td>".$queue['record']."</td><td>".$queue['event_id']."</td><td>".$queue['instrument']."</td><td>".$queue['instance']."</td><td>".$queue['isRepeatInstrument']."</td><td>".$queue['option']."</td><td>".$queue['deactivated']."</td>";
             if($super_user) {
                 $preview .= "<td><i class=\"far fa-trash-alt\" style='cursor:pointer' onclick='deleteEmailAlertQueue(\"".$id."\",\"".$index."\")'></i>";
             }
