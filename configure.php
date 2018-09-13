@@ -1352,10 +1352,10 @@ if(USERID != "") {
                             }else if($configRow['key'] == 'email-subject') {
                                 $msg .= '<div><span>'.$configRow['value'][$index] . '</span></div><br>';
                             }else if ($configRow['key'] == 'email-text'){
-                                $msg .= '<span><a onclick="previewEmailAlert('.$index.')" style="cursor:pointer" >Preview Message</a></span>';
+                                $msg .= '<span><a onclick="previewEmailAlert('.$index.','.$alert_number.')" style="cursor:pointer" >Preview Message</a></span>';
                                 if($isAdmin) {
-                                    $msg .= '<span><a onclick="previewEmailAlertRecord(' . $index . ')" style="cursor:pointer" >Preview Message by Record</a></span>';
-                                    $msg .= '<span><a onclick="previewEmailAlertQueue(' . $index . ')" style="cursor:pointer" >Preview Queued Emails</a></span>';
+                                    $msg .= '<span><a onclick="previewEmailAlertRecord(' . $index . ','.$alert_number.')" style="cursor:pointer" >Preview Message by Record</a></span>';
+                                    $msg .= '<span><a onclick="previewEmailAlertQueue(' . $index . ','.$alert_number.')" style="cursor:pointer" >Preview Queued Emails</a></span>';
                                 }
                             }else if ($configRow['key'] == 'email-condition' && $configRow['value'][$index] != ""){
                                 $redcapLogic = '<br>REDCap Logic: <strong>'.$configRow['value'][$index].'</strong>';
@@ -1588,7 +1588,7 @@ if(USERID != "") {
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Record Preview</h4>
+                        <h4 class="modal-title" id="myModalLabel">Record Preview <span id="modalRecordNumber"></span></h4>
                     </div>
                     <div class="modal-body form-control-custom">
                         <div style="padding-bottom: 10px;">Select a record to preview the email</div>
@@ -1730,7 +1730,7 @@ if(USERID != "") {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Preview Email Alert</h4>
+                    <h4 class="modal-title" id="myModalLabel">Preview Email <span id="modalPreviewNumber"></span></h4>
                 </div>
                 <div class="modal-body">
                     <div id="modal_message_preview"></div>

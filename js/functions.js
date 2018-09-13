@@ -2,7 +2,7 @@
  * Function to preview the message on the alerts table
  * @param index, the alert id
  */
-function previewEmailAlert(index){
+function previewEmailAlert(index,alertnumber){
     var data = "&index_modal_preview="+index;
     $.ajax({
         type: "POST",
@@ -14,17 +14,19 @@ function previewEmailAlert(index){
         success: function (result) {
             // console.log(result)
             $('#modal_message_preview').html(result);
+            $('#modalPreviewNumber').text("- Alert #"+alertnumber);
             $('#external-modules-configure-modal-preview').modal('show');
         }
     });
 }
 
-function previewEmailAlertRecord(index){
+function previewEmailAlertRecord(index,alertnumber){
     $('#index_modal_record_preview').val(index)
+    $('#modalRecordNumber').text("- Alert #"+alertnumber);
     $('#external-modules-configure-modal-record').modal('show');
 }
 
-function previewEmailAlertQueue(index){
+function previewEmailAlertQueue(index,alertnumber){
     var data = "&index_modal_queue="+index;
     $.ajax({
         type: "POST",
@@ -36,7 +38,7 @@ function previewEmailAlertQueue(index){
         success: function (result) {
             // console.log(result)
             $('#modal_message_queue').html(result);
-            $('#modalQueueNumber').text("- Alert #"+index);
+            $('#modalQueueNumber').text("- Alert #"+alertnumber);
             $('#external-modules-configure-modal-queue').modal('show');
         }
     });
@@ -54,6 +56,7 @@ function loadPreviewEmailAlertRecord(data){
             alert(xhr.responseText);
         },
         success: function (result) {
+            $('#modalRecordPreviewNumber').text("- Alert #"+index);
             $('#modal_message_record_preview').html(result);
         }
     });
