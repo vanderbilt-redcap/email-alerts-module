@@ -15,7 +15,6 @@
 
 	"permissions": [
 		"hook_save_record",
-		"hook_survey_complete",
 		"hook_every_page_before_render"
 	],
 
@@ -29,7 +28,7 @@
 		]
 	},
 
-	"no-auth-pages":["surveyPassthru","downloadFile","deleteRecordEmailRepetitiveSent","deleteAllEmailRepetitiveSent"],
+	"no-auth-pages":["surveyPassthru","downloadFile"],
 
 	"email-dashboard-settings": [
         {

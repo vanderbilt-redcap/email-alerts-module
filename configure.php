@@ -1252,49 +1252,53 @@ if(USERID != "") {
                 foreach ($config['email-dashboard-settings'] as $configKey => $configRow) {
                     if ($configRow['key'] == 'cron-send-email-on' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-repeat-email' || $configRow['key'] == 'cron-repeat-until' || $configRow['key'] == 'cron-repeat-until-field' || $configRow['key'] == 'cron-repeat-for' || $configRow['key'] == 'cron-queue-expiration-date' || $configRow['key'] == 'cron-queue-expiration-date-field') {
                         //SHCEDULE EMAIL INFO
-                        if($configRow['key'] == 'cron-send-email-on'){
-                            if($configRow['value'][$index] == "now" || $configRow['value'][$index] == ""){
-                                $scheduled_email = "Send <strong>now</strong>";
-                            }else if($configRow['value'][$index] == "date"){
-                                $scheduled_email = "Send on ".$configRow['value'][$index];
-                            }else if($configRow['value'][$index] == "calc"){
-                                $scheduled_email = "Send on conditional";
+                        if($projectData['settings']['email-repetitive']['value'][$index] != '1') {
+                            if ($configRow['key'] == 'cron-send-email-on') {
+                                if ($configRow['value'][$index] == "now" || $configRow['value'][$index] == "") {
+                                    $scheduled_email = "Send <strong>now</strong>";
+                                } else if ($configRow['value'][$index] == "date") {
+                                    $scheduled_email = "Send on " . $configRow['value'][$index];
+                                } else if ($configRow['value'][$index] == "calc") {
+                                    $scheduled_email = "Send on conditional";
+                                }
                             }
-                        }
-                        if($configRow['key'] == 'cron-send-email-on-field' && $configRow['value'][$index] != ""){
-                            $scheduled_email .= ": <strong>".$configRow['value'][$index]."</strong>";
-                        }
-                        if($configRow['key'] == 'cron-repeat-email' && $configRow['value'][$index] == "1"){
-                            $scheduled_email .= "<br><br> Repeat";
-                            $isRepeatCron = true;
-                        }
-                        if($configRow['key'] == 'cron-repeat-for' && $configRow['value'][$index] != "" && $isRepeatCron){
-                            $scheduled_email .= " for ".$configRow['value'][$index]." days";
-                        }
-                        if($configRow['key'] == 'cron-repeat-until' && $isRepeatCron){
-                            if($configRow['value'][$index] == "forever"){
-                                $scheduled_email .= " forever";
-                            }else if($configRow['value'][$index] == "cond"){
-                                $scheduled_email .= " until condition is met";
-                            }else if($configRow['value'][$index] == "date"){
-                                $scheduled_email .= " until ";
+                            if ($configRow['key'] == 'cron-send-email-on-field' && $configRow['value'][$index] != "") {
+                                $scheduled_email .= ": <strong>" . $configRow['value'][$index] . "</strong>";
                             }
-                        }
-                        if($configRow['key'] == 'cron-repeat-until-field' && $configRow['value'][$index] != '' && $isRepeatCron){
-                            $scheduled_email .= $configRow['value'][$index];
-                        }
-                        if($configRow['key'] == "cron-queue-expiration-date" && $configRow['value'][$index] != "" && $configRow['value'][$index] != null){
-                            $scheduled_email .= " ";
-                            if($configRow['value'][$index] == "cond"){
-                                $scheduled_email .= "<br><br>Expires on condition: ";
-                            }else if($configRow['value'][$index] == "date"){
-                                $scheduled_email .= "<br><br> Expires on: ";
-                            }else{
-                                $scheduled_email .= "<br><br><b>Never</b> Expires";
+                            if ($configRow['key'] == 'cron-repeat-email' && $configRow['value'][$index] == "1") {
+                                $scheduled_email .= "<br><br> Repeat";
+                                $isRepeatCron = true;
                             }
-                        }
-                        if($configRow['key'] == "cron-queue-expiration-date-field" && $configRow['value'][$index] != ""){
-                            $scheduled_email .= $configRow['value'][$index]."";
+                            if ($configRow['key'] == 'cron-repeat-for' && $configRow['value'][$index] != "" && $isRepeatCron) {
+                                $scheduled_email .= " for " . $configRow['value'][$index] . " days";
+                            }
+                            if ($configRow['key'] == 'cron-repeat-until' && $isRepeatCron) {
+                                if ($configRow['value'][$index] == "forever") {
+                                    $scheduled_email .= " forever";
+                                } else if ($configRow['value'][$index] == "cond") {
+                                    $scheduled_email .= " until condition is met";
+                                } else if ($configRow['value'][$index] == "date") {
+                                    $scheduled_email .= " until ";
+                                }
+                            }
+                            if ($configRow['key'] == 'cron-repeat-until-field' && $configRow['value'][$index] != '' && $isRepeatCron) {
+                                $scheduled_email .= $configRow['value'][$index];
+                            }
+                            if ($configRow['key'] == "cron-queue-expiration-date" && $configRow['value'][$index] != "" && $configRow['value'][$index] != null) {
+                                $scheduled_email .= " ";
+                                if ($configRow['value'][$index] == "cond") {
+                                    $scheduled_email .= "<br><br>Expires on condition: ";
+                                } else if ($configRow['value'][$index] == "date") {
+                                    $scheduled_email .= "<br><br> Expires on: ";
+                                } else {
+                                    $scheduled_email .= "<br><br><b>Never</b> Expires";
+                                }
+                            }
+                            if ($configRow['key'] == "cron-queue-expiration-date-field" && $configRow['value'][$index] != "") {
+                                $scheduled_email .= $configRow['value'][$index] . "";
+                            }
+                        }else{
+                            $scheduled_email = "<i>No scheduled alerts</i>";
                         }
                     }else{
                         //NORMAL EMAIL
@@ -1321,16 +1325,22 @@ if(USERID != "") {
                             $checkboxes .= '<span>' .$configRow['name'].' <strong>'. $value . '</strong></span>';
                         } else {
                             if($configRow['key'] == 'form-name') {
+                                $event_selected = "";
+                                if(\REDCap::isLongitudinal()){
+                                    $Project = new \Project($pid);
+                                    $event_selected = "<div><strong>Event:</strong> ".$Project->eventInfo[$projectData['settings']['form-name-event']['value'][$index]]['name_ext']."</div>";
+                                }
+
                                 if($projectData['settings']['email-deleted']['value'][$index] == '1'){
                                     if($email_sent == "1"){
-                                        $formName .= '<span class="email_deleted"><i>Alert #'.$alert_number.'</i> <i class="fas fa-check email_sent" aria-hidden="true"></i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                        $formName .= '<span class="email_deleted"><i>Alert #'.$alert_number.'</i> <i class="fas fa-check email_sent" aria-hidden="true"></i></span><span>' . $configRow['value'][$index] . $event_selected . '</span>'.$message_sent.'</td>';
                                     }else{
-                                        $formName .= '<span class="email_deleted"><i>Alert #'.$alert_number.'</i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                        $formName .= '<span class="email_deleted"><i>Alert #'.$alert_number.'</i></span><span>' . $configRow['value'][$index] . $event_selected . '</span>'.$message_sent.'</td>';
                                     }
                                 }else if($email_sent == "1"){
-                                    $formName .= '<span class="email_sent"><i>Alert #'.$alert_number.'</i> <i class="fas fa-check" aria-hidden="true"></i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                    $formName .= '<span class="email_sent"><i>Alert #'.$alert_number.'</i> <i class="fas fa-check" aria-hidden="true"></i></span><span>' . $configRow['value'][$index] . $event_selected . '</span>'.$message_sent.'</td>';
                                 }else{
-                                    $formName .= '<span><i>Alert #'.$alert_number.'</i></span><span>' . $configRow['value'][$index] . '</span>'.$message_sent.'</td>';
+                                    $formName .= '<span><i>Alert #'.$alert_number.'</i></span><span>' . $configRow['value'][$index] . $event_selected . '</span>'.$message_sent.'</td>';
                                 }
 
                             }else if($configRow['key'] == 'email-attachment-variable'){
@@ -1594,23 +1604,28 @@ if(USERID != "") {
                         <div style="padding-bottom: 10px;">Select a record to preview the email</div>
                         <?php
                         $events_array = array();
-                        $data = \REDCap::getData($pid,'array');
-                        if(count($data) < 500){
-                            foreach ($data as $record_id => $event){
-                                array_push($events_array,$record_id);
-                            }
-
-                            if(!empty($events_array)){
-                                $event_selector = '<div style="padding-bottom:10px"><select class="external-modules-input-element" name="preview_record_id"><option value="">Select a Record</option>';
-                                foreach ($events_array as $id){
-                                    $event_selector .= '<option value="'.$id.'" >'.$id.'</option>';
-                                }
-                                $event_selector .= '</select></div>';
-                                echo $event_selector;
-                            }
-                        }else{
+                        if(\REDCap::isLongitudinal()){
                             echo "<div style='margin-bottom: 60px;'><input type='text' name='preview_record_id' id='preview_record_id' placeholder='Type a record' style='width: 80%;float: left;'>
                                     <a href='#' class='btn btn-default save' id='preview_record_id_btn' style='float: left;margin-left: 20px;padding-top: 8px;padding-bottom: 7px;'>Preview</a></div>";
+                        }else{
+                            $data = \REDCap::getData($pid,'array');
+                            if(count($data) < 500){
+                                foreach ($data as $record_id => $event){
+                                    array_push($events_array,$record_id);
+                                }
+
+                                if(!empty($events_array)){
+                                    $event_selector = '<div style="padding-bottom:10px"><select class="external-modules-input-element" name="preview_record_id"><option value="">Select a Record</option>';
+                                    foreach ($events_array as $id){
+                                        $event_selector .= '<option value="'.$id.'" >'.$id.'</option>';
+                                    }
+                                    $event_selector .= '</select></div>';
+                                    echo $event_selector;
+                                }
+                            }else{
+                                echo "<div style='margin-bottom: 60px;'><input type='text' name='preview_record_id' id='preview_record_id' placeholder='Type a record' style='width: 80%;float: left;'>
+                                    <a href='#' class='btn btn-default save' id='preview_record_id_btn' style='float: left;margin-left: 20px;padding-top: 8px;padding-bottom: 7px;'>Preview</a></div>";
+                            }
                         }
                         ?>
                         <div>
