@@ -47,7 +47,7 @@ function deleteEmailAlertQueue(index,alertid){
     ajaxLoadOptionAndMessage("&index_modal_queue="+index+"&pid="+project_id+"&alertid="+alertid,_delete_queue_url,"O");
 }
 
-function loadPreviewEmailAlertRecord(data){
+function loadPreviewEmailAlertRecord(data,index){
     $.ajax({
         type: "POST",
         url: _preview_record_url,
