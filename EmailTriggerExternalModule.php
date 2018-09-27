@@ -496,9 +496,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $queue['times_sent'] = $times_sent;
         $queue['last_sent'] = $last_sent;
 
-        $email_queue = empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
+        $email_queue = empty($this->getProjectSetting('email-queue', $project_id))?array():$this->getProjectSetting('email-queue', $project_id);
         array_push($email_queue,$queue);
-        $this->setProjectSetting('email-queue', $email_queue);
+        $this->setProjectSetting('email-queue', $email_queue, $project_id);
     }
 
     /**
