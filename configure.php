@@ -1603,8 +1603,32 @@ if(USERID != "") {
                     <div class="modal-body form-control-custom">
                         <div style="padding-bottom: 10px;">Select a record to preview the email</div>
                         <?php
+
+                        $sql = "SELECT b.event_id FROM  redcap_events_arms a LEFT JOIN redcap_events_metadata b ON(a.arm_id = b.arm_id) where a.project_id ='$pid'";
+                        $q = db_query($sql);
+                        $repeatable = false;
+                        if (db_num_rows($q)) {
+                            while($row = db_fetch_assoc($q)) {
+                                $form_name = empty($module->getProjectSetting('form-name'))?array():$module->getProjectSetting('form-name');
+                                foreach ($form_name as $form){
+                                    $project_name = db_escape(\Project::getValidProjectName($form));
+                                    $event_id = $row['event_id'];
+                                    $sql = "SELECT * FROM redcap_events_repeat WHERE event_id='$event_id' AND form_name='$project_name'";
+                                    $q = db_query($sql);
+                                    $row = db_fetch_assoc($q);
+                                    if ($row) {
+                                        $repeatable = true;
+                                        break;
+                                    }
+                                }
+
+
+                            }
+                        }
+
+
                         $events_array = array();
-                        if(\REDCap::isLongitudinal()){
+                        if(\REDCap::isLongitudinal() || $repeatable){
                             echo "<div style='margin-bottom: 60px;'><input type='text' name='preview_record_id' id='preview_record_id' placeholder='Type a record' style='width: 80%;float: left;'>
                                     <a href='#' class='btn btn-default save' id='preview_record_id_btn' style='float: left;margin-left: 20px;padding-top: 8px;padding-bottom: 7px;'>Preview</a></div>";
                         }else{
