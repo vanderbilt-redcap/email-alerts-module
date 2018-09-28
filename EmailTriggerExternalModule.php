@@ -178,7 +178,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery))) {
                 #If the condition is met or if we don't have any, we send the email
                 $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record, $event_id);
-                if ($isRepeatInstrument) {
+                if ($isRepeatInstrument && !$evaluateLogic) {
                     $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record, $event_id, $repeat_instance, $instrument);
                 }
                 if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && $evaluateLogic) || empty($email_condition)) {
