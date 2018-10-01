@@ -1287,15 +1287,12 @@ if(USERID != "") {
                             if ($configRow['key'] == "cron-queue-expiration-date" && $configRow['value'][$index] != "" && $configRow['value'][$index] != null) {
                                 $scheduled_email .= " ";
                                 if ($configRow['value'][$index] == "cond") {
-                                    $scheduled_email .= "<br><br>Expires on condition: ";
+                                    $scheduled_email .= "<br><br>Expires on condition: ".$configRow['value'][$index] . "";
                                 } else if ($configRow['value'][$index] == "date") {
-                                    $scheduled_email .= "<br><br> Expires on: ";
+                                    $scheduled_email .= "<br><br> Expires on: ".$configRow['value'][$index] . "";
                                 } else {
                                     $scheduled_email .= "<br><br><b>Never</b> Expires";
                                 }
-                            }
-                            if ($configRow['key'] == "cron-queue-expiration-date-field" && $configRow['value'][$index] != "") {
-                                $scheduled_email .= $configRow['value'][$index] . "";
                             }
                         }else{
                             $scheduled_email = "<i>No scheduled alerts</i>";
