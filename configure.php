@@ -1249,6 +1249,7 @@ if(USERID != "") {
                 $msg = '';
                 $redcapLogic = '<br>REDCap Logic: <strong>None</strong>';
                 $isRepeatCron = false;
+                $never = false;
                 foreach ($config['email-dashboard-settings'] as $configKey => $configRow) {
                     if ($configRow['key'] == 'cron-send-email-on' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-repeat-email' || $configRow['key'] == 'cron-repeat-until' || $configRow['key'] == 'cron-repeat-until-field' || $configRow['key'] == 'cron-repeat-for' || $configRow['key'] == 'cron-queue-expiration-date' || $configRow['key'] == 'cron-queue-expiration-date-field') {
                         //SHCEDULE EMAIL INFO
@@ -1287,12 +1288,16 @@ if(USERID != "") {
                             if ($configRow['key'] == "cron-queue-expiration-date" && $configRow['value'][$index] != "" && $configRow['value'][$index] != null) {
                                 $scheduled_email .= " ";
                                 if ($configRow['value'][$index] == "cond") {
-                                    $scheduled_email .= "<br><br>Expires on condition: ".$configRow['value'][$index] . "";
+                                    $scheduled_email .= "<br><br>Expires on condition: ";
                                 } else if ($configRow['value'][$index] == "date") {
-                                    $scheduled_email .= "<br><br> Expires on: ".$configRow['value'][$index] . "";
+                                    $scheduled_email .= "<br><br> Expires on: ";
                                 } else {
                                     $scheduled_email .= "<br><br><b>Never</b> Expires";
+                                    $never = true;
                                 }
+                            }
+                            if ($configRow['key'] == "cron-queue-expiration-date-field" && $configRow['value'][$index] != "" && !$never) {
+                                $scheduled_email .= $configRow['value'][$index] . "";
                             }
                         }else{
                             $scheduled_email = "<i>No scheduled alerts</i>";
