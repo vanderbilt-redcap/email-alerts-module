@@ -14,6 +14,7 @@
 	"description": "Allows users to construct and send customized email alerts to one or more recipients, in which the emails are triggered when a form/survey is completed and optionally based on conditional logic. The user interface enables customized options such as rich text, data piping, and file attachments.",
 
 	"permissions": [
+		"hook_survey_complete",
 		"hook_save_record",
 		"hook_every_page_before_render"
 	],
