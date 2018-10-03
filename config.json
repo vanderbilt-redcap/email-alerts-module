@@ -51,6 +51,12 @@
 			"type":"checkbox"
 		},
 		{
+			"key": "email-incomplete-descriptive",
+			"name": "<span style='color:red;font-style:italic'>*Do not select any form status  if you use Page Breaks in your survey</span>",
+			"required": false,
+			"type":"descriptive"
+		},
+		{
 			"key": "email-from",
 			"name": "Email From",
 			"required": true,
