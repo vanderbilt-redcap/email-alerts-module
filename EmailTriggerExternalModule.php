@@ -25,10 +25,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $forms_name = $this->getProjectSetting("form-name",$project_id);
             if(!empty($forms_name) && $record != NULL){
                 foreach ($forms_name as $id => $form){
-                    if($_REQUEST['page'] == "" && $_REQUEST['s'] != ""){
+                    if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
                         #Surveys are always complete
                         $isRepeatInstrument = false;
-                        if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
+                        if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
                             $isRepeatInstrument = true;
                         }
                         $this->sendEmailFromSurveyCode($_REQUEST['s'], $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument, $form);
@@ -59,7 +59,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                     $email_incomplete = $this->getProjectSetting("email-incomplete",$project_id)[$id];
 //                    if($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrumentComplete || $email_incomplete == "1"){
-                    if(($email_incomplete == "1" &&(($isRepeatInstrument && !$isRepeatInstrumentComplete) || $data[$record][$event_id][$form.'_complete'] != '2')) || (!$this->isSurveyPage() && ($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrumentComplete))){
+                    if(($email_incomplete == "1" &&(($isRepeatInstrument && !$isRepeatInstrumentComplete) || (!$isRepeatInstrument && $data[$record][$event_id][$form.'_complete'] != '2'))) || (!$this->isSurveyPage() && ($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrumentComplete))){
                         if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
                             if ($_REQUEST['page'] == $form) {
                                 $this->setEmailTriggerRequested(true);
@@ -82,7 +82,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             throw new \Exception($sql.': '.$error);
         }
 
-        while($row = db_fetch_assoc($q)){
+        if($row = db_fetch_assoc($q)){
             if ($row['form_name'] == $form) {
                 $this->setEmailTriggerRequested(true);
                 $this->sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrumentComplete);
