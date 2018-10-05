@@ -1162,7 +1162,6 @@ if(USERID != "") {
                         $message_sent .= "<span style='display:block;font-style:italic;color:red;'>Email deactivated</span>";
                     }
 
-                    $class_sent = "email_deactivated";
                     $deactivate = "Activate";
                     $active_col = "N";
                     $show_button_active = "display:none;";
@@ -1182,7 +1181,6 @@ if(USERID != "") {
                 if($projectData['settings']['email-deleted']['value'][$index] == '1'){
                     $deactivated_deleted_text = ($active_col == 'N')?'Email was INNACTIVE when deleted':'Email was ACTIVE when deleted';
                     $message_sent .= "<div><span style='font-style:italic;color:red;line-height: 2;float: left;'>".$deactivated_deleted_text."</span></div><br><br>";
-                    $class_sent = "email_deleted";
                     $deleted_modal = "external-modules-configure-modal-delete-confirmation";
                     $deleted_index = "index_modal_delete";
                     $deleted_col = "Y";

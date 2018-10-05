@@ -58,7 +58,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $isRepeatInstrument = true;
                     }
                     $email_incomplete = $this->getProjectSetting("email-incomplete",$project_id)[$id];
-//                    if($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrumentComplete || $email_incomplete == "1"){
                     if(($email_incomplete == "1" &&(($isRepeatInstrument && !$isRepeatInstrumentComplete) || (!$isRepeatInstrument && $data[$record][$event_id][$form.'_complete'] != '2'))) || (!$this->isSurveyPage() && ($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrumentComplete))){
                         if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
                             if ($_REQUEST['page'] == $form) {
