@@ -25,13 +25,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $forms_name = $this->getProjectSetting("form-name",$project_id);
             if(!empty($forms_name) && $record != NULL){
                 foreach ($forms_name as $id => $form){
-                    if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
-                        #Surveys are always complete
-                        $isRepeatInstrument = false;
-                        if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
-                            $isRepeatInstrument = true;
+                    $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
+                    $isLongitudinalData = false;
+                    if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
+                        $isLongitudinalData = true;
+                    }
+
+                    if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
+                        if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
+                            #Surveys are always complete
+                            $isRepeatInstrument = false;
+                            if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
+                                $isRepeatInstrument = true;
+                            }
+                            $this->sendEmailFromSurveyCode($_REQUEST['s'], $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument, $form);
                         }
-                        $this->sendEmailFromSurveyCode($_REQUEST['s'], $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument, $form);
                     }
                 }
             }
