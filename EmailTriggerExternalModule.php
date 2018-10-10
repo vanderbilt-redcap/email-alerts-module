@@ -199,7 +199,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery))) {
                 #If the condition is met or if we don't have any, we send the email
                 $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record, $event_id);
-                if ($isRepeatInstrument && !$evaluateLogic) {
+                if (($isRepeatInstrument || \REDCap::isLongitudinal()) && !$evaluateLogic) {
                     $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record, $event_id, $repeat_instance, $instrument);
                 }
                 if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && $evaluateLogic) || empty($email_condition)) {
@@ -1320,7 +1320,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if(!empty($emailFailed_var)){
             $emailsFailed = preg_split("/[;,]+/", $emailFailed_var);
             foreach ($emailsFailed as $failed){
-                \REDCap::email(trim($failed), 'noreply@vanderbilt.edu',$subject, $message);
+                \REDCap::email(trim($failed), 'noreply@vumc.org',$subject, $message);
             }
         }
     }
