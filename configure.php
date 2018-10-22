@@ -395,9 +395,9 @@ if(USERID != "") {
                 $('[name="email-from"]').val(from_default);
 
                 if(isAdmin) {
-                    $('[name="cron-send-email-on"][value="now"').prop('checked', true);
-                    $('[name="cron-queue-expiration-date"][value="never"').prop('checked', true);
-                    $('[name="cron-repeat-until"][value="forever"').prop('checked', true);
+                    $('[name="cron-send-email-on"][value="now"]').prop('checked', true);
+                    $('[name="cron-queue-expiration-date"][value="never"]').prop('checked', true);
+                    $('[name="cron-repeat-until"][value="forever"]').prop('checked', true);
                     $('[field="cron-repeat-for"]').hide();
                     $('[field="cron-repeat-until"]').hide();
                     $('[field="cron-repeat-until-field"]').hide();
