@@ -394,13 +394,15 @@ if(USERID != "") {
                 $('[name="email-from"]').attr('placeholder','myemail@server.com, "Sender name"');
                 $('[name="email-from"]').val(from_default);
 
-                $('[name="cron-send-email-on"][value="now"').prop('checked',true);
-                $('[name="cron-queue-expiration-date"][value="never"').prop('checked',true);
-                $('[name="cron-repeat-until"][value="forever"').prop('checked',true);
-                $('[field="cron-repeat-for"]').hide();
-                $('[field="cron-repeat-until"]').hide();
-                $('[field="cron-repeat-until-field"]').hide();
-                $('[field="cron-queue-expiration-date-field"]').hide();
+                if(isAdmin) {
+                    $('[name="cron-send-email-on"][value="now"').prop('checked', true);
+                    $('[name="cron-queue-expiration-date"][value="never"').prop('checked', true);
+                    $('[name="cron-repeat-until"][value="forever"').prop('checked', true);
+                    $('[field="cron-repeat-for"]').hide();
+                    $('[field="cron-repeat-until"]').hide();
+                    $('[field="cron-repeat-until-field"]').hide();
+                    $('[field="cron-queue-expiration-date-field"]').hide();
+                }
 
                 //Add calendar on expiration by default
                 var suffix='-update';
