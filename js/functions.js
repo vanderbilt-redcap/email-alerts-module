@@ -467,9 +467,9 @@ function gerUtlMessageParam(letter){
         url = url.substring(0, url.length-1);
     }
     if(window.location.href.match(/(&message=)([A-Z]{1})/)){
-        url = window.location.href = window.location.href.replace( /(&message=)([A-Z]{1})/, "&message="+letter );
+        url = url.replace( /(&message=)([A-Z]{1})/, "&message="+letter );
     }else{
-        url = window.location.href + "&message="+letter;
+        url = url + "&message="+letter;
     }
     return url;
 }
