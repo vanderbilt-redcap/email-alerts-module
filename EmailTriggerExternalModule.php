@@ -125,19 +125,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             if($email_repetitive_sent) {
                 foreach ($email_repetitive_sent as $form => $form_value) {
                     foreach ($form_value as $alert => $alert_value) {
-                        $one_less = 0;
                         foreach ($alert_value as $record => $value) {
-                            //we don't add the deleted alert and rename the old ones.
-                            if ($value == $record_id) {
-                                $one_less = 1;
-                            }else if($record >= 0){
-                                //if the record is -1 do not add it. When copying a project sometimes it has a weird config.
-                                $jsonArray[$form][$alert][$record - $one_less] = $value;
+                            #we delete the found record
+                            if ($record == $record_id) {
+                                unset($email_repetitive_sent[$form][$alert][$record]);
                             }
                         }
                     }
                 }
-                $this->setProjectSetting('email-repetitive-sent', json_encode($jsonArray));
+                $this->setProjectSetting('email-repetitive-sent', json_encode($email_repetitive_sent));
             }
             if($email_records_sent){
                 foreach ($email_records_sent as $index=>$sent){
@@ -145,11 +141,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     foreach ($records as $record){
                         if($record == $record_id){
                             #Delete list of records sent
-                            if(str_replace($record_id.", ","",$email_records_sent[$index], $count) == 0){
-                                $email_records_sent[$index] = str_replace($record_id.", ","",$email_records_sent[$index]);
-                            }else{
+                            $aux = str_replace(", ".$record_id,"",$email_records_sent[$index], $count);
+                            if($count == 0){
                                 $email_records_sent[$index] = str_replace($record_id,"",$email_records_sent[$index]);
+                            }else{
+                                $email_records_sent[$index] = $aux;
                             }
+                        }else if($record == ""){
+                            #If there are empty values in the string we delete the commas
+                            $email_records_sent[$index] = str_replace(", ,",",",$email_records_sent[$index], $count);
+
                         }
                     }
                 }
@@ -168,6 +169,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $this->setProjectSetting('email-queue', $email_queue_aux);
             }
         }
+//        die;
     }
 
     /**
