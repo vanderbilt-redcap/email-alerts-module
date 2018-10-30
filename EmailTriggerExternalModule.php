@@ -1291,6 +1291,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
                        } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap)){
                             $mail = $this->check_single_email($mail,$email,$option,$project_id);
+                       }else if(filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap)){
+                           $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
+                       }else{
+                           $email_redcap_checkboxes = preg_split("/[;,]+/", $email_redcap);
+                           foreach ($email_redcap_checkboxes as $email_ck){
+                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL) && (empty($email_ck) || $email != $email_ck)){
+                                   $mail = $this->check_single_email($mail,$email_ck,$option,$project_id);
+                               }
+                           }
                        }
                     } else {
                         $mail = $this->check_single_email($mail,$email,$option,$project_id);
