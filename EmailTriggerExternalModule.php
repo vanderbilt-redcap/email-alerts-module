@@ -1283,20 +1283,22 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(!empty($email)) {
                     if (\LogicTester::isValid($var[0])) {
                        $email_redcap = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var[0],1,$isLongitudinal);
-                       if(is_numeric($email_redcap)){
+                       $isLabel = false;
+                       if(is_numeric($email_redcap) || empty($email_redcap)){
+                           $isLabel = true;
                            $email_redcap = $this->getChoiceLabel(array('field_name'=>$email, 'value'=>$email_redcap, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$repeat_instance));
                        }
 
-                       if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email)) {
+                       if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email) && !$isLabel) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
-                       } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap)){
+                       } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap) && !$isLabel){
                             $mail = $this->check_single_email($mail,$email,$option,$project_id);
-                       }else if(filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap)){
+                       }else if(filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL) && $email == $var[0] && $isLabel){
                            $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
-                       }else{
+                       }else if($email == $var[0] && $isLabel){
                            $email_redcap_checkboxes = preg_split("/[;,]+/", $email_redcap);
                            foreach ($email_redcap_checkboxes as $email_ck){
-                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL) && (empty($email_ck) || $email != $email_ck)){
+                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL)){
                                    $mail = $this->check_single_email($mail,$email_ck,$option,$project_id);
                                }
                            }
