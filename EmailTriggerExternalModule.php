@@ -1283,6 +1283,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(!empty($email)) {
                     if (\LogicTester::isValid($var[0])) {
                        $email_redcap = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var[0],1,$isLongitudinal);
+
                        $isLabel = false;
                        if(is_numeric($email_redcap) || empty($email_redcap)){
                            $isLabel = true;
@@ -1291,7 +1292,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                        if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email) && !$isLabel) {
                             $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
-                       } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap) && !$isLabel){
+                       } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap)){
                             $mail = $this->check_single_email($mail,$email,$option,$project_id);
                        }else if(filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL) && $email == $var[0] && $isLabel){
                            $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
