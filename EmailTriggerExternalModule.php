@@ -1285,7 +1285,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                        $email_redcap = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var[0],1,$isLongitudinal);
 
                        $isLabel = false;
-                       if(is_numeric($email_redcap) || empty($email_redcap)){
+                       if(is_numeric($email_redcap) || empty($email_redcap) || (is_array($email_redcap) && $isLongitudinal)){
                            $isLabel = true;
                            $email_redcap = $this->getChoiceLabel(array('field_name'=>$email, 'value'=>$email_redcap, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$repeat_instance));
                        }
