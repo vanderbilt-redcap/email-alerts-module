@@ -162,14 +162,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $email_queue_aux = $email_queue;
             if($email_queue){
                 foreach ($email_queue as $id=>$email){
-                    if($email['project_id'] == $project_id && $email['record'] == $record){
+                    if($email['record'] == $record){
                         unset($email_queue_aux[$id]);
                     }
                 }
                 $this->setProjectSetting('email-queue', $email_queue_aux);
             }
         }
-//        die;
     }
 
     /**
