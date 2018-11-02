@@ -169,7 +169,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $this->setProjectSetting('email-queue', $email_queue_aux);
             }
         }
-//        die;
     }
 
     /**
