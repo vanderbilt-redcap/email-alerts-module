@@ -62,25 +62,26 @@ function loadPreviewEmailAlertRecord(data,index){
     });
 }
 
-function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_field,cron_repeat_email,cron_repeat_for,cron_repeat_until,cron_repeat_until_field,cron_expiration_date,cron_expiration_date_field){
+function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_field,cron_repeat_for,cron_expiration_date,cron_expiration_date_field){
     if(repetitive == '1'){
         $('.email-schedule-title'+suffix).hide();
         $('[field="cron-send-email-on'+suffix+'"]').hide();
         $('[field="cron-send-email-on-field'+suffix+'"]').hide();
-        $('[field="cron-repeat-email'+suffix+'"]').hide();
         $('[field="cron-repeat-for'+suffix+'"]').hide();
-        $('[field="cron-repeat-until'+suffix+'"]').hide();
-        $('[field="cron-repeat-until-field'+suffix+'"]').hide();
         $('[field="cron-queue-expiration-date'+suffix+'"]').hide();
         $('[field="cron-queue-expiration-date-field'+suffix+'"]').hide();
         $('[field="cron-queue-update"]').hide();
+        $('[field="cron-queue-send-label'+suffix+'"]').hide();
     }else{
         $('.email-schedule-title'+suffix).show();
         $('[field="cron-send-email-on'+suffix+'"]').show();
-        $('[field="cron-repeat-email'+suffix+'"]').show();
         $('[field="cron-queue-expiration-date'+suffix+'"]').show();
         $('[field="cron-queue-expiration-date-field'+suffix+'"]').show();
         $('[field="cron-queue-update"]').show();
+        $('[field="cron-queue-send-label'+suffix+'"]').show();
+
+        $('[field="cron-repeat-for'+suffix+'"]').show();
+        $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-for'+suffix+'"]').val(cron_repeat_for);
 
         if(cron_send_email_on == "" || cron_send_email_on == undefined || cron_send_email_on == null){
             $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-send-email-on'+suffix+'"][value="now"]').prop('checked',true);
@@ -118,9 +119,9 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
         }else if(cron_expiration_date == 'date'){
             $('[field="cron-queue-expiration-date-field'+suffix+'"]').show();
             $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-queue-expiration-date'+suffix+'"][value="date"]').prop('checked',true);
-            $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker_aux');
+            $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker_aux_expire');
             $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker');
-            $(".datepicker_aux").datepicker({
+            $(".datepicker_aux_expire").datepicker({
                 showOn: "button",
                 buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
                 buttonImageOnly: true,
@@ -129,63 +130,13 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
             });
         }else{
             $('[field="cron-queue-expiration-date-field'+suffix+'"]').show();
-            $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-queue-expiration-date'+suffix+'"][value="cond"]').prop('checked',true);
+            $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-queue-expiration-date'+suffix+'"][value="'+cron_expiration_date+'"]').prop('checked',true);
             $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').datepicker("destroy");
             $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker');
-            $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker_aux');
+            $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker_aux_expire');
             $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
         }
         $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-queue-expiration-date-field'+suffix+'"]').val(cron_expiration_date_field);
-
-        if(cron_repeat_email == "" || cron_repeat_email == undefined || cron_repeat_email == null){
-            $('[field="cron-repeat-for'+suffix+'"]').hide();
-            $('[field="cron-repeat-until'+suffix+'"]').hide();
-            $('[field="cron-repeat-until-field'+suffix+'"]').hide();
-        }else{
-            if(cron_repeat_email == "1"){
-                $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-email'+suffix+'"]').prop('checked',true);
-                $('[field="cron-repeat-for'+suffix+'"]').show();
-                $('[field="cron-repeat-until'+suffix+'"]').show();
-                $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-for'+suffix+'"]').val(cron_repeat_for);
-
-                if(cron_repeat_until == "date" || cron_repeat_until == "cond"){
-                    $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until'+suffix+'"][value="'+cron_repeat_until+'"]').prop('checked',true);
-                    $('[field="cron-repeat-until-field'+suffix+'"]').show();
-                    $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until-field'+suffix+'"]').val(cron_repeat_until_field);
-                    if(cron_repeat_until == 'date'){
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').addClass('datepicker_aux2');
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').addClass('datepicker');
-                        $(".datepicker_aux2").datepicker({
-                            showOn: "button",
-                            buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
-                            buttonImageOnly: true,
-                            buttonText: "Select date",
-                            dateFormat: "yy-mm-dd"
-                        });
-                    }else{
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').datepicker("destroy");
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('datepicker');
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('datepicker_aux2');
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
-                    }
-
-                }else if(cron_repeat_until == "forever" || cron_repeat_until == ""){
-                    $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until'+suffix+'"][value="forever"]').prop('checked',true);
-                    $('[field="cron-repeat-until-field'+suffix+'"]').hide();
-                }
-            }else if(cron_repeat_email == "0"){
-                $('[field="cron-repeat-for'+suffix+'"]').hide();
-                $('[field="cron-repeat-until'+suffix+'"]').hide();
-                $('[field="cron-repeat-until-field'+suffix+'"]').hide();
-            }
-        }
-    }
-}
-
-function checkSchduleExpireVSRepeat(cron_repeat_until,cron_expiration_date,cron_expiration_date_field,suffix){
-    //Expire vs Repeat logic
-    if((cron_repeat_until == "date" && cron_expiration_date == "date") || (cron_repeat_until == "cond" && cron_expiration_date == "cond")){
-        $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-until-field'+suffix+'"]').val(cron_expiration_date_field);
     }
 }
 
@@ -231,7 +182,7 @@ function editEmailAlert(modal, index){
     $('[name=external-modules-configure-modal-update] input[name="email-incomplete-update"]').val(modal['email-incomplete']);
     $('[name=external-modules-configure-modal-update] input[name="cron-queue-update"]').val(modal['cron-queue-update']);
 
-    checkSchedule(modal['email-repetitive'],'-update',modal['cron-send-email-on'],modal['cron-send-email-on-field'],modal['cron-repeat-email'],modal['cron-repeat-for'],modal['cron-repeat-until'],modal['cron-repeat-until-field'],modal['cron-queue-expiration-date'],modal['cron-queue-expiration-date-field']);
+    checkSchedule(modal['email-repetitive'],'-update',modal['cron-send-email-on'],modal['cron-send-email-on-field'],modal['cron-repeat-for'],modal['cron-queue-expiration-date'],modal['cron-queue-expiration-date-field']);
 
     uploadLongitudinalEvent('project_id='+project_id+'&form='+modal['form-name']+'&index='+index,'[field=form-name-event]');
 
@@ -533,6 +484,18 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
                 $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-queue-expiration-date-field'+suffix+']').addClass('alert');
             }
         }else{ $('[name=external-modules-configure-modal'+suffix+'] select[name=form-name'+suffix+']').removeClass('alert');}
+    }
+
+
+    if($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val() == ""){
+        errMsg.push("<strong>Repeat every # number of days </strong>can't be blank. Please enter a number");
+        $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').addClass('alert');
+    }else{
+        var integer = ($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val()%1);
+        if(integer != 0 || $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val().indexOf(',') != -1 || $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val().indexOf('.') != -1){
+            errMsg.push('<strong> '+$('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val()+'</strong> is not a valid number for # of days.');
+            $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').addClass('alert');
+        }
     }
 
     var editor_text = tinymce.activeEditor.getContent();

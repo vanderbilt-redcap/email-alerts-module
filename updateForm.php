@@ -22,10 +22,7 @@ $email_condition =  empty($module->getProjectSetting('email-condition'))?array()
 $email_incomplete =  empty($module->getProjectSetting('email-incomplete'))?array():$module->getProjectSetting('email-incomplete');
 $cron_send_email_on =  empty($module->getProjectSetting('cron-send-email-on'))?array():$module->getProjectSetting('cron-send-email-on');
 $cron_send_email_on_field =  empty($module->getProjectSetting('cron-send-email-on-field'))?array():$module->getProjectSetting('cron-send-email-on-field');
-$cron_repeat_email =  empty($module->getProjectSetting('cron-repeat-email'))?array():$module->getProjectSetting('cron-repeat-email');
 $cron_repeat_for =  empty($module->getProjectSetting('cron-repeat-for'))?array():$module->getProjectSetting('cron-repeat-for');
-$cron_repeat_until =  empty($module->getProjectSetting('cron-repeat-until'))?array():$module->getProjectSetting('cron-repeat-until');
-$cron_repeat_until_field=  empty($module->getProjectSetting('cron-repeat-until-field'))?array():$module->getProjectSetting('cron-repeat-until-field');
 $cron_queue_expiration_date =  empty($module->getProjectSetting('cron-queue-expiration-date'))?array():$module->getProjectSetting('cron-queue-expiration-date');
 $cron_queue_expiration_date_field =  empty($module->getProjectSetting('cron-queue-expiration-date-field'))?array():$module->getProjectSetting('cron-queue-expiration-date-field');
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
@@ -49,12 +46,6 @@ if(!isset($_REQUEST['email-incomplete-update'])){
     $incomplete = "1";
 }
 
-if(!isset($_REQUEST['cron-repeat-email-update'])){
-    $cron_repeat = "0";
-}else{
-    $cron_repeat = "1";
-}
-
 //If first time new alert naming, update all.
 if(empty($alert_id)){
     foreach ($form_name as $index=>$value){
@@ -71,10 +62,10 @@ if(empty($alert_id)){
 $action_description = "Modifications on Scheduled Alert ".$index;
 $schedule_changed = false;
 if($cron_send_email_on[$index] != $_REQUEST['cron-send-email-on-update'] || $cron_send_email_on_field[$index] != $_REQUEST['cron-send-email-on-field-update'] ||
-    $cron_repeat_email[$index] != $cron_repeat || $cron_repeat_for[$index] != $_REQUEST['cron-repeat-for-update'] ||
+    $cron_repeat_for[$index] != $_REQUEST['cron-repeat-for-update'] ||
     $cron_queue_expiration_date[$index] != $_REQUEST['cron-queue-expiration-date-update'] || $cron_queue_expiration_date_field[$index] != $_REQUEST['cron-queue-expiration-date-field-update']){
     $schedule_changed = true;
-    $module->addQueueLog($pid, $action_description." - Old Settings", $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_email[$index], $cron_repeat_for[$index], $cron_repeat_until[$index], $cron_repeat_until_field[$index], $cron_queue_expiration_date[$index], $cron_queue_expiration_date_field[$index]);
+    $module->addQueueLog($pid, $action_description." - Old Settings", $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_for[$index], $cron_queue_expiration_date[$index], $cron_queue_expiration_date_field[$index]);
 }
 
 #Change from non re-send to re-send we need to deactivate queued emails
@@ -119,7 +110,7 @@ $cron_queue_expiration_date[$index] = $_REQUEST['cron-queue-expiration-date-upda
 $cron_queue_expiration_date_field[$index] = $_REQUEST['cron-queue-expiration-date-field-update'];
 
 if($schedule_changed){
-    $module->addQueueLog($pid, $action_description, $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_email[$index], $cron_repeat_for[$index], $cron_repeat_until[$index], $cron_repeat_until_field[$index], $cron_queue_expiration_date[$index], $cron_queue_expiration_date_field[$index]);
+    $module->addQueueLog($pid, $action_description, $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_for[$index], $cron_queue_expiration_date[$index], $cron_queue_expiration_date_field[$index]);
 }
 
 #Already scheduled emails need to be updated

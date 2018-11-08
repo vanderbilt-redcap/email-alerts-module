@@ -134,6 +134,12 @@
           "required": false,
           "type":"checkbox"
         },
+		{
+			"key": "cron-queue-send-label",
+			"name": "<span style='color:red;font-style:italic'>*The <strong>Repeat every # of days field</strong> by default will be 0, emails will be deleted right after being send. On any other number emails will keep sending every # days.<br/> For example, 1 will send every day while 3 will send every 3 days.</span>",
+			"required": false,
+			"type":"descriptive"
+		},
         {
           "key": "cron-send-email-on",
           "name": "Send email on",
@@ -187,40 +193,8 @@
           "type":"text"
         },
         {
-          "key": "cron-repeat-email",
-          "name": "Do you want to repeat this email?",
-          "required": false,
-          "type":"checkbox"
-        },
-        {
           "key": "cron-repeat-for",
           "name": "Repeat every # of days",
-          "required": false,
-          "type":"text"
-        },
-        {
-          "key": "cron-repeat-until",
-          "name": "Repeat until",
-          "required": false,
-          "choices": [
-            {
-              "name": "Forever",
-              "value": "forever"
-            },
-            {
-              "name": "Date",
-              "value": "date"
-            },
-            {
-              "name": "Conditional",
-              "value": "cond"
-            }
-          ],
-          "type":"radio"
-        },
-        {
-          "key": "cron-repeat-until-field",
-          "name": "Insert value",
           "required": false,
           "type":"text"
         }

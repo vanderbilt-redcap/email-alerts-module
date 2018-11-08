@@ -292,9 +292,9 @@ if(USERID != "") {
                     }
                     inputHtml += '<tr field="form-name-event" class="form-control-custom" style="display:none"></tr>';
                     return inputHtml;
-                }else if(!isAdmin && (setting.key == 'cron-send-email-on' || setting.key == 'cron-send-email-on-field' || setting.key == 'cron-queue-expiration-date' || setting.key == 'cron-queue-expiration-date-field' || setting.key == 'cron-repeat-email' || setting.key == 'cron-repeat-until' || setting.key == 'cron-repeat-until-field' || setting.key == 'cron-repeat-for' || setting.key == 'cron-send-email-on-update' || setting.key == 'cron-send-email-on-field-update' || setting.key == 'cron-repeat-email-update' || setting.key == 'cron-repeat-until-update' || setting.key == 'cron-repeat-until-field-update' || setting.key == 'cron-repeat-for-update')){
+                }else if(!isAdmin && (setting.key == 'cron-send-email-on' || setting.key == 'cron-queue-send-label' || setting.key == 'cron-send-email-on-field' || setting.key == 'cron-queue-expiration-date' || setting.key == 'cron-queue-expiration-date-field' || setting.key == 'cron-repeat-for' || setting.key == 'cron-send-email-on-update' || setting.key == 'cron-queue-send-label-update' || setting.key == 'cron-queue-expiration-label-update' || setting.key == 'cron-send-email-on-field-update' || setting.key == 'cron-repeat-for-update' || setting.key == 'cron-queue-expiration-date-update' || setting.key == 'cron-queue-expiration-date-field-update')){
                     //if it's not admin we don't show the Schedule editing
-                }else if(isAdmin && setting.key == 'cron-repeat-until-field-update'){
+                }else if(isAdmin && setting.key == 'cron-repeat-for-update'){
 
                     if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
                         inputHtml += EMparent.getSettingColumns.call(this, setting, instance, header);
@@ -305,7 +305,7 @@ if(USERID != "") {
                     inputHtml += '<tr field="cron-queue-update" class="form-control-custom"><td><span class="external-modules-instance-label"> </span><label>Select this if <i>Send email on</i> parameters<br> have changed and you would like<br> to update the queue</label></td>';
                     inputHtml += '<td class="external-modules-input-td"><input type="checkbox" name="cron-queue-update" class="external-modules-input-element" value=""></td></tr>';
                     return inputHtml;
-                }else if(isAdmin && setting.key == 'cron-repeat-until-field-update'){
+                }else if(isAdmin && setting.key == 'cron-repeat-for-update'){
 
                     if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
                         inputHtml += EMparent.getSettingColumns.call(this, setting, instance, header);
@@ -341,7 +341,7 @@ if(USERID != "") {
                 }else if(setting.type == 'text' && setting.key == 'email-attachment-variable') {
                     rowsHtml += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Attachments</div></td></tr>";
                     rowsHtmlUpdate += "<tr class='form-control-custom'><td colspan='4'><div class='form-control-custom-title'>Email Attachments</div></td></tr>";
-                }else if(setting.type == 'radio' && setting.key == 'cron-send-email-on' && isAdmin) {
+                }else if(setting.type == 'descriptive' && setting.key == 'cron-queue-send-label' && isAdmin) {
                     rowsHtml += "<tr class='form-control-custom email-schedule-title'><td colspan='4'><div class='form-control-custom-title'>Email Schedule</div></td></tr>";
                     rowsHtmlUpdate += "<tr class='form-control-custom email-schedule-title-update'><td colspan='4'><div class='form-control-custom-title'>Email Schedule</div></td></tr>";
                 }
@@ -397,10 +397,9 @@ if(USERID != "") {
                 if(isAdmin) {
                     $('[name="cron-send-email-on"][value="now"]').prop('checked', true);
                     $('[name="cron-queue-expiration-date"][value="never"]').prop('checked', true);
-                    $('[name="cron-repeat-until"][value="forever"]').prop('checked', true);
-                    $('[field="cron-repeat-for"]').hide();
-                    $('[field="cron-repeat-until"]').hide();
-                    $('[field="cron-repeat-until-field"]').hide();
+                    $('[name="cron-repeat-for"]').val('0');
+                    $('[name="cron-repeat-for"]').attr('placeholder','0 to do not repeat, a number to repeat');
+                    $('[name="cron-repeat-for-update"]').attr('placeholder','0 to do not repeat, a number to repeat');
                     $('[field="cron-queue-expiration-date-field"]').hide();
                 }
 
@@ -582,7 +581,7 @@ if(USERID != "") {
                 }else if($(this).val() == 'cond'){
                     $('[field="cron-queue-expiration-date-field'+suffix+'"]').show();
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').datepicker("destroy");
-                    $('[field="ccron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker');
+                    $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker');
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('datepicker_aux_expire');
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','');
@@ -590,68 +589,14 @@ if(USERID != "") {
                     $('[field="cron-queue-expiration-date-field'+suffix+'"]').hide();
                     $('[field="cron-queue-expiration-date-field'+suffix+'"]').val("");
                 }
-                checkSchduleExpireVSRepeat($("[name='cron-repeat-until"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date-field"+suffix+"']").val(),suffix);
             });
-
-            $('[name="cron-repeat-email"],[name="cron-repeat-email-update"]').on('click', function(e){
-                var suffix = '';
-                if($(this).attr('name').includes("-update")){
-                    suffix = '-update';
-                }
-                if($(this).is(':checked')){
-                    $('[field="cron-repeat-for'+suffix+'"]').show();
-                    $('[field="cron-repeat-until'+suffix+'"]').show();
-                    if($('[name=cron-repeat-until'+suffix+']:checked').val() == "forever" || $('[name=cron-repeat-until'+suffix+']:checked').val() == "" || $('[name=cron-repeat-until'+suffix+']:checked').val() == undefined) {
-                        $('[name=external-modules-configure-modal' + suffix + '] input[name="cron-repeat-until' + suffix + '"][value="forever"]').prop('checked', true);
-                    }else{
-                        $('[field="cron-repeat-until-field'+suffix+'"]').show();
-                    }
-                }else{
-                    $('[field="cron-repeat-for'+suffix+'"]').hide();
-                    $('[field="cron-repeat-until'+suffix+'"]').hide();
-                    $('[field="cron-repeat-until-field'+suffix+'"]').hide();
-                }
-            });
-
-            $('[name="cron-repeat-until"],[name="cron-repeat-until-update"]').on('click', function(e){
-                var suffix = '';
-                if($(this).attr('name').includes("-update")){
-                    suffix = '-update';
-                }
-                if($(this).val() == 'forever'){
-                    $('[field="cron-repeat-until-field'+suffix+'"]').hide();
-                }else if($(this).val() == 'date' || $(this).val() == 'cond'){
-                    $('[field="cron-repeat-until-field'+suffix+'"]').show();
-                    if($(this).val() == 'date'){
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').addClass('datepicker_aux2');
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').addClass('datepicker');
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
-                        $(".datepicker_aux2").datepicker({
-                            showOn: "button",
-                            buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
-                            buttonImageOnly: true,
-                            buttonText: "Select date",
-                            dateFormat: "yy-mm-dd"
-                        });
-                    }else{
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').datepicker("destroy");
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('datepicker');
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('datepicker_aux2');
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').attr('placeholder','');
-                        $('[field="cron-repeat-until-field'+suffix+'"] td input').removeClass('hasDatepicker').removeAttr('id');
-                    }
-
-                    checkSchduleExpireVSRepeat($("[name='cron-repeat-until"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date"+suffix+"']:checked").val(),$("[name='cron-queue-expiration-date-field"+suffix+"']").val(),suffix);
-                }
-            });
-
 
             $('[name="email-repetitive"],[name="email-repetitive-update"]').on('click', function(e){
                 var suffix = '';
                 if($(this).attr('name').includes("-update")){
                     suffix = '-update';
                 }
-                checkSchedule($(this).is(':checked'),suffix,$('[name=cron-send-email-on'+suffix+']:checked').val(),$('[name=cron-send-email-on-field'+suffix+']').val(),$('[name=cron-repeat-email'+suffix+']').is(':checked'),$('[name=cron-repeat-for'+suffix+']').val(),$('[name=cron-repeat-until'+suffix+']:checked').val(),$('[name=cron-repeat-until-field'+suffix+']').val(),$('[name=cron-queue-expiration-date'+suffix+']:checked').val(),$('[name=cron-queue-expiration-date-field'+suffix+']:checked').val());
+                checkSchedule($(this).is(':checked'),suffix,$('[name=cron-send-email-on'+suffix+']:checked').val(),$('[name=cron-send-email-on-field'+suffix+']').val(),$('[name=cron-repeat-for'+suffix+']').val(),$('[name=cron-queue-expiration-date'+suffix+']').val(),$('[name=cron-queue-expiration-date-field'+suffix+']').val());
             });
 
             $('#addQueue .close').on('click', function () {
@@ -1248,10 +1193,9 @@ if(USERID != "") {
                 $formName = '';
                 $msg = '';
                 $redcapLogic = '<br>REDCap Logic: <strong>None</strong>';
-                $isRepeatCron = false;
                 $never = false;
                 foreach ($config['email-dashboard-settings'] as $configKey => $configRow) {
-                    if ($configRow['key'] == 'cron-send-email-on' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-repeat-email' || $configRow['key'] == 'cron-repeat-until' || $configRow['key'] == 'cron-repeat-until-field' || $configRow['key'] == 'cron-repeat-for' || $configRow['key'] == 'cron-queue-expiration-date' || $configRow['key'] == 'cron-queue-expiration-date-field') {
+                    if ($configRow['key'] == 'cron-send-email-on' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-repeat-until-field' || $configRow['key'] == 'cron-repeat-for' || $configRow['key'] == 'cron-queue-expiration-date' || $configRow['key'] == 'cron-queue-expiration-date-field') {
                         //SHCEDULE EMAIL INFO
                         if($projectData['settings']['email-repetitive']['value'][$index] != '1') {
                             if ($configRow['key'] == 'cron-send-email-on') {
@@ -1266,29 +1210,20 @@ if(USERID != "") {
                             if ($configRow['key'] == 'cron-send-email-on-field' && $configRow['value'][$index] != "") {
                                 $scheduled_email .= ": <strong>" . $configRow['value'][$index] . "</strong>";
                             }
-                            if ($configRow['key'] == 'cron-repeat-email' && $configRow['value'][$index] == "1") {
-                                $scheduled_email .= "<br><br> Repeat";
-                                $isRepeatCron = true;
-                            }
-                            if ($configRow['key'] == 'cron-repeat-for' && $configRow['value'][$index] != "" && $isRepeatCron) {
-                                $scheduled_email .= " for " . $configRow['value'][$index] . " days";
-                            }
-                            if ($configRow['key'] == 'cron-repeat-until' && $isRepeatCron) {
-                                if ($configRow['value'][$index] == "forever") {
-                                    $scheduled_email .= " forever";
-                                } else if ($configRow['value'][$index] == "cond") {
-                                    $scheduled_email .= " until condition is met";
-                                } else if ($configRow['value'][$index] == "date") {
-                                    $scheduled_email .= " until ";
+
+                            if ($configRow['key'] == 'cron-repeat-for' && $configRow['value'][$index] != "" && $configRow['value'][$index] != "0") {
+                                if($configRow['value'][$index] == 1){
+                                    $scheduled_email .= "<br><br>Repeat every day";
+                                }else{
+                                    $scheduled_email .= "<br><br>Repeat every " . $configRow['value'][$index] . " days";
                                 }
-                            }
-                            if ($configRow['key'] == 'cron-repeat-until-field' && $configRow['value'][$index] != '' && $isRepeatCron) {
-                                $scheduled_email .= $configRow['value'][$index];
                             }
                             if ($configRow['key'] == "cron-queue-expiration-date" && $configRow['value'][$index] != "" && $configRow['value'][$index] != null) {
                                 $scheduled_email .= " ";
                                 if ($configRow['value'][$index] == "cond") {
                                     $scheduled_email .= "<br><br>Expires on condition: ";
+                                } else if ($configRow['value'][$index] == "condSendOne") {
+                                    $scheduled_email .= "<br><br> Expires on condition or sent: ";
                                 } else if ($configRow['value'][$index] == "date") {
                                     $scheduled_email .= "<br><br> Expires on: ";
                                 } else {
@@ -1387,7 +1322,7 @@ if(USERID != "") {
                 $alerts .= "<td>".$reactivate_button."<div style='".$show_button.$show_button_active."'><a id='emailRow$index' type='button' class='btn btn-info btn-new-email btn-new-email-edit'>Edit Email</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='deactivateEmailAlert(".$index.",\"".$deactivate."\");return true;' type='button' class='btn btn-info btn-new-email btn-new-email-deactivate' >".$deactivate."</a></div>";
                 $alerts .= "<div style='".$show_button."'><a onclick='duplicateEmailAlert(\"".$index."\");return true;' type='button' class='btn btn-success btn-new-email btn-new-email-deactivate' >Duplicate</a></div>";
-                if($super_user) {
+                if($isAdmin) {
                     $alerts .= "<div><a onclick='addQueue(\"".$index."\",\"".$info_modal[$index]['form-name']."\");return true;' style='".$show_queue."' id='addQueueBtn' type='button' class='btn btn-warning btn-new-email' >Add Queue</a></div>";
                 }
                 $alerts .= "<div><a onclick='deleteEmailAlert(\"".$index."\",\"".$deleted_modal."\",\"".$deleted_index."\")' type='button' class='btn btn-info btn-new-email btn-new-email-delete' >".$deleted_text."</a></div></td>";
