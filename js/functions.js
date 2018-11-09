@@ -486,15 +486,16 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
         }else{ $('[name=external-modules-configure-modal'+suffix+'] select[name=form-name'+suffix+']').removeClass('alert');}
     }
 
-
-    if($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val() == ""){
-        errMsg.push("<strong>Repeat every # number of days </strong>can't be blank. Please enter a number");
-        $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').addClass('alert');
-    }else{
-        var integer = ($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val()%1);
-        if(integer != 0 || $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val().indexOf(',') != -1 || $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val().indexOf('.') != -1){
-            errMsg.push('<strong> '+$('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val()+'</strong> is not a valid number for # of days.');
+    if(!$('[name=external-modules-configure-modal'+suffix+'] input[name=email-repetitive'+suffix+']').is(':checked')){
+        if($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val() == ""){
+            errMsg.push("<strong>Repeat every # number of days </strong>can't be blank. Please enter a number");
             $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').addClass('alert');
+        }else{
+            var integer = ($('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val()%1);
+            if(integer != 0 || $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val().indexOf(',') != -1 || $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val().indexOf('.') != -1){
+                errMsg.push('<strong> '+$('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').val()+'</strong> is not a valid number for # of days.');
+                $('[name=external-modules-configure-modal'+suffix+'] input[name=cron-repeat-for'+suffix+']').addClass('alert');
+            }
         }
     }
 
