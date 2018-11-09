@@ -136,7 +136,7 @@
         },
 		{
 			"key": "cron-queue-send-label",
-			"name": "<span style='color:red;font-style:italic'>*The <strong>Repeat every # of days field</strong> by default will be 0, emails will be deleted right after being send. On any other number emails will keep sending every # days.<br/> For example, 1 will send every day while 3 will send every 3 days.</span>",
+			"name": "<span style='color:red;font-style:italic'>*The <strong>Repeat every # of days</strong> field by default will be 0, meaning the alert will not repeat and will be removed from the queue after initialy sent. If any other number is enterd the alert will repeat and continue to send every # days until the email expire logic is true.</span>",
 			"required": false,
 			"type":"descriptive"
 		},
