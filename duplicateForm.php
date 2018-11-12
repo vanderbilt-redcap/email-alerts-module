@@ -23,6 +23,8 @@ $email_incomplete =  empty($module->getProjectSetting('email-incomplete'))?array
 $cron_send_email_on =  empty($module->getProjectSetting('cron-send-email-on'))?array():$module->getProjectSetting('cron-send-email-on');
 $cron_send_email_on_field =  empty($module->getProjectSetting('cron-send-email-on-field'))?array():$module->getProjectSetting('cron-send-email-on-field');
 $cron_repeat_for =  empty($module->getProjectSetting('cron-repeat-for'))?array():$module->getProjectSetting('cron-repeat-for');
+$cron_queue_expiration_date =  empty($module->getProjectSetting('cron-queue-expiration-date'))?array():$module->getProjectSetting('cron-queue-expiration-date');
+$cron_queue_expiration_date_field =  empty($module->getProjectSetting('cron-queue-expiration-date-field'))?array():$module->getProjectSetting('cron-queue-expiration-date-field');
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
 
 //If first time new alert naming, update all.
@@ -51,6 +53,8 @@ array_push($email_incomplete,$email_incomplete[$index]);
 array_push($cron_send_email_on,$cron_send_email_on[$index]);
 array_push($cron_send_email_on_field,$cron_send_email_on_field[$index]);
 array_push($cron_repeat_for,$cron_repeat_for[$index]);
+array_push($cron_queue_expiration_date,$cron_queue_expiration_date[$index]);
+array_push($cron_queue_expiration_date_field,$cron_queue_expiration_date_field[$index]);
 array_push($alert_id,$new_alert_id);
 
 #Save data
@@ -70,6 +74,8 @@ $module->setProjectSetting('email-incomplete', $email_incomplete);
 $module->setProjectSetting('cron-send-email-on', $cron_send_email_on);
 $module->setProjectSetting('cron-send-email-on-field', $cron_send_email_on_field);
 $module->setProjectSetting('cron-repeat-for', $cron_repeat_for);
+$module->setProjectSetting('cron-queue-expiration-date', $cron_queue_expiration_date);
+$module->setProjectSetting('cron-queue-expiration-date-field', $cron_queue_expiration_date_field);
 $module->setProjectSetting('alert-id', $alert_id);
 
 //Extra Data
