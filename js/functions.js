@@ -80,6 +80,10 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
         $('[field="cron-queue-update"]').show();
         $('[field="cron-queue-send-label'+suffix+'"]').show();
 
+        if(cron_repeat_for == ""){
+            cron_repeat_for = "0";
+        }
+
         $('[field="cron-repeat-for'+suffix+'"]').show();
         $('[name=external-modules-configure-modal'+suffix+'] input[name="cron-repeat-for'+suffix+'"]').val(cron_repeat_for);
 
