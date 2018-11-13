@@ -422,6 +422,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function hasQueueExpired($queue,$index){
         $cron_queue_expiration_date =  $this->getProjectSetting('cron-queue-expiration-date',$queue['project_id'])[$queue['alert']];
         $cron_queue_expiration_date_field =  $this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id'])[$queue['alert']];
+        $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
+
+        #If the repeat is 0 we delete regardless of the expiration option
+        if($cron_repeat_for == "" || $cron_repeat_for == "0" && $queue['last_sent'] != ""){
+            $this->deleteQueuedEmail($index, $queue['project_id']);
+            return true;
+        }
 
         if($cron_queue_expiration_date_field != "" && $cron_queue_expiration_date != '' && $cron_queue_expiration_date != 'never') {
             $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $queue['project_id'], $queue['record'], $queue['event_id']);
@@ -441,11 +448,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
             }
         }else if($cron_queue_expiration_date == 'never'){
-            $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
-            if($cron_repeat_for == "" || $cron_repeat_for == "0" && $queue['last_sent'] != ""){
-                $this->deleteQueuedEmail($index, $queue['project_id']);
-                return true;
-            }
             return false;
         }
         return false;
