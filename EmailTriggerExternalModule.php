@@ -352,13 +352,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             }
                         }
                         #Check if we need to delete the queue
-                        $delete_queue = $this->stopRepeat($delete_queue,$queue,$index);
+//                        $delete_queue = $this->stopRepeat($delete_queue,$queue,$index);
+                        $this->stopRepeat($queue,$index);
                     }
                 }
-                if($delete_queue != ""){
-                    #delete all queues that need to stop sending
-                    $this->deleteQueuedEmail($delete_queue,$project_id);
-                }
+//                if($delete_queue != ""){
+//                    #delete all queues that need to stop sending
+//                    $this->deleteQueuedEmail($delete_queue,$project_id);
+//                }
             }
         }
     }
@@ -404,12 +405,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $index, queue index
      * @return mixed
      */
-    function stopRepeat($delete_queue,$queue,$index){
+    function stopRepeat($queue,$index){
         $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
         if($cron_repeat_for == "" || $cron_repeat_for == "0" && $queue['last_sent'] != ""){
-            array_push($delete_queue,$index);
+            $this->deleteQueuedEmail($index, $queue['project_id']);
         }
-        return $delete_queue;
     }
 
     /**
