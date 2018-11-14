@@ -23,7 +23,22 @@ function previewEmailAlert(index,alertnumber){
 function previewEmailAlertRecord(index,alertnumber){
     $('#index_modal_record_preview').val(index)
     $('#modalRecordNumber').text("- Alert #"+alertnumber);
-    $('#external-modules-configure-modal-record').modal('show');
+
+
+    var data = "&index_modal_alert="+index;
+    $.ajax({
+        type: "POST",
+        url: _preview_record_modal_url,
+        data: data,
+        error: function (xhr, status, error) {
+            alert(xhr.responseText);
+        },
+        success: function (result) {
+            $('#load_preview_record').html(result);
+            $('#external-modules-configure-modal-record').modal('show');
+        }
+    });
+
 }
 
 function previewEmailAlertQueue(index,alertnumber){
@@ -47,19 +62,23 @@ function deleteEmailAlertQueue(index,alertid){
     ajaxLoadOptionAndMessage("&index_modal_queue="+index+"&pid="+project_id+"&alertid="+alertid,_delete_queue_url,"O");
 }
 
-function loadPreviewEmailAlertRecord(data,index){
-    $.ajax({
-        type: "POST",
-        url: _preview_record_url,
-        data: data,
-        error: function (xhr, status, error) {
-            alert(xhr.responseText);
-        },
-        success: function (result) {
-            $('#modalRecordPreviewNumber').text("- Alert #"+index);
-            $('#modal_message_record_preview').html(result);
-        }
-    });
+function loadPreviewEmailAlertRecord(value){
+    if(value == ""){
+        $('#modal_message_record_preview').html("");
+    }else{
+        var data = $('#selectPreviewRecord').serialize();
+        $.ajax({
+            type: "POST",
+            url: _preview_record_url,
+            data: data,
+            error: function (xhr, status, error) {
+                alert(xhr.responseText);
+            },
+            success: function (result) {
+                $('#modal_message_record_preview').html(result);
+            }
+        });
+    }
 }
 
 function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_field,cron_repeat_for,cron_expiration_date,cron_expiration_date_field){

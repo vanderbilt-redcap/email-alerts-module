@@ -109,6 +109,7 @@ if(USERID != "") {
         var _delete_queue_url = '<?=$module->getUrl('deleteQueue.php')?>';
         var _preview_queue_url = '<?=$module->getUrl('previewQueue.php')?>';
         var _preview_record_url = '<?=$module->getUrl('previewRecordForm.php')?>';
+        var _preview_record_modal_url = '<?=$module->getUrl('previewRecordModal.php')?>';
         var _edoc_name_url = '<?=$module->getUrl('get-edoc-name.php')?>';
         var _longitudinal_url = '<?=$module->getUrl('getLongitudinal_forms_event_AJAX.php')?>';
         var _repeatable_url = '<?=$module->getUrl('getRepeatableInstances_AJAX.php')?>';
@@ -628,27 +629,6 @@ if(USERID != "") {
                     $('#updateForm').submit();
                     $('#external-modules-configure-modal').modal('hide');
                 }
-            });
-
-            /***PREVIEW BY RECORD***/
-            $('select[name=preview_record_id]').on('change', function(e){
-                if($(this).val() == ""){
-                    $('#modal_message_record_preview').html("");
-                }else{
-                    var data = $('#selectPreviewRecord').serialize();
-                    loadPreviewEmailAlertRecord(data);
-                }
-
-                return false;
-            });
-            $('#preview_record_id_btn').on('click', function(e){
-                if($('input[name=preview_record_id]').val() == ""){
-                    $('#modal_message_record_preview').html("");
-                }else{
-                    var data = $('#selectPreviewRecord').serialize();
-                    loadPreviewEmailAlertRecord(data);
-                }
-                return false;
             });
 
             $('#external-modules-configure-modal-record').on('hidden.bs.modal', function () {
@@ -1539,8 +1519,9 @@ if(USERID != "") {
                     </div>
                     <div class="modal-body form-control-custom">
                         <div style="padding-bottom: 10px;">Select a record to preview the email</div>
+                        <div id="load_preview_record"></div>
                         <?php
-
+/*
                         $sql = "SELECT b.event_id FROM  redcap_events_arms a LEFT JOIN redcap_events_metadata b ON(a.arm_id = b.arm_id) where a.project_id ='$pid'";
                         $q = db_query($sql);
                         $repeatable = false;
@@ -1587,7 +1568,7 @@ if(USERID != "") {
                                 echo "<div style='margin-bottom: 60px;'><input type='text' name='preview_record_id' id='preview_record_id' placeholder='Type a record' style='width: 80%;float: left;'>
                                     <a href='#' class='btn btn-default save' id='preview_record_id_btn' style='float: left;margin-left: 20px;padding-top: 8px;padding-bottom: 7px;'>Preview</a></div>";
                             }
-                        }
+                        }*/
                         ?>
                         <div>
                             <input type="hidden" value="" id="index_modal_record_preview" name="index_modal_record_preview">

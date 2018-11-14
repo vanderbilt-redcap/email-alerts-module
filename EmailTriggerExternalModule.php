@@ -350,16 +350,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $this->setProjectSetting('email-queue', $queue_aux,$queue['project_id']);
                                 $email_sent_total++;
                             }
+                            #Check if we need to delete the queue
                             $this->stopRepeat($queue,$index);
                         }
-                        #Check if we need to delete the queue
-//                        $delete_queue = $this->stopRepeat($delete_queue,$queue,$index);
                     }
                 }
-//                if($delete_queue != ""){
-//                    #delete all queues that need to stop sending
-//                    $this->deleteQueuedEmail($delete_queue,$project_id);
-//                }
             }
         }
     }
