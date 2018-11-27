@@ -334,7 +334,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $project_id = $row['project_id'];
             $email_queue =  $this->getProjectSetting('email-queue',$project_id);
             $queue_aux = $email_queue;
-            $delete_queue = "";
 			if($email_queue != ''){
                 $email_sent_total = 0;
                 foreach ($email_queue as $index=>$queue){
@@ -541,35 +540,27 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if($cron_send_email_on_field != ""){
             $scheduled_email .= ": ".$cron_send_email_on_field."";
         }
-        if($cron_repeat_email == "1"){
-            $scheduled_email .= "\n Repeat";
-
-            if($cron_repeat_for != ""){
-                $scheduled_email .= " for ".$cron_repeat_for." days";
-            }
-            if($cron_repeat_until == "forever"){
-                $scheduled_email .= " forever";
-            }else if($cron_repeat_until == "cond"){
-                $scheduled_email .= " until condition is met";
-            }else if($cron_repeat_until == "condSendOne"){
-                $scheduled_email .= " until condition is met or after first time this alert is sent";
-            }else if($cron_repeat_until == "date"){
-                $scheduled_email .= " until ";
-            }
-            if($cron_repeat_until_field != ''){
-                $scheduled_email .= $cron_repeat_until_field;
+        $never = false;
+        if ($cron_repeat_for != "" && $cron_repeat_for != "0") {
+            if($cron_repeat_for == 1){
+                $scheduled_email .= "<br><br>Repeat every day";
+            }else{
+                $scheduled_email .= "<br><br>Repeat every " . $cron_repeat_for . " days";
             }
         }
-
-        if($cron_queue_expiration_date == "date"){
-            $scheduled_email .= "\nExpires on date";
-        }else if($cron_queue_expiration_date == "calc"){
-            $scheduled_email .= "\nExpires oncondition";
-        }else if($cron_queue_expiration_date == "calc"){
-            $scheduled_email .= "\nNever expires";
+        if ($cron_queue_expiration_date != "" && $cron_queue_expiration_date != null) {
+            $scheduled_email .= " ";
+            if ($cron_queue_expiration_date == "cond") {
+                $scheduled_email .= "<br><br>Expires on condition: ";
+            }else if ($cron_queue_expiration_date == "date") {
+                $scheduled_email .= "<br><br> Expires on: ";
+            } else {
+                $scheduled_email .= "<br><br><b>Never</b> Expires";
+                $never = true;
+            }
         }
-        if($cron_queue_expiration_date_field != ""){
-            $scheduled_email .= ": ".$cron_queue_expiration_date_field."";
+        if ($cron_queue_expiration_date_field != "" && !$never) {
+            $scheduled_email .= $cron_queue_expiration_date_field . "";
         }
 
         $changes_made = $scheduled_email;

@@ -1184,7 +1184,7 @@ if(USERID != "") {
                                 } else if ($configRow['value'][$index] == "date") {
                                     $scheduled_email = "Send on " . $configRow['value'][$index];
                                 } else if ($configRow['value'][$index] == "calc") {
-                                    $scheduled_email = "Send on conditional";
+                                    $scheduled_email = "Send on condition";
                                 }
                             }
                             if ($configRow['key'] == 'cron-send-email-on-field' && $configRow['value'][$index] != "") {
@@ -1202,9 +1202,7 @@ if(USERID != "") {
                                 $scheduled_email .= " ";
                                 if ($configRow['value'][$index] == "cond") {
                                     $scheduled_email .= "<br><br>Expires on condition: ";
-                                } else if ($configRow['value'][$index] == "condSendOne") {
-                                    $scheduled_email .= "<br><br> Expires on condition or sent: ";
-                                } else if ($configRow['value'][$index] == "date") {
+                                }else if ($configRow['value'][$index] == "date") {
                                     $scheduled_email .= "<br><br> Expires on: ";
                                 } else {
                                     $scheduled_email .= "<br><br><b>Never</b> Expires";
