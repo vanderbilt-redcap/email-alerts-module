@@ -12,7 +12,7 @@ $index =  $_REQUEST['index_modal_alert'];
 #get data from the DB
 $form_name_event =  empty($module->getProjectSetting('form-name-event'))?array():$module->getProjectSetting('form-name-event')[$index];
 if($form_name_event != ""){
-    $form_name_event = \REDCap::getEventIdUsingUniqueEventName($form_name_event);
+    $form_name_event = \REDCap::getEventIdFromUniqueEvent($form_name_event);
 }
 
 $sql = "SELECT b.event_id FROM  redcap_events_arms a LEFT JOIN redcap_events_metadata b ON(a.arm_id = b.arm_id) where a.project_id ='$project_id'";
@@ -64,7 +64,7 @@ if(\REDCap::isLongitudinal() || $repeatable){
         }
     } else {
         $event_selector = "<div style='margin-bottom: 60px;'><input type='text' name='preview_record_id' id='preview_record_id' placeholder='Type a record' style='width: 80%;float: left;'>
-                                    <a href='#' class='btn btn-default save' id='preview_record_id_btn' style='float: left;margin-left: 20px;padding-top: 8px;padding-bottom: 7px;'>Preview</a></div>";
+                                    <a href='#' class='btn btn-default save' onclick='loadPreviewEmailAlertRecord()' id='preview_record_id_btn' style='float: left;margin-left: 20px;padding-top: 8px;padding-bottom: 7px;'>Preview</a></div>";
     }
 }
 
