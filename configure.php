@@ -445,7 +445,6 @@ if(USERID != "") {
                     }
                 }
 
-
                 if ($('#datapipeEmail_var').val() != "" && $('#datapipeEmail_var').val() != "0") {
                     var pipeVar = $('#datapipeEmail_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
@@ -455,7 +454,6 @@ if(USERID != "") {
                         }
                     }
                 }
-
 
                 if ($('#emailFromForm_var').val() != "" && $('#emailFromForm_var').val() != "0") {
                     var result = $('#emailFromForm_var').val().split(",");
@@ -517,14 +515,12 @@ if(USERID != "") {
                     checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$module->getUrl('check_survey_save_return_AJAX.php')?>','');
                     $('#errMsgContainer').show();
                     $('html,body').scrollTop(0);
-                    return false;
                 }else{
                     if ($('#surveyLink_var').val() != "" && $('#surveyLink_var').val() != "0") {
                         checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$module->getUrl('check_survey_save_return_AJAX.php')?>','<?=$module->getUrl('configureAJAX.php')?>');
                     }else{
                         var data = $('#mainForm').serialize();
                         ajaxLoadOptionAndMessage(data, '<?=$module->getUrl('configureAJAX.php')?>', "C");
-                        return true;
                     }
                 }
                 return false;
