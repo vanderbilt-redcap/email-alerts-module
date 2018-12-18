@@ -306,7 +306,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function isAlreadyInQueue($alert, $project_id, $record, $instance){
-        $email_queue = empty($this->getProjectSetting('email-queue'))?array():$this->getProjectSetting('email-queue');
+        $email_queue = $this->getProjectSetting('email-queue');
         $found = false;
         foreach ($email_queue as $index=>$queue){
             if($alert == $queue['alert'] && $project_id == $queue['project_id'] && $record == $queue['record'] && $queue['instance'] == $instance){
