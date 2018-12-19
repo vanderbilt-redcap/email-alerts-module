@@ -593,7 +593,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if($isCron){
             $sql = "SELECT count(e.event_id) as number_events FROM redcap_projects p, redcap_events_metadata e, redcap_events_arms a WHERE p.project_id='".$project_id."' AND p.repeatforms='1' AND a.arm_id = e.arm_id AND p.project_id=a.project_id";
             $result = $this->query($sql);
-            if(!empty($row = db_fetch_assoc($result))) {
+            if($row = db_fetch_assoc($result)) {
                 if($row['number_events'] >= "2") {
                     $isLongitudinal = true;
                 }
@@ -653,7 +653,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $mail->DKIM_selector = 'PHPMailer';
         $mail->DKIM_passphrase = ''; //key is not encrypted
 
-        if(empty($alert_id)){
+        if($alert_id != ""){
             $alert_number = $id;
         }else{
             $alert_number = $alert_id[$id];
