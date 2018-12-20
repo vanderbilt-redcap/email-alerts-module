@@ -612,6 +612,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_text = $this->setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
 
         $mail = new \PHPMailer;
+        #Enable debug messages
+        $mail->SMTPDebug = 3;
 
         #Email Addresses
         $mail = $this->setEmailAddresses($mail, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal);
