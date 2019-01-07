@@ -197,6 +197,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     function sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument){
+        #To ensure it's the last module called
+        $delayedSuccessful = $this->delayModuleExecution();
+        if ($delayedSuccessful) {
+            return;
+        }
+
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_deleted = $this->getProjectSetting("email-deleted",$project_id)[$id];
@@ -215,12 +221,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $cron_repeat_email = $this->getProjectSetting("cron-repeat-email", $project_id)[$id];
                     $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
                     $cron_send_email_on_field = $this->getProjectSetting("cron-send-email-on-field", $project_id)[$id];
-
-                    #To ensure it's the last module called
-                    $delayedSuccessful = $this->delayModuleExecution();
-                    if ($delayedSuccessful) {
-                        return;
-                    }
 
                     if ($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field != ''))) {
                         #SCHEDULED EMAIL
