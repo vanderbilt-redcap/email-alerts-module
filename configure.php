@@ -54,6 +54,10 @@ $UserRights = \REDCap::getUserRights(USERID)[USERID];
 $isAdmin = false;
 if($UserRights['user_rights'] == '1'){
     $isAdmin = true;
+}$UserRights = \REDCap::getUserRights(USERID)[USERID];
+$isAdmin = false;
+if($UserRights['user_rights'] == '1'){
+    $isAdmin = true;
 }
 
 $super_user = false;
