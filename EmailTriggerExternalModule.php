@@ -332,25 +332,27 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         while($row = db_fetch_assoc($q)){
             $project_id = $row['project_id'];
-            $email_queue =  $this->getProjectSetting('email-queue',$project_id);
-            $queue_aux = $email_queue;
-			if($email_queue != ''){
-                $email_sent_total = 0;
-                foreach ($email_queue as $index=>$queue){
-                    if($email_sent_total < 100 && !$this->hasQueueExpired($queue,$index) && $queue['deactivated'] != 1) {
-                        if( $this->sendToday($queue)){
-                            error_log("scheduledemails PID: ".$project_id." - Has queued emails to send today ".date("Y-m-d H:i:s"));
-                            #SEND EMAIL
-                            $email_sent = $this->sendQueuedEmail($queue['project_id'],$queue['record'],$queue['alert'],$queue['instrument'],$queue['instance'],$queue['isRepeatInstrument'],$queue['event_id']);
-                            #If email sent save date and number of times sent and delete queue if needed
-                            if($email_sent){
-                                $queue_aux[$index]['last_sent'] = date('Y-m-d');
-                                $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
-                                $this->setProjectSetting('email-queue', $queue_aux,$queue['project_id']);
-                                $email_sent_total++;
+            if($project_id != "") {
+                $email_queue = $this->getProjectSetting('email-queue', $project_id);
+                $queue_aux = $email_queue;
+                if ($email_queue != '') {
+                    $email_sent_total = 0;
+                    foreach ($email_queue as $index => $queue) {
+                        if ($email_sent_total < 100 && !$this->hasQueueExpired($queue, $index) && $queue['deactivated'] != 1) {
+                            if ($this->sendToday($queue)) {
+                                error_log("scheduledemails PID: " . $project_id . " - Has queued emails to send today " . date("Y-m-d H:i:s"));
+                                #SEND EMAIL
+                                $email_sent = $this->sendQueuedEmail($queue['project_id'], $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
+                                #If email sent save date and number of times sent and delete queue if needed
+                                if ($email_sent) {
+                                    $queue_aux[$index]['last_sent'] = date('Y-m-d');
+                                    $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
+                                    $this->setProjectSetting('email-queue', $queue_aux, $queue['project_id']);
+                                    $email_sent_total++;
+                                }
+                                #Check if we need to delete the queue
+                                $this->stopRepeat($queue, $index);
                             }
-                            #Check if we need to delete the queue
-                            $this->stopRepeat($queue,$index);
                         }
                     }
                 }
