@@ -47,7 +47,7 @@ if(array_key_exists('message', $_REQUEST)){
 }
 
 #get number of instances
-$indexSubSet = sizeof($config['email-dashboard-settings'][0]['value']);
+$indexSubSet = sizeof($config['email-dashboard-settings'][1]['value']);
 
 #User rights
 $UserRights = \REDCap::getUserRights(USERID)[USERID];
@@ -1238,6 +1238,8 @@ if(USERID != "") {
                         } else if ($configRow['type'] == 'checkbox') {
                             $value = ($configRow['value'][$index] == 0) ? "No" : "Yes";
                             $checkboxes .= '<span>' .$configRow['name'].' <strong>'. $value . '</strong></span>';
+                        } else if ($configRow['key'] == 'alert-name') {
+                            $formName .= '<span><strong>'.$configRow['value'][$index].'</strong></span>';
                         } else {
                             if($configRow['key'] == 'form-name') {
                                 $event_selected = "";
@@ -1518,56 +1520,6 @@ if(USERID != "") {
                     <div class="modal-body form-control-custom">
                         <div style="padding-bottom: 10px;">Select a record to preview the email</div>
                         <div id="load_preview_record"></div>
-                        <?php
-/*
-                        $sql = "SELECT b.event_id FROM  redcap_events_arms a LEFT JOIN redcap_events_metadata b ON(a.arm_id = b.arm_id) where a.project_id ='$pid'";
-                        $q = db_query($sql);
-                        $repeatable = false;
-                        if (db_num_rows($q)) {
-                            while($row = db_fetch_assoc($q)) {
-                                $form_name = empty($module->getProjectSetting('form-name'))?array():$module->getProjectSetting('form-name');
-                                foreach ($form_name as $form){
-                                    $project_name = db_escape(\Project::getValidProjectName($form));
-                                    $event_id = $row['event_id'];
-                                    $sql = "SELECT * FROM redcap_events_repeat WHERE event_id='$event_id' AND form_name='$project_name'";
-                                    $q = db_query($sql);
-                                    $row = db_fetch_assoc($q);
-                                    if ($row) {
-                                        $repeatable = true;
-                                        break;
-                                    }
-                                }
-
-
-                            }
-                        }
-
-
-                        $events_array = array();
-                        if(\REDCap::isLongitudinal() || $repeatable){
-                            echo "<div style='margin-bottom: 60px;'><input type='text' name='preview_record_id' id='preview_record_id' placeholder='Type a record' style='width: 80%;float: left;'>
-                                    <a href='#' class='btn btn-default save' id='preview_record_id_btn' style='float: left;margin-left: 20px;padding-top: 8px;padding-bottom: 7px;'>Preview</a></div>";
-                        }else{
-                            $data = \REDCap::getData($pid,'array');
-                            if(count($data) < 500){
-                                foreach ($data as $record_id => $event){
-                                    array_push($events_array,$record_id);
-                                }
-
-                                if(!empty($events_array)){
-                                    $event_selector = '<div style="padding-bottom:10px"><select class="external-modules-input-element" name="preview_record_id"><option value="">Select a Record</option>';
-                                    foreach ($events_array as $id){
-                                        $event_selector .= '<option value="'.$id.'" >'.$id.'</option>';
-                                    }
-                                    $event_selector .= '</select></div>';
-                                    echo $event_selector;
-                                }
-                            }else{
-                                echo "<div style='margin-bottom: 60px;'><input type='text' name='preview_record_id' id='preview_record_id' placeholder='Type a record' style='width: 80%;float: left;'>
-                                    <a href='#' class='btn btn-default save' id='preview_record_id_btn' style='float: left;margin-left: 20px;padding-top: 8px;padding-bottom: 7px;'>Preview</a></div>";
-                            }
-                        }*/
-                        ?>
                         <div>
                             <input type="hidden" value="" id="index_modal_record_preview" name="index_modal_record_preview">
                             <input type="hidden" value="<?=$module->getUrl('previewFormRecord.php')?>" id="url_modal_delete_user" name="url_modal_delete_user">

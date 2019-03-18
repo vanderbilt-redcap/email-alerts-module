@@ -3,10 +3,10 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
+use PHPMailer\PHPMailer\PHPMailer;
 
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 require_once 'vendor/autoload.php';
-
 
 class EmailTriggerExternalModule extends AbstractExternalModule
 {
@@ -613,7 +613,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_text = $this->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
         $email_text = $this->setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
 
-        $mail = new \PHPMailer;
+        $mail = new PHPMailer;
         #Enable debug messages
         $mail->SMTPDebug = 3;
 

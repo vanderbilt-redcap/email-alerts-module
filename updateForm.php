@@ -26,6 +26,7 @@ $cron_repeat_for =  empty($module->getProjectSetting('cron-repeat-for'))?array()
 $cron_queue_expiration_date =  empty($module->getProjectSetting('cron-queue-expiration-date'))?array():$module->getProjectSetting('cron-queue-expiration-date');
 $cron_queue_expiration_date_field =  empty($module->getProjectSetting('cron-queue-expiration-date-field'))?array():$module->getProjectSetting('cron-queue-expiration-date-field');
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
+$alert_name =  empty($module->getProjectSetting('alert-name'))?array():$module->getProjectSetting('alert-name');
 
 #checkboxes
 if(!isset($_REQUEST['email-repetitive-update'])){
@@ -102,12 +103,12 @@ $email_condition[$index] = $_REQUEST['email-condition-update'];
 $email_incomplete[$index] = $incomplete;
 $cron_send_email_on[$index] = $_REQUEST['cron-send-email-on-update'];
 $cron_send_email_on_field[$index] = $_REQUEST['cron-send-email-on-field-update'];
-$cron_repeat_email[$index] = $cron_repeat;
 $cron_repeat_for[$index] = $_REQUEST['cron-repeat-for-update'];
 $cron_repeat_until[$index] = $_REQUEST['cron-repeat-until-update'];
 $cron_repeat_until_field[$index] = $_REQUEST['cron-repeat-until-field-update'];
 $cron_queue_expiration_date[$index] = $_REQUEST['cron-queue-expiration-date-update'];
 $cron_queue_expiration_date_field[$index] = $_REQUEST['cron-queue-expiration-date-field-update'];
+$alert_name[$index] = $_REQUEST['alert-name-update'];
 
 if($schedule_changed){
     $module->addQueueLog($pid, $action_description, $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_for[$index], $cron_queue_expiration_date[$index], $cron_queue_expiration_date_field[$index]);
@@ -115,7 +116,7 @@ if($schedule_changed){
 
 #Already scheduled emails need to be updated
 if(isset($_REQUEST['cron-queue-update'])){
-    if(($email_repetitive[$index] == '0' && ($cron_repeat_email[$index] == '1' || ($cron_send_email_on[$index] != 'now' && $cron_send_email_on[$index] != '' && $cron_send_email_on_field[$index] !=''))) || $cron_send_email_on[$index] == 'now'){
+    if(($email_repetitive[$index] == '0' && ($cron_send_email_on[$index] != 'now' && $cron_send_email_on[$index] != '' && $cron_send_email_on_field[$index] !='')) || $cron_send_email_on[$index] == 'now'){
         $email_queue =  empty($module->getProjectSetting('email-queue'))?array():$module->getProjectSetting('email-queue');
         if(!empty($email_queue)){
             $scheduled_records_changed = "";
@@ -150,12 +151,12 @@ $module->setProjectSetting('email-condition', $email_condition);
 $module->setProjectSetting('email-incomplete', $email_incomplete);
 $module->setProjectSetting('cron-send-email-on', $cron_send_email_on);
 $module->setProjectSetting('cron-send-email-on-field', $cron_send_email_on_field);
-$module->setProjectSetting('cron-repeat-email', $cron_repeat_email);
 $module->setProjectSetting('cron-repeat-for', $cron_repeat_for);
 $module->setProjectSetting('cron-repeat-until', $cron_repeat_until);
 $module->setProjectSetting('cron-repeat-until-field', $cron_repeat_until_field);
 $module->setProjectSetting('cron-queue-expiration-date', $cron_queue_expiration_date);
 $module->setProjectSetting('cron-queue-expiration-date-field', $cron_queue_expiration_date_field);
+$module->setProjectSetting('alert-name', $alert_name);
 
 echo json_encode(array(
     'status' => 'success',

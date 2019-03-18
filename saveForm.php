@@ -23,6 +23,7 @@ $cron_repeat_for =  empty($module->getProjectSetting('cron-repeat-for'))?array()
 $cron_queue_expiration_date =  empty($module->getProjectSetting('cron-queue-expiration-date'))?array():$module->getProjectSetting('cron-queue-expiration-date');
 $cron_queue_expiration_date_field =  empty($module->getProjectSetting('cron-queue-expiration-date-field'))?array():$module->getProjectSetting('cron-queue-expiration-date-field');
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
+$alert_name =  empty($module->getProjectSetting('alert-name'))?array():$module->getProjectSetting('alert-name');
 
 #checkboxes
 if(!isset($_REQUEST['email-repetitive'])){
@@ -72,6 +73,7 @@ array_push($cron_repeat_for,$_REQUEST['cron-repeat-for']);
 array_push($cron_queue_expiration_date,$_REQUEST['cron-queue-expiration-date']);
 array_push($cron_queue_expiration_date_field,$_REQUEST['cron-queue-expiration-date-field']);
 array_push($alert_id,$new_alert_id);
+array_push($alert_name,$_REQUEST['alert-name']);
 
 #Save data
 $module->setProjectSetting('form-name', $form_name);
@@ -92,6 +94,7 @@ $module->setProjectSetting('cron-repeat-for', $cron_repeat_for);
 $module->setProjectSetting('cron-queue-expiration-date', $cron_queue_expiration_date);
 $module->setProjectSetting('cron-queue-expiration-date-field', $cron_queue_expiration_date_field);
 $module->setProjectSetting('alert-id', $alert_id);
+$module->setProjectSetting('alert-name', $alert_name);
 
 //Extra Data
 $email_sent =  empty($module->getProjectSetting('email-sent'))?array():$module->getProjectSetting('email-sent');

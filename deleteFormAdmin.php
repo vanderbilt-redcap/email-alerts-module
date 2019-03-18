@@ -37,6 +37,7 @@ $cron_queue_expiration_date_field =  empty($module->getProjectSetting('cron-queu
 $email_records_sent =  empty($module->getProjectSetting('email-records-sent'))?array():$module->getProjectSetting('email-records-sent');
 $email_deleted =  empty($module->getProjectSetting('email-deleted'))?array():$module->getProjectSetting('email-deleted');
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
+$alert_name =  empty($module->getProjectSetting('alert-name'))?array():$module->getProjectSetting('alert-name');
 $email_queue =  empty($module->getProjectSetting('email-queue'))?array():$module->getProjectSetting('email-queue');
 
 #Add some logs
@@ -118,6 +119,7 @@ unset($cron_queue_expiration_date_field[$index]);
 unset($email_records_sent[$index]);
 unset($email_deleted[$index]);
 unset($alert_id[$index]);
+unset($alert_name[$index]);
 
 #Rearrange the indexes
 $form_name = array_values($form_name);
@@ -148,6 +150,7 @@ $cron_queue_expiration_date_field = array_values($cron_queue_expiration_date_fie
 $email_records_sent = array_values($email_records_sent);
 $email_deleted = array_values($email_deleted);
 $alert_id = array_values($alert_id);
+$alert_name = array_values($alert_name);
 
 #Save data
 $module->setProjectSetting('form-name', $form_name);
@@ -178,6 +181,7 @@ $module->setProjectSetting('cron-queue-expiration-date-field', $cron_queue_expir
 $module->setProjectSetting('email-records-sent', $email_records_sent);
 $module->setProjectSetting('email-deleted', $email_deleted);
 $module->setProjectSetting('alert-id', $alert_id);
+$module->setProjectSetting('alert-name', $alert_name);
 
 #we rename the alert number in the queued emails
 if(!empty($email_queue)){

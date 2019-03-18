@@ -32,6 +32,11 @@
 	"no-auth-pages":["surveyPassthru","downloadFile"],
 
 	"email-dashboard-settings": [
+		{
+			"key": "alert-name",
+			"name": "Alert name",
+			"type": "text"
+		},
         {
           "key": "form-name",
           "name": "REDCap Instrument",
