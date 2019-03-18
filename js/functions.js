@@ -188,6 +188,7 @@ function editEmailAlert(modal, index){
     $('[name="email-from-update"]').attr('placeholder','myemail@server.com, "Sender name"');
 
     //Add values
+    $('[name=external-modules-configure-modal-update] input[name="alert-name-update"]').val(modal['alert-name']);
     $('[name=external-modules-configure-modal-update] select[name="form-name-update"]').val(modal['form-name']);
     $('[name=external-modules-configure-modal-update] input[name="email-from-update"]').val(modal['email-from']);
 
