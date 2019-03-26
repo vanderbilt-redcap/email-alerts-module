@@ -20,7 +20,7 @@ $email_subject =  empty($module->getProjectSetting('email-subject'))?array():$mo
 $email_text =  empty($module->getProjectSetting('email-text'))?array():$module->getProjectSetting('email-text')[$index];
 $datapipe_var = $module->getProjectSetting("datapipe_var", $project_id);
 
-$data = \REDCap::getData($project_id);
+$data = \REDCap::getData($project_id,"array",$record);
 
 if(empty($form_name_event)){
     if(array_key_exists('repeat_instances',$data[$record])){
