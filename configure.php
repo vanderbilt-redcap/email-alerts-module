@@ -1335,7 +1335,7 @@ if(USERID != "") {
                                     <select class="external-modules-input-element" name="form_form_name" id="form_form_name">
                                         <option value=""></option>
                                         <?php
-                                        foreach ($simple_config['email-dashboard-settings'][0]['choices'] as $choice){
+                                        foreach ($simple_config['email-dashboard-settings'][1]['choices'] as $choice){
                                             echo '<option value="'.$choice['value'].'">'.$choice['name'].'</option>';
                                         }
                                         ?>
@@ -1387,7 +1387,7 @@ if(USERID != "") {
                                     <select class="external-modules-input-element" name="survey_form_name" id="survey_form_name">
                                         <option value=""></option>
                                         <?php
-                                        foreach ($simple_config['email-dashboard-settings'][0]['choices'] as $choice){
+                                        foreach ($simple_config['email-dashboard-settings'][1]['choices'] as $choice){
                                             echo '<option value="'.$choice['value'].'">'.$choice['name'].'</option>';
                                         }
                                         ?>
