@@ -422,7 +422,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
 
         #If the repeat is 0 we delete regardless of the expiration option
-        if($cron_repeat_for == "" || $cron_repeat_for == "0" && $queue['last_sent'] != ""){
+        if(($cron_repeat_for == "" || $cron_repeat_for == "0") && $queue['last_sent'] != ""){
             $this->deleteQueuedEmail($index, $queue['project_id']);
             error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert # ".$queue['alert']." Queue #".$index." expired. Delete.");
             return true;
