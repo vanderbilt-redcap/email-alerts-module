@@ -672,55 +672,59 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             error_log("scheduledemails PID: ".$project_id." Mailer Error:".$mail->ErrorInfo);
             $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error:".$mail->ErrorInfo." in Project: ".$project_id.", Record: ".$record." Alert #".$alert_number);
         }else{
-            error_log("scheduledemails PID: ".$project_id." - Email was sent!");
-            $email_sent = $this->getProjectSetting("email-sent",$project_id);
-            $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent",$project_id);
-            $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id),true);
-            $email_records_sent = $this->getProjectSetting("email-records-sent",$project_id);
-            $email_sent_ok = true;
+            try {
+                error_log("scheduledemails PID: " . $project_id . " - Email was sent!");
+                $email_sent = $this->getProjectSetting("email-sent", $project_id);
+                $email_timestamp_sent = $this->getProjectSetting("email-timestamp-sent", $project_id);
+                $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent", $project_id), true);
+                $email_records_sent = $this->getProjectSetting("email-records-sent", $project_id);
+                $email_sent_ok = true;
 
-            $email_sent[$id] = "1";
-            $email_timestamp_sent[$id] = date('Y-m-d H:i:s');
+                $email_sent[$id] = "1";
+                $email_timestamp_sent[$id] = date('Y-m-d H:i:s');
 
-            $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id);
-            $this->setProjectSetting('email-sent', $email_sent, $project_id);
-
-
-            if(!$isEmailAlreadySentForThisSurvery){
-                $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent,$record,$instrument,$id,$isRepeatInstrument,$instance,$event_id);
-                $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
-            }
+                $this->setProjectSetting('email-timestamp-sent', $email_timestamp_sent, $project_id);
+                $this->setProjectSetting('email-sent', $email_sent, $project_id);
 
 
-            $records = array_map('trim', explode(',', $email_records_sent[$id]));
-            $record_found = false;
-            foreach ($records as $record_id){
-                if($record_id == $record){
-                    $record_found = true;
-                    break;
+                if (!$isEmailAlreadySentForThisSurvery) {
+                    $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $id, $isRepeatInstrument, $instance, $event_id);
+                    $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
                 }
-            }
 
-            if(!$record_found){
-                if($email_records_sent[$id] == ''){
-                    $email_records_sent[$id] = $record;
-                }else{
-                    $email_records_sent[$id] = $email_records_sent[$id].", ".$record;
+
+                $records = array_map('trim', explode(',', $email_records_sent[$id]));
+                $record_found = false;
+                foreach ($records as $record_id) {
+                    if ($record_id == $record) {
+                        $record_found = true;
+                        break;
+                    }
                 }
-                $this->setProjectSetting('email-records-sent', $email_records_sent, $project_id);
-            }
 
-            #Add some logs
-            $action_description = "Email Sent - Alert ".$alert_number;
-            $changes_made = "[Subject]: ".$email_subject.", [Message]: ".$email_text;
-            \REDCap::logEvent($action_description,$changes_made,null,$record,$event_id,$project_id);
+                if (!$record_found) {
+                    if ($email_records_sent[$id] == '') {
+                        $email_records_sent[$id] = $record;
+                    } else {
+                        $email_records_sent[$id] = $email_records_sent[$id] . ", " . $record;
+                    }
+                    $this->setProjectSetting('email-records-sent', $email_records_sent, $project_id);
+                }
 
-            $action_description = "Email Sent To - Alert ".$alert_number;
-            $email_list = '';
-            foreach ($mail->getAllRecipientAddresses() as $email=>$value){
-                $email_list .= $email.";";
+                #Add some logs
+                $action_description = "Email Sent - Alert " . $alert_number;
+                $changes_made = "[Subject]: " . $email_subject . ", [Message]: " . $email_text;
+                \REDCap::logEvent($action_description, $changes_made, null, $record, $event_id, $project_id);
+
+                $action_description = "Email Sent To - Alert " . $alert_number;
+                $email_list = '';
+                foreach ($mail->getAllRecipientAddresses() as $email => $value) {
+                    $email_list .= $email . ";";
+                }
+                \REDCap::logEvent($action_description, $email_list, null, $record, $event_id, $project_id);
+            }catch(Exception $e){
+
             }
-            \REDCap::logEvent($action_description,$email_list,null,$record,$event_id,$project_id);
         }
         unlink($privatekeyfile);
 
