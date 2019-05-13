@@ -1068,15 +1068,17 @@ if(USERID != "") {
             $alerts = "";
             $email_repetitive_sent = $module->getProjectSettingLog($pid,"email-repetitive-sent");
             $email_records_sent = $module->getProjectSettingLog($pid,"email-records-sent");
+            $email_timestamp_sent = $module->getProjectSettingLog($pid,"email-timestamp-sent");
+            $email_sent_all = $module->getProjectSettingLog($pid,"email-sent");
 
             $alert_id = $projectData['settings']['alert-id']['value'];
             $email_queue = $projectData['settings']['email-queue']['value'];
             for ($index = 0; $index < $indexSubSet; $index++) {
-                $email_sent = $projectData['settings']['email-sent']['value'][$index];
+                $email_sent = $email_sent_all[$index];
                 $message_sent = "";
                 if($email_sent == "1"){
-                    if(!empty($projectData['settings']['email-timestamp-sent']['value'][$index])){
-                        $message_sent = "<span style='display:block;font-style:italic'>Most recently activated on: ".$projectData['settings']['email-timestamp-sent']['value'][$index]."</span>";
+                    if(!empty($email_timestamp_sent[$index])){
+                        $message_sent = "<span style='display:block;font-style:italic'>Most recently activated on: ".$email_timestamp_sent[$index]."</span>";
                     }else{
                         $message_sent = "<span style='display:block;font-style:italic'>Email activated</span>";
                     }

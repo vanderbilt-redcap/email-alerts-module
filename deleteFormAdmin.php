@@ -87,9 +87,6 @@ if(!empty($email_queue)){
     \REDCap::logEvent($action_description,$changes_made,null,null,null,$pid);
 }
 
-
-
-
 #Delete one element in array
 unset($form_name[$index]);
 unset($form_name_event[$index]);
@@ -117,10 +114,14 @@ unset($cron_repeat_for[$index]);
 unset($cron_queue_expiration_date[$index]);
 unset($cron_queue_expiration_date_field[$index]);
 unset($email_records_sent[$index]);
-$module->deleteLogs("where project_id = $pid and message = 'email-records-sent' and id = $index");
 unset($email_deleted[$index]);
 unset($alert_id[$index]);
 unset($alert_name[$index]);
+
+$module->removeLogs("where project_id = $pid and message = 'email-records-sent' and id = $index");
+$module->removeLogs("where project_id = $pid and message = 'email-timestamp-sent' and id = $index");
+$module->removeLogs("where project_id = $pid and message = 'email-repetitive-sent' and alert = $index");
+$module->removeLogs("where project_id = $pid and message = 'email-sent' and id = $index");
 
 #Rearrange the indexes
 $form_name = array_values($form_name);

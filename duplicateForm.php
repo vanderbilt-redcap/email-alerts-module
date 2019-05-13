@@ -79,16 +79,10 @@ $module->setProjectSetting('cron-queue-expiration-date-field', $cron_queue_expir
 $module->setProjectSetting('alert-id', $alert_id);
 
 //Extra Data
-$email_sent =  empty($module->getProjectSetting('email-sent'))?array():$module->getProjectSetting('email-sent');
-$email_timestamp_sent =  empty($module->getProjectSetting('email-timestamp-sent'))?array():$module->getProjectSetting('email-timestamp-sent');
 $email_deactivate =  empty($module->getProjectSetting('email-deactivate'))?array():$module->getProjectSetting('email-deactivate');
 $email_deleted =  empty($module->getProjectSetting('email-deleted'))?array():$module->getProjectSetting('email-deleted');
-array_push($email_sent,"0");
-array_push($email_timestamp_sent,"0");
 array_push($email_deactivate,"0");
 array_push($email_deleted,"0");
-$module->setProjectSetting('email-sent', $email_sent);
-$module->setProjectSetting('email-timestamp-sent', $email_timestamp_sent);
 $module->setProjectSetting('email-deactivate', $email_deactivate);
 $module->setProjectSetting('email-deleted', $email_deleted);
 

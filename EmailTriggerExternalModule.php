@@ -111,8 +111,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $this->setProjectSetting('email-repetitive-sent', '');
             $this->setProjectSetting('email-records-sent', '');
             $this->setProjectSetting('email-queue', '');
-            $this->deleteLogs("where project_id = $project_id and message = 'email-repetitive-sent'");
-            $this->deleteLogs("where project_id = $project_id and message = 'email-records-sent'");
+            $this->removeLogs("where project_id = $project_id and message = 'email-repetitive-sent'");
+            $this->removeLogs("where project_id = $project_id and message = 'email-records-sent'");
         }else if($_REQUEST['route'] == 'DataEntryController:deleteRecord' && $_REQUEST['record'] != ""){
             #Button: Delete record
 
@@ -135,7 +135,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
                 $this->setProjectSetting('email-repetitive-sent', json_encode($email_repetitive_sent));
-                $this->deleteLogs("where project_id = $project_id and message = 'email-repetitive-sent' and record_id='$record_id'");
+                $this->removeLogs("where project_id = $project_id and message = 'email-repetitive-sent' and record_id='$record_id'");
             }
             if($email_records_sent){
                 foreach ($email_records_sent as $index=>$sent){
@@ -157,7 +157,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
                 $this->setProjectSetting('email-records-sent', $email_records_sent);
-                $this->deleteLogs("where project_id = $project_id and message = 'email-records-sent' and value='$record_id'");
+                $this->removeLogs("where project_id = $project_id and message = 'email-records-sent' and value='$record_id'");
 
             }
 
@@ -204,8 +204,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_deleted = $this->getProjectSetting("email-deleted",$project_id)[$id];
-//        $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id),true);
-//        $email_records_sent = $this->getProjectSetting("email-records-sent",$project_id);
         $email_repetitive_sent = $this->getProjectSettingLog($project_id,"email-repetitive-sent",$isRepeatInstrument);
         $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
         $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
@@ -523,8 +521,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
         $data = \REDCap::getData($project_id,"array",$record);
-//        $email_repetitive_sent = json_decode($this->getProjectSetting("email-repetitive-sent",$project_id),true);
-//        $email_records_sent = $this->getProjectSetting("email-records-sent",$project_id);
         $email_repetitive_sent = $this->getProjectSettingLog($project_id,"email-repetitive-sent",$isRepeatInstrument);
         $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$instance);
@@ -607,7 +603,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
             }else{
                 foreach($logs as $log) {
-                    array_push($data,$log['value']);
+                    $data[$log['id']] = $log['value'];
                 }
             }
         }
@@ -717,7 +713,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             try {
                 error_log("scheduledemails PID: " . $project_id . " - Email was sent!");
 
-//                $email_repetitive_sent = $this->getProjectSettingLog($project_id,"email-repetitive-sent",$isRepeatInstrument);
                 $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
                 $email_sent_ok = true;
 
@@ -1168,7 +1163,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'])){
                             if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
                                 if(in_array($repeat_instance, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$event_id])){
-                                    echo "1";
                                     return true;
                                 }
                             }else{
@@ -1179,7 +1173,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         unset($email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$index]);
                                         $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                                         $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
-                                        echo "2";
                                         return true;
                                     }
                                 }
@@ -1195,7 +1188,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 #Add the event in the new structure
                                 $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                                 $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
-                                echo "3";
                                 return true;
                             }
                         }
@@ -1204,7 +1196,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if($this->recordExistsInRegisteredRecords($email_records_sent,$record) && (!array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances']) && !array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]))){
                         $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
                         $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
-                        echo "H";
                         return true;
                     }
                 }
