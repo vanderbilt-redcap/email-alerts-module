@@ -7,7 +7,6 @@ use ExternalModules\ExternalModules;
 $pid = $_GET['pid'];
 $index =  $_REQUEST['index_modal_delete'];
 
-
 #get data from the DB
 $form_name = empty($module->getProjectSetting('form-name'))?array():$module->getProjectSetting('form-name');
 $form_name_event = empty($module->getProjectSetting('form-name-event'))?array():$module->getProjectSetting('form-name-event');
@@ -118,10 +117,10 @@ unset($email_deleted[$index]);
 unset($alert_id[$index]);
 unset($alert_name[$index]);
 
-$module->removeLogs("where project_id = $pid and message = 'email-records-sent' and id = $index");
-$module->removeLogs("where project_id = $pid and message = 'email-timestamp-sent' and id = $index");
-$module->removeLogs("where project_id = $pid and message = 'email-repetitive-sent' and alert = $index");
-$module->removeLogs("where project_id = $pid and message = 'email-sent' and id = $index");
+$module->removeLogs("project_id = $pid and message = 'email-records-sent' and id = $index");
+$module->removeLogs("project_id = $pid and message = 'email-timestamp-sent' and id = $index");
+$module->removeLogs("project_id = $pid and message = 'email-repetitive-sent' and alert = $index");
+$module->removeLogs(" project_id = $pid and message = 'email-sent' and id = $index");
 
 #Rearrange the indexes
 $form_name = array_values($form_name);
