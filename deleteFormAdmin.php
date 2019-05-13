@@ -117,6 +117,7 @@ unset($cron_repeat_for[$index]);
 unset($cron_queue_expiration_date[$index]);
 unset($cron_queue_expiration_date_field[$index]);
 unset($email_records_sent[$index]);
+$module->deleteLogs("where project_id = $pid and message = 'email-records-sent' and id = $index");
 unset($email_deleted[$index]);
 unset($alert_id[$index]);
 unset($alert_name[$index]);

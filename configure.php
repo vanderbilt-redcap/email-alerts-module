@@ -1066,8 +1066,9 @@ if(USERID != "") {
             <tbody>
             <?php
             $alerts = "";
-            $email_repetitive_sent = json_decode($projectData['settings']['email-repetitive-sent']['value'],true);
-            $email_records_sent = $projectData['settings']['email-records-sent']['value'];
+            $email_repetitive_sent = $module->getProjectSettingLog($pid,"email-repetitive-sent");
+            $email_records_sent = $module->getProjectSettingLog($pid,"email-records-sent");
+
             $alert_id = $projectData['settings']['alert-id']['value'];
             $email_queue = $projectData['settings']['email-queue']['value'];
             for ($index = 0; $index < $indexSubSet; $index++) {
