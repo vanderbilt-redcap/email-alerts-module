@@ -135,7 +135,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
                 $this->setProjectSetting('email-repetitive-sent', json_encode($email_repetitive_sent));
-                $this->removeLogs("project_id = $project_id and message = 'email-repetitive-sent' and record_id='$record_id'");
             }
             if($email_records_sent){
                 foreach ($email_records_sent as $index=>$sent){
@@ -157,9 +156,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
                 $this->setProjectSetting('email-records-sent', $email_records_sent);
-                $this->removeLogs("project_id = $project_id and message = 'email-records-sent' and value='$record_id'");
-
             }
+
+            $this->removeLogs("project_id = $project_id and message = 'email-repetitive-sent' and record_id='$record_id'");
+            $this->removeLogs("project_id = $project_id and message = 'email-records-sent' and value='$record_id'");
 
             #Delete the queued emails for that record
             $email_queue = $this->getProjectSetting('email-queue');
