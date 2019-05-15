@@ -581,7 +581,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function getProjectSettingLog($project_id,$settingName,$isRepeatInstrument=""){
         $data = $this->getProjectSetting($settingName, $project_id);
         if($settingName == "email-repetitive-sent"){
-            $logs = $this->queryLogs("select instrument, alert, record, event, instance where project_id = $project_id and message = '$settingName'");
+            $logs = $this->queryLogs("select instrument, alert, record_id, event, instance where project_id = $project_id and message = '$settingName'");
             $data = json_decode($data,true);
             foreach($logs as $log){
                 $instrument = $log['instrument'];
@@ -594,11 +594,20 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }else {
             $logs = $this->queryLogs("select value,id where project_id = $project_id and message = '$settingName'");
             if($settingName == "email-records-sent"){
-                foreach ($data as $id=>$value){
-                    foreach($logs as $log) {
-                        if($id == $log['id']){
-                            $data[$id] .= ", ".$log['value'];
+                if(!empty($data)){
+                    foreach ($data as $id=>$value){
+                        foreach($logs as $log) {
+                            if($id == $log['id']){
+                                $data[$id] .= ", ".$log['value'];
+                            }
                         }
+                    }
+                }else{
+                    foreach($logs as $log){
+                        $data[$log['id']] .= $log['value'].", ";
+                    }
+                    foreach($data as $id=>$dat){
+                        $data[$id] = rtrim($dat,", ");
                     }
                 }
             }else{
