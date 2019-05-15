@@ -597,14 +597,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(!empty($data)){
                     foreach ($data as $id=>$value){
                         foreach($logs as $log) {
-                            if($id == $log['id'] && !in_array($log['value'],$data[$id])){
+                            if($id == $log['id'] && strpos($data[$log['id']],$log['value']) === false){
                                 $data[$id] .= ", ".$log['value'];
                             }
                         }
                     }
                 }else{
                     foreach($logs as $log){
-                        if(!in_array($log['value'],$data[$log['id']])){
+                        if(strpos($data[$log['id']],$log['value']) === false){
                             $data[$log['id']] .= $log['value'] . ", ";
                         }
                     }
