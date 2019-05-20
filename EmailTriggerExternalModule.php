@@ -595,13 +595,24 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $logs = $this->queryLogs("select value,id where project_id = $project_id and message = '$settingName'");
             if($settingName == "email-records-sent"){
                 if(!empty($data)){
-                    foreach ($data as $id=>$value){
-                        foreach($logs as $log) {
-                            if($id == $log['id'] && strpos($data[$log['id']],$log['value']) === false){
-                                $data[$id] .= ", ".$log['value'];
+                    $aux = $data;
+                    foreach($logs as $log){
+                        $log_found = false;
+                        foreach ($data as $id=>$value){
+                            if($id == $log['id'] && strpos($aux[$log['id']],$log['value']) === false){
+                                $aux[$id] .= ", ".$log['value'];
+                                $log_found = true;
+                            }
+                        }
+                        if(!$log_found) {
+                            if($aux[$log['id']] == ""){
+                                $aux[$log['id']] .= $log['value'];
+                            }else{
+                                $aux[$log['id']] .= ", ".$log['value'];
                             }
                         }
                     }
+                    $data = $aux;
                 }else{
                     foreach($logs as $log){
                         if(strpos($data[$log['id']],$log['value']) === false){
