@@ -589,7 +589,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $record = $log['record_id'];
                 $event = $log['event'];
                 $instance = $log['instance'];
-                $data = json_decode($this->addRecordSent($data, $record, $instrument, $alert, $isRepeatInstrument, $instance, $event),true);
+                $data = $this->addRecordSent($data, $record, $instrument, $alert, $isRepeatInstrument, $instance, $event);
             }
         }else {
             $logs = $this->queryLogs("select value,id where project_id = $project_id and message = '$settingName'");
@@ -1194,7 +1194,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         #delete the old instance and add a the new structure
                                         unset($email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$index]);
                                         $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
-                                        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                                        $this->setProjectSetting('email-repetitive-sent', json_encode($email_repetitive_sent), $project_id);
                                         return true;
                                     }
                                 }
@@ -1208,16 +1208,32 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             #Old structure
                             if($email_repetitive_sent[$instrument][$alertid][$record] == "1" && !$isRepeatInstrument){
                                 #Add the event in the new structure
-                                $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
-                                $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+//                                $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
+//                                $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                                $this->log('email-repetitive-sent', [
+                                    'project_id' => $project_id,
+                                    'instrument' => $instrument,
+                                    'alert' => $alertid,
+                                    'record_id' => $record,
+                                    'event' => $event_id,
+                                    'instance' => $instance
+                                ]);
                                 return true;
                             }
                         }
                     }
                     #If the record is registered as sent but it's not in the old repetitive sent structure
                     if($this->recordExistsInRegisteredRecords($email_records_sent,$record) && (!array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances']) && !array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]))){
-                        $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
-                        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+//                        $email_repetitive_sent = $this->addRecordSent($email_repetitive_sent, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id);
+//                        $this->setProjectSetting('email-repetitive-sent', $email_repetitive_sent, $project_id);
+                        $this->log('email-repetitive-sent', [
+                            'project_id' => $project_id,
+                            'instrument' => $instrument,
+                            'alert' => $alertid,
+                            'record_id' => $record,
+                            'event' => $event_id,
+                            'instance' => $instance
+                        ]);
                         return true;
                     }
                 }
@@ -1471,7 +1487,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             }else{
                                                 $event_array = array($event_id => $repeat_instance);
                                                 $email_repetitive_sent_aux[$instrument][$alertid][$new_record] = $event_array;
-                                                return json_encode($email_repetitive_sent_aux);
+                                                return $email_repetitive_sent_aux;
                                             }
                                         }
 
@@ -1493,7 +1509,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }else if(!$found_new_record && !$found_is_repeat){
                 return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id,true);
             }
-            return json_encode($email_repetitive_sent_aux);
+            return $email_repetitive_sent_aux;
         }else{
             return $this->addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id,false);
         }
@@ -1551,7 +1567,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
             array_push($email_repetitive_sent_aux[$instrument][$alertid][$new_record][$event_id],$repeat_instance);
         }
-        return json_encode($email_repetitive_sent_aux);
+        return $email_repetitive_sent_aux;
     }
 }
 
