@@ -600,15 +600,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $log_found = false;
                         foreach ($data as $id=>$value){
                             if($id == $log['id'] && strpos($aux[$log['id']],$log['value']) === false){
-                                $aux[$id] .= ", ".$log['value'];
+                                $aux[$id] = $aux[$id].", ".$log['value'];
                                 $log_found = true;
                             }
                         }
                         if(!$log_found) {
                             if($aux[$log['id']] == ""){
-                                $aux[$log['id']] .= $log['value'];
+                                $aux[$log['id']] = $aux[$log['id']].$log['value'];
                             }else{
-                                $aux[$log['id']] .= ", ".$log['value'];
+                                $aux[$log['id']] = $aux[$log['id']].", ".$log['value'];
                             }
                         }
                     }
@@ -616,7 +616,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }else{
                     foreach($logs as $log){
                         if(strpos($data[$log['id']],$log['value']) === false){
-                            $data[$log['id']] .= $log['value'] . ", ";
+                            $data[$log['id']] = $data[$log['id']].$log['value'] . ", ";
                         }
                     }
                     foreach($data as $id=>$dat){
