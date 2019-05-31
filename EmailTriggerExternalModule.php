@@ -734,7 +734,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }else{
             try {
                 error_log("scheduledemails PID: " . $project_id . " - Email was sent!");
-                error_log("scheduledemails PID: " . $project_id . " - Alert #".$id.", Record ".$record.", Event ".$event_id);
+                error_log("scheduledemails PID: " . $project_id . " - Alert #".$alert_number.", Record ".$record.", Event ".$event_id);
 
                 $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
                 $email_sent_ok = true;
