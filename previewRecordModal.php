@@ -15,7 +15,7 @@ if($form_name_event != ""){
     $form_name_event = \REDCap::getEventIdFromUniqueEvent($form_name_event);
 }
 
-$sql = "SELECT b.event_id FROM  redcap_events_arms a LEFT JOIN redcap_events_metadata b ON(a.arm_id = b.arm_id) where a.project_id ='$project_id'";
+$sql = "SELECT b.event_id FROM  redcap_events_arms a LEFT JOIN redcap_events_metadata b ON(a.arm_id = b.arm_id) where a.project_id ='".db_escape($project_id)."'";
 $q = db_query($sql);
 $repeatable = false;
 if (db_num_rows($q)) {
@@ -24,7 +24,7 @@ if (db_num_rows($q)) {
         foreach ($form_name as $form){
             $project_name = db_escape(\Project::getValidProjectName($form));
             $event_id = $row['event_id'];
-            $sql = "SELECT * FROM redcap_events_repeat WHERE event_id='$event_id' AND form_name='$project_name'";
+            $sql = "SELECT * FROM redcap_events_repeat WHERE event_id='".db_escape($event_id)."' AND form_name='".db_escape($project_name)."'";
             $q = db_query($sql);
             $row = db_fetch_assoc($q);
             if ($row) {

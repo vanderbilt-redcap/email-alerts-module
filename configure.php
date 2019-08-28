@@ -64,7 +64,7 @@ $super_user = false;
 if(USERID != "") {
     $sql = "SELECT i.user_email, i.user_firstname, i.user_lastname, i.super_user, i.allow_create_db
 					FROM redcap_user_information i
-					WHERE i.username = '" . USERID . "'";
+					WHERE i.username = '" . db_escape(USERID) . "'";
     $query = db_query($sql);
     if (!$query) throw new \Exception("Error looking up user information", self::$SQL_ERROR);
 
@@ -1225,7 +1225,7 @@ if(USERID != "") {
                                 $fileAttachments++;
 
                             if (!empty($configRow['value'][$index])) {
-                                $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=" . $configRow['value'][$index];
+                                $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id='" . db_escape($configRow['value'][$index])."'";
                                 $q = $module->query($sql);
 
                                     if ($error = db_error()) {

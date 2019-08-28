@@ -82,7 +82,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function sendEmailFromSurveyCode($surveyCode, $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrumentComplete, $form){
-        $sql="SELECT s.form_name FROM redcap_surveys_participants as sp LEFT JOIN redcap_surveys s ON (sp.survey_id = s.survey_id ) where s.project_id =".$project_id." AND sp.hash='".$surveyCode."'";
+        $sql="SELECT s.form_name FROM redcap_surveys_participants as sp LEFT JOIN redcap_surveys s ON (sp.survey_id = s.survey_id ) where s.project_id ='".db_escape($project_id)."' AND sp.hash='".db_escape($surveyCode)."'";
         $q = $this->query($sql);
 
         if($error = db_error()){
@@ -1426,7 +1426,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function addNewAttachment($mail,$edoc,$project_id, $type){
         if(!empty($edoc)) {
-            $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=" . $edoc." AND project_id=".$project_id;
+            $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id='" . db_escape($edoc)."' AND project_id='".db_escape($project_id)."'";
             $q = $this->query($sql);
 
             if ($error = db_error()) {
