@@ -623,6 +623,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $data[$id] = rtrim($dat,", ");
                     }
                 }
+            }else if($settingName == "email-timestamp-sent"){
+                foreach($logs as $log) {
+                    if($data[$log['id']] < $log['value'] || $data[$log['id']] == ''){
+                        $data[$log['id']] = $log['value'];
+                    }
+                }
             }else{
                 foreach($logs as $log) {
                     $data[$log['id']] = $log['value'];
