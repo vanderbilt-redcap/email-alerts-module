@@ -113,6 +113,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $this->setProjectSetting('email-queue', '');
             $this->removeLogs("project_id = $project_id and message = 'email-repetitive-sent'");
             $this->removeLogs("project_id = $project_id and message = 'email-records-sent'");
+            $this->removeLogs("project_id = $project_id and message = 'email-sent'");
+            $this->removeLogs("project_id = $project_id and message = 'email-timestamp-sent'");
         }else if($_REQUEST['route'] == 'DataEntryController:deleteRecord' && $_REQUEST['record'] != ""){
             #Button: Delete record
 
@@ -160,6 +162,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
             $this->removeLogs("project_id = $project_id and message = 'email-repetitive-sent' and record_id='$record_id'");
             $this->removeLogs("project_id = $project_id and message = 'email-records-sent' and value='$record_id'");
+            $this->removeLogs("project_id = $project_id and message = 'email-sent' and value='$record_id'");
+            $this->removeLogs("project_id = $project_id and message = 'email-timestamp-sent' and value='$record_id'");
 
             #Delete the queued emails for that record
             $email_queue = $this->getProjectSetting('email-queue');
