@@ -876,16 +876,31 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      */
     function setFrom($mail, $project_id, $record, $id){
+    	global $from_email;
+		// Using the Universal From Email Address?
+		$usingUniversalFrom = ($from_email != '');
+		// Get the defined FROM address
         $email_from = $this->getProjectSetting("email-from", $project_id)[$id];
         if(!empty($email_from)){
             $from_data = preg_split("/[;,]+/", $email_from);
             if(filter_var(trim($from_data[0]), FILTER_VALIDATE_EMAIL)) {
-                if($from_data[1] == '""' || empty($from_data[1])){
-                    $mail->SetFrom($from_data[0]);
-                }else{
-                    $mail->SetFrom($from_data[0], $from_data[1]);
-                }
-
+				// Set the From email for this message
+				$this_from_email = (!$usingUniversalFrom ? $from_data[0] : $from_email);
+				// From, Reply-To, and Return-Path. Also, set Display Name if possible.
+				if ($from_data[1] == '""' || empty($from_data[1])) {
+					// If no Display Name, then use the Sender address as the Display Name if using Universal FROM address
+					$fromDisplayName = $usingUniversalFrom ? $from_data[0] : "";
+					$replyToDisplayName = '';
+				} else {
+					// Clean the defined display name
+					$from_data[1] = str_replace('"', '', trim($from_data[1]));
+					// If has a Display Name, then use the Sender address+real Display Name if using Universal FROM address
+					$fromDisplayName = $usingUniversalFrom ? $from_data[1]." <".$from_data[0].">" : $from_data[1];
+					$replyToDisplayName = $from_data[1];
+				}
+				$mail->setFrom($this_from_email, $fromDisplayName, false);
+				$mail->addReplyTo($from_data[0], $replyToDisplayName);
+				$mail->Sender = $from_data[0]; // Return-Path
             }else{
                 $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$from_data[0]." in Project: ".$project_id.", Record: ".$record." Alert #".$id.", does not exist");
             }
