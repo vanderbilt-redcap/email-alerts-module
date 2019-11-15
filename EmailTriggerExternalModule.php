@@ -50,6 +50,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $data = \REDCap::getData($project_id,"array",$record);
         $this->setEmailTriggerRequested(false);
         if(isset($project_id)){
+			error_log("EAM: Start save: ".$project_id." ~ ".$record);
             #Form Complete
             $forms_name = $this->getProjectSetting("form-name",$project_id);
             if(!empty($forms_name) && $record != null){
@@ -69,6 +70,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if(($email_incomplete == "1" &&(($isRepeatInstrument && !$isRepeatInstrumentComplete) || (!$isRepeatInstrument && $data[$record][$event_id][$form.'_complete'] != '2'))) || (!$this->isSurveyPage() && ($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrumentComplete))){
                         if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
                             if ($_REQUEST['page'] == $form) {
+
+								error_log("EAM: Send Alert: ".$form." ~ ".$record);
                                 $this->setEmailTriggerRequested(true);
                                 $this->sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
                             }else if($_REQUEST['page'] == "" && $_REQUEST['s'] != ""){
