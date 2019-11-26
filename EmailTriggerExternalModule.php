@@ -524,11 +524,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
+        gc_disable();
         $data = \REDCap::getData($project_id,"array",$record);
         $email_repetitive_sent = $this->getProjectSettingLog($project_id,"email-repetitive-sent",$isRepeatInstrument);
         $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$instance);
         $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true,$isEmailAlreadySentForThisSurvery);
+
+        unset($data);
+        gc_enable();
+        gc_collect_cycles();
         return $email_sent;
     }
 
@@ -658,7 +663,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron,$isEmailAlreadySentForThisSurvery=false){
         //memory increase
-        ini_set('memory_limit', '512M');
+        ini_set('memory_limit', '4096M');
 
         $email_subject = $this->getProjectSetting("email-subject", $project_id)[$id];
         $email_text = $this->getProjectSetting("email-text", $project_id)[$id];
@@ -805,6 +810,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_list .= $email . ";";
                 }
                 \REDCap::logEvent($action_description, $email_list, null, $record, $event_id, $project_id);
+                $mail->ClearAllRecipients();
+
             }catch(Exception $e){
 
             }
@@ -815,6 +822,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $mail->clearAddresses();
         $mail->clearAttachments();
         return $email_sent_ok;
+
     }
 
     /**
@@ -1302,6 +1310,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var, $option=null, $isLongitudinal=false){
         $var_name = str_replace('[', '', $var);
         $var_name = str_replace(']', '', $var_name);
+        $logic = "";
         if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name] != "") {
             #Repeating instruments by form
             $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
@@ -1429,18 +1438,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_list_error = array();
         $emails = preg_split("/[;,]+/", $emails);
         foreach ($emails as $email){
-            if(!empty($email)){
+            if(!empty(trim($email))){
                 if(filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     //VALID
-                    array_push($email_list,$email);
+                    array_push($email_list,trim($email));
                 }else{
                     array_push($email_list_error,$email);
-
                 }
             }
         }
         if(!empty($email_list_error)){
-           $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$email." in the project ".$project_id.", do not exist");
+           $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Error: Email Address Validation" ,"The email ".print_r($email_list_error, true)." in the project ".$project_id.", may be invalid format");
         }
         return $email_list;
     }
