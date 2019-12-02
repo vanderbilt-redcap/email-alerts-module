@@ -348,17 +348,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_sent_total = 0;
                     foreach ($email_queue as $index => $queue) {
                         if ($email_sent_total < 100 && !$this->hasQueueExpired($queue, $index) && $queue['deactivated'] != 1) {
-                            error_log("TESTscheduledemails" . $project_id . " - deactivate: " . $this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']]." alert:".$queue['alert']);
-                            if ($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && $this->sendToday($queue)) {
+                           if ($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && $this->sendToday($queue)) {
                                 error_log("scheduledemails PID: " . $project_id . " - Has queued emails to send today " . date("Y-m-d H:i:s"));
                                 #SEND EMAIL
                                 $email_sent = $this->sendQueuedEmail($queue['project_id'], $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
                                 #If email sent save date and number of times sent and delete queue if needed
-
-                                error_log("TESTscheduledemails" . $project_id . " - is sent? ".$email_sent);
                                 if ($email_sent) {
-
-                                    error_log("TESTscheduledemails" . $project_id . " - save last_sent");
+                                    error_log("scheduledemails PID: " . $project_id . " - save last_sent");
                                     $queue_aux[$index]['last_sent'] = date('Y-m-d');
                                     $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
                                     $this->setProjectSetting('email-queue', $queue_aux, $queue['project_id']);
@@ -400,8 +396,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $evaluateLogic_on = \REDCap::evaluateLogic($cron_send_email_on_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
         }
 
-		if(strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == ""){
-            error_log("TESTscheduledemails" . $queue['project_id'] . " - last sent: " . $queue['last_sent'].", record:".$queue['record'].", event:".$queue['event_id'].", alert:".$queue['alert']. " - deactivate: " . $this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']]);
+		if($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && (strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == "")){
+            error_log("scheduledemails PID: " . $queue['project_id'] . " - last sent: " . $queue['last_sent'].", record:".$queue['record'].", event:".$queue['event_id'].", alert:".$queue['alert']. " - deactivate: " . $this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']]);
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 return true;
             }
@@ -536,7 +532,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$instance);
         $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true,$isEmailAlreadySentForThisSurvery);
-
+        error_log("scheduledemails PID: " . $project_id . " - email_sent:".$email_sent);
         unset($data);
         gc_enable();
         gc_collect_cycles();
@@ -816,7 +812,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_list .= $email . ";";
                 }
                 \REDCap::logEvent($action_description, $email_list, null, $record, $event_id, $project_id);
-                $mail->ClearAllRecipients();
 
             }catch(Exception $e){
 
@@ -827,6 +822,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         #Clear all addresses and attachments for next loop
         $mail->clearAddresses();
         $mail->clearAttachments();
+        $mail->ClearAllRecipients();
+        error_log("scheduledemails PID: " . $project_id . " - email_sent_ok:".$email_sent_ok);
         return $email_sent_ok;
 
     }
