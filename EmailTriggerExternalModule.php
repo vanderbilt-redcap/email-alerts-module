@@ -332,15 +332,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     function scheduledemails(){
-        $sql="SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = 'true' AND (m.directory_prefix = 'vanderbilt_emailTrigger' OR m.directory_prefix = 'email_alerts') AND s.`key` = 'enabled'";
-        $q = $this->query($sql);
+//        $sql="SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = 'true' AND (m.directory_prefix = 'vanderbilt_emailTrigger' OR m.directory_prefix = 'email_alerts') AND s.`key` = 'enabled'";
+//        $q = $this->query($sql);
+//
+//        if($error = db_error()){
+//            throw new \Exception($sql.': '.$error);
+//        }
 
-        if($error = db_error()){
-            throw new \Exception($sql.': '.$error);
-        }
-
-        while($row = db_fetch_assoc($q)){
-            $project_id = $row['project_id'];
+//        while($row = db_fetch_assoc($q)){
+        foreach ($this->getProjectsWithModuleEnabled() as $project_id){
+//            $project_id = $row['project_id'];
             if($project_id != "") {
                 $email_queue = $this->getProjectSetting('email-queue', $project_id);
                 $queue_aux = $email_queue;
@@ -353,8 +354,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 #SEND EMAIL
                                 $email_sent = $this->sendQueuedEmail($queue['project_id'], $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
                                 #If email sent save date and number of times sent and delete queue if needed
-                                if ($email_sent) {
-                                    error_log("scheduledemails PID: " . $project_id . " - save last_sent");
+                                if ($email_sent || $email_sent == "1") {
                                     $queue_aux[$index]['last_sent'] = date('Y-m-d');
                                     $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
                                     $this->setProjectSetting('email-queue', $queue_aux, $queue['project_id']);
@@ -397,7 +397,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
 		if($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && (strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == "")){
-            error_log("scheduledemails PID: " . $queue['project_id'] . " - last sent: " . $queue['last_sent'].", record:".$queue['record'].", event:".$queue['event_id'].", alert:".$queue['alert']. " - deactivate: " . $this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']]);
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 return true;
             }
@@ -532,7 +531,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$instance);
         $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true,$isEmailAlreadySentForThisSurvery);
-        error_log("scheduledemails PID: " . $project_id . " - email_sent:".$email_sent);
+
         unset($data);
         gc_enable();
         gc_collect_cycles();
@@ -783,7 +782,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     ]);
                 }
 
-
                 $records = array_map('trim', explode(',', $email_records_sent[$id]));
                 $record_found = false;
                 foreach ($records as $record_id) {
@@ -823,7 +821,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $mail->clearAddresses();
         $mail->clearAttachments();
         $mail->ClearAllRecipients();
-        error_log("scheduledemails PID: " . $project_id . " - email_sent_ok:".$email_sent_ok);
         return $email_sent_ok;
 
     }
