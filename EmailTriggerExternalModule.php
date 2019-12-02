@@ -342,6 +342,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         while($row = db_fetch_assoc($q)){
             $project_id = $row['project_id'];
             if($project_id != "") {
+                error_log("Test emailalerts ".$project_id);
                 $email_queue = $this->getProjectSetting('email-queue', $project_id);
                 $queue_aux = $email_queue;
                 if ($email_queue != '') {
