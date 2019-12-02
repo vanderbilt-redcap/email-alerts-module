@@ -332,16 +332,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     function scheduledemails(){
-//        $sql="SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = 'true' AND (m.directory_prefix = 'vanderbilt_emailTrigger' OR m.directory_prefix = 'email_alerts') AND s.`key` = 'enabled'";
-//        $q = $this->query($sql);
-//
-//        if($error = db_error()){
-//            throw new \Exception($sql.': '.$error);
-//        }
+        $sql="SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = 'true' AND (m.directory_prefix = 'vanderbilt_emailTrigger' OR m.directory_prefix = 'email_alerts') AND s.`key` = 'enabled'";
+        $q = $this->query($sql);
 
-//        while($row = db_fetch_assoc($q)){
-        foreach ($this->getProjectsWithModuleEnabled() as $project_id){
-//            $project_id = $row['project_id'];
+        if($error = db_error()){
+            throw new \Exception($sql.': '.$error);
+        }
+
+        while($row = db_fetch_assoc($q)){
+//        foreach ($this->getProjectsWithModuleEnabled() as $project_id){
+            $project_id = $row['project_id'];
             if($project_id != "") {
                 $email_queue = $this->getProjectSetting('email-queue', $project_id);
                 $queue_aux = $email_queue;
