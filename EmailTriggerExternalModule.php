@@ -348,7 +348,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_sent_total = 0;
                     foreach ($email_queue as $index => $queue) {
                         if ($email_sent_total < 100 && !$this->hasQueueExpired($queue, $index) && $queue['deactivated'] != 1 && $this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']] != "1") {
-                            error_log("TEST scheduledemails PID: " . $project_id . " - deactivate: " . $this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']]." alert:".$queue['alert']);
+                            error_log("TESTscheduledemails PID: " . $project_id . " - deactivate: " . $this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']]." alert:".$queue['alert']);
                             if ($this->sendToday($queue)) {
                                 error_log("scheduledemails PID: " . $project_id . " - Has queued emails to send today " . date("Y-m-d H:i:s"));
                                 #SEND EMAIL
@@ -397,7 +397,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
 		if(strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == ""){
-            error_log("TEST scheduledemails PID: " . $queue['project_id'] . " - last sent: " . $queue['last_sent'].", record:".$queue['record'].", event:".$queue['event_id'].", alert:".$queue['alert']);
+            error_log("TESTscheduledemails PID: " . $queue['project_id'] . " - last sent: " . $queue['last_sent'].", record:".$queue['record'].", event:".$queue['event_id'].", alert:".$queue['alert']);
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 return true;
             }
