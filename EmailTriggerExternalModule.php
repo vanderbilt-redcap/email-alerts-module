@@ -1319,13 +1319,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }else{
             $project = new \Project($project_id);
             if($option == '1'){
-                if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true) == ""){
+                if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
                 }else{
-                    $logic = \LogicTester::apply($var, $data[$record], $project, true);
+                    $logic = \LogicTester::apply($var, $data[$record], $project, true, true);
                 }
             }else{
-                if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true) == ""){
+                if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
                 }else{
                     preg_match_all("/\[[^\]]*\]/", $var, $matches);
@@ -1333,7 +1333,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
                         $logic = $data[$record][$event_id][$var_name];
                     }else{
-                        $logic = \LogicTester::apply($var, $data[$record], $project, true);
+                        $logic = \LogicTester::apply($var, $data[$record], $project, true, true);
                     }
                 }
             }
