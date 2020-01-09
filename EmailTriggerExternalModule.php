@@ -400,6 +400,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             error_log("scheduledemails PID: " . $queue['project_id'] . " - Last sent: " . $queue['last_sent']." Today: ".$today);
             error_log("scheduledemails PID: " . $queue['project_id'] . " - Times sent: " . $queue['times_sent']);
             error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert: " . $queue['alert']." Record: ".$queue['record']);
+            error_log("scheduledemails PID: " . json_encode($queue));
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 return true;
             }
