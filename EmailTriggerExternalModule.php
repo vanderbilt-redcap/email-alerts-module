@@ -355,15 +355,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 #If email sent save date and number of times sent and delete queue if needed
                                error_log("scheduledemails PID: " . $project_id . " after sent");
                                if ($email_sent || $email_sent == "1") {
-                                    error_log("scheduledemails PID: " . $project_id . " - IN index: ".$index);
-                                    $queue_aux[$index]['last_sent'] = date('Y-m-d');
-                                    $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
-                                    $this->setProjectSetting('email-queue', $queue_aux, $project_id);
-                                   error_log("scheduledemails PID: " . $project_id . " Single: ".json_encode($queue_aux));
-                                   error_log("scheduledemails PID: " . $project_id . " All: ".json_encode($this->getProjectSetting('email-queue', $project_id)[$index]));
-                                    $email_sent_total++;
-                                }else{
-                                    error_log("scheduledemails PID: " . $project_id . " - OUT");
+//                                    error_log("scheduledemails PID: " . $project_id . " - IN index: ".$index);
+//                                    $queue_aux[$index]['last_sent'] = date('Y-m-d');
+//                                    $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
+//                                    $this->setProjectSetting('email-queue', $queue_aux, $project_id);
+//                                   error_log("scheduledemails PID: " . $project_id . " Single: ".json_encode($queue_aux));
+                                   $email_sent_total++;
                                 }
                                 #Check if we need to delete the queue
                                 $this->stopRepeat($queue, $index);
@@ -542,7 +539,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$instance);
         $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true,$isEmailAlreadySentForThisSurvery);
 
-        error_log("scheduledemails PID: " . $project_id . " - Return email sent: ".$email_sent);
+        if ($email_sent || $email_sent == "1") {
+            $email_queue = $this->getProjectSetting('email-queue', $project_id);
+            error_log("scheduledemails PID: " . $project_id . " - IN index: ".$id);
+            $email_queue[$id]['last_sent'] = date('Y-m-d');
+            $email_queue[$id]['times_sent'] = $email_queue['times_sent'][$id] + 1;
+            $this->setProjectSetting('email-queue', $email_queue, $project_id);
+            error_log("scheduledemails PID: " . $project_id . " Single: ".json_encode($email_queue));
+        }
 
         unset($data);
         gc_enable();
