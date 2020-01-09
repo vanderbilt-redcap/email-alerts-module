@@ -354,10 +354,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $email_sent = $this->sendQueuedEmail($queue['project_id'], $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
                                 #If email sent save date and number of times sent and delete queue if needed
                                 if ($email_sent || $email_sent == "1") {
+                                    error_log("scheduledemails PID: " . $project_id . "IN index:".$index);
                                     $queue_aux[$index]['last_sent'] = date('Y-m-d');
                                     $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
                                     $this->setProjectSetting('email-queue', $queue_aux, $queue['project_id']);
                                     $email_sent_total++;
+                                }else{
+                                    error_log("scheduledemails PID: " . $project_id . "OUT");
                                 }
                                 #Check if we need to delete the queue
                                 $this->stopRepeat($queue, $index);
