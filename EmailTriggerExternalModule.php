@@ -353,14 +353,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 #SEND EMAIL
                                 $email_sent = $this->sendQueuedEmail($queue['project_id'], $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
                                 #If email sent save date and number of times sent and delete queue if needed
-                                if ($email_sent || $email_sent == "1") {
-                                    error_log("scheduledemails PID: " . $project_id . "IN index:".$index);
+                               error_log("scheduledemails PID: " . $project_id . " after sent");
+                               if ($email_sent || $email_sent == "1") {
+                                    error_log("scheduledemails PID: " . $project_id . " - IN index:".$index);
                                     $queue_aux[$index]['last_sent'] = date('Y-m-d');
                                     $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
                                     $this->setProjectSetting('email-queue', $queue_aux, $queue['project_id']);
                                     $email_sent_total++;
                                 }else{
-                                    error_log("scheduledemails PID: " . $project_id . "OUT");
+                                    error_log("scheduledemails PID: " . $project_id . " - OUT");
                                 }
                                 #Check if we need to delete the queue
                                 $this->stopRepeat($queue, $index);
@@ -538,6 +539,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$instance);
         $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true,$isEmailAlreadySentForThisSurvery);
+
+        error_log("scheduledemails PID: " . $project_id . " - Return email sent: ".$email_sent);
 
         unset($data);
         gc_enable();
