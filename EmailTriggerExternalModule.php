@@ -396,6 +396,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
 		if($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && (strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == "")){
+            error_log("scheduledemails PID: " . $queue['project_id'] . " - today is different! " . strtotime($queue['last_sent'])." != ".strtotime($today));
+            error_log("scheduledemails PID: " . $queue['project_id'] . " - Last sent: " . $queue['last_sent']." Today: ".$today);
+            error_log("scheduledemails PID: " . $queue['project_id'] . " - Times sent: " . $queue['times_sent']);
+            error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert: " . $queue['alert']." Record: ".$queue['record']);
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 return true;
             }
