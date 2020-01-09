@@ -543,7 +543,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $email_queue = $this->getProjectSetting('email-queue', $project_id);
             error_log("scheduledemails PID: " . $project_id . " - IN index: ".$id);
             $email_queue[$id]['last_sent'] = date('Y-m-d');
-            $email_queue[$id]['times_sent'] = $email_queue['times_sent'][$id] + 1;
+            $email_queue[$id]['times_sent'] = $email_queue[$id]['times_sent'] + 1;
             $this->setProjectSetting('email-queue', $email_queue, $project_id);
             error_log("scheduledemails PID: " . $project_id . " Single: ".json_encode($email_queue[$id]));
         }
