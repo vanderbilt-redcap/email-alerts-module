@@ -346,11 +346,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if ($email_queue != '') {
                     $email_sent_total = 0;
                     foreach ($email_queue as $index => $queue) {
+                        if($queue['project_id'] == ''){
+                            $queue['project_id'] = $project_id;
+                        }
                         if ($email_sent_total < 100 && !$this->hasQueueExpired($queue, $index, $project_id) && $queue['deactivated'] != 1) {
-                           if ($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && $this->sendToday($queue)) {
+                           if ($this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']] != "1" && $this->sendToday($queue)) {
                                 error_log("scheduledemails PID: " . $project_id . " - Has queued emails to send today " . date("Y-m-d H:i:s"));
                                 #SEND EMAIL
-                                $email_sent = $this->sendQueuedEmail($index,$queue['project_id'], $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
+                                $email_sent = $this->sendQueuedEmail($index,$project_id, $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
                                 #If email sent save date and number of times sent and delete queue if needed
                                if ($email_sent || $email_sent == "1") {
                                    $email_sent_total++;
