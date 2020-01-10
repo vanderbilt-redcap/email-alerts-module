@@ -351,7 +351,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                            if ($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && $this->sendToday($queue)) {
                                 error_log("scheduledemails PID: " . $project_id . " - Has queued emails to send today " . date("Y-m-d H:i:s"));
                                 #SEND EMAIL
-                                $email_sent = $this->sendQueuedEmail($queue['project_id'], $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
+                                $email_sent = $this->sendQueuedEmail($index,$queue['project_id'], $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
                                 #If email sent save date and number of times sent and delete queue if needed
                                error_log("scheduledemails PID: " . $project_id . " after sent");
                                if ($email_sent || $email_sent == "1") {
@@ -526,7 +526,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $event_id
      * @return bool
      */
-    function sendQueuedEmail($project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
+    function sendQueuedEmail($index,$project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
         gc_disable();
         $data = \REDCap::getData($project_id,"array",$record);
         $email_repetitive_sent = $this->getProjectSettingLog($project_id,"email-repetitive-sent",$isRepeatInstrument);
@@ -538,16 +538,27 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if ($email_sent || $email_sent == "1") {
             $email_queue = $this->getProjectSetting('email-queue', $project_id);
 
-            error_log("scheduledemails PID: " . $email_queue[$id]['project_id'] . " - Last sent: " . $email_queue[$id]['last_sent']);
-            error_log("scheduledemails PID: " . $email_queue[$id]['project_id'] . " - Times sent: " . $email_queue[$id]['times_sent']);
-            error_log("scheduledemails PID: " . $email_queue[$id]['project_id'] . " - Alert: " . $email_queue[$id]['alert']." Record: ".$email_queue[$id]['record']);
+            error_log("scheduledemails PID: " . $email_queue[$index]['project_id'] . " - Last sent: " . $email_queue[$index]['last_sent']);
+            error_log("scheduledemails PID: " . $email_queue[$index]['project_id'] . " - Times sent: " . $email_queue[$index]['times_sent']);
+            error_log("scheduledemails PID: " . $email_queue[$index]['project_id'] . " - Alert: " . $email_queue[$index]['alert']." Record: ".$email_queue[$index]['record']);
 
-            error_log("scheduledemails PID: " . $project_id . " - IN index: ".$id);
-            $email_queue[$id]['last_sent'] = date('Y-m-d');
-            $email_queue[$id]['times_sent'] = $email_queue[$id]['times_sent'] + 1;
-            error_log("scheduledemails PID: " . $project_id . " Single before: ".json_encode($email_queue[$id]));
+            error_log("scheduledemails PID: " . $project_id . " - IN index: ".$index);
+            $email_queue[$index]['last_sent'] = date('Y-m-d');
+            $email_queue[$index]['times_sent'] = $email_queue[$index]['times_sent'] + 1;
+            $email_queue[$index]['alert'] = $id;
+            $email_queue['record'] = $record;
+            $email_queue['project_id'] = $project_id;
+            $email_queue['event_id'] = $event_id;
+            $email_queue['instrument'] = $instrument;
+            $email_queue['instance'] = $instance;
+            $email_queue['isRepeatInstrument'] = $isRepeatInstrument;
+            $email_queue['creation_date'] = date('Y-m-d');
+            $queue['option'] = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
+            $queue['deactivated'] = 0;
+
+            error_log("scheduledemails PID: " . $project_id . " Single before: ".json_encode($email_queue[$index]));
             $this->setProjectSetting('email-queue', $email_queue, $project_id);
-            error_log("scheduledemails PID: " . $project_id . " Single: ".json_encode($email_queue[$id]));
+            error_log("scheduledemails PID: " . $project_id . " Single: ".json_encode($email_queue[$index]));
         }
 
         unset($data);
