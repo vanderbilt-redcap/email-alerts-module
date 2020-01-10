@@ -553,10 +553,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $email_queue['instance'] = $instance;
             $email_queue['isRepeatInstrument'] = $isRepeatInstrument;
             $email_queue['creation_date'] = date('Y-m-d');
-            $queue['option'] = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
-            $queue['deactivated'] = 0;
+            $email_queue['option'] = $this->getProjectSetting("cron-send-email-on", $project_id)[$index];
+            $email_queue['deactivated'] = 0;
 
-            error_log("scheduledemails PID: " . $queue['project_id'] . " - Queue updated: " . json_encode($queue));
+            error_log("scheduledemails PID: " . $email_queue['project_id'] . " - Queue updated: " . json_encode($email_queue));
 
             $this->setProjectSetting('email-queue', $email_queue, $project_id);
         }
