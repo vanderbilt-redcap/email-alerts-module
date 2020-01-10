@@ -346,9 +346,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if ($email_queue != '') {
                     $email_sent_total = 0;
                     foreach ($email_queue as $index => $queue) {
-                        $queue['project_id'] = $project_id;
                         if ($email_sent_total < 100 && !$this->hasQueueExpired($queue, $index, $project_id) && $queue['deactivated'] != 1) {
-                           if ($this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']] != "1" && $this->sendToday($queue)) {
+                           if ($this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']] != "1" && $this->sendToday($queue,$project_id)) {
                                 error_log("scheduledemails PID: " . $project_id . " - Has queued emails to send today " . date("Y-m-d H:i:s"));
                                 #SEND EMAIL
                                 $email_sent = $this->sendQueuedEmail($index,$project_id, $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
@@ -372,10 +371,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $index, the queue index
      * @return bool
      */
-    function sendToday($queue)
+    function sendToday($queue,$project_id)
     {
-        $cron_send_email_on_field = $this->getProjectSetting('cron-send-email-on-field',$queue['project_id'])[$queue['alert']];
-        $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
+        $cron_send_email_on_field = $this->getProjectSetting('cron-send-email-on-field',$project_id)[$queue['alert']];
+        $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$project_id)[$queue['alert']];
 
         $repeat_days = $cron_repeat_for;
         if($queue['times_sent'] != 0){
@@ -387,21 +386,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $repeat_date = date('Y-m-d', strtotime($cron_send_email_on_field . $extra_days));
         $repeat_date_now = date('Y-m-d', strtotime($queue['last_sent'] . '+'.$cron_repeat_for.' days'));
 
-        $evaluateLogic_on = \REDCap::evaluateLogic($cron_send_email_on_field, $queue['project_id'], $queue['record'], $queue['event_id']);
+        $evaluateLogic_on = \REDCap::evaluateLogic($cron_send_email_on_field, $project_id, $queue['record'], $queue['event_id']);
         if($queue['isRepeatInstrument']){
-            $evaluateLogic_on = \REDCap::evaluateLogic($cron_send_email_on_field,  $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
+            $evaluateLogic_on = \REDCap::evaluateLogic($cron_send_email_on_field,  $project_id, $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
         }
 
-		if($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && (strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == "")){
+		if($this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']] != "1" && (strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == "")){
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
 
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - Today: " . $today);
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - Last sent: " . $queue['last_sent']);
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - cron_send_email_on_field: " . $cron_send_email_on_field);
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - evaluateLogic_on: " . $evaluateLogic_on);
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - Times sent: " . $queue['times_sent']);
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert: " . $queue['alert']." Record: ".$queue['record']);
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - Queue: " . json_encode($queue));
+                error_log("scheduledemails PID: " . $project_id . " - Today: " . $today);
+                error_log("scheduledemails PID: " . $project_id . " - Last sent: " . $queue['last_sent']);
+                error_log("scheduledemails PID: " . $project_id . " - cron_send_email_on_field: " . $cron_send_email_on_field);
+                error_log("scheduledemails PID: " . $project_id . " - evaluateLogic_on: " . $evaluateLogic_on);
+                error_log("scheduledemails PID: " . $project_id . " - Times sent: " . $queue['times_sent']);
+                error_log("scheduledemails PID: " . $project_id . " - Alert: " . $queue['alert']." Record: ".$queue['record']);
+                error_log("scheduledemails PID: " . $project_id . " - Queue: " . json_encode($queue));
 
                 return true;
             }
