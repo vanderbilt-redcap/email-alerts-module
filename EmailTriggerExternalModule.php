@@ -346,7 +346,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if ($email_queue != '') {
                     $email_sent_total = 0;
                     foreach ($email_queue as $index => $queue) {
-                        if ($email_sent_total < 100 && !$this->hasQueueExpired($queue, $index) && $queue['deactivated'] != 1) {
+                        if ($email_sent_total < 100 && !$this->hasQueueExpired($queue, $index, $project_id) && $queue['deactivated'] != 1) {
                            if ($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && $this->sendToday($queue)) {
                                 error_log("scheduledemails PID: " . $project_id . " - Has queued emails to send today " . date("Y-m-d H:i:s"));
                                 #SEND EMAIL
@@ -430,34 +430,34 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $project_id
      * @return bool
      */
-    function hasQueueExpired($queue,$index){
-        $cron_queue_expiration_date =  $this->getProjectSetting('cron-queue-expiration-date',$queue['project_id'])[$queue['alert']];
-        $cron_queue_expiration_date_field =  $this->getProjectSetting('cron-queue-expiration-date-field',$queue['project_id'])[$queue['alert']];
-        $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
+    function hasQueueExpired($queue,$index,$project_id){
+        $cron_queue_expiration_date =  $this->getProjectSetting('cron-queue-expiration-date',$project_id)[$queue['alert']];
+        $cron_queue_expiration_date_field =  $this->getProjectSetting('cron-queue-expiration-date-field',$project_id)[$queue['alert']];
+        $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$project_id)[$queue['alert']];
 
         #If the repeat is 0 we delete regardless of the expiration option
         if(($cron_repeat_for == "" || $cron_repeat_for == "0") && $queue['last_sent'] != ""){
-            $this->deleteQueuedEmail($index, $queue['project_id']);
-            error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert # ".$queue['alert']." Queue #".$index." expired. Delete.");
+            $this->deleteQueuedEmail($index, $project_id);
+            error_log("scheduledemails PID: " . $project_id . " - Alert # ".$queue['alert']." Queue #".$index." expired. Delete.");
             return true;
         }
 
         if($cron_queue_expiration_date_field != "" && $cron_queue_expiration_date != '' && $cron_queue_expiration_date != 'never') {
-            $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $queue['project_id'], $queue['record'], $queue['event_id']);
+            $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $project_id, $queue['record'], $queue['event_id']);
             if ($queue['isRepeatInstrument']) {
-                $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $queue['project_id'], $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
+                $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $project_id, $queue['record'], $queue['event_id'], $queue['instance'], $queue['instrument']);
             }
 
             if ($cron_queue_expiration_date == 'date' && $cron_queue_expiration_date_field != "") {
                 if (strtotime($cron_queue_expiration_date_field) <= strtotime(date('Y-m-d'))) {
-                    $this->deleteQueuedEmail($index, $queue['project_id']);
-                    error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert # ".$queue['alert']." Queue #".$index." expired date. Delete.");
+                    $this->deleteQueuedEmail($index, $project_id);
+                    error_log("scheduledemails PID: " . $project_id . " - Alert # ".$queue['alert']." Queue #".$index." expired date. Delete.");
                     return true;
                 }
             }else if ($cron_queue_expiration_date == 'cond' && $cron_queue_expiration_date_field != "") {
                 if ($evaluateLogic) {
-                    $this->deleteQueuedEmail($index, $queue['project_id']);
-                    error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert # ".$queue['alert']." Queue #".$index." expired condition. Delete.");
+                    $this->deleteQueuedEmail($index, $project_id);
+                    error_log("scheduledemails PID: " . $project_id . " - Alert # ".$queue['alert']." Queue #".$index." expired condition. Delete.");
                     return true;
                 }
             }
