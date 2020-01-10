@@ -55,6 +55,7 @@ function previewEmailAlertQueue(index,alertnumber){
             $('#modal_message_queue').html(result);
             $('#modalQueueNumber').text("- Alert #"+alertnumber);
             $('#external-modules-configure-modal-queue').modal('show');
+            $('#alertid').val(index);
         }
     });
 }
@@ -693,4 +694,8 @@ function showIfRepeatingForm(data, field){
             alert("An error occurred");
         }
     });
+}
+
+function deleteAllQueue(){
+    ajaxLoadOptionAndMessage("&pid="+project_id+"&alertid="+$('#alertid').val(),_delete_queue_all_url,"O");
 }

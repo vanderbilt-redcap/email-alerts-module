@@ -111,6 +111,7 @@ if(USERID != "") {
         var _preview_url = '<?=$module->getUrl('previewForm.php')?>';
         var _update_queue_url = '<?=$module->getUrl('updateQueue.php')?>';
         var _delete_queue_url = '<?=$module->getUrl('deleteQueue.php')?>';
+        var _delete_queue_all_url = '<?=$module->getUrl('deleteQueueAll.php')?>';
         var _preview_queue_url = '<?=$module->getUrl('previewQueue.php')?>';
         var _preview_record_url = '<?=$module->getUrl('previewRecordForm.php')?>';
         var _preview_record_modal_url = '<?=$module->getUrl('previewRecordModal.php')?>';
@@ -1363,7 +1364,7 @@ if(USERID != "") {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         <button type="submit" form="AddFormForm" class="btn btn-default btn_color_formLink" id='btnModalAddFormForm'>Add data-form link</button>
                     </div>
                 </div>
@@ -1407,7 +1408,7 @@ if(USERID != "") {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         <button type="submit" form="AddSurveyForm" class="btn btn-default btn_color_surveyLink" id='btnModalAddSurveyForm'>Add survey link</button>
                     </div>
                 </div>
@@ -1455,7 +1456,7 @@ if(USERID != "") {
 
                             <div class="modal-footer">
                                 <button type="submit" form="updateForm" class="btn btn-default btn-delete" id='btnModalRescheduleForm'>Reschedule</button>
-                                <a class="btn btn-default btn-cancel" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</a>
+                                <a class="btn btn-default btn-cancel" data-dismiss="modal">Cancel</a>
                             </div>
                         </div>
                     </div>
@@ -1480,7 +1481,7 @@ if(USERID != "") {
 
                     <div class="modal-footer">
                         <button type="submit" form="deleteUserForm" class="btn btn-default btn-delete" id='btnModalDeleteForm'>Delete</button>
-                        <a class="btn btn-default btn-cancel" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</a>
+                        <a class="btn btn-default btn-cancel" data-dismiss="modal">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -1504,7 +1505,7 @@ if(USERID != "") {
 
                     <div class="modal-footer">
                         <button type="submit" form="deleteForm" class="btn btn-default btn-delete" id='btnModalDeleteForm'>Delete</button>
-                        <a class="btn btn-default btn-cancel" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</a>
+                        <a class="btn btn-default btn-cancel" data-dismiss="modal">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -1531,7 +1532,7 @@ if(USERID != "") {
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -1545,14 +1546,22 @@ if(USERID != "") {
                     <div class="modal-header">
                         <button type="button" class="close closeCustomModal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         <h4 class="modal-title" id="myModalLabel">Preview Queued Emails <span id="modalQueueNumber"></span></h4>
+                        <input type="hidden" id="alertid" name="alertid" value="">
                     </div>
                     <div class="modal-body">
                         <div id="modal_message_queue"></div>
                     </div>
 
                     <div class="modal-footer">
-
-                        <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
+                        <?php
+                        if($isAdmin) {
+                        ?>
+                        <button type="button" class="btn btn-danger" onclick="
+                                       $('#external-modules-configure-modal-queue').modal('hide');
+									simpleDialog('Are you sure you want to delete All queued emails? This means that ALL queued emails for this alert will be permanently deleted.','ARE YOU SURE?',null,null,function(){},'Cancel',function(){deleteAllQueue();},'Yes, I understand');
+                               ">Delete All</button>
+                        <?php } ?>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -1605,7 +1614,7 @@ if(USERID != "") {
                     </div>
 
                     <div class="modal-footer">
-                        <a class="btn btn-default btn-cancel" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</a>
+                        <a class="btn btn-default btn-cancel" data-dismiss="modal">Cancel</a>
                         <button type="submit" form="addQueue" class="btn btn-default btn-delete" id='btnModalAddQueue'>Add Queue</button>
                     </div>
                 </div>
@@ -1629,7 +1638,7 @@ if(USERID != "") {
 
                     <div class="modal-footer">
                         <button type="submit" form="deactivateForm" class="btn btn-default btn-delete" id='btnModalDeactivateForm'></button>
-                        <a class="btn btn-default btn-cancel" id='btnCloseCodesModalDelete' data-dismiss="modal">Cancel</a>
+                        <a class="btn btn-default btn-cancel" data-dismiss="modal">Cancel</a>
                     </div>
                 </div>
             </div>
@@ -1648,7 +1657,7 @@ if(USERID != "") {
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
