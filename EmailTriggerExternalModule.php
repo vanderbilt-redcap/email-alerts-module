@@ -556,6 +556,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $queue['option'] = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
             $queue['deactivated'] = 0;
 
+            error_log("scheduledemails PID: " . $queue['project_id'] . " - Queue updated: " . json_encode($queue));
+
             $this->setProjectSetting('email-queue', $email_queue, $project_id);
         }
 
