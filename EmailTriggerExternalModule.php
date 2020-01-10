@@ -343,7 +343,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $project_id = $row['project_id'];
             if($project_id != "") {
                 $email_queue = $this->getProjectSetting('email-queue', $project_id);
-                $queue_aux = $email_queue;
                 if ($email_queue != '') {
                     $email_sent_total = 0;
                     foreach ($email_queue as $index => $queue) {
@@ -357,7 +356,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                    $email_sent_total++;
                                 }
                                 #Check if we need to delete the queue
-                                $this->stopRepeat($queue, $index);
+                                $this->stopRepeat($queue, $index, $project_id);
                             }
                         }
                     }
@@ -415,10 +414,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $index, queue index
      * @return mixed
      */
-    function stopRepeat($queue,$index){
+    function stopRepeat($queue,$index,$project_id){
         $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
         if($cron_repeat_for == "" || $cron_repeat_for == "0" && $queue['last_sent'] != ""){
-            $this->deleteQueuedEmail($index, $queue['project_id']);
+            $this->deleteQueuedEmail($index, $project_id);
             error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert # ".$queue['alert']." Queue #".$index." stop repeat. Delete.");
         }
     }
