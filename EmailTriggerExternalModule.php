@@ -353,13 +353,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 #SEND EMAIL
                                 $email_sent = $this->sendQueuedEmail($index,$queue['project_id'], $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
                                 #If email sent save date and number of times sent and delete queue if needed
-                               error_log("scheduledemails PID: " . $project_id . " after sent");
                                if ($email_sent || $email_sent == "1") {
-//                                    error_log("scheduledemails PID: " . $project_id . " - IN index: ".$index);
-//                                    $queue_aux[$index]['last_sent'] = date('Y-m-d');
-//                                    $queue_aux[$index]['times_sent'] = $queue['times_sent'] + 1;
-//                                    $this->setProjectSetting('email-queue', $queue_aux, $project_id);
-//                                   error_log("scheduledemails PID: " . $project_id . " Single: ".json_encode($queue_aux));
                                    $email_sent_total++;
                                 }
                                 #Check if we need to delete the queue
@@ -400,7 +394,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
 		if($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && (strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == "")){
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
-               return true;
+
+                error_log("scheduledemails PID: " . $queue['project_id'] . " - Today: " . $today);
+                error_log("scheduledemails PID: " . $queue['project_id'] . " - Last sent: " . $queue['last_sent']);
+                error_log("scheduledemails PID: " . $queue['project_id'] . " - Times sent: " . $queue['times_sent']);
+                error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert: " . $queue['alert']." Record: ".$queue['record']);
+
+                return true;
             }
         }
         return false;
@@ -538,11 +538,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if ($email_sent || $email_sent == "1") {
             $email_queue = $this->getProjectSetting('email-queue', $project_id);
 
-            error_log("scheduledemails PID: " . $email_queue[$index]['project_id'] . " - Last sent: " . $email_queue[$index]['last_sent']);
-            error_log("scheduledemails PID: " . $email_queue[$index]['project_id'] . " - Times sent: " . $email_queue[$index]['times_sent']);
-            error_log("scheduledemails PID: " . $email_queue[$index]['project_id'] . " - Alert: " . $email_queue[$index]['alert']." Record: ".$email_queue[$index]['record']);
-
-            error_log("scheduledemails PID: " . $project_id . " - IN index: ".$index);
             $email_queue[$index]['last_sent'] = date('Y-m-d');
             $email_queue[$index]['times_sent'] = $email_queue[$index]['times_sent'] + 1;
             $email_queue[$index]['alert'] = $id;
@@ -556,9 +551,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $queue['option'] = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
             $queue['deactivated'] = 0;
 
-            error_log("scheduledemails PID: " . $project_id . " Single before: ".json_encode($email_queue[$index]));
             $this->setProjectSetting('email-queue', $email_queue, $project_id);
-            error_log("scheduledemails PID: " . $project_id . " Single: ".json_encode($email_queue[$index]));
         }
 
         unset($data);
