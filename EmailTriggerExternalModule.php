@@ -400,6 +400,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 error_log("scheduledemails PID: " . $queue['project_id'] . " - evaluateLogic_on: " . $evaluateLogic_on);
                 error_log("scheduledemails PID: " . $queue['project_id'] . " - Times sent: " . $queue['times_sent']);
                 error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert: " . $queue['alert']." Record: ".$queue['record']);
+                error_log("scheduledemails PID: " . $queue['project_id'] . " - Queue: " . json_encode($queue));
 
                 return true;
             }
