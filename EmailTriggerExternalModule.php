@@ -400,12 +400,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
 		if($this->getProjectSetting('email-deactivate', $queue['project_id'])[$queue['alert']] != "1" && (strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == "")){
             if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - today is different! " . strtotime($queue['last_sent'])." != ".strtotime($today));
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - Last sent: " . $queue['last_sent']." Today: ".$today);
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - Times sent: " . $queue['times_sent']);
-                error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert: " . $queue['alert']." Record: ".$queue['record']);
-                error_log("scheduledemails PID: " . json_encode($queue));
-                return true;
+               return true;
             }
         }
         return false;
@@ -539,8 +534,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$instance);
         $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true,$isEmailAlreadySentForThisSurvery);
 
+
         if ($email_sent || $email_sent == "1") {
             $email_queue = $this->getProjectSetting('email-queue', $project_id);
+
+            error_log("scheduledemails PID: " . $email_queue['project_id'] . " - Last sent: " . $email_queue['last_sent']." Today: ".$email_queue);
+            error_log("scheduledemails PID: " . $email_queue['project_id'] . " - Times sent: " . $email_queue['times_sent']);
+            error_log("scheduledemails PID: " . $email_queue['project_id'] . " - Alert: " . $email_queue['alert']." Record: ".$email_queue['record']);
+
             error_log("scheduledemails PID: " . $project_id . " - IN index: ".$id);
             $email_queue[$id]['last_sent'] = date('Y-m-d');
             $email_queue[$id]['times_sent'] = $email_queue[$id]['times_sent'] + 1;
