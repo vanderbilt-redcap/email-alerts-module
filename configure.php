@@ -1551,6 +1551,11 @@ if(USERID != "") {
                     </div>
 
                     <div class="modal-footer">
+                        <?php
+                        if($isAdmin) {
+                        ?>
+                        <button type="button" class="btn btn-danger" id='btnCloseCodesModalDelete' data-dismiss="modal">Delete All</button>
+                        <?php } ?>
                         <button type="button" class="btn btn-default" id='btnCloseCodesModalDelete' data-dismiss="modal">Close</button>
                     </div>
                 </div>
