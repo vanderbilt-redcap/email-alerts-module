@@ -538,9 +538,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if ($email_sent || $email_sent == "1") {
             $email_queue = $this->getProjectSetting('email-queue', $project_id);
 
-            error_log("scheduledemails PID: " . $email_queue['project_id'] . " - Last sent: " . $email_queue['last_sent']." Today: ".$email_queue);
-            error_log("scheduledemails PID: " . $email_queue['project_id'] . " - Times sent: " . $email_queue['times_sent']);
-            error_log("scheduledemails PID: " . $email_queue['project_id'] . " - Alert: " . $email_queue['alert']." Record: ".$email_queue['record']);
+            error_log("scheduledemails PID: " . $email_queue[$id]['project_id'] . " - Last sent: " . $email_queue[$id]['last_sent']);
+            error_log("scheduledemails PID: " . $email_queue[$id]['project_id'] . " - Times sent: " . $email_queue[$id]['times_sent']);
+            error_log("scheduledemails PID: " . $email_queue[$id]['project_id'] . " - Alert: " . $email_queue[$id]['alert']." Record: ".$email_queue[$id]['record']);
 
             error_log("scheduledemails PID: " . $project_id . " - IN index: ".$id);
             $email_queue[$id]['last_sent'] = date('Y-m-d');
