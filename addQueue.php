@@ -49,14 +49,10 @@ if (strpos($queue_ids, ";") !== false) {
             array_push($failed_records,$failed);
         }
     }
-} else {
-    //ERROR
-    $message = "Incorrect format. Couldn't generate PDF.";
 }
 
 if ($record != "") {
     foreach ($record as $id) {
-
         if(is_array($instance)){
             foreach ($instance as $one_instance){
                 $failed = $module->addQueueEmailFromInterface($project_id, $index, $id, $times_sent, $event_id, $last_sent, $one_instance);

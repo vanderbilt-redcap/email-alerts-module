@@ -392,16 +392,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
 		if($this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']] != "1" && (strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == "")){
-            if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
-
-                error_log("scheduledemails PID: " . $project_id . " - Today: " . $today);
-                error_log("scheduledemails PID: " . $project_id . " - Last sent: " . $queue['last_sent']);
-                error_log("scheduledemails PID: " . $project_id . " - cron_send_email_on_field: " . $cron_send_email_on_field);
-                error_log("scheduledemails PID: " . $project_id . " - evaluateLogic_on: " . $evaluateLogic_on);
-                error_log("scheduledemails PID: " . $project_id . " - Times sent: " . $queue['times_sent']);
-                error_log("scheduledemails PID: " . $project_id . " - Alert: " . $queue['alert']." Record: ".$queue['record']);
-                error_log("scheduledemails PID: " . $project_id . " - Queue: " . json_encode($queue));
-
+            if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on && $repeat_date_now == $today) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 return true;
             }
         }
@@ -551,8 +542,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $email_queue['isRepeatInstrument'] = $isRepeatInstrument;
             $email_queue['option'] = $this->getProjectSetting("cron-send-email-on", $project_id)[$index];
             $email_queue['deactivated'] = 0;
-
-            error_log("scheduledemails PID: " . $email_queue['project_id'] . " - Queue updated: " . json_encode($email_queue));
 
             $this->setProjectSetting('email-queue', $email_queue, $project_id);
         }
