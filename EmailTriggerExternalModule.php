@@ -392,7 +392,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
 		if($this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']] != "1" && (strtotime($queue['last_sent']) != strtotime($today) || $queue['last_sent'] == "")){
-            if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on && $repeat_date_now == $today) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
+            if (($queue['option'] == 'date' && ($cron_send_email_on_field == $today || $repeat_date == $today || ($queue['last_sent'] == "" && strtotime($cron_send_email_on_field) <= strtotime($today)))) || ($queue['option'] == 'calc' && $evaluateLogic_on && ($repeat_date_now == $today || $queue['last_sent'] == '')) || ($queue['option'] == 'now' && ($repeat_date_now == $today || $queue['last_sent'] == ''))) {
                 return true;
             }
         }
