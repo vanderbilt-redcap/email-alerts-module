@@ -537,14 +537,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $email_queue[$index]['last_sent'] = date('Y-m-d');
             $email_queue[$index]['times_sent'] = $email_queue[$index]['times_sent'] + 1;
             $email_queue[$index]['alert'] = $id;
-            $email_queue['record'] = $record;
-            $email_queue['project_id'] = $project_id;
-            $email_queue['event_id'] = $event_id;
-            $email_queue['instrument'] = $instrument;
-            $email_queue['instance'] = $instance;
-            $email_queue['isRepeatInstrument'] = $isRepeatInstrument;
-            $email_queue['option'] = $this->getProjectSetting("cron-send-email-on", $project_id)[$index];
-            $email_queue['deactivated'] = 0;
+            $email_queue[$index]['record'] = $record;
+            $email_queue[$index]['project_id'] = $project_id;
+            $email_queue[$index]['event_id'] = $event_id;
+            $email_queue[$index]['instrument'] = $instrument;
+            $email_queue[$index]['instance'] = $instance;
+            $email_queue[$index]['isRepeatInstrument'] = $isRepeatInstrument;
+            $email_queue[$index]['option'] = $this->getProjectSetting("cron-send-email-on", $project_id)[$index];
+            $email_queue[$index]['deactivated'] = 0;
 
             $this->setProjectSetting('email-queue', $email_queue, $project_id);
         }
