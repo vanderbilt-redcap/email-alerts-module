@@ -344,7 +344,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         while($row = db_fetch_assoc($q)){
             $project_id = $row['project_id'];
             if($project_id != "") {
-                error_log("scheduledemails PID start: " . $project_id);
+                error_log("scheduledemails PID: " . $project_id." start");
                 $email_queue = $this->getProjectSetting('email-queue', $project_id);
                 if ($email_queue != '') {
                     $email_sent_total = 0;
