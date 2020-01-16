@@ -362,7 +362,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $this->stopRepeat($queue, $index, $project_id);
                             }
                         }else if($email_sent_total >= 100){
-                            error_log("scheduledemails PID: " . $project_id . " - First batch ended at " . date("Y-m-d H:i:s"));
+                            error_log("scheduledemails PID: " . $project_id . " - Batch ended at " . date("Y-m-d H:i:s"));
+                            break;
                         }
                     }
                 }
