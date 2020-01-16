@@ -344,7 +344,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         while($row = db_fetch_assoc($q)){
             $project_id = $row['project_id'];
             if($project_id != "") {
-                error_log("scheduledemails PID: " . $project_id." start");
+                error_log("scheduledemails PID: " . $project_id." - start");
                 $email_queue = $this->getProjectSetting('email-queue', $project_id);
                 if ($email_queue != '') {
                     $email_sent_total = 0;
@@ -361,6 +361,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 #Check if we need to delete the queue
                                 $this->stopRepeat($queue, $index, $project_id);
                             }
+                        }else if($email_sent_total >= 100){
+                            error_log("scheduledemails PID: " . $project_id . " - First batch ended at " . date("Y-m-d H:i:s"));
                         }
                     }
                 }
@@ -530,28 +532,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$instance);
         $email_sent = $this->createAndSendEmail($data, $project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,true,$isEmailAlreadySentForThisSurvery);
 
-
         if ($email_sent || $email_sent == "1") {
             $email_queue = $this->getProjectSetting('email-queue', $project_id);
 
             $email_queue[$index]['last_sent'] = date('Y-m-d');
             $email_queue[$index]['times_sent'] = $email_queue[$index]['times_sent'] + 1;
-//            $email_queue[$index]['alert'] = $id;
-//            $email_queue[$index]['record'] = $record;
-//            $email_queue[$index]['project_id'] = $project_id;
-//            $email_queue[$index]['event_id'] = $event_id;
-//            $email_queue[$index]['instrument'] = $instrument;
-//            $email_queue[$index]['instance'] = $instance;
-//            $email_queue[$index]['isRepeatInstrument'] = $isRepeatInstrument;
-//            $email_queue[$index]['option'] = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
-//            $email_queue[$index]['deactivated'] = 0;
 
             $this->setProjectSetting('email-queue', $email_queue, $project_id);
         }
 
-        unset($data);
-        gc_enable();
-        gc_collect_cycles();
         return $email_sent;
     }
 
