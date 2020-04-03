@@ -121,7 +121,7 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
                     $('[field="cron-send-email-on-field'+suffix+'"] td input').addClass('datepicker');
                     $(".datepicker_aux").datepicker({
                         showOn: "button",
-                        buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                        buttonImage: calendarimg,
                         buttonImageOnly: true,
                         buttonText: "Select date",
                         dateFormat: "yy-mm-dd"
@@ -147,7 +147,7 @@ function checkSchedule(repetitive,suffix,cron_send_email_on,cron_send_email_on_f
             $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker');
             $(".datepicker_aux_expire").datepicker({
                 showOn: "button",
-                buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                buttonImage: calendarimg,
                 buttonImageOnly: true,
                 buttonText: "Select date",
                 dateFormat: "yy-mm-dd"
@@ -302,7 +302,7 @@ function addQueue(index,form){
     $('#last_sent').addClass('datepicker_queue');
     $(".datepicker_queue").datepicker({
         showOn: "button",
-        buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+        buttonImage: calendarimg,
         buttonImageOnly: true,
         buttonText: "Select date",
         dateFormat: "yy-mm-dd"

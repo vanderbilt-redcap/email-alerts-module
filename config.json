@@ -3,6 +3,8 @@
 
 	"namespace": "Vanderbilt\\EmailTriggerExternalModule",
 
+	"framework-version": 3,
+
 	"authors": [
 		{
 			"name": "Eva Bascompte Moragas",
@@ -24,7 +26,8 @@
 			{
 				"name": "Configure Email Alerts",
 				"icon": "email",
-				"url": "configure.php"
+				"url": "configure.php",
+				"show-header-and-footer": true
 			}
 		]
 	},

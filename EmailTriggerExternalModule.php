@@ -1611,6 +1611,165 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
         return $email_repetitive_sent_aux;
     }
+
+    function getAdditionalFieldChoices($configRow,$pid) {
+        if ($configRow['type'] == 'user-role-list') {
+            $choices = [];
+
+            $sql = "SELECT CAST(role_id as CHAR) as role_id,role_name
+						FROM redcap_user_roles
+						WHERE project_id = ?
+						ORDER BY role_id";
+            $result = $this->query($sql, [$pid]);
+
+            while ($row = $result->fetch_assoc()) {
+                $choices[] = ['value' => $row['role_id'], 'name' => strip_tags(nl2br($row['role_name']))];
+            }
+
+            $configRow['choices'] = $choices;
+        }
+        else if ($configRow['type'] == 'user-list') {
+            $choices = [];
+
+            $sql = "SELECT ur.username,ui.user_firstname,ui.user_lastname
+						FROM redcap_user_rights ur, redcap_user_information ui
+						WHERE ur.project_id = ?
+								AND ui.username = ur.username
+						ORDER BY ui.ui_id";
+            $result = $this->query($sql, [$pid]);
+
+            while ($row = $result->fetch_assoc()) {
+                $choices[] = ['value' => strtolower($row['username']), 'name' => $row['user_firstname'] . ' ' . $row['user_lastname']];
+            }
+
+            $configRow['choices'] = $choices;
+        }
+        else if ($configRow['type'] == 'dag-list') {
+            $choices = [];
+
+            $sql = "SELECT CAST(group_id as CHAR) as group_id,group_name
+						FROM redcap_data_access_groups
+						WHERE project_id = ?
+						ORDER BY group_id";
+            $result = $this->query($sql, [$pid]);
+
+            while ($row = $result->fetch_assoc()) {
+                $choices[] = ['value' => $row['group_id'], 'name' => strip_tags(nl2br($row['group_name']))];
+            }
+
+            $configRow['choices'] = $choices;
+        }
+        else if ($configRow['type'] == 'field-list') {
+            $choices = [];
+
+            $sql = "SELECT field_name,element_label
+					FROM redcap_metadata
+					WHERE project_id = ?
+					ORDER BY field_order";
+            $result = $this->query($sql, [$pid]);
+
+            while ($row = $result->fetch_assoc()) {
+                $row['element_label'] = strip_tags(nl2br($row['element_label']));
+                if (strlen($row['element_label']) > 30) {
+                    $row['element_label'] = substr($row['element_label'], 0, 20) . "... " . substr($row['element_label'], -8);
+                }
+                $choices[] = ['value' => $row['field_name'], 'name' => $row['field_name'] . " - " . htmlspecialchars($row['element_label'])];
+            }
+
+            $configRow['choices'] = $choices;
+        }
+        else if ($configRow['type'] == 'form-list') {
+            $choices = [];
+
+            $sql = "SELECT DISTINCT form_name
+					FROM redcap_metadata
+					WHERE project_id = ?
+					ORDER BY field_order";
+            $result = $this->query($sql, [$pid]);
+
+            while ($row = $result->fetch_assoc()) {
+                $choices[] = ['value' => $row['form_name'], 'name' => strip_tags(nl2br($row['form_name']))];
+            }
+
+            $configRow['choices'] = $choices;
+        }
+        else if ($configRow['type'] == 'arm-list') {
+            $choices = [];
+
+            $sql = "SELECT CAST(a.arm_id as CHAR) as arm_id, a.arm_name
+					FROM redcap_events_arms a
+					WHERE a.project_id = ?
+					ORDER BY a.arm_id";
+            $result = $this->query($sql, [$pid]);
+
+            while ($row = $result->fetch_assoc()) {
+                $choices[] = ['value' => $row['arm_id'], 'name' => $row['arm_name']];
+            }
+
+            $configRow['choices'] = $choices;
+        }
+        else if ($configRow['type'] == 'event-list') {
+            $choices = [];
+
+            $sql = "SELECT CAST(e.event_id as CHAR) as event_id, e.descrip, CAST(a.arm_id as CHAR) as arm_id, a.arm_name
+					FROM redcap_events_metadata e, redcap_events_arms a
+					WHERE a.project_id = ?
+						AND e.arm_id = a.arm_id
+					ORDER BY e.event_id";
+            $result = $this->query($sql, [$pid]);
+
+            while ($row = $result->fetch_assoc()) {
+                $choices[] = ['value' => $row['event_id'], 'name' => "Arm: ".strip_tags(nl2br($row['arm_name']))." - Event: ".strip_tags(nl2br($row['descrip']))];
+            }
+
+            $configRow['choices'] = $choices;
+        }
+        else if($configRow['type'] == 'sub_settings') {
+            foreach ($configRow['sub_settings'] as $subConfigKey => $subConfigRow) {
+                $configRow['sub_settings'][$subConfigKey] = $this->getAdditionalFieldChoices($subConfigRow,$pid);
+                if($configRow['super-users-only']) {
+                    $configRow['sub_settings'][$subConfigKey]['super-users-only'] = $configRow['super-users-only'];
+                }
+                if(!isset($configRow['source']) && $configRow['sub_settings'][$subConfigKey]['source']) {
+                    $configRow['source'] = "";
+                }
+                $configRow["source"] .= ($configRow["source"] == "" ? "" : ",").$configRow['sub_settings'][$subConfigKey]['source'];
+            }
+        }
+        else if($configRow['type'] == 'project-id') {
+            // We only show projects to which the current user has design rights
+            // since modules could make all kinds of changes to projects.
+            $sql ="SELECT CAST(p.project_id as char) as project_id, p.app_title
+					FROM redcap_projects p, redcap_user_rights u
+					WHERE p.project_id = u.project_id
+						AND u.username = ?
+						AND u.design = 1";
+
+            $result = ExternalModules::query($sql, USERID);
+
+            $matchingProjects = [
+                [
+                    "value" => "",
+                    "name" => ""
+                ]
+            ];
+
+            while($row = $result->fetch_assoc()) {
+                $projectName = utf8_encode($row["app_title"]);
+
+                // Required to display things like single quotes correctly
+                $projectName = htmlspecialchars_decode($projectName, ENT_QUOTES);
+
+                $matchingProjects[] = [
+                    "value" => $row["project_id"],
+                    "name" => "(" . $row["project_id"] . ") " . $projectName,
+                ];
+            }
+            $configRow['choices'] = $matchingProjects;
+        }
+
+        return $configRow;
+    }
 }
 
 

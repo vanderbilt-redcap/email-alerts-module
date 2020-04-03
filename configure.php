@@ -4,7 +4,6 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-require_once ExternalModules::getProjectHeaderPath();
 require_once 'EmailTriggerExternalModule.php';
 require_once APP_PATH_EXTMOD . 'manager/templates/globals.php';
 
@@ -28,12 +27,12 @@ for($i=0;$i<sizeof($config['email-dashboard-settings']);$i++){
 
 #Add choices values to settings
 foreach($config['email-dashboard-settings'] as $configKey => $configRow) {
-    $config['email-dashboard-settings'][$configKey] = ExternalModules::getAdditionalFieldChoices($configRow,$_GET['pid']);
+    $config['email-dashboard-settings'][$configKey] = $module->getAdditionalFieldChoices($configRow,$_GET['pid']);
 }
 
 #Add choices values to simple settings
 foreach($simple_config['email-dashboard-settings'] as $configKey => $configRow) {
-    $simple_config['email-dashboard-settings'][$configKey] = ExternalModules::getAdditionalFieldChoices($configRow,$_GET['pid']);
+    $simple_config['email-dashboard-settings'][$configKey] = $module->getAdditionalFieldChoices($configRow,$_GET['pid']);
     $simple_config_update['email-dashboard-settings'][$configKey]['key'] = $configRow['key']."-update";
 }
 
@@ -76,15 +75,21 @@ if(USERID != "") {
 }
 ?>
 
+<?=$module->framework->initializeJavascriptModuleObject()?>
+<script>
+    var module = <?=$module->framework->getJavascriptModuleObjectName()?>;
+</script>
     <link type='text/css' href='<?=$module->getUrl('css/font-awesome.min.css')?>' rel='stylesheet' media='screen' />
     <link type='text/css' href='<?=$module->getUrl('css/style_arrangement.css')?>' rel='stylesheet' media='screen' />
 
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/style.css')?>">
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/jquery.flexdatalist.min.css')?>">
 
+    <script type="text/javascript" src="<?=$module->getUrl('js/globals.js')?>"></script>
     <script type="text/javascript" src="<?=$module->getUrl('js/jquery.dataTables.min.js')?>"></script>
     <script type="text/javascript" src="<?=$module->getUrl('js/jquery.flexdatalist.js')?>"></script>
     <script type="text/javascript" src="<?=$module->getUrl('js/functions.js')?>"></script>
+
 
     <script type="text/javascript">
         var EMparentAux;
@@ -123,6 +128,7 @@ if(USERID != "") {
         var lastClick = null;
         var startPos = 0;
         var endPos = 0;
+        var calendarimg = '<?=$module->getUrl('img/date.png')?>';
 
         $(function(){
             //Fix to make code source editable with a modal
@@ -204,9 +210,9 @@ if(USERID != "") {
 
             var customClass = "form-control-custom";
             var inputHtml = "";
-            var EMparent = ExternalModules.Settings.prototype;
+            var EMparent = EmailAlerts.Settings.prototype;
             var EMSettings = function(){}
-            EMSettings.prototype = Object.create(ExternalModules.Settings.prototype);
+            EMSettings.prototype = Object.create(EmailAlerts.Settings.prototype);
             EMSettings.prototype.getSettingColumns  = function(setting,savedSettings,previousInstance) {
 				previousInstance = undefined;
                 if (setting.type == "checkbox") {
@@ -417,9 +423,10 @@ if(USERID != "") {
                 $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker_aux_expire');
                 $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').addClass('datepicker');
                 $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
+
                 $(".datepicker_aux_expire").datepicker({
                     showOn: "button",
-                    buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                    buttonImage: calendarimg,
                     buttonImageOnly: true,
                     buttonText: "Select date",
                     dateFormat: "yy-mm-dd"
@@ -548,7 +555,7 @@ if(USERID != "") {
                         $('[field="cron-send-email-on-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
                         $(".datepicker_aux").datepicker({
                             showOn: "button",
-                            buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                            buttonImage: calendarimg,
                             buttonImageOnly: true,
                             buttonText: "Select date",
                             dateFormat: "yy-mm-dd"
@@ -575,7 +582,7 @@ if(USERID != "") {
                     $('[field="cron-queue-expiration-date-field'+suffix+'"] td input').attr('placeholder','YYYY-MM-DD');
                     $(".datepicker_aux_expire").datepicker({
                         showOn: "button",
-                        buttonImage: "/redcap_v6.14.1/Resources/images/date.png",
+                        buttonImage: calendarimg,
                         buttonImageOnly: true,
                         buttonText: "Select date",
                         dateFormat: "yy-mm-dd"
@@ -1663,4 +1670,3 @@ if(USERID != "") {
         </div>
     </div>
 </div>
-<?php require_once ExternalModules::getProjectFooterPath();
