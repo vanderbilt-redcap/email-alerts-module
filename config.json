@@ -25,7 +25,7 @@
 		"project": [
 			{
 				"name": "Configure Email Alerts",
-				"icon": "email",
+				"icon": "fas fa-envelope",
 				"url": "configure.php",
 				"show-header-and-footer": true
 			}
