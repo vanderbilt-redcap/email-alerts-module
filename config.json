@@ -26,8 +26,7 @@
 			{
 				"name": "Configure Email Alerts",
 				"icon": "fas fa-envelope",
-				"url": "configure.php",
-				"show-header-and-footer": true
+				"url": "configure.php"
 			}
 		]
 	},

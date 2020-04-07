@@ -1,11 +1,8 @@
 <?php
 namespace Vanderbilt\EmailTriggerExternalModule;
-
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
-
-require_once 'EmailTriggerExternalModule.php';
-require_once APP_PATH_EXTMOD . 'manager/templates/globals.php';
+require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 $config = $module->getConfig();
 $prefix = $_GET['prefix'];
@@ -73,12 +70,38 @@ if(USERID != "") {
         }
     }
 }
-?>
 
-<?=$module->framework->initializeJavascriptModuleObject()?>
+
+$module->framework->initializeJavascriptModuleObject();
+
+
+$language_errors =[
+    "em_errors_91",
+    "em_errors_92",
+    "em_errors_93",
+    "em_errors_94",
+    "em_errors_95",
+    "em_errors_96",
+    "em_errors_97",
+    "em_manage_13",
+    "em_manage_72",
+    "em_manage_73",
+    "em_manage_74",
+    "em_manage_75",
+    "em_manage_76",
+    "em_manage_77",
+    "em_manage_78",
+    "em_tinymce_language",
+];
+foreach ($language_errors as $err){
+    $module->framework->tt_transferToJavascriptModuleObject($err);
+}
+?>
 <script>
-    var module = <?=$module->framework->getJavascriptModuleObjectName()?>;
+        var module = <?=$module->framework->getJavascriptModuleObjectName()?>;
+
 </script>
+
     <link type='text/css' href='<?=$module->getUrl('css/font-awesome.min.css')?>' rel='stylesheet' media='screen' />
     <link type='text/css' href='<?=$module->getUrl('css/style_arrangement.css')?>' rel='stylesheet' media='screen' />
 
@@ -86,11 +109,21 @@ if(USERID != "") {
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/jquery.flexdatalist.min.css')?>">
 
     <script type="text/javascript" src="<?=$module->getUrl('js/globals.js')?>"></script>
+    <script type="text/javascript" src="<?php echo APP_PATH_JS ?>select2.js"></script>
+    <link rel='stylesheet' href='<?php echo APP_PATH_CSS ?>spectrum.css'>
+    <link rel='stylesheet' href='<?php echo APP_PATH_CSS ?>spectrum.css'>
+    <script type='text/javascript' src='<?php echo APP_PATH_JS ?>spectrum.js'></script>
+    <script src="<?php echo APP_PATH_JS ?>tinymce/tinymce.min.js"></script>
+
     <script type="text/javascript" src="<?=$module->getUrl('js/jquery.dataTables.min.js')?>"></script>
     <script type="text/javascript" src="<?=$module->getUrl('js/jquery.flexdatalist.js')?>"></script>
     <script type="text/javascript" src="<?=$module->getUrl('js/functions.js')?>"></script>
 
-
+<script>
+    $(function() {
+        //var module = <?//=$module->framework->getJavascriptModuleObjectName()?>//;
+    })
+</script>
     <script type="text/javascript">
         var EMparentAux;
         var configSettings = <?=json_encode($simple_config['email-dashboard-settings'])?>;
@@ -224,7 +257,7 @@ if(USERID != "") {
                 //We customize depending on the field type
                 if (setting.type == 'rich-text') {
                     //We add the Data Piping buttons
-					if(typeof ExternalModules.Settings.prototype.getColumnHtml === "undefined") {
+					if(typeof EmailAlerts.Settings.prototype.getColumnHtml === "undefined") {
 						var inputHtml = EMparent.getSettingColumns.call(this, setting, instance, header);
 					}
 	                else {
@@ -478,7 +511,7 @@ if(USERID != "") {
 
                 var pipeVarLocs = { "#surveyLink_var" :
                                                           {
-                                                              "prefix" : "[__SURVEYLINK_", 
+                                                              "prefix" : "[__SURVEYLINK_",
                                                               "type" : "Survey"
                                                           },
                                     "#formLink_var" :

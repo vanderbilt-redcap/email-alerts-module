@@ -89,7 +89,7 @@ EmailAlerts = $.extend(ExternalModules, {
             if(value && !EmailAlerts.validateEmail(value)){
                 var label = input.closest('tr').find('label').text()
                 //= The email address entered for the following field is not valid:
-                errorMessage = EmailAlerts.$lang.tt('em_errors_91') + '<br><br>' + label
+                errorMessage = module.tt('em_errors_91') + '<br><br>' + label
             }
         })
 
@@ -143,7 +143,7 @@ EmailAlerts = $.extend(ExternalModules, {
 
             // Only support the jquery UI datepicker's default date format for now.
             //= Dates must be specified in MM/DD/YYYY format. The following value is not a valid date:
-            errorMessage = EmailAlerts.$lang.tt('em_errors_92') + '<br><br>' + value
+            errorMessage = module.tt('em_errors_92') + '<br><br>' + value
         })
 
         return errorMessage
@@ -450,7 +450,7 @@ EmailAlerts.Settings.prototype.getColumnHtml = function(setting,value,className)
         var reqLabel = '';
         if(setting.required) {
             //= * must provide value
-            reqLabel = '<div class="requiredlabel">' + EmailAlerts.$lang.tt('em_manage_72') + '</div>';
+            reqLabel = '<div class="requiredlabel">' + module.tt('em_manage_72') + '</div>';
         }
         html = "<td" + colspan + "><span class='external-modules-instance-label'>" + instanceLabel + "</span><label>" + setting.name + (type == 'descriptive' ? '' : ':') + "</label>" + reqLabel + "</td>";
     }
@@ -630,7 +630,7 @@ EmailAlerts.Settings.prototype.getFileFieldElement = function(name, value, input
         var input = $('<input type="hidden" name="' + name + '">');
         var html = this.addEscapedAttribute(input, 'value', value);
         html += '<span class="external-modules-edoc-file"></span>';
-        html += '<button class="external-modules-delete-file" '+attributeString+'>'+EmailAlerts.$lang.tt('em_manage_73')+'</button>'; //= Delete File
+        html += '<button class="external-modules-delete-file" '+attributeString+'>'+module.tt('em_manage_73')+'</button>'; //= Delete File
         $.post('ajax/get-edoc-name.php?' + pid, { edoc : value }, function(data) {
             //Name starts with
             $("[name^='"+name+"'][value='"+value+"']").closest("tr").find(".external-modules-edoc-file").html("<b>" + data.doc_name + "</b><br>");
@@ -878,7 +878,7 @@ EmailAlerts.Settings.prototype.initializeRichTextFields = function(){
 
     // The decision to use TinyMCE was not taken lightly.  We tried integrating Quill, Trix, and Summernote as well, but they either
     // didn't work as well out of the box when placed inside the configuration model, or were not as flexible/customizable.
-    var tinyLang = EmailAlerts.$lang.tt('em_tinymce_language');
+    var tinyLang = module.tt('em_tinymce_language');
     if (tinyLang == null) tinyLang = 'en_US';
     // Since the corresponding en_US.js is missing in the 'tinymce/langs' directory, unset if en_US.
     if (tinyLang == "en_US") tinyLang = undefined;
@@ -1096,7 +1096,7 @@ $(function(){
                 input.remove();
             } else {		// failure
                 //= The file was not able to be deleted.
-                alert(EmailAlerts.$lang.tt('em_errors_94')+' '+JSON.stringify(data));
+                alert(module.tt('em_errors_94')+' '+JSON.stringify(data));
             }
         });
     };
@@ -1107,7 +1107,7 @@ $(function(){
     var resetSaveButton = function() {
         if ($(this).val() != "") {
             //= Save and Upload
-            $(".save").html(EmailAlerts.$lang.tt('em_manage_74'));
+            $(".save").html(module.tt('em_manage_74'));
         }
         var allEmpty = true;
         $("input[type=file]").each(function() {
@@ -1117,7 +1117,7 @@ $(function(){
         });
         if (allEmpty) {
             //= Save
-            $(".save").html(EmailAlerts.$lang.tt('em_manage_13'));
+            $(".save").html(module.tt('em_manage_13'));
         }
     }
 
@@ -1144,14 +1144,14 @@ $(function(){
                 success: function(returnData) {
                     if (returnData.status != 'success') {
                         //= One or more of the files could not be saved.
-                        alert(EmailAlerts.$lang.tt('em_errors_95')+' '+JSON.stringify(returnData));
+                        alert(module.tt('em_errors_95')+' '+JSON.stringify(returnData));
                     }
                     // proceed anyways to save data
                     callbackWithNoArgs();
                 },
                 error: function(e) {
                     //= One or more of the files could not be saved.
-                    alert(EmailAlerts.$lang.tt('em_errors_95')+' '+JSON.stringify(e));
+                    alert(module.tt('em_errors_95')+' '+JSON.stringify(e));
                     callbackWithNoArgs();
                 }
             });
@@ -1171,7 +1171,7 @@ $(function(){
         ).done( function(returnData){
             if(returnData.status != 'success'){
                 //= An error occurred while saving settings:
-                alert(EmailAlerts.$lang.tt('em_errors_96')+'\n\n'+returnData);
+                alert(module.tt('em_errors_96')+'\n\n'+returnData);
                 configureModal.show();
                 return;
             }
@@ -1190,7 +1190,7 @@ $(function(){
         if(errorMessage){
             simpleDialog(errorMessage,
                 //= Error
-                EmailAlerts.$lang.tt('em_manage_75'))
+                module.tt('em_manage_75'))
             return
         }
 
@@ -1205,7 +1205,7 @@ $(function(){
         //= SOME SETTINGS REQUIRE A VALUE!
         //=
         //= It appears that some settings are required but are missing a value. If you wish to go back and enter more values, click CANCEL. If you wish to save the current settings, click OK.
-        if (requiredFieldErrors > 0 && !confirm(EmailAlerts.$lang.tt('em_manage_76'))) {
+        if (requiredFieldErrors > 0 && !confirm(module.tt('em_manage_76'))) {
             return;
         }
 
@@ -1243,7 +1243,7 @@ $(function(){
                     },
                     error: function(e) {
                         //= Error cleaning {0}
-                        alert(EmailAlerts.$lang.tt('em_errors_97', name));
+                        alert(module.tt('em_errors_97', name));
                     }
                 });
             } else {
@@ -1285,12 +1285,12 @@ $(function(){
         var prefix = row.data('module')
         $.get('ajax/usage.php', {prefix: prefix}, function(data){
             if(data == ''){
-                data = EmailAlerts.$lang.tt('em_manage_77') //= None
+                data = module.tt('em_manage_77') //= None
             }
 
             var modal = $('#external-modules-usage-modal')
             //= Project Usage:
-            modal.find('.modal-title').html(EmailAlerts.$lang.tt('em_manage_78')+'<br><b>' + row.find('.external-modules-title').text() + '</b>')
+            modal.find('.modal-title').html(module.tt('em_manage_78')+'<br><b>' + row.find('.external-modules-title').text() + '</b>')
             modal.find('.modal-body').html(data)
             modal.modal('show')
         })
