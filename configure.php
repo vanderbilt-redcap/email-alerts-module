@@ -110,11 +110,24 @@ foreach ($language_errors as $err){
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/jquery.flexdatalist.min.css')?>">
 
     <script type="text/javascript" src="<?=$module->getUrl('js/globals.js')?>"></script>
-    <script type="text/javascript" src="<?php $module->getUrl(APP_PATH_JS.'select2.js')?>"></script>
-    <link rel='stylesheet' href='<?php $module->getUrl(APP_PATH_CSS."spectrum.css")?>'>
-    <link rel='stylesheet' href='<?php $module->getUrl(APP_PATH_CSS."spectrum.css")?>'>
-    <script type='text/javascript' src='<?php $module->getUrl(APP_PATH_JS."spectrum.js")?>'></script>
-    <script src="<?php $module->getUrl(APP_PATH_JS.'tinymce/tinymce.min.js')?>"></script>
+    <?php
+    if (version_compare(REDCAP_VERSION, '9.8.0', '>=')) {
+        ?>
+        <link rel='stylesheet' href='<?php $module->getUrl(APP_PATH_CSS."spectrum.css")?>'>
+        <script type='text/javascript' src='<?php $module->getUrl(APP_PATH_JS."Libraries/spectrum.js")?>'></script>
+        <?php
+    } else {
+        ?>
+        <script src="<?php $module->getUrl(APP_PATH_JS.'tinymce/tinymce.min.js')?>"></script>
+        <script rel="stylesheet" type="text/css" href="<?php $module->getUrl(APP_PATH_CSS.'select2.css')?>"></script>
+        <script type="text/javascript" src="<?php $module->getUrl(APP_PATH_JS.'select2.js')?>"></script>
+        <link rel='stylesheet' href='<?php $module->getUrl(APP_PATH_CSS."spectrum.css")?>'>
+        <script type='text/javascript' src='<?php $module->getUrl(APP_PATH_JS."spectrum.js")?>'></script>
+
+        <?php
+    }
+    ?>
+
 
     <script type="text/javascript" src="<?=$module->getUrl('js/jquery.dataTables.min.js')?>"></script>
     <script type="text/javascript" src="<?=$module->getUrl('js/jquery.flexdatalist.js')?>"></script>
