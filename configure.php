@@ -113,17 +113,16 @@ foreach ($language_errors as $err){
     <?php
     if (version_compare(REDCAP_VERSION, '9.8.0', '>=')) {
         ?>
-        <link rel='stylesheet' href='<?php $module->getUrl(APP_PATH_CSS."spectrum.css")?>'>
-        <script type='text/javascript' src='<?php $module->getUrl(APP_PATH_JS."Libraries/spectrum.js")?>'></script>
+        <link rel='stylesheet' href='<?php echo APP_PATH_CSS ?>spectrum.css'>
+        <script type='text/javascript' src='<?php echo APP_PATH_JS ?>Libraries/spectrum.js'></script>
         <?php
     } else {
         ?>
-        <script src="<?php $module->getUrl(APP_PATH_JS.'tinymce/tinymce.min.js')?>"></script>
-        <script rel="stylesheet" type="text/css" href="<?php $module->getUrl(APP_PATH_CSS.'select2.css')?>"></script>
-        <script type="text/javascript" src="<?php $module->getUrl(APP_PATH_JS.'select2.js')?>"></script>
-        <link rel='stylesheet' href='<?php $module->getUrl(APP_PATH_CSS."spectrum.css")?>'>
-        <script type='text/javascript' src='<?php $module->getUrl(APP_PATH_JS."spectrum.js")?>'></script>
-
+        <script src="<?php echo APP_PATH_JS ?>tinymce/tinymce.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="<?php echo APP_PATH_CSS ?>select2.css">
+        <script type="text/javascript" src="<?php echo APP_PATH_JS ?>select2.js"></script>
+        <link rel='stylesheet' href='<?php echo APP_PATH_CSS ?>spectrum.css'>
+        <script type='text/javascript' src='<?php echo APP_PATH_JS ?>spectrum.js'></script>
         <?php
     }
     ?>
