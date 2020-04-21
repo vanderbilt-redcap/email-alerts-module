@@ -216,7 +216,7 @@
         "cron_description": "Cron that runs every 15 minutes to send scheduled emails",
         "method": "scheduledemails",
         "cron_frequency": "900",
-        "cron_max_run_time": "60"
+        "cron_max_run_time": "5400"
       }
     ],
 
