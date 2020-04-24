@@ -524,7 +524,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function sendQueuedEmail($index,$project_id, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
-        gc_disable();
         $data = \REDCap::getData($project_id,"array",$record);
         $email_repetitive_sent = $this->getProjectSettingLog($project_id,"email-repetitive-sent",$isRepeatInstrument);
         $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
