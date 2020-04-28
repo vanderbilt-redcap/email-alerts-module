@@ -55,23 +55,23 @@ $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getP
 $new_alert_id = max($alert_id) + 1;
 
 #Add new data with old
-array_push($form_name,$_REQUEST['form-name']);
+array_push($form_name,htmlspecialchars($_REQUEST['form-name']));
 array_push($form_name_event,$_REQUEST['form-name-event']);
 array_push($email_from,$_REQUEST['email-from']);
 array_push($email_to,$_REQUEST['email-to']);
 array_push($email_cc,$_REQUEST['email-cc']);
 array_push($email_bcc,$_REQUEST['email-bcc']);
-array_push($email_subject,$_REQUEST['email-subject']);
+array_push($email_subject,htmlspecialchars($_REQUEST['email-subject']));
 array_push($email_text,$_REQUEST['email-text-editor']);
-array_push($email_attachment_variable,$_REQUEST['email-attachment-variable']);
+array_push($email_attachment_variable,htmlspecialchars($_REQUEST['email-attachment-variable']));
 array_push($email_repetitive,$repetitive);
-array_push($email_condition,$_REQUEST['email-condition']);
+array_push($email_condition,htmlspecialchars($_REQUEST['email-condition']));
 array_push($email_incomplete,$incomplete);
 array_push($cron_send_email_on,$_REQUEST['cron-send-email-on']);
-array_push($cron_send_email_on_field,$_REQUEST['cron-send-email-on-field']);
+array_push($cron_send_email_on_field,htmlspecialchars($_REQUEST['cron-send-email-on-field']));
 array_push($cron_repeat_for,$_REQUEST['cron-repeat-for']);
 array_push($cron_queue_expiration_date,$_REQUEST['cron-queue-expiration-date']);
-array_push($cron_queue_expiration_date_field,$_REQUEST['cron-queue-expiration-date-field']);
+array_push($cron_queue_expiration_date_field,htmlspecialchars($_REQUEST['cron-queue-expiration-date-field']));
 array_push($alert_id,$new_alert_id);
 array_push($alert_name,$_REQUEST['alert-name']);
 

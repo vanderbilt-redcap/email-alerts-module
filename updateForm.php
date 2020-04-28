@@ -89,25 +89,25 @@ if($email_repetitive[$index] == "0" && $repetitive == "1" || $email_repetitive[$
 }
 
 #Replace new data with old
-$form_name[$index] = $_REQUEST['form-name-update'];
+$form_name[$index] = htmlspecialchars($_REQUEST['form-name-update']);
 $form_name_event[$index] = $_REQUEST['form-name-event'];
 $email_from[$index] = $_REQUEST['email-from-update'];
 $email_to[$index] = $_REQUEST['email-to-update'];
 $email_cc[$index] = $_REQUEST['email-cc-update'];
 $email_bcc[$index] = $_REQUEST['email-bcc-update'];
-$email_subject[$index] = $_REQUEST['email-subject-update'];
+$email_subject[$index] = htmlspecialchars($_REQUEST['email-subject-update']);
 $email_text[$index] = $_REQUEST['email-text-update-editor'];
-$email_attachment_variable[$index] = $_REQUEST['email-attachment-variable-update'];
+$email_attachment_variable[$index] = htmlspecialchars($_REQUEST['email-attachment-variable-update']);
 $email_repetitive[$index] = $repetitive;
-$email_condition[$index] = $_REQUEST['email-condition-update'];
+$email_condition[$index] = htmlspecialchars($_REQUEST['email-condition-update']);
 $email_incomplete[$index] = $incomplete;
 $cron_send_email_on[$index] = $_REQUEST['cron-send-email-on-update'];
 $cron_send_email_on_field[$index] = $_REQUEST['cron-send-email-on-field-update'];
 $cron_repeat_for[$index] = $_REQUEST['cron-repeat-for-update'];
 $cron_repeat_until[$index] = $_REQUEST['cron-repeat-until-update'];
-$cron_repeat_until_field[$index] = $_REQUEST['cron-repeat-until-field-update'];
+$cron_repeat_until_field[$index] = htmlspecialchars($_REQUEST['cron-repeat-until-field-update']);
 $cron_queue_expiration_date[$index] = $_REQUEST['cron-queue-expiration-date-update'];
-$cron_queue_expiration_date_field[$index] = $_REQUEST['cron-queue-expiration-date-field-update'];
+$cron_queue_expiration_date_field[$index] = htmlspecialchars($_REQUEST['cron-queue-expiration-date-field-update']);
 $alert_name[$index] = $_REQUEST['alert-name-update'];
 
 if($schedule_changed){
