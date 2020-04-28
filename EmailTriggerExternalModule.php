@@ -1769,6 +1769,46 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         return $configRow;
     }
+
+    // This can be removed once the REDCap min version can be updated to a version that includes this function in the framework.
+    public function getSafePath($path, $root){
+		if(!file_exists($root)){
+			//= The specified root ({0}) does not exist as either an absolute path or a relative path to the module directory.
+			throw new \Exception(ExternalModules::tt("em_errors_103", $root));
+		}
+
+		$root = realpath($root);
+
+		if(strpos($path, $root) === 0){
+			// The root is already included inthe path.
+			$fullPath = $path;
+		}
+		else{
+			$fullPath = "$root/$path";
+		}
+
+		if(file_exists($fullPath)){
+			$fullPath = realpath($fullPath);
+		}
+		else{
+			// Also support the case where this is a path to a new file that doesn't exist yet and check it's parents.
+			$dirname = dirname($fullPath);
+				
+			if(!file_exists($dirname)){
+				//= The parent directory ({0}) does not exist.  Please create it before calling getSafePath() since the realpath() function only works on directories that exist.
+				throw new \Exception(ExternalModules::tt("em_errors_104", $dirname));
+			}
+
+			$fullPath = realpath($dirname) . DIRECTORY_SEPARATOR . basename($fullPath);
+		}
+
+		if(strpos($fullPath, $root) !== 0){
+			//= You referenced a path ({0}) that is outside of your allowed parent directory ({1}).
+			throw new \Exception(ExternalModules::tt("em_errors_105", $fullPath, $root));
+		}
+
+		return $fullPath;
+	}
 }
 
 
