@@ -1341,7 +1341,11 @@ foreach ($language_errors as $err){
                             }
                         }
                     }
-                    $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
+                    if($configRow['key'] == 'form-name' || $configRow['key'] == 'email-condition' || $configRow['key'] == 'email-subject' || $configRow['key'] == 'email-attachment-variable' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-queue-expiration-date-field'){
+                        $info_modal[$index][$configRow['key']] = htmlspecialchars_decode($configRow['value'][$index]);
+                    }else{
+                        $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
+                    }
                 }
                 $alerts .= "<tr>";
                 $alerts .= "<td data-order='".$alert_number."'>".$formName."</td>";

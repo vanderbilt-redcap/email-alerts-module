@@ -216,7 +216,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_deleted = $this->getProjectSetting("email-deleted",$project_id)[$id];
         $email_repetitive_sent = $this->getProjectSettingLog($project_id,"email-repetitive-sent",$isRepeatInstrument);
         $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
-        $email_condition = $this->getProjectSetting("email-condition", $project_id)[$id];
+        $email_condition = htmlspecialchars_decode($this->getProjectSetting("email-condition", $project_id)[$id]);
         if(($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance);
             if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery))) {
@@ -229,7 +229,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && $evaluateLogic) || empty($email_condition)) {
                     $cron_repeat_email = $this->getProjectSetting("cron-repeat-email", $project_id)[$id];
                     $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
-                    $cron_send_email_on_field = $this->getProjectSetting("cron-send-email-on-field", $project_id)[$id];
+                    $cron_send_email_on_field = htmlspecialchars_decode($this->getProjectSetting("cron-send-email-on-field", $project_id)[$id]);
 
                     if ($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field != ''))) {
                         #SCHEDULED EMAIL
@@ -284,7 +284,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function isQueueExpired($project_id, $record, $event_id, $instance, $instrument, $isRepeatInstrument, $id){
         $cron_queue_expiration_date =  $this->getProjectSetting('cron-queue-expiration-date',$project_id)[$id];
-        $cron_queue_expiration_date_field =  $this->getProjectSetting('cron-queue-expiration-date-field',$project_id)[$id];
+        $cron_queue_expiration_date_field =  htmlspecialchars_decode($this->getProjectSetting('cron-queue-expiration-date-field',$project_id)[$id]);
 
         $today = date('Y-m-d');
         $evaluateLogic = \REDCap::evaluateLogic($cron_queue_expiration_date_field, $project_id, $record, $event_id);
@@ -377,7 +377,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function sendToday($queue,$project_id)
     {
-        $cron_send_email_on_field = $this->getProjectSetting('cron-send-email-on-field',$project_id)[$queue['alert']];
+        $cron_send_email_on_field = htmlspecialchars_decode($this->getProjectSetting('cron-send-email-on-field',$project_id)[$queue['alert']]);
         $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$project_id)[$queue['alert']];
 
         $repeat_days = $cron_repeat_for;
@@ -427,7 +427,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function hasQueueExpired($queue,$index,$project_id){
         $cron_queue_expiration_date =  $this->getProjectSetting('cron-queue-expiration-date',$project_id)[$queue['alert']];
-        $cron_queue_expiration_date_field =  $this->getProjectSetting('cron-queue-expiration-date-field',$project_id)[$queue['alert']];
+        $cron_queue_expiration_date_field =  htmlspecialchars_decode($this->getProjectSetting('cron-queue-expiration-date-field',$project_id)[$queue['alert']]);
         $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$project_id)[$queue['alert']];
 
         #If the repeat is 0 we delete regardless of the expiration option
@@ -670,7 +670,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         //memory increase
         ini_set('memory_limit', '4096M');
 
-        $email_subject = $this->getProjectSetting("email-subject", $project_id)[$id];
+        $email_subject = htmlspecialchars_decode($this->getProjectSetting("email-subject", $project_id)[$id]);
         $email_text = $this->getProjectSetting("email-text", $project_id)[$id];
         $datapipe_var = $this->getProjectSetting("datapipe_var", $project_id);
         $alert_id = $this->getProjectSetting("alert-id", $project_id);
@@ -1152,7 +1152,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     function setAttachmentsREDCapVar($mail,$project_id,$data, $record, $event_id, $instrument, $repeat_instance, $id, $isLongitudinal=false){
-        $email_attachment_variable = $this->getProjectSetting("email-attachment-variable", $project_id)[$id];
+        $email_attachment_variable = htmlspecialchars_decode($this->getProjectSetting("email-attachment-variable", $project_id)[$id]);
         if(!empty($email_attachment_variable)){
             $var = preg_split("/[;,]+/", $email_attachment_variable);
             foreach ($var as $attachment) {
