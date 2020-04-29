@@ -18,27 +18,29 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 	}
 
     function hook_survey_complete ($project_id,$record = null,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
-        $data = \REDCap::getData($project_id,"array",$record);
-        $this->setEmailTriggerRequested(false);
-        if(isset($project_id)){
-            #Form Complete
-            $forms_name = $this->getProjectSetting("form-name",$project_id);
-            if(!empty($forms_name) && $record != NULL){
-                foreach ($forms_name as $id => $form){
-                    $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
-                    $isLongitudinalData = false;
-                    if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
-                        $isLongitudinalData = true;
-                    }
+        if($record != "") {
+            $data = \REDCap::getData($project_id, "array", $record);
+            $this->setEmailTriggerRequested(false);
+            if (isset($project_id)) {
+                #Form Complete
+                $forms_name = $this->getProjectSetting("form-name", $project_id);
+                if (!empty($forms_name) && $record != NULL) {
+                    foreach ($forms_name as $id => $form) {
+                        $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
+                        $isLongitudinalData = false;
+                        if (\REDCap::isLongitudinal() && !empty($form_name_event_id)) {
+                            $isLongitudinalData = true;
+                        }
 
-                    if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
-                        if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
-                            #Surveys are always complete
-                            $isRepeatInstrument = false;
-                            if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
-                                $isRepeatInstrument = true;
+                        if (($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData) {
+                            if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
+                                #Surveys are always complete
+                                $isRepeatInstrument = false;
+                                if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
+                                    $isRepeatInstrument = true;
+                                }
+                                $this->sendEmailFromSurveyCode($_REQUEST['s'], $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument, $form);
                             }
-                            $this->sendEmailFromSurveyCode($_REQUEST['s'], $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument, $form);
                         }
                     }
                 }
@@ -47,32 +49,34 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function hook_save_record ($project_id,$record = null,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
-        $data = \REDCap::getData($project_id,"array",$record);
-        $this->setEmailTriggerRequested(false);
-        if(isset($project_id)){
-            #Form Complete
-            $forms_name = $this->getProjectSetting("form-name",$project_id);
-            if(!empty($forms_name) && $record != null){
-                foreach ($forms_name as $id => $form){
-                    $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
-                    $isLongitudinalData = false;
-                    if(\REDCap::isLongitudinal() && !empty($form_name_event_id)){
-                        $isLongitudinalData = true;
-                    }
+        if($record != "") {
+            $data = \REDCap::getData($project_id, "array", $record);
+            $this->setEmailTriggerRequested(false);
+            if (isset($project_id)) {
+                #Form Complete
+                $forms_name = $this->getProjectSetting("form-name", $project_id);
+                if (!empty($forms_name) && $record != null) {
+                    foreach ($forms_name as $id => $form) {
+                        $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
+                        $isLongitudinalData = false;
+                        if (\REDCap::isLongitudinal() && !empty($form_name_event_id)) {
+                            $isLongitudinalData = true;
+                        }
 
-                    $isRepeatInstrumentComplete = $this->isRepeatInstrumentComplete($data, $record, $event_id, $form, $repeat_instance);
-                    $isRepeatInstrument = false;
-                    if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form.'_complete'] != ''))){
-                        $isRepeatInstrument = true;
-                    }
-                    $email_incomplete = $this->getProjectSetting("email-incomplete",$project_id)[$id];
-                    if(($email_incomplete == "1" &&(($isRepeatInstrument && !$isRepeatInstrumentComplete) || (!$isRepeatInstrument && $data[$record][$event_id][$form.'_complete'] != '2'))) || (!$this->isSurveyPage() && ($data[$record][$event_id][$form.'_complete'] == '2' || $isRepeatInstrumentComplete))){
-                        if(($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData){
-                            if ($_REQUEST['page'] == $form) {
-                                $this->setEmailTriggerRequested(true);
-                                $this->sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument);
-                            }else if($_REQUEST['page'] == "" && $_REQUEST['s'] != ""){
-                                $this->sendEmailFromSurveyCode($_REQUEST['s'], $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrumentComplete, $form);
+                        $isRepeatInstrumentComplete = $this->isRepeatInstrumentComplete($data, $record, $event_id, $form, $repeat_instance);
+                        $isRepeatInstrument = false;
+                        if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
+                            $isRepeatInstrument = true;
+                        }
+                        $email_incomplete = $this->getProjectSetting("email-incomplete", $project_id)[$id];
+                        if (($email_incomplete == "1" && (($isRepeatInstrument && !$isRepeatInstrumentComplete) || (!$isRepeatInstrument && $data[$record][$event_id][$form . '_complete'] != '2'))) || (!$this->isSurveyPage() && ($data[$record][$event_id][$form . '_complete'] == '2' || $isRepeatInstrumentComplete))) {
+                            if (($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData) {
+                                if ($_REQUEST['page'] == $form) {
+                                    $this->setEmailTriggerRequested(true);
+                                    $this->sendEmailAlert($project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument);
+                                } else if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
+                                    $this->sendEmailFromSurveyCode($_REQUEST['s'], $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrumentComplete, $form);
+                                }
                             }
                         }
                     }
@@ -254,19 +258,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $times_sent
      */
     function addQueueEmailFromInterface($project_id, $alert, $record, $times_sent, $event_id, $last_sent,$instance){
-        $data = \REDCap::getData($project_id,"array",$record);
+        if($record != "") {
+            $data = \REDCap::getData($project_id, "array", $record);
 
-        $instrument = $this->getProjectSetting("form-name",$project_id)[$alert];
+            $instrument = $this->getProjectSetting("form-name", $project_id)[$alert];
 
-        $isRepeatInstrument = false;
-        if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument.'_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$instrument.'_complete'] != ''))){
-            $isRepeatInstrument = true;
-        }
+            $isRepeatInstrument = false;
+            if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$instrument . '_complete'] != ''))) {
+                $isRepeatInstrument = true;
+            }
 
-        if(!$this->isQueueExpired($project_id, $record, $event_id, $instance, $instrument, $isRepeatInstrument, $alert) && !$this->isAlreadyInQueue($alert, $project_id, $record,$instance)){
-            $this->addQueuedEmail($alert,$project_id,$record,$event_id,$instrument,$instance,$isRepeatInstrument,$times_sent,$last_sent);
-        }else{
-            return $record;
+            if (!$this->isQueueExpired($project_id, $record, $event_id, $instance, $instrument, $isRepeatInstrument, $alert) && !$this->isAlreadyInQueue($alert, $project_id, $record, $instance)) {
+                $this->addQueuedEmail($alert, $project_id, $record, $event_id, $instrument, $instance, $isRepeatInstrument, $times_sent, $last_sent);
+            } else {
+                return $record;
+            }
         }
         return "";
     }
@@ -347,7 +353,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if ($email_queue != '') {
                     $email_sent_total = 0;
                     foreach ($email_queue as $index => $queue) {
-                        if ($email_sent_total < 100 && !$this->hasQueueExpired($queue, $index, $project_id) && $queue['deactivated'] != 1) {
+                        if ($queue['record'] != '' && $email_sent_total < 100 && !$this->hasQueueExpired($queue, $index, $project_id) && $queue['deactivated'] != 1) {
                            if ($this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']] != "1" && $this->sendToday($queue,$project_id)) {
                                 error_log("scheduledemails PID: " . $project_id . " - Has queued emails to send today " . date("Y-m-d H:i:s"));
                                 #SEND EMAIL
