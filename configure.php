@@ -990,91 +990,95 @@ foreach ($language_errors as $err){
             <div class="col-md-12 page_title">Configure Email Alerts</div>
             <div id='errMsgContainer' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>
             <div class="alert alert-success col-md-12" style="border-color: #b2dba1 !important;display: none;" id="succMsgContainer"></div>
-              <div class="col-md-12">
+            <div class="col-md-12">
                 <table class="table table-bordered table-hover" style="margin-bottom: 0">
                     <tr class="table_header">
                         <td>Option</td>
                         <td>Field Mappings</td>
                     </tr>
-
-                    <tr class="table_subheader panel-heading" data-toggle="collapse" data-target=".EA_collapsed">
-                        <td colspan="2">
-                            Email Addresses
-                            <span class="sorting_icon">
-                                <span class="glyphicon glyphicon-triangle-top" style="line-height: 0.7;"></span>
-                                <span class="glyphicon glyphicon-triangle-bottom" style="line-height: 0.7;"></span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> to email addresses. </span><div class="description_config">Allows email fields from the REDCap form(s) to be piped into the TO and CC fields of email messages. </div></td>
-                        <td style="width: 25%;padding: 10px 30px;">
-                            <span class="table_example">Format: [variable_name], Button Name</span><br/>
-                            <textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[variable_name], Button Name ..." value="<?=$module->getProjectSetting('datapipeEmail_var');?>"><?=$module->getProjectSetting('datapipeEmail_var');?></textarea>
-                            <div class="btn_color_square btn_color_datapipeEmail"></div>Email button (blue)
-                        </td>
-                    </tr>
-                    <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;"><strong>Preload email addresses</strong> from existing REDCap records. </span><div class="description_config">Enables autocomplete of email addresses in the TO and CC email fields. The list of email addresses is pulled from the specified variables in already existing REDCap records. </div></td>
-                        <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[email_var], ..." value="<?=$module->getProjectSetting('emailFromForm_var');?>"></td>
-                    </tr>
-                    <tr class="panel-collapse collapse EA_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Name</strong> for email alerts</span><div class="description_config">Allows the user to set a default custom sender name for the email alerts. This only affects the sender name, not the sender email address, that will appear in the alert by default.</div></td>
-                        <td style="width: 25%;padding: 10px 30px;">
-                            Sender name<br/><input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='Sender name' value='<?=$module->getProjectSetting('emailSender_var');?>'/>
-                        </td>
-                    </tr>
-
-                    <tr class="table_subheader panel-heading" data-toggle="collapse" data-target=".EC_collapsed">
-                        <td colspan="2">
-                            Email Content
-                            <span class="sorting_icon">
-                                <span class="glyphicon glyphicon-triangle-top" style="line-height: 0.7;"></span>
-                                <span class="glyphicon glyphicon-triangle-bottom" style="line-height: 0.7;"></span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> in email content. </span><div class="description_config">Allows data from the REDCap form(s) to be piped into the email messages. Project variables must be mapped to labels to be used in email piping. Enter one mapping per line.</div></td>
-                        <td style="width: 25%;padding: 10px 30px;">
-                            <span class="table_example">Format: [email_variable], Button Name</span><br/>
-                            <textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="[email_variable], Button Name" value="<?=$module->getProjectSetting('datapipe_var');?>"><?=$module->getProjectSetting('datapipe_var');?></textarea>
-                            <div class="btn_color_square btn_color_datapipe"></div>Data variable button (gray)
-                        </td>
-                    </tr>
-                    <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content</span><div class="description_config">Allows links to REDCap surveys for any survey-enabled form to be inserted into email messages.</div></td>
-                        <td style="width: 25%;padding: 10px 30px;">
-                            <span class="table_example">Example: [__SURVEYLINK_form_name], name ...</span><br/>
-                            <a id="addLinkBtn" onclick="javascript:$('#addSurveyLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
-                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[__SURVEYLINK_form_name], name ..." value="<?=$module->getProjectSetting('surveyLink_var');?>"><?=$module->getProjectSetting('surveyLink_var');?></textarea>
-                            <div class="btn_color_square btn_color_surveyLink"></div>Survey link button (orange)
-                        </td>
-                    </tr>
-                    <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data-Form Links</strong> in email content</span><div class="description_config">Allows REDCap links to REDCap Data-Entry Forms to be inserted into email messages.</div></td>
-                        <td style="width: 25%;padding: 10px 30px;">
-                            <span class="table_example">Example: [__FORMLINK_form_name], name ...</span><br/>
-                            <a id="addLinkBtn" onclick="javascript:$('#addFormLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_formLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
-                            <textarea type="text"  name="formLink_var" id="formLink_var" style="width: 100%;height: 100px;" placeholder="[__FORMLINK_form_name], name ..." value="<?=$module->getProjectSetting('formLink_var');?>"><?=$module->getProjectSetting('formLink_var');?></textarea>
-                            <div class="btn_color_square btn_color_formLink"></div>Form link button (yellow)
-                        </td>
-                    </tr>
-
-                    <tr class="table_subheader panel-heading" data-toggle="collapse" data-target=".EE_collapsed">
-                        <td colspan="2">
-                            Email Errors
-                            <span class="sorting_icon">
-                                <span class="glyphicon glyphicon-triangle-top" style="line-height: 0.7;"></span>
-                                <span class="glyphicon glyphicon-triangle-bottom" style="line-height: 0.7;"></span>
-                            </span>
-                        </td>
-                    </tr>
-                    <tr class="panel-collapse collapse EE_collapsed <?=$tr_class?>" aria-expanded="true">
-                        <td style="width: 15%;"><span style="padding-left: 5px;">Send <strong>Failed Email Alerts</strong> to specified address</span></td>
-                        <td style="width: 25%;padding: 10px 30px;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="<?=$module->getProjectSetting('emailFailed_var');?>"/></td>
-                    </tr>
                 </table>
+                <div class="panel panel-default">
+                    <div class="table_subheader panel-heading">
+                        <h3 class="panel-title">
+                            <a data-toggle="collapse" href="#EA_collapsed">Email Addresses</a>
+                        </h3>
+                    </div>
+                    <div id="EA_collapsed" class="panel-collapse collapse" aria-expanded="true" style="margin-bottom: 0px;border:0px;">
+                        <table>
+                            <tr aria-expanded="true">
+                                <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> to email addresses. </span><div class="description_config">Allows email fields from the REDCap form(s) to be piped into the TO and CC fields of email messages. </div></td>
+                                <td style="width: 25%;padding: 10px 30px;">
+                                    <span class="table_example">Format: [variable_name], Button Name</span><br/>
+                                    <textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[variable_name], Button Name ..." value="<?=$module->getProjectSetting('datapipeEmail_var');?>"><?=$module->getProjectSetting('datapipeEmail_var');?></textarea>
+                                    <div class="btn_color_square btn_color_datapipeEmail"></div>Email button (blue)
+                                </td>
+                            </tr>
+                            <tr aria-expanded="true">
+                                <td style="width: 15%;"><span style="padding-left: 5px;"><strong>Preload email addresses</strong> from existing REDCap records. </span><div class="description_config">Enables autocomplete of email addresses in the TO and CC email fields. The list of email addresses is pulled from the specified variables in already existing REDCap records. </div></td>
+                                <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[email_var], ..." value="<?=$module->getProjectSetting('emailFromForm_var');?>"></td>
+                            </tr>
+                            <tr aria-expanded="true">
+                                <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Name</strong> for email alerts</span><div class="description_config">Allows the user to set a default custom sender name for the email alerts. This only affects the sender name, not the sender email address, that will appear in the alert by default.</div></td>
+                                <td style="width: 25%;padding: 10px 30px;">
+                                    Sender name<br/><input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='Sender name' value='<?=$module->getProjectSetting('emailSender_var');?>'/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="table_subheader panel-heading">
+                        <h3 class="panel-title">
+                            <a data-toggle="collapse" href="#EC_collapsed">Email Content</a>
+                        </h3>
+                    </div>
+                    <div id="EC_collapsed" class="panel-collapse collapse" aria-expanded="true" style="margin-bottom: 0px;border:0px;">
+                        <table>
+                            <tr aria-expanded="true">
+                                <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> in email content. </span><div class="description_config">Allows data from the REDCap form(s) to be piped into the email messages. Project variables must be mapped to labels to be used in email piping. Enter one mapping per line.</div></td>
+                                <td style="width: 25%;padding: 10px 30px;">
+                                    <span class="table_example">Format: [email_variable], Button Name</span><br/>
+                                    <textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="[email_variable], Button Name" value="<?=$module->getProjectSetting('datapipe_var');?>"><?=$module->getProjectSetting('datapipe_var');?></textarea>
+                                    <div class="btn_color_square btn_color_datapipe"></div>Data variable button (gray)
+                                </td>
+                            </tr>
+                            <tr aria-expanded="true">
+                                <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content</span><div class="description_config">Allows links to REDCap surveys for any survey-enabled form to be inserted into email messages.</div></td>
+                                <td style="width: 25%;padding: 10px 30px;">
+                                    <span class="table_example">Example: [__SURVEYLINK_form_name], name ...</span><br/>
+                                    <a id="addLinkBtn" onclick="javascript:$('#addSurveyLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
+                                    <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[__SURVEYLINK_form_name], name ..." value="<?=$module->getProjectSetting('surveyLink_var');?>"><?=$module->getProjectSetting('surveyLink_var');?></textarea>
+                                    <div class="btn_color_square btn_color_surveyLink"></div>Survey link button (orange)
+                                </td>
+                            </tr>
+                            <tr aria-expanded="true">
+                                <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data-Form Links</strong> in email content</span><div class="description_config">Allows REDCap links to REDCap Data-Entry Forms to be inserted into email messages.</div></td>
+                                <td style="width: 25%;padding: 10px 30px;">
+                                    <span class="table_example">Example: [__FORMLINK_form_name], name ...</span><br/>
+                                    <a id="addLinkBtn" onclick="javascript:$('#addFormLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_formLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
+                                    <textarea type="text"  name="formLink_var" id="formLink_var" style="width: 100%;height: 100px;" placeholder="[__FORMLINK_form_name], name ..." value="<?=$module->getProjectSetting('formLink_var');?>"><?=$module->getProjectSetting('formLink_var');?></textarea>
+                                    <div class="btn_color_square btn_color_formLink"></div>Form link button (yellow)
+                                </td>
+                            </tr>
+
+                        </table>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="table_subheader panel-heading">
+                        <h3 class="panel-title">
+                            <a data-toggle="collapse" href="#EE_collapsed">Email Errors</a>
+                        </h3>
+                    </div>
+                    <div id="EE_collapsed" class="panel-collapse collapse" aria-expanded="true" style="margin-bottom: 0px;border:0px;">
+                        <table>
+                            <tr aria-expanded="true">
+                                <td style="width: 15%;"><span style="padding-left: 5px;">Send <strong>Failed Email Alerts</strong> to specified address</span></td>
+                                <td style="width: 25%;padding: 10px 30px;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="<?=$module->getProjectSetting('emailFailed_var');?>"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1082,6 +1086,105 @@ foreach ($language_errors as $err){
         <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Save Settings</button>
     </div>
 </form>
+<!---->
+<!---->
+<!--<form class="form-inline" action="" method="post" id='mainForm'>-->
+<!--    <div class="container-fluid wiki">-->
+<!--        <div class='row' style=''>-->
+<!--            <div class="col-md-12 page_title">Configure Email Alerts</div>-->
+<!--            <div id='errMsgContainer' class="alert alert-danger col-md-12" role="alert" style="display:none;margin-bottom:20px;"></div>-->
+<!--            <div class="alert alert-success col-md-12" style="border-color: #b2dba1 !important;display: none;" id="succMsgContainer"></div>-->
+<!--              <div class="col-md-12">-->
+<!--                <table class="table table-bordered table-hover" style="margin-bottom: 0">-->
+<!--                    <tr class="table_header">-->
+<!--                        <td>Option</td>-->
+<!--                        <td>Field Mappings</td>-->
+<!--                    </tr>-->
+<!--                    <tr class="table_subheader panel-heading" data-toggle="collapse" data-target=".EA_collapsed">-->
+<!--                        <td colspan="2">-->
+<!--                            Email Addresses-->
+<!--                            <span class="sorting_icon">-->
+<!--                                <span class="glyphicon glyphicon-triangle-top" style="line-height: 0.7;"></span>-->
+<!--                                <span class="glyphicon glyphicon-triangle-bottom" style="line-height: 0.7;"></span>-->
+<!--                            </span>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr class="panel-collapse collapse EA_collapsed --><?//=$tr_class?><!--" aria-expanded="true">-->
+<!--                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> to email addresses. </span><div class="description_config">Allows email fields from the REDCap form(s) to be piped into the TO and CC fields of email messages. </div></td>-->
+<!--                        <td style="width: 25%;padding: 10px 30px;">-->
+<!--                            <span class="table_example">Format: [variable_name], Button Name</span><br/>-->
+<!--                            <textarea type="text"  name="datapipeEmail_var" id="datapipeEmail_var" style="width: 100%;height: 100px;" placeholder="[variable_name], Button Name ..." value="--><?//=$module->getProjectSetting('datapipeEmail_var');?><!--">--><?//=$module->getProjectSetting('datapipeEmail_var');?><!--</textarea>-->
+<!--                            <div class="btn_color_square btn_color_datapipeEmail"></div>Email button (blue)-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr class="panel-collapse collapse EA_collapsed --><?//=$tr_class?><!--" aria-expanded="true">-->
+<!--                        <td style="width: 15%;"><span style="padding-left: 5px;"><strong>Preload email addresses</strong> from existing REDCap records. </span><div class="description_config">Enables autocomplete of email addresses in the TO and CC email fields. The list of email addresses is pulled from the specified variables in already existing REDCap records. </div></td>-->
+<!--                        <td style="width: 25%;padding: 10px 30px;"><span class="table_example">Format: [email_var], ...</span><br/><input type="text"  name="emailFromForm_var" id="emailFromForm_var" style="width: 100%;" placeholder="[email_var], ..." value="--><?//=$module->getProjectSetting('emailFromForm_var');?><!--"></td>-->
+<!--                    </tr>-->
+<!--                    <tr class="panel-collapse collapse EA_collapsed --><?//=$tr_class?><!--" aria-expanded="true">-->
+<!--                        <td style="width: 15%;"><span style="padding-left: 5px;">Define <strong>Sender Email Name</strong> for email alerts</span><div class="description_config">Allows the user to set a default custom sender name for the email alerts. This only affects the sender name, not the sender email address, that will appear in the alert by default.</div></td>-->
+<!--                        <td style="width: 25%;padding: 10px 30px;">-->
+<!--                            Sender name<br/><input type="text"  name="emailSender_var" id="emailSender_var" style="width: 100%;" placeholder='Sender name' value='--><?//=$module->getProjectSetting('emailSender_var');?><!--'/>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!---->
+<!--                    <tr class="table_subheader panel-heading" data-toggle="collapse" data-target=".EC_collapsed">-->
+<!--                        <td colspan="2">-->
+<!--                            Email Content-->
+<!--                            <span class="sorting_icon">-->
+<!--                                <span class="glyphicon glyphicon-triangle-top" style="line-height: 0.7;"></span>-->
+<!--                                <span class="glyphicon glyphicon-triangle-bottom" style="line-height: 0.7;"></span>-->
+<!--                            </span>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr class="panel-collapse collapse EC_collapsed --><?//=$tr_class?><!--" aria-expanded="true">-->
+<!--                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> in email content. </span><div class="description_config">Allows data from the REDCap form(s) to be piped into the email messages. Project variables must be mapped to labels to be used in email piping. Enter one mapping per line.</div></td>-->
+<!--                        <td style="width: 25%;padding: 10px 30px;">-->
+<!--                            <span class="table_example">Format: [email_variable], Button Name</span><br/>-->
+<!--                            <textarea type="text"  name="datapipe_var" id="datapipe_var" style="width: 100%;height: 100px;" placeholder="[email_variable], Button Name" value="--><?//=$module->getProjectSetting('datapipe_var');?><!--">--><?//=$module->getProjectSetting('datapipe_var');?><!--</textarea>-->
+<!--                            <div class="btn_color_square btn_color_datapipe"></div>Data variable button (gray)-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr class="panel-collapse collapse EC_collapsed --><?//=$tr_class?><!--" aria-expanded="true">-->
+<!--                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content</span><div class="description_config">Allows links to REDCap surveys for any survey-enabled form to be inserted into email messages.</div></td>-->
+<!--                        <td style="width: 25%;padding: 10px 30px;">-->
+<!--                            <span class="table_example">Example: [__SURVEYLINK_form_name], name ...</span><br/>-->
+<!--                            <a id="addLinkBtn" onclick="javascript:$('#addSurveyLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>-->
+<!--                            <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[__SURVEYLINK_form_name], name ..." value="--><?//=$module->getProjectSetting('surveyLink_var');?><!--">--><?//=$module->getProjectSetting('surveyLink_var');?><!--</textarea>-->
+<!--                            <div class="btn_color_square btn_color_surveyLink"></div>Survey link button (orange)-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr class="panel-collapse collapse EC_collapsed --><?//=$tr_class?><!--" aria-expanded="true">-->
+<!--                        <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data-Form Links</strong> in email content</span><div class="description_config">Allows REDCap links to REDCap Data-Entry Forms to be inserted into email messages.</div></td>-->
+<!--                        <td style="width: 25%;padding: 10px 30px;">-->
+<!--                            <span class="table_example">Example: [__FORMLINK_form_name], name ...</span><br/>-->
+<!--                            <a id="addLinkBtn" onclick="javascript:$('#addFormLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_formLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>-->
+<!--                            <textarea type="text"  name="formLink_var" id="formLink_var" style="width: 100%;height: 100px;" placeholder="[__FORMLINK_form_name], name ..." value="--><?//=$module->getProjectSetting('formLink_var');?><!--">--><?//=$module->getProjectSetting('formLink_var');?><!--</textarea>-->
+<!--                            <div class="btn_color_square btn_color_formLink"></div>Form link button (yellow)-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!---->
+<!--                    <tr class="table_subheader panel-heading" data-toggle="collapse" data-target=".EE_collapsed">-->
+<!--                        <td colspan="2">-->
+<!--                            Email Errors-->
+<!--                            <span class="sorting_icon">-->
+<!--                                <span class="glyphicon glyphicon-triangle-top" style="line-height: 0.7;"></span>-->
+<!--                                <span class="glyphicon glyphicon-triangle-bottom" style="line-height: 0.7;"></span>-->
+<!--                            </span>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                    <tr class="panel-collapse collapse EE_collapsed --><?//=$tr_class?><!--" aria-expanded="true">-->
+<!--                        <td style="width: 15%;"><span style="padding-left: 5px;">Send <strong>Failed Email Alerts</strong> to specified address</span></td>-->
+<!--                        <td style="width: 25%;padding: 10px 30px;">Email addresses<br/><input type="text"  name="emailFailed_var" id="emailFailed_var" style="width: 100%;" placeholder="myemail@server.com, myemail2@server.com,..." value="--><?//=$module->getProjectSetting('emailFailed_var');?><!--"/></td>-->
+<!--                    </tr>-->
+<!--                </table>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <div style="width:100%">-->
+<!--        <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Save Settings</button>-->
+<!--    </div>-->
+<!--</form>-->
 
 <?PHP require('codes_modal.php');?>
 <!-- ALERTS TABLE -->

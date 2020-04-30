@@ -22,6 +22,14 @@
     background-color:#e6f3ff;
     color: #005299;
     cursor: pointer;
+    height: 45px;
+    border-bottom: 1px solid #dee2e6;
+    border-left: 1px solid #dee2e6;
+    border-right: 1px solid #dee2e6;
+    padding-left: 15px;
+}
+#mainForm tr{
+    border: 1px solid #dee2e6;
 }
 .table_subheader:hover {
     background-color: #e6f3ff !important;
@@ -365,4 +373,13 @@ a.btn_color_surveyLink:hover{background-color: #ffd7b3 !important;}
 }
 .code_modal_table{
     width: 100%;
+}
+.panel-heading [data-toggle="collapse"]:after {
+    font-family: 'FontAwesome';
+    content: "\f078";
+    float: right;
+    color: #005299;
+    font-size: 18px;
+    line-height: 40px;
+    padding-right: 20px;
 }
