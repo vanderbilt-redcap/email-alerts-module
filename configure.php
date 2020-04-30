@@ -1000,10 +1000,12 @@ foreach ($language_errors as $err){
                 <div class="panel panel-default">
                     <div class="table_subheader panel-heading">
                         <h3 class="panel-title">
-                            <a data-toggle="collapse" href="#EA_collapsed">Email Addresses</a>
+<!--                            <a data-toggle="collapse" href="#EA_collapsed">Email Addresses</a>-->
+                            <a class="accordion-toggle collapsed" id="accordion1" data-toggle="collapse" data-parent="#accordion1" href="#collapseOne">Email Addresses</a>
                         </h3>
                     </div>
-                    <div id="EA_collapsed" class="panel-collapse collapse" aria-expanded="true" style="margin-bottom: 0px;border:0px;">
+<!--                    <div id="EA_collapsed" class="panel-collapse collapse" aria-expanded="true" style="margin-bottom: 0px;border:0px;">-->
+                    <div id="collapseOne" class="collapse in p-3" style="margin-bottom: 0px;border:0px;">
                         <table>
                             <tr aria-expanded="true">
                                 <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Data Piping</strong> to email addresses. </span><div class="description_config">Allows email fields from the REDCap form(s) to be piped into the TO and CC fields of email messages. </div></td>
