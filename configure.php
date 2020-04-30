@@ -110,6 +110,7 @@ foreach ($language_errors as $err){
     <link rel="stylesheet" type="text/css" href="<?=$module->getUrl('css/jquery.flexdatalist.min.css')?>">
 
     <script type="text/javascript" src="<?=$module->getUrl('js/globals.js')?>"></script>
+    <script type="text/javascript" src="<?=$module->getUrl('js/query-3.3.1.min.js')?>"></script>
     <?php
     if (version_compare(REDCAP_VERSION, '9.8.0', '>=')) {
         ?>
