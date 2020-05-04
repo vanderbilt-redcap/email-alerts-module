@@ -1625,7 +1625,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 						FROM redcap_user_roles
 						WHERE project_id = ?
 						ORDER BY role_id";
-            $result = $this->query($sql, [$pid]);
+            $result = ExternalModules::query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
                 $choices[] = ['value' => $row['role_id'], 'name' => strip_tags(nl2br($row['role_name']))];
@@ -1641,7 +1641,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 						WHERE ur.project_id = ?
 								AND ui.username = ur.username
 						ORDER BY ui.ui_id";
-            $result = $this->query($sql, [$pid]);
+            $result = ExternalModules::query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
                 $choices[] = ['value' => strtolower($row['username']), 'name' => $row['user_firstname'] . ' ' . $row['user_lastname']];
@@ -1656,7 +1656,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 						FROM redcap_data_access_groups
 						WHERE project_id = ?
 						ORDER BY group_id";
-            $result = $this->query($sql, [$pid]);
+            $result = ExternalModules::query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
                 $choices[] = ['value' => $row['group_id'], 'name' => strip_tags(nl2br($row['group_name']))];
@@ -1671,7 +1671,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 					FROM redcap_metadata
 					WHERE project_id = ?
 					ORDER BY field_order";
-            $result = $this->query($sql, [$pid]);
+            $result = ExternalModules::query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
                 $row['element_label'] = strip_tags(nl2br($row['element_label']));
@@ -1690,7 +1690,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 					FROM redcap_metadata
 					WHERE project_id = ?
 					ORDER BY field_order";
-            $result = $this->query($sql, [$pid]);
+            $result = ExternalModules::query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
                 $choices[] = ['value' => $row['form_name'], 'name' => strip_tags(nl2br($row['form_name']))];
@@ -1705,7 +1705,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 					FROM redcap_events_arms a
 					WHERE a.project_id = ?
 					ORDER BY a.arm_id";
-            $result = $this->query($sql, [$pid]);
+            $result = ExternalModules::query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
                 $choices[] = ['value' => $row['arm_id'], 'name' => $row['arm_name']];
@@ -1721,7 +1721,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 					WHERE a.project_id = ?
 						AND e.arm_id = a.arm_id
 					ORDER BY e.event_id";
-            $result = $this->query($sql, [$pid]);
+            $result = ExternalModules::query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
                 $choices[] = ['value' => $row['event_id'], 'name' => "Arm: ".strip_tags(nl2br($row['arm_name']))." - Event: ".strip_tags(nl2br($row['descrip']))];

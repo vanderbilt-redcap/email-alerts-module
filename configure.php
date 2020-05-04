@@ -4,6 +4,7 @@ use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
+/** @var \Vanderbilt\EmailTriggerExternalModule\EmailTriggerExternalModule $module */
 $config = $module->getConfig();
 $prefix = $_GET['prefix'];
 
@@ -1086,8 +1087,8 @@ foreach ($language_errors as $err){
         <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Save Settings</button>
     </div>
 </form>
-<!---->
-<!---->
+<?php
+/***<!---->
 <!--<form class="form-inline" action="" method="post" id='mainForm'>-->
 <!--    <div class="container-fluid wiki">-->
 <!--        <div class='row' style=''>-->
@@ -1185,7 +1186,8 @@ foreach ($language_errors as $err){
 <!--        <button type="submit" form="mainForm" class="btn btn-info pull-right email_forms_button" id="SubmitNewConfigureBtn">Save Settings</button>-->
 <!--    </div>-->
 <!--</form>-->
-
+**/
+?>
 <?PHP require('codes_modal.php');?>
 <!-- ALERTS TABLE -->
 <div style="padding-top:50px" class="col-md-12">
