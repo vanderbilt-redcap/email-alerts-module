@@ -872,7 +872,11 @@ EmailAlerts.Settings.prototype.resetConfigInstances = function() {
 };
 
 EmailAlerts.Settings.prototype.initializeRichTextFields = function(){
-    $(".external-modules-autocomplete-dropdown").select2();
+    var autoCompletes = $(".external-modules-autocomplete-dropdown");
+
+    if(autoCompletes.length > 0) {
+        $(".external-modules-autocomplete-dropdown").select2();
+    }
 
     var settingsObject = this;
 
