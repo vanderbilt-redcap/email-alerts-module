@@ -545,6 +545,48 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
     }
 }
 
+function checkBranchingLogicValidAndSave(data, logicData, url, urlFile, urlForm, files, suffix, errorContainerSuffix, letter){
+    var errMsg = [];
+    $('#errMsgContainerModal'+errorContainerSuffix).empty();
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: logicData,
+        dataType: 'json',
+        success: function (result) {
+            if(result.isBranchingValid && result.isBranchingValidQueue && result.isBranchingValidExpQueue){
+                $('#errMsgContainerModal'+errorContainerSuffix).hide();
+
+                var index = $('#index_modal_update').val();
+                if(suffix != '') {
+                    //close confirmation modal
+                    $('#external-modules-configure-modal-schedule-confirmation').modal('hide');
+                    $('#external-modules-configure-modal').modal('hide');
+                    deleteFile(index);
+                }
+                saveFilesIfTheyExist(urlFile+'&index=' + index, files);
+                ajaxLoadOptionAndMessage(data, urlForm, letter);
+            }else{
+                if(!result.isBranchingValid){
+                    errMsg.push("<strong>Email Condition (REDCap logic)</strong> Incorrect");
+                }
+                if(!result.isBranchingValidQueue){
+                    errMsg.push("<strong>Email Schedule Conditional</strong> Incorrect");
+                }
+                if(!result.isBranchingValidExpQueue){
+                    errMsg.push("<strong>Email Schedule Expiration Conditional</strong> Incorrect");
+                }
+
+                $.each(errMsg, function (i, e) {
+                    $('#errMsgContainerModal'+errorContainerSuffix).append('<div>' + e + '</div>');
+                });
+                $('#errMsgContainerModal'+errorContainerSuffix).show();
+                $('[name=external-modules-configure-modal'+suffix+']').scrollTop(0);
+            }
+        }
+    });
+}
+
 function ajaxLoadOptionAndMessage(data, url, message){
     $.post(url, data, function(returnData){
         jsonAjax = jQuery.parseJSON(returnData);

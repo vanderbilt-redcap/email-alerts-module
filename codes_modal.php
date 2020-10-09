@@ -37,8 +37,13 @@ require_once 'EmailTriggerExternalModule.php';
             });
 
             if(checkRequiredFieldsAndLoadOption('','')){
-                saveFilesIfTheyExist('<?=$module->getUrl('save-file.php')?>', files);
-                ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('saveForm.php')?>',"A");
+                var checkBranchingLogic = '&logic='+$('[name=email-condition]').val()+'&logicQueueField='+$('[name=cron-send-email-on-field]').val()+'&logicQueueCond='+$('[name=cron-send-email-on]:checked').val()+'&logicExpQueueField='+$('[name=cron-queue-expiration-date-field]').val()+'&logicExpQueueCond='+$('[name=cron-queue-expiration-date]:checked').val();
+                var urlFile = '<?=$module->getUrl('save-file.php')?>';
+                var urlSaveForm = '<?=$module->getUrl('saveForm.php')?>';
+                var logic = checkBranchingLogicValidAndSave(data, checkBranchingLogic,'<?=$module->getUrl('isBranchingLogicValid.php')?>',urlFile, urlSaveForm, files, '','', "A");
+
+                //saveFilesIfTheyExist('<?//=$module->getUrl('save-file.php')?>//', files);
+                //ajaxLoadOptionAndMessage(data,'<?//=$module->getUrl('saveForm.php')?>//',"A");
             }
 			return false;
         });
