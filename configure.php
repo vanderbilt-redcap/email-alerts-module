@@ -760,7 +760,11 @@ foreach ($language_errors as $err){
                     return false;
                 }
                 else {
-                    var data = "&queue_ids="+$('#queue_ids').val()+"&index_modal_queue="+$('#index_modal_queue').val()+"&times_sent="+$('#times_sent').val()+"&last_sent="+$('#last_sent').val()+"&queue_event_select="+$('#queue_event_select').val()+"&queue_instances="+$('#queue_instances').val();
+                    var queueInstance = $('#queue_instances').val();
+                    if(queueInstance == undefined){
+                        queueInstance = 1;
+                    }
+                    var data = "&queue_ids="+$('#queue_ids').val()+"&index_modal_queue="+$('#index_modal_queue').val()+"&times_sent="+$('#times_sent').val()+"&last_sent="+$('#last_sent').val()+"&queue_event_select="+$('#queue_event_select').val()+"&queue_instances="+queueInstance;
                     ajaxLoadOptionAndMessageQueue(data,'<?=$module->getUrl('addQueue.php')?>',"Q");
                     return true;
                 }
