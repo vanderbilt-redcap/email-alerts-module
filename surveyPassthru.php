@@ -6,16 +6,13 @@ use ExternalModules\ExternalModules;
 
 require_once 'EmailTriggerExternalModule.php';
 
-$passthruData = $module->resetSurveyAndGetCodes($_REQUEST['pid'], $_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']);
+$returnCode = \REDCap::getSurveyReturnCode($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']);
+$surveyLink = \REDCap::getSurveyLink($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']);
 
-$returnCode = $passthruData['return_code'];
-$hash = $passthruData['hash'];
-if($returnCode == $_REQUEST['returnCode']){
+if(strcasecmp($returnCode, $_REQUEST['returnCode']) == 0) {
 
-    $surveyLink = APP_PATH_SURVEY_FULL."?s=".$hash;
     $link = ($_REQUEST['returnCode'] == "NULL")? "":"<input type='hidden' value='".$returnCode."' name='__code'/>";
     ?>
-
 
     <html>
     <body>
