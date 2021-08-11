@@ -4,8 +4,8 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-$index =  $_REQUEST['index_modal_update'];
-$pid = $_GET['pid'];
+$index =  (int)$_REQUEST['index_modal_update'];
+$pid = (int)$_GET['pid'];
 
 #get data from the DB
 $form_name = empty($module->getProjectSetting('form-name'))?array():$module->getProjectSetting('form-name');
@@ -89,25 +89,25 @@ if($email_repetitive[$index] == "0" && $repetitive == "1" || $email_repetitive[$
 }
 
 #Replace new data with old
-$form_name[$index] = htmlspecialchars($_REQUEST['form-name-update']);
+$form_name[$index] = htmlspecialchars($_REQUEST['form-name-update'],ENT_QUOTES);
 $form_name_event[$index] = $_REQUEST['form-name-event'];
 $email_from[$index] = $_REQUEST['email-from-update'];
 $email_to[$index] = $_REQUEST['email-to-update'];
 $email_cc[$index] = $_REQUEST['email-cc-update'];
 $email_bcc[$index] = $_REQUEST['email-bcc-update'];
-$email_subject[$index] = htmlspecialchars($_REQUEST['email-subject-update']);
+$email_subject[$index] = htmlspecialchars($_REQUEST['email-subject-update'],ENT_QUOTES);
 $email_text[$index] = $_REQUEST['email-text-update-editor'];
-$email_attachment_variable[$index] = htmlspecialchars($_REQUEST['email-attachment-variable-update']);
+$email_attachment_variable[$index] = htmlspecialchars($_REQUEST['email-attachment-variable-update'],ENT_QUOTES);
 $email_repetitive[$index] = $repetitive;
-$email_condition[$index] = htmlspecialchars($_REQUEST['email-condition-update']);
+$email_condition[$index] = htmlspecialchars($_REQUEST['email-condition-update'],ENT_QUOTES);
 $email_incomplete[$index] = $incomplete;
 $cron_send_email_on[$index] = $_REQUEST['cron-send-email-on-update'];
 $cron_send_email_on_field[$index] = $_REQUEST['cron-send-email-on-field-update'];
 $cron_repeat_for[$index] = $_REQUEST['cron-repeat-for-update'];
 $cron_repeat_until[$index] = $_REQUEST['cron-repeat-until-update'];
-$cron_repeat_until_field[$index] = htmlspecialchars($_REQUEST['cron-repeat-until-field-update']);
+$cron_repeat_until_field[$index] = htmlspecialchars($_REQUEST['cron-repeat-until-field-update'],ENT_QUOTES);
 $cron_queue_expiration_date[$index] = $_REQUEST['cron-queue-expiration-date-update'];
-$cron_queue_expiration_date_field[$index] = htmlspecialchars($_REQUEST['cron-queue-expiration-date-field-update']);
+$cron_queue_expiration_date_field[$index] = htmlspecialchars($_REQUEST['cron-queue-expiration-date-field-update'],ENT_QUOTES);
 $alert_name[$index] = $_REQUEST['alert-name-update'];
 
 if($schedule_changed){

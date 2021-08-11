@@ -5,9 +5,9 @@ use ExternalModules\ExternalModules;
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 $config = $module->getConfig();
-$prefix = $_GET['prefix'];
+$prefix = htmlspecialchars($_REQUEST['prefix'],ENT_QUOTES);
 
-$pid = $_GET['pid'];
+$pid = (int)$_GET['pid'];
 $from_default = empty($module->getProjectSetting('email-sender'))?array():$module->getProjectSetting('email-sender').',"'.$module->getProjectSetting('emailSender_var').'"';
 
 $projectData= (array(
@@ -136,10 +136,10 @@ foreach ($language_errors as $err){
         var EMparentAux;
         var configSettings = <?=json_encode($simple_config['email-dashboard-settings'])?>;
         var configSettingsUpdate = <?=json_encode($simple_config_update['email-dashboard-settings'])?>;
-        var project_id = <?=json_encode($_GET['pid'])?>;
+        var project_id = <?=$pid?>;
         var isLongitudinal = <?=json_encode(\REDCap::isLongitudinal())?>;
         var from_default = <?=json_encode($from_default)?>;
-        var message_letter = <?=json_encode($_REQUEST['message'])?>;
+        var message_letter = <?=json_encode(htmlspecialchars($_REQUEST['message'],ENT_QUOTES))?>;
         var isAdmin = <?=json_encode($isAdmin)?>;
 
         //Dashboard info
@@ -416,7 +416,7 @@ foreach ($language_errors as $err){
             });
             EMparentAux = EMparent;
             EMparent.getPrefix = function() {
-                var prefix = <?=json_encode($_REQUEST['prefix'])?>;
+                var prefix = <?=json_encode($prefix)?>;
                 return prefix;
             };
             //we call the doBranching but do nothing to avoid getting errors as Email alerts goes differently
@@ -1473,7 +1473,7 @@ foreach ($language_errors as $err){
 
     <div class="col-md-12">
         <form class="form-horizontal" action="" method="post" id='updateForm'>
-            <div class="modal fade" id="external-modules-configure-modal" name="external-modules-configure-modal-update" data-module="<?=$_REQUEST['prefix']?>" tabindex="-1" role="dialog" aria-labelledby="Codes">
+            <div class="modal fade" id="external-modules-configure-modal" name="external-modules-configure-modal-update" data-module="<?=$prefix?>" tabindex="-1" role="dialog" aria-labelledby="Codes">
                 <div class="modal-dialog" role="document" style="width: 800px">
                     <div class="modal-content">
                         <div class="modal-header">

@@ -2,11 +2,11 @@
 //require_once __DIR__ . '/../../external_modules/classes/ExternalModules.php';
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 
-$pid = @$_GET['pid'];
-$edoc = $_POST['edoc'];
+$pid = (int)@$_GET['pid'];
+$edoc = (int)$_POST['edoc'];
 
 $doc_name = "";
-if (($edoc) && (is_numeric($edoc))) {
+if ($edoc != "") {
     $ary = \Files::getEdocContentsAttributes((integer) $edoc);
     $doc_name = $ary[1];
 }

@@ -6,8 +6,8 @@ use ExternalModules\ExternalModules;
 require_once 'EmailTriggerExternalModule.php';
 
 $form = $_REQUEST['form'];
-$project_id = $_REQUEST['project_id'];
-$index = $_REQUEST['index'];
+$project_id = (int)$_REQUEST['project_id'];
+$index = (int)$_REQUEST['index'];
 $queue = $_REQUEST['queue'];
 
 if(!empty($form) && !empty($project_id)){

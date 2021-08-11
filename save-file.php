@@ -6,7 +6,7 @@ use ExternalModules\ExternalModules;
 
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 
-$index = $_GET['index'];
+$index = (int)$_GET['index'];
 
 $edoc = null;
 $myfiles = array();
@@ -14,7 +14,7 @@ foreach($_FILES as $key=>$value){
     $myfiles[] = $key;
     if ($value) {
         # use REDCap's uploadFile
-        $edoc = \Files::uploadFile($_FILES[$key]);
+        $edoc = (int)\Files::uploadFile($_FILES[$key]);
         if ($edoc) {
             $email_attachment =  empty($module->getProjectSetting($key))?array():$module->getProjectSetting($key);
 
@@ -42,7 +42,7 @@ if ($edoc) {
     header('Content-type: application/json');
     echo json_encode(array(
         'myfiles' => json_encode($myfiles),
-        '_POST' => json_encode($_POST),
+        '_POST' => json_encode(db_escape($_POST)),
         'status' => 'You could not find a file.'
     ));
 }

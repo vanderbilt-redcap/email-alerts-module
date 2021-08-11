@@ -8,7 +8,7 @@ require_once 'EmailTriggerExternalModule.php';
 
 
 $surveyLink_var = $_REQUEST['surveyLink_var'];
-$project_id = $_REQUEST['project_id'];
+$project_id = (int)$_REQUEST['project_id'];
 $message = '';
 if(!empty($surveyLink_var)){
 
@@ -23,10 +23,10 @@ if(!empty($surveyLink_var)){
             $var = $matches[0][1];
         }
         $instrument_form = str_replace('[__SURVEYLINK_', '', $var);
-        $instrument_form = str_replace(']', '', $instrument_form);
+        $instrument_form = db_escape(filter_var(str_replace(']', '', $instrument_form), FILTER_SANITIZE_STRING));
 
 
-        $sql = "SELECT save_and_return from `redcap_surveys` where project_id = ".$project_id." AND form_name ='".db_escape($instrument_form)."'";
+        $sql = "SELECT save_and_return from `redcap_surveys` where project_id = ".db_escape($project_id)." AND form_name ='".db_escape($instrument_form)."'";
         $result = $module->query($sql);
 
         if(APP_PATH_WEBROOT[0] == '/'){

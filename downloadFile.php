@@ -1,7 +1,7 @@
 <?php
 
-$filename = $_REQUEST['file'];
-$sname = $_REQUEST['sname'];
+$filename = db_escape($_REQUEST['file']);
+$sname = db_escape($_REQUEST['sname']);
 
 header('Content-type: application/pdf');
 header('Content-Disposition: attachment; filename="'.$filename.'"');

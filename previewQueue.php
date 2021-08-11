@@ -6,8 +6,8 @@ use ExternalModules\ExternalModules;
 
 require_once __DIR__.'/vendor/autoload.php';
 
-$project_id = $_GET['pid'];
-$index =  $_REQUEST['index_modal_queue'];
+$project_id = (int)$_GET['pid'];
+$index =  (int)$_REQUEST['index_modal_queue'];
 
 #User rights
 $UserRights = \REDCap::getUserRights(USERID)[USERID];
