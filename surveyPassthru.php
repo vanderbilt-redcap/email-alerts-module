@@ -6,8 +6,16 @@ use ExternalModules\ExternalModules;
 
 require_once 'EmailTriggerExternalModule.php';
 
+/* version 10.6 introduces new params for REDCap::getSurveyLink */
+$funcArray = [$_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']];
+
+if(\REDCap::versionCompare(REDCAP_VERSION, '10.6.1') >= 0) {
+        $funcArray = [$_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], 1, '', false];
+} else {
+        $funcArray = [$_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']];
+}
 $returnCode = \REDCap::getSurveyReturnCode($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']);
-$surveyLink = \REDCap::getSurveyLink($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']);
+$surveyLink = call_user_func_array(['REDCap', 'getSurveyLink'], $funcArray);
 
 if(strcasecmp($returnCode, $_REQUEST['returnCode']) == 0) {
 
