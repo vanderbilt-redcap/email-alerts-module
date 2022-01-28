@@ -707,8 +707,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $mail->ClearAddresses();
         $mail->ClearAttachments();
 
-        #Enable debug messages
-        $mail->SMTPDebug = 3;
+        #Enable debug messages. 3 show messages 0 do not show
+        $mail->SMTPDebug = 0;
 
         #Email Addresses
         $mail = $this->setEmailAddresses($mail, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal);
