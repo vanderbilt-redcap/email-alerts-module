@@ -950,10 +950,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
-                    if($var == "[region_vote_status][1]"){
-                        error_log("LogicTester email content: ".$email_content);
-                        error_log("LogicTester var: ".$var);
-                        error_log("LogicTester emailvar: ".$emailvar);
+                    $test = $var;
+                    if($test == "[region_vote_status][1]"){
+                        error_log("LogicTester var: ".$test);
                     }
 
                     preg_match_all("/\\[(.*?)\\]/", $var, $matches);
@@ -973,7 +972,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $logic = $label;
                     }
 
-                    if($var == "[region_vote_status][1]"){
+                    if($test == "[region_vote_status][1]"){
+                        error_log("LogicTester var2: ".$var);
                         error_log("LogicTester Logic: ".$logic);
                         error_log("LogicTester Label: ".$label);
                         error_log("LogicTester Instance: ".$instance);
