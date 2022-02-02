@@ -950,8 +950,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
+                    error_log("LogicTester email content: ".$email_content);
                     error_log("LogicTester datapipe_var: ".$datapipe_var);
-                    error_log("LogicTester: ".$var);
+                    error_log("LogicTester var: ".$var);
+                    error_log("LogicTester emailvar: ".$var);
                     preg_match_all("/\\[(.*?)\\]/", $var, $matches);
 
                     $var_replace = $var;
