@@ -973,6 +973,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
 
                     if($test == "[region_vote_status][1]"){
+                        error_log("LogicTester var_replace: ".$var_replace);
                         error_log("LogicTester var2: ".$var);
                         error_log("LogicTester Logic: ".$logic);
                         error_log("LogicTester Label: ".$label);
