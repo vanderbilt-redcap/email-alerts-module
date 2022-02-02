@@ -950,6 +950,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
+                    error_log("LogicTester IN");
                     preg_match_all("/\\[(.*?)\\]/", $var, $matches);
 
                     $var_replace = $var;
@@ -966,6 +967,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if(!empty($label)){
                         $logic = $label;
                     }
+                    error_log(json_encode(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance),JSON_PRETTY_PRINT));
                     $email_content = str_replace($var_replace, $logic, $email_content);
                 }
             }
