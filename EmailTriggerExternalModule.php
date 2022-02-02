@@ -945,12 +945,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      */
     function setDataPiping($datapipe_var, $email_content, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
-        error_log("LogicTester datapipe_var: ".$datapipe_var);
         if (!empty($datapipe_var)) {
             $datapipe = explode("\n", $datapipe_var);
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
+                    error_log("LogicTester datapipe_var: ".$datapipe_var);
                     error_log("LogicTester: ".$var);
                     preg_match_all("/\\[(.*?)\\]/", $var, $matches);
 
