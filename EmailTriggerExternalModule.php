@@ -945,6 +945,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      */
     function setDataPiping($datapipe_var, $email_content, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
+        error_log("LogicTester datapipe_var: ".$datapipe_var);
         if (!empty($datapipe_var)) {
             $datapipe = explode("\n", $datapipe_var);
             foreach ($datapipe as $emailvar) {
@@ -969,7 +970,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                     error_log("LogicTester Logic: ".$logic);
                     error_log("LogicTester Label: ".$label);
-                    error_log(json_encode(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance),JSON_PRETTY_PRINT));
+                    error_log("LogicTester Instance: ".$instance);
+
                     $email_content = str_replace($var_replace, $logic, $email_content);
                 }
             }
