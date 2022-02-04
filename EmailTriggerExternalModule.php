@@ -950,36 +950,30 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
-                    $test = $var;
-                    if($test == "[region_vote_status][1]"){
-                        error_log("LogicTester var: ".$test);
-                    }
-
                     preg_match_all("/\\[(.*?)\\]/", $var, $matches);
 
                     $var_replace = $var;
                     //For arms and different events
                     if(count($matches[1]) > 1){
                         $project = new \Project($project_id);
-                        $event_id = $project->getEventIdUsingUniqueEventName($matches[1][0]);
+                        $event_id_repeating = $project->getEventIdUsingUniqueEventName($matches[1][0]);
                         $var = $matches[1][1];
+                        if($event_id_repeating == "") {
+                            #Repeating instances
+                            $var = $matches[1][0];
+                            $instance = $matches[1][1];
+                        }else{
+                            $event_id = $event_id_repeating;
+                        }
                     }
 
                     //Repeatable instruments
                     $logic = $this->isRepeatingInstrument($project_id, $data, $record, $event_id, $instrument, $instance, $var,0, $isLongitudinal);
                     $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance));
+
                     if(!empty($label)){
                         $logic = $label;
                     }
-
-                    if($test == "[region_vote_status][1]"){
-                        error_log("LogicTester var_replace: ".$var_replace);
-                        error_log("LogicTester var2: ".$var);
-                        error_log("LogicTester Logic: ".$logic);
-                        error_log("LogicTester Label: ".$label);
-                        error_log("LogicTester Instance: ".$instance);
-                    }
-
 
                     $email_content = str_replace($var_replace, $logic, $email_content);
                 }
@@ -1360,6 +1354,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         $logic = $data[$record][$event_id][$var_name];
                     }else{
                         $logic = \LogicTester::apply($var, $data[$record], $project, true, true);
+                    }
+                }
+
+                if($logic == ""){
+                    #it's a repeating instance from a different form
+                    foreach ($data[$record]['repeat_instances'][$event_id] as $instrumentFound =>$instances){
+                        foreach ($instances as $intanceFound=>$p){
+                            if($intanceFound == $repeat_instance){
+                                $logic = $data[$record]['repeat_instances'][$event_id][$instrumentFound][$repeat_instance][$var_name];
+                            }
+                        }
                     }
                 }
             }
