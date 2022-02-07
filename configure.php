@@ -1346,6 +1346,10 @@ foreach ($language_errors as $err){
                     }
                     if($configRow['key'] == 'form-name' || $configRow['key'] == 'email-condition' || $configRow['key'] == 'email-subject' || $configRow['key'] == 'email-attachment-variable' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-queue-expiration-date-field'){
                         $info_modal[$index][$configRow['key']] = htmlspecialchars_decode($configRow['value'][$index],ENT_NOQUOTES);
+                        if( $configRow['key'] == 'email-condition'){
+                            error_log("EmailTesting value: ".$configRow['value'][$index]);
+                            error_log("EmailTesting value2: ". htmlspecialchars_decode($configRow['value'][$index],ENT_NOQUOTES));
+                        }
                     }else{
                         $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
                     }
