@@ -703,52 +703,23 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_text = $this->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
         $email_text = $this->setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
 
-        $mail = new PHPMailer;
-        $mail->ClearAddresses();
-        $mail->ClearAttachments();
-
-        #Enable debug messages. 3 show messages 0 do not show
-        $mail->SMTPDebug = 0;
+        #Email Data structure
+        $array_emails = array();
 
         #Email Addresses
-        $mail = $this->setEmailAddresses($mail, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal);
+        $array_emails = $this->setEmailAddresses($array_emails, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal);
 
         #Email From
-        $mail = $this->setFrom($mail, $project_id, $record, $id);
+        $array_emails = $this->setFrom($array_emails, $project_id, $record, $id);
 
         #Embedded images
-        $mail = $this->setEmbeddedImages($mail, $project_id, $email_text);
-
-        $mail->CharSet = 'UTF-8';
-        $mail->Subject = $email_subject;
-        $mail->IsHTML(true);
-        $mail->Body = $email_text;
-
-		if($this->getSystemSetting("logEmails") == 1) {
-			error_log("Email Module: ".$email_text);
-		}
+        $array_emails = $this->setEmbeddedImages($array_emails, $project_id, $email_text);
 
         #Attachments
-        $mail = $this->setAttachments($mail, $project_id, $id);
+        $array_emails = $this->setAttachments($array_emails, $project_id, $id);
 
         #Attchment from RedCap variable
-        $mail = $this->setAttachmentsREDCapVar($mail, $project_id, $data, $record, $event_id, $instrument, $instance, $id, $isLongitudinal);
-
-        #DKIM to make sure the email does not go into spam folder
-        $privatekeyfile = 'dkim_private.key';
-        //Make a new key pair
-        //(2048 bits is the recommended minimum key length -
-        //gmail won't accept less than 1024 bits)
-        $pk = openssl_pkey_new(
-            array(
-                'private_key_bits' => 2048,
-                'private_key_type' => OPENSSL_KEYTYPE_RSA
-            )
-        );
-        openssl_pkey_export_to_file($pk, $privatekeyfile);
-        $mail->DKIM_private = $privatekeyfile;
-        $mail->DKIM_selector = 'PHPMailer';
-        $mail->DKIM_passphrase = ''; //key is not encrypted
+        $array_emails = $this->setAttachmentsREDCapVar($array_emails, $project_id, $data, $record, $event_id, $instrument, $instance, $id, $isLongitudinal);
 
         if($alert_id != ""){
             $alert_number = $id;
@@ -757,8 +728,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         $email_sent_ok = false;
-        if (!$mail->send()) {
-            error_log("scheduledemails PID: ".$project_id." Mailer Error:".$mail->ErrorInfo);
+        $send = \REDCap::email ($array_emails['to'],  $array_emails['from'], $email_subject,  $email_text ,  $array_emails['cc'] ,  $array_emails['bcc'] ,  $array_emails['fromName'],$array_emails['attachments']);
+        if (!$send) {
+            error_log("scheduledemails PID: ".$project_id."Mailer Error: the email could not be sent");
             $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error:".$mail->ErrorInfo." in Project: ".$project_id.", Record: ".$record." Alert #".$alert_number);
         }else{
             try {
@@ -815,9 +787,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 \REDCap::logEvent($action_description, $changes_made, null, $record, $event_id, $project_id);
 
                 $action_description = "Email Sent To - Alert " . $alert_number;
-                $email_list = '';
-                foreach ($mail->getAllRecipientAddresses() as $email => $value) {
-                    $email_list .= $email . ";";
+                $email_list = $array_emails['to'];
+                if($array_emails['cc'] != ""){
+                    $email_list .= ";".$array_emails['cc'];
+                }
+                if($array_emails['bcc'] != ""){
+                    $email_list .= ";".$array_emails['bcc'];
                 }
                 \REDCap::logEvent($action_description, $email_list, null, $record, $event_id, $project_id);
 
@@ -825,14 +800,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
             }
         }
-        unlink($privatekeyfile);
-
-        #Clear all addresses and attachments for next loop
-        $mail->clearAddresses();
-        $mail->clearAttachments();
-        $mail->ClearAllRecipients();
         return $email_sent_ok;
-
     }
 
     /**
@@ -848,44 +816,29 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param bool $isLongitudinal
      * @return mixed
      */
-    function setEmailAddresses($mail, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal=false){
+    function setEmailAddresses($array_emails, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal=false){
         $datapipeEmail_var = $this->getProjectSetting("datapipeEmail_var", $project_id);
         $email_to = $this->getProjectSetting("email-to", $project_id)[$id];
         $email_cc = $this->getProjectSetting("email-cc", $project_id)[$id];
         $email_bcc = $this->getProjectSetting("email-bcc", $project_id)[$id];
+
         if (!empty($datapipeEmail_var)) {
             $email_form_var = explode("\n", $datapipeEmail_var);
 
             $emailsTo = preg_split("/[;,]+/", $email_to);
             $emailsCC = preg_split("/[;,]+/", $email_cc);
             $emailsBCC = preg_split("/[;,]+/", $email_bcc);
-            $mail = $this->fill_emails($mail,$emailsTo, $email_form_var, $data, 'to',$project_id,$record, $event_id, $instrument, $instance, $isLongitudinal);
-            $mail = $this->fill_emails($mail,$emailsCC, $email_form_var, $data, 'cc',$project_id,$record, $event_id, $instrument, $instance, $isLongitudinal);
-            $mail = $this->fill_emails($mail,$emailsBCC, $email_form_var, $data, 'bcc',$project_id,$record, $event_id, $instrument, $instance, $isLongitudinal);
+
+            $array_emails = $this->fill_emails($array_emails,$emailsTo, $email_form_var, $data, 'to',$project_id,$record, $event_id, $instrument, $instance, $isLongitudinal);
+            $array_emails = $this->fill_emails($array_emails,$emailsCC, $email_form_var, $data, 'cc',$project_id,$record, $event_id, $instrument, $instance, $isLongitudinal);
+            $array_emails = $this->fill_emails($array_emails,$emailsBCC, $email_form_var, $data, 'bcc',$project_id,$record, $event_id, $instrument, $instance, $isLongitudinal);
         }else{
-            $email_to_ok = $this->check_email ($email_to,$project_id);
-            $email_cc_ok = $this->check_email ($email_cc,$project_id);
-            $email_bcc_ok = $this->check_email ($email_bcc,$project_id);
 
-            if(!empty($email_to_ok)) {
-                foreach ($email_to_ok as $email) {
-                    $mail = $this->check_single_email($mail,$email, 'to', $project_id);
-                }
-            }
-
-            if(!empty($email_cc_ok)){
-                foreach ($email_cc_ok as $email) {
-                    $mail = $this->check_single_email($mail,$email, 'cc', $project_id);
-                }
-            }
-
-            if(!empty($email_bcc_ok)){
-                foreach ($email_bcc_ok as $email) {
-                    $mail = $this->check_single_email($mail,$email, 'bcc', $project_id);
-                }
-            }
+            $array_emails['to'] = $email_to;
+            $array_emails['cc'] = $email_cc;
+            $array_emails['bcc'] = $email_bcc;
         }
-        return $mail;
+        return $array_emails;
     }
 
     /**
@@ -896,7 +849,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $id
      * @return mixed
      */
-    function setFrom($mail, $project_id, $record, $id){
+    function setFrom($array_emails, $project_id, $record, $id){
     	global $from_email;
 		// Using the Universal From Email Address?
 		$usingUniversalFrom = ($from_email != '');
@@ -919,16 +872,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 					$fromDisplayName = $usingUniversalFrom ? $from_data[1]." <".$from_data[0].">" : $from_data[1];
 					$replyToDisplayName = $from_data[1];
 				}
-				$mail->setFrom($this_from_email, $fromDisplayName, false);
-				$mail->addReplyTo($from_data[0], $replyToDisplayName);
-				$mail->Sender = $from_data[0]; // Return-Path
+                $array_emails['from'] = $this_from_email;
+                $array_emails['fromName'] = $fromDisplayName;
             }else{
                 $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$from_data[0]." in Project: ".$project_id.", Record: ".$record." Alert #".$id.", does not exist");
             }
         }else{
             $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Sender is empty" ,"The sender in Project: ".$project_id.", Record: ".$record." Alert #".$id.", is empty.");
         }
-        return $mail;
+        return $array_emails;
     }
 
     /**
@@ -1142,14 +1094,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      * @throws \Exception
      */
-    function setAttachments($mail, $project_id, $id){
+    function setAttachments($array_emails, $project_id, $id){
         for($i=1; $i<6 ; $i++){
             $edoc = $this->getProjectSetting("email-attachment".$i,$project_id)[$id];
             if(is_numeric($edoc)){
-                $mail = $this->addNewAttachment($mail,$edoc,$project_id,'files');
+                $array_emails = $this->addNewAttachment($array_emails,$edoc,$project_id,'files');
             }
         }
-        return $mail;
+        return $array_emails;
     }
 
     /**
@@ -1166,7 +1118,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      * @throws \Exception
      */
-    function setAttachmentsREDCapVar($mail,$project_id,$data, $record, $event_id, $instrument, $repeat_instance, $id, $isLongitudinal=false){
+    function setAttachmentsREDCapVar($array_emails,$project_id,$data, $record, $event_id, $instrument, $repeat_instance, $id, $isLongitudinal=false){
         $email_attachment_variable = htmlspecialchars_decode($this->getProjectSetting("email-attachment-variable", $project_id)[$id]);
         if(!empty($email_attachment_variable)){
             $var = preg_split("/[;,]+/", $email_attachment_variable);
@@ -1174,12 +1126,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(\LogicTester::isValid(trim($attachment))) {
                     $edoc = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $attachment,0, $isLongitudinal);
                     if(is_numeric($edoc)) {
-                        $this->addNewAttachment($mail, $edoc, $project_id, 'files');
+                        $array_emails = $this->addNewAttachment($array_emails,$edoc,$project_id,'files');
                     }
                 }
             }
         }
-        return $mail;
+        return $array_emails;
     }
 
     /**
@@ -1382,7 +1334,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $project_id
      * @return mixed
      */
-    function fill_emails($mail, $emailsTo, $email_form_var, $data, $option, $project_id, $record, $event_id, $instrument, $repeat_instance, $isLongitudinal=false){
+    function fill_emails($array_emails, $emailsTo, $email_form_var, $data, $option, $project_id, $record, $event_id, $instrument, $repeat_instance, $isLongitudinal=false){
+        $array_emails_aux = array();
         foreach ($emailsTo as $email){
             foreach ($email_form_var as $email_var) {
                 $var = preg_split("/[;,]+/", $email_var);
@@ -1397,49 +1350,27 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                        }
 
                        if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email) && !$isLabel) {
-                            $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
+                           array_push($array_emails_aux,$email_redcap);
                        } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap)){
-                            $mail = $this->check_single_email($mail,$email,$option,$project_id);
+                           array_push($array_emails_aux,$email);
                        }else if(filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL) && $email == $var[0] && $isLabel){
-                           $mail = $this->check_single_email($mail,$email_redcap,$option,$project_id);
+                           array_push($array_emails_aux,$email_redcap);
                        }else if($email == $var[0] && $isLabel){
                            $email_redcap_checkboxes = preg_split("/[;,]+/", $email_redcap);
                            foreach ($email_redcap_checkboxes as $email_ck){
                                if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL)){
-                                   $mail = $this->check_single_email($mail,$email_ck,$option,$project_id);
+                                   array_push($array_emails_aux,$email_ck);
                                }
                            }
                        }
                     } else {
-                        $mail = $this->check_single_email($mail,$email,$option,$project_id);
+                        array_push($array_emails_aux,$email);
                     }
                 }
             }
         }
-        return $mail;
-    }
-
-    /**
-     * Function that if valid adds an email address to the mail
-     * @param $mail
-     * @param $email
-     * @param $option, if they are To or CC emails
-     * @param $project_id
-     * @return mixed
-     */
-    function check_single_email($mail,$email, $option, $project_id){
-        if(filter_var(trim($email), FILTER_VALIDATE_EMAIL)) {
-            if($option == "to"){
-                $mail->addAddress($email);
-            }else if($option == "cc"){
-                $mail->addCC($email);
-            }else if($option == "bcc"){
-                $mail->addBCC($email);
-            }
-        }else{
-           $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Wrong recipient" ,"The email ".$email." in the project ".$project_id.", do not exist");
-        }
-        return $mail;
+        $array_emails[$option] = implode(";",$array_emails_aux);
+        return $array_emails;
     }
 
     /**
@@ -1490,7 +1421,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $project_id
      * @return mixed
      */
-    function addNewAttachment($mail,$edoc,$project_id, $type){
+    function addNewAttachment($array_emails,$edoc,$project_id){
         if(!empty($edoc)) {
             $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id='" . db_escape($edoc)."' AND project_id='".db_escape($project_id)."'";
             $q = $this->query($sql);
@@ -1503,16 +1434,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if($row['doc_size'] > 3145728 ){
                    $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"File Size too big" ,"One or more ".$type." in the project ".$project_id.", are too big to be sent.");
                 }else{
-                    if($type == 'files'){
-                        //attach file with a different name
-                        $mail->AddAttachment(EDOC_PATH . $row['stored_name'], $row['doc_name']);
-                    }else if($type == 'images'){
-                        $mail->AddEmbeddedImage(EDOC_PATH . $row['stored_name'],$edoc);
-                    }
+                    //attach file with name as index
+                    $array_emails['attachments'][$row['doc_name']] = EDOC_PATH . $row['stored_name'];
                 }
             }
         }
-        return $mail;
+        return $array_emails;
     }
 
     /**
