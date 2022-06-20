@@ -19,6 +19,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function hook_survey_complete ($project_id,$record = null,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         if($record != "") {
+            $this->deleteOldLogs($project_id);
             $data = \REDCap::getData($project_id, "array", $record);
             $this->setEmailTriggerRequested(false);
             if (isset($project_id)) {
@@ -50,6 +51,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function hook_save_record ($project_id,$record = null,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         if($record != "") {
+            $this->deleteOldLogs($project_id);
             $data = \REDCap::getData($project_id, "array", $record);
             $this->setEmailTriggerRequested(false);
             if (isset($project_id)) {
@@ -348,14 +350,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         while($row = db_fetch_assoc($q)){
             $project_id = $row['project_id'];
             if($project_id != "") {
-                error_log("scheduledemails PID: " . $project_id." - start");
+                $this->log("scheduledemails PID: " . $project_id." - start",['scheduledemails' => 1]);
                 $email_queue = $this->getProjectSetting('email-queue', $project_id);
                 if ($email_queue != '') {
                     $email_sent_total = 0;
                     foreach ($email_queue as $index => $queue) {
                         if ($queue['record'] != '' && $email_sent_total < 100 && !$this->hasQueueExpired($queue, $index, $project_id) && $queue['deactivated'] != 1) {
                            if ($this->getProjectSetting('email-deactivate', $project_id)[$queue['alert']] != "1" && $this->sendToday($queue,$project_id)) {
-                                error_log("scheduledemails PID: " . $project_id . " - Has queued emails to send today " . date("Y-m-d H:i:s"));
+                               $this->log("scheduledemails PID: " . $project_id . " - Has queued emails to send today " . date("Y-m-d H:i:s"),['scheduledemails' => 1]);
                                 #SEND EMAIL
                                 $email_sent = $this->sendQueuedEmail($index,$project_id, $queue['record'], $queue['alert'], $queue['instrument'], $queue['instance'], $queue['isRepeatInstrument'], $queue['event_id']);
                                 #If email sent save date and number of times sent and delete queue if needed
@@ -366,7 +368,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $this->stopRepeat($queue, $index, $project_id);
                             }
                         }else if($email_sent_total >= 100){
-                            error_log("scheduledemails PID: " . $project_id . " - Batch ended at " . date("Y-m-d H:i:s"));
+                            $this->log("scheduledemails PID: " . $project_id . " - Batch ended at " . date("Y-m-d H:i:s"),['scheduledemails' => 1]);
                             break;
                         }
                     }
@@ -420,7 +422,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
         if($cron_repeat_for == "" || $cron_repeat_for == "0" && $queue['last_sent'] != ""){
             $this->deleteQueuedEmail($index, $project_id);
-            error_log("scheduledemails PID: " . $queue['project_id'] . " - Alert # ".$queue['alert']." Queue #".$index." stop repeat. Delete.");
+            $this->log("scheduledemails PID: " . $queue['project_id'] . " - Alert # ".$queue['alert']." Queue #".$index." stop repeat. Delete.",['scheduledemails' => 1]);
         }
     }
 
@@ -438,7 +440,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         #If the repeat is 0 we delete regardless of the expiration option
         if(($cron_repeat_for == "" || $cron_repeat_for == "0") && $queue['last_sent'] != ""){
-            error_log("scheduledemails PID: " . $project_id . " - Alert # ".$queue['alert']." Queue #".$index." expired. Delete.");
+            $this->log("scheduledemails PID: " . $project_id . " - Alert # ".$queue['alert']." Queue #".$index." expired. Delete.",['scheduledemails' => 1]);
             $this->deleteQueuedEmail($index, $project_id);
             return true;
         }
@@ -451,13 +453,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
             if ($cron_queue_expiration_date == 'date' && $cron_queue_expiration_date_field != "") {
                 if (strtotime($cron_queue_expiration_date_field) <= strtotime(date('Y-m-d'))) {
-                    error_log("scheduledemails PID: " . $project_id . " - Alert # ".$queue['alert']." Queue #".$index." expired date. Delete.");
+                    $this->log("scheduledemails PID: " . $project_id . " - Alert # ".$queue['alert']." Queue #".$index." expired date. Delete.",['scheduledemails' => 1]);
                     $this->deleteQueuedEmail($index, $project_id);
                     return true;
                 }
             }else if ($cron_queue_expiration_date == 'cond' && $cron_queue_expiration_date_field != "") {
                 if ($evaluateLogic) {
-                    error_log("scheduledemails PID: " . $project_id . " - Alert # ".$queue['alert']." Queue #".$index." expired condition. Delete.");
+                    $this->log("scheduledemails PID: " . $project_id . " - Alert # ".$queue['alert']." Queue #".$index." expired condition. Delete.",['scheduledemails' => 1]);
                     $this->deleteQueuedEmail($index, $project_id);
                     return true;
                 }
@@ -730,12 +732,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_sent_ok = false;
         $send = \REDCap::email ($array_emails['to'],  $array_emails['from'], $email_subject,  $email_text ,  $array_emails['cc'] ,  $array_emails['bcc'] ,  $array_emails['fromName'],$array_emails['attachments']);
         if (!$send) {
-            error_log("scheduledemails PID: ".$project_id."Mailer Error: the email could not be sent");
-            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error:".$mail->ErrorInfo." in Project: ".$project_id.", Record: ".$record." Alert #".$alert_number);
+            $this->log("scheduledemails PID: ".$project_id."Mailer Error: the email could not be sent",['scheduledemails' => 1]);
+            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error in Project: ".$project_id.", Record: ".$record." Alert #".$alert_number."<br>Subject:".$email_subject);
         }else{
             try {
-                error_log("scheduledemails PID: " . $project_id . " - Email was sent!");
-                error_log("scheduledemails PID: " . $project_id . " - Alert #".$alert_number.", Record ".$record.", Event ".$event_id);
+                $this->log("scheduledemails PID: " . $project_id . " - Email was sent!",['scheduledemails' => 1]);
+                $this->log("scheduledemails PID: " . $project_id . " - Alert #".$alert_number.", Record ".$record.", Event ".$event_id,['scheduledemails' => 1]);
 
                 $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
                 $email_sent_ok = true;
@@ -1762,6 +1764,25 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
 		return $fullPath;
 	}
+
+	function deleteOldLogs($project_id){
+        #If logs are older than a month, delete them. Only delete the scheduledemails log data
+        $pseudoSql = "
+                select timestamp,log_id, message, scheduledemails
+                where
+                    project_id = ".$project_id."
+                    and scheduledemails = 1
+                order by timestamp desc
+            ";
+        $result = $this->queryLogs($pseudoSql);
+        $today = date('Y-m-d');
+        while($row = $result->fetch_assoc()){
+            $months_past_date = date('Y-m-d',strtotime("+1 month ".$row['timestamp']));
+            if(strtotime($today) >= strtotime($months_past_date)){
+                $this->removeLogs('log_id=? and project_id=?', [$row['log_id'],$project_id]);
+            }
+        }
+    }
 }
 
 
