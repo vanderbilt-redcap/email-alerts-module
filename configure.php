@@ -43,7 +43,10 @@ if(array_key_exists('message', $_REQUEST)){
 }
 
 #get number of instances
-$indexSubSet = sizeof($config['email-dashboard-settings'][1]['value']);
+$indexSubSet = 0;
+if($config['email-dashboard-settings'][1]['value'] != null) {
+    $indexSubSet = count($config['email-dashboard-settings'][1]['value']);
+}
 
 #User rights
 $UserRights = \REDCap::getUserRights(USERID)[USERID];

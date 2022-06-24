@@ -216,7 +216,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if ($delayedSuccessful) {
             return;
         }
-
         $email_repetitive = $this->getProjectSetting("email-repetitive",$project_id)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$project_id)[$id];
         $email_deleted = $this->getProjectSetting("email-deleted",$project_id)[$id];
@@ -233,11 +232,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $evaluateLogic = \REDCap::evaluateLogic($email_condition, $project_id, $record, $event_id, $repeat_instance, $instrument);
                 }
                 if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && $evaluateLogic) || empty($email_condition)) {
-                    $cron_repeat_email = $this->getProjectSetting("cron-repeat-email", $project_id)[$id];
+                    $cron_repeat_for = $this->getProjectSetting("cron-repeat-for", $project_id)[$id];
                     $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $project_id)[$id];
                     $cron_send_email_on_field = htmlspecialchars_decode($this->getProjectSetting("cron-send-email-on-field", $project_id)[$id]);
 
-                    if ($email_repetitive == '0' && ($cron_repeat_email == '1' || ($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field != ''))) {
+                    if ($email_repetitive == '0' && (($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field != '') || ($cron_send_email_on == 'now' && $cron_repeat_for >= 1))) {
                         #SCHEDULED EMAIL
                         if (!$this->isQueueExpired($project_id, $record, $event_id, $repeat_instance, $instrument, $isRepeatInstrument, $id) && !$this->isAlreadyInQueue($id, $project_id, $record,$repeat_instance)) {
                             $this->addQueuedEmail($id, $project_id, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument);
