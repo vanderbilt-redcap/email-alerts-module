@@ -1363,6 +1363,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                    array_push($array_emails_aux,$email_ck);
                                }
                            }
+                       }else{
+                           $parsed_email = trim(preg_split('/\s*<([^>]*)>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE)[1]);
+                           if(filter_var($parsed_email)){
+                               array_push($array_emails_aux,$parsed_email);
+                           }
                        }
                     } else {
                         array_push($array_emails_aux,$email);
@@ -1371,6 +1376,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         $array_emails[$option] = implode(";",$array_emails_aux);
+        error_log(json_encode($array_emails,JSON_PRETTY_PRINT));
         return $array_emails;
     }
 
