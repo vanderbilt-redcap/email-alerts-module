@@ -349,6 +349,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         while($row = db_fetch_assoc($q)){
             $project_id = $row['project_id'];
             if($project_id != "") {
+                $this->deleteOldLogs($project_id);
                 $this->log("scheduledemails PID: " . $project_id." - start",['scheduledemails' => 1]);
                 $email_queue = $this->getProjectSetting('email-queue', $project_id);
                 if ($email_queue != '') {
