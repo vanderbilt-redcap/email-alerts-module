@@ -729,10 +729,29 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
 
         $email_sent_ok = false;
-        $send = \REDCap::email ($array_emails['to'],  $array_emails['from'], $email_subject,  $email_text ,  $array_emails['cc'] ,  $array_emails['bcc'] ,  $array_emails['fromName'],$array_emails['attachments']);
+
+        #We use the message class so the emails get recorded in the Email Logging section in REDCap
+        $email = new \Message($project_id, $record, $event_id, $instrument, $instance);
+        $email->setTo($array_emails['to']);
+        if ($array_emails['cc'] != '') $email->setCc($array_emails['cc']);
+        if ($array_emails['bcc'] != '') $email->setBcc($array_emails['bcc']);
+        $email->setFrom($array_emails['from']);
+        $email->setFromName($array_emails['fromName']);
+        $email->setSubject($email_subject);
+        $email->setBody($email_text);
+        if (is_array($array_emails['attachments']) && !empty($array_emails['attachments'])) {
+            foreach ($array_emails['attachments'] as $name=>$fullPath) {
+                $email->setAttachment($fullPath, $name);
+            }
+        }
+        $send = $email->send();
+
         if (!$send) {
-            $this->log("scheduledemails PID: ".$project_id."Mailer Error: the email could not be sent",['scheduledemails' => 1]);
-            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error in Project: ".$project_id.", Record: ".$record." Alert #".$alert_number."<br>Subject:".$email_subject);
+            $this->log("scheduledemails PID: ".$project_id."Mailer Error: The email could not be sent",['scheduledemails' => 1]);
+            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"Mailer Error" ,"Mailer Error: The email could not be sent in project ".$project_id." record #".$record.
+                "<br><br>To: ".$array_emails['to'] ."<br>CC: ".$array_emails['cc'] ."<br>From (".$array_emails['fromName']."): ".$array_emails['from']."<br>Subject: ".$email_subject.
+                "<br>Message: <br>".$email_text);
+
         }else{
             try {
                 $this->log("scheduledemails PID: " . $project_id . " - Email was sent!",['scheduledemails' => 1]);
