@@ -1797,21 +1797,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
 	function deleteOldLogs($project_id){
         #If logs are older than a month, delete them. Only delete the scheduledemails log data
-        $pseudoSql = "
-                select timestamp,log_id, message, scheduledemails
-                where
-                    project_id = ".$project_id."
-                    and scheduledemails = 1
-                order by timestamp desc
-            ";
-        $result = $this->queryLogs($pseudoSql);
-        $today = date('Y-m-d');
-        while($row = $result->fetch_assoc()){
-            $months_past_date = date('Y-m-d',strtotime("+1 month ".$row['timestamp']));
-            if(strtotime($today) >= strtotime($months_past_date)){
-                $this->removeLogs('log_id=? and project_id=?', [$row['log_id'],$project_id]);
-            }
-        }
+        $this->removeLogs('
+                project_id = ?
+                and scheduledemails = 1
+                and timestamp < date_sub(now(), interval 1 month)
+                ', [$project_id]);
     }
 
     function isProjectStatusCompleted ($project_id){
