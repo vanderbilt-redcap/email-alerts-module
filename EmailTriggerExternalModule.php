@@ -17,7 +17,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		$this->disableUserBasedSettingPermissions();
 	}
 
-    function hook_survey_complete ($project_id,$record = null,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
+    function hook_survey_complete ($project_id,$record,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         if($record != "") {
             $this->deleteOldLogs($project_id);
             if(!$this->isProjectStatusCompleted($project_id)) {
@@ -51,7 +51,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
-    function hook_save_record ($project_id,$record = null,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
+    function hook_save_record ($project_id,$record,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         if($record != "") {
             $this->deleteOldLogs($project_id);
             if(!$this->isProjectStatusCompleted($project_id)) {
