@@ -19,7 +19,9 @@ $simple_config_update = $config;
 
 #Add DataBase values to settings
 for($i=0;$i<sizeof($config['email-dashboard-settings']);$i++){
-     $config['email-dashboard-settings'][$i]['value'] =  $projectData['settings'][$config['email-dashboard-settings'][$i]['key']]['value'];
+    if (isset($projectData['settings'][$config['email-dashboard-settings'][$i]['key']])) {
+        $config['email-dashboard-settings'][$i]['value'] =  $projectData['settings'][$config['email-dashboard-settings'][$i]['key']]['value'];
+    }
 }
 
 #Add choices values to settings
@@ -142,7 +144,7 @@ foreach ($language_errors as $err){
         var project_id = <?=$pid?>;
         var isLongitudinal = <?=json_encode(\REDCap::isLongitudinal())?>;
         var from_default = <?=json_encode($from_default)?>;
-        var message_letter = <?=json_encode(htmlspecialchars($_REQUEST['message'],ENT_QUOTES))?>;
+        var message_letter = <?=json_encode(htmlspecialchars(isset($_REQUEST['message']) ? $_REQUEST['message'] : "",ENT_QUOTES))?>;
         var isAdmin = <?=json_encode($isAdmin)?>;
 
         //Dashboard info
@@ -1127,9 +1129,17 @@ foreach ($language_errors as $err){
             $email_sent_all = $module->getProjectSettingLog($pid,"email-sent");
 
             $alert_id = $projectData['settings']['alert-id']['value'];
-            $email_queue = $projectData['settings']['email-queue']['value'];
+            if (isset($projectData['settings']['email-queue'])) {
+                $email_queue = $projectData['settings']['email-queue']['value'];
+            } else {
+                $email_queue = [];
+            }
             for ($index = 0; $index < $indexSubSet; $index++) {
-                $email_sent = $email_sent_all[$index];
+                if (isset($email_sent_all[$index])) {
+                    $email_sent = $email_sent_all[$index];
+                } else {
+                    $email_sent = "";
+                }
                 $message_sent = "";
                 if($email_sent == "1"){
                     if(!empty($email_timestamp_sent[$index])){
@@ -1349,7 +1359,7 @@ foreach ($language_errors as $err){
                     }
                     if($configRow['key'] == 'form-name' || $configRow['key'] == 'email-condition' || $configRow['key'] == 'email-subject' || $configRow['key'] == 'email-attachment-variable' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-queue-expiration-date-field'){
                         $info_modal[$index][$configRow['key']] = htmlspecialchars_decode($configRow['value'][$index],ENT_QUOTES);
-                    }else{
+                    }else if (isset($configRow['value'])) {
                         $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
                     }
                 }

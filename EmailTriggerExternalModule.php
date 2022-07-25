@@ -125,7 +125,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $this->removeLogs("project_id = $project_id and message = 'email-records-sent'");
             $this->removeLogs("project_id = $project_id and message = 'email-sent'");
             $this->removeLogs("project_id = $project_id and message = 'email-timestamp-sent'");
-        }else if($_REQUEST['route'] == 'DataEntryController:deleteRecord' && $_REQUEST['record'] != ""){
+        }else if (
+            isset($_REQUEST['route'])
+            && isset($_REQUEST['record'])
+            && ($_REQUEST['route'] == 'DataEntryController:deleteRecord')
+            && ($_REQUEST['record'] != "")
+        ){
             #Button: Delete record
 
             $record_id = urldecode($_REQUEST['record']);
@@ -608,9 +613,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function getProjectSettingLog($project_id,$settingName,$isRepeatInstrument=""){
         $data = $this->getProjectSetting($settingName, $project_id);
+        if ($data === NULL) {
+            $data = [];
+        }
         if($settingName == "email-repetitive-sent"){
             $logs = $this->queryLogs("select instrument, alert, record_id, event, instance where project_id = $project_id and message = '$settingName'");
-            $data = json_decode($data,true);
+            $data = $data ? json_decode($data,true) : [];
             foreach($logs as $log){
                 $instrument = $log['instrument'];
                 $alert = $log['alert'];
@@ -621,6 +629,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }else {
             $logs = $this->queryLogs("select value,id where project_id = $project_id and message = '$settingName'");
+            if ($logs === NULL) {
+                $logs = [];
+            }
             if($settingName == "email-records-sent"){
                 if(!empty($data)){
                     $aux = $data;
@@ -1123,7 +1134,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function setAttachments($array_emails, $project_id, $id){
         for($i=1; $i<6 ; $i++){
-            $edoc = $this->getProjectSetting("email-attachment".$i,$project_id)[$id];
+            $attachmentAry = $this->getProjectSetting("email-attachment".$i,$project_id);
+            $edoc = isset($attachmentAry[$id]) ? $attachmentAry[$id] : FALSE;
             if(is_numeric($edoc)){
                 $array_emails = $this->addNewAttachment($array_emails,$edoc,$project_id,'files');
             }
