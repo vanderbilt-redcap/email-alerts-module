@@ -111,7 +111,7 @@ if($email_repetitive[$index] == "0" && $repetitive == "1" || $email_repetitive[$
 $form_name[$index] = htmlspecialchars(isset($_REQUEST['form-name-update']) ? $_REQUEST['form-name-update'] : "",ENT_QUOTES);
 $form_name_event[$index] = isset($_REQUEST['form-name-event']) ? $_REQUEST['form-name-event'] : "";
 $email_from[$index] = isset($_REQUEST['email-from-update']) ? $_REQUEST['email-from-update'] : "";
-$email_to[$index] = isset($_REQUEST['email-cc-update']) ? $_REQUEST['email-cc-update'] : "";
+$email_to[$index] = isset($_REQUEST['email-to-update']) ? $_REQUEST['email-to-update'] : "";
 $email_cc[$index] = isset($_REQUEST['email-cc-update']) ? $_REQUEST['email-cc-update'] : "";
 $email_bcc[$index] = isset($_REQUEST['email-bcc-update']) ? $_REQUEST['email-bcc-update'] : "";
 $email_subject[$index] = htmlspecialchars(isset($_REQUEST['email-subject-update']) ? $_REQUEST['email-subject-update'] : "",ENT_QUOTES);

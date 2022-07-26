@@ -51,7 +51,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function hook_save_record ($project_id,$record,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
-        error_log("hook_save_record");
         if($record != "") {
             $this->deleteOldLogs($project_id);
             if(!$this->isProjectStatusCompleted($project_id)) {
@@ -62,7 +61,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $forms_name = $this->getProjectSetting("form-name", $project_id);
                     if (!empty($forms_name) && $record != null) {
                         foreach ($forms_name as $id => $form) {
-                            error_log("For $id = $form");
                             $form_name_event_id = $this->getProjectSetting("form-name-event", $project_id)[$id];
                             $isLongitudinalData = false;
                             if (\REDCap::isLongitudinal() && !empty($form_name_event_id)) {
@@ -72,11 +70,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $isRepeatInstrumentComplete = $this->isRepeatInstrumentComplete($data, $record, $event_id, $form, $repeat_instance);
                             $isRepeatInstrument = false;
                             if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
-                                error_log("isRepeatInstrument TRUE");
                                 $isRepeatInstrument = true;
                             }
                             $incompleteAry = $this->getProjectSetting("email-incomplete", $project_id);
-                            error_log("incompleteAry: ".json_encode($incompleteAry));
                             $email_incomplete = isset($incompleteAry[$id]) ? $incompleteAry[$id] : "";
                             if (
                                 (
@@ -93,10 +89,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                         || $isRepeatInstrumentComplete)
                                 )
                             ) {
-                                error_log("In if");
                                 if (($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData) {
                                     if ($_REQUEST['page'] == $form) {
-                                        error_log("sendEmailAlert");
                                         $this->setEmailTriggerRequested(true);
                                         $this->sendEmailAlert($project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrument);
                                     } else if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
@@ -891,9 +885,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if (!empty($datapipeEmail_var)) {
             $email_form_var = explode("\n", $datapipeEmail_var);
 
-            $emailsTo = preg_split("/[;,]+/", $email_to);
-            $emailsCC = preg_split("/[;,]+/", $email_cc);
-            $emailsBCC = preg_split("/[;,]+/", $email_bcc);
+            $emailsTo = ($email_to !== "") ? preg_split("/[;,]+/", $email_to) : [];
+            $emailsCC = ($email_cc !== "") ? preg_split("/[;,]+/", $email_cc) : [];
+            $emailsBCC = ($email_bcc !== "") ? preg_split("/[;,]+/", $email_bcc) : [];
 
             $array_emails = $this->fill_emails($array_emails,$emailsTo, $email_form_var, $data, 'to',$project_id,$record, $event_id, $instrument, $instance, $isLongitudinal);
             $array_emails = $this->fill_emails($array_emails,$emailsCC, $email_form_var, $data, 'cc',$project_id,$record, $event_id, $instrument, $instance, $isLongitudinal);
@@ -1238,10 +1232,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function isRepeatInstrumentComplete($data, $record, $event_id, $instrument, $instance){
         if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument.'_complete'] == '2'))){
-            error_log("isRepeatInstrumentComplete returning TRUE");
             return true;
         }
-        error_log("isRepeatInstrumentComplete returning FALSE ",json_encode($data[$record]));
         return false;
     }
 
@@ -1348,7 +1340,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      */
     function isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $var, $option=null, $isLongitudinal=false){
-        error_log("isRepeatingInstrument with $var");
         $var_name = str_replace('[', '', $var);
         $var_name = str_replace(']', '', $var_name);
         $logic = "";
@@ -1359,39 +1350,32 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         ) {
             #Repeating instruments by form
             $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
-            error_log("ifA $var = $logic");
         }else if(
             array_key_exists('repeat_instances',$data[$record])
             && isset($data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name])
             && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name] != "") {
             #Repeating instruments by event
             $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
-            error_log("ifB $var = $logic");
         }else{
             $project = new \Project($project_id);
             if($option == '1'){
                 if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
-                    error_log("option 1A $var = $logic");
                 }else{
-                    $logic = \Piping::replaceVariablesInLabel($var, $record, $event_id, $repeat_instance, $data[$record]);
-                    error_log("option 1B $var = $logic");
-                    // SJP $logic = \LogicTester::apply($var, $data[$record], $project, true, true);
+                    $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
+                    $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
                 }
             }else{
                 if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
-                    error_log("elseA $var = $logic");
                 }else{
                     preg_match_all("/\[[^\]]*\]/", $var, $matches);
                     #Special case for radio buttons
                     if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
                         $logic = $data[$record][$event_id][$var_name];
-                        error_log("elseB $var = $logic");
                     }else{
-                        $logic = \Piping::replaceVariablesInLabel($var, $record, $event_id, $repeat_instance, $data[$record]);
-                        error_log("elseC $var = $logic");
-                        // SJP $logic = \LogicTester::apply($var, $data[$record], $project, true, true);
+                        $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
+                        $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
                     }
                 }
 
@@ -1422,7 +1406,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function fill_emails($array_emails, $emailsTo, $email_form_var, $data, $option, $project_id, $record, $event_id, $instrument, $repeat_instance, $isLongitudinal=false){
         $array_emails_aux = array();
-        error_log("fill_emails");
         foreach ($emailsTo as $email){
             foreach ($email_form_var as $email_var) {
                 $var = preg_split("/[;,]+/", $email_var);
