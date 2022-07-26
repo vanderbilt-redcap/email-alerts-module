@@ -3,7 +3,6 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
-use PHPMailer\PHPMailer\PHPMailer;
 
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 require_once 'vendor/autoload.php';

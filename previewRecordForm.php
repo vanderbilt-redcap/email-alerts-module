@@ -4,8 +4,6 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-use PHPMailer\PHPMailer\PHPMailer;
-
 require_once __DIR__.'/vendor/autoload.php';
 
 $project_id = $_GET['pid'];
@@ -36,23 +34,22 @@ if(empty($form_name_event)){
     }
 }
 
-$mail = new PHPMailer;
-
 #Email Addresses
-$mail = $module->setEmailAddresses($mail, $project_id, $record, $form_name_event, $form_name, 1, $data, $index,\REDCap::isLongitudinal());
+$array_emails = array();
+$array_emails = $module->setEmailAddresses($array_emails, $project_id, $record, $event_id, $form_name, 1, $data, $index, \REDCap::isLongitudinal());
 
 $email_to = "";
-foreach ($mail->getToAddresses() as $address){
+foreach ($array_emails['to'] as $address){
     $email_to .= $address[0].", ";
 }
 
 $email_cc = "";
-foreach ($mail->getCcAddresses() as $address){
+foreach ($array_emails['cc'] as $address){
     $email_cc .= $address[0].", ";
 }
 
 $email_bcc = "";
-foreach ($mail->getBccAddresses() as $address){
+foreach ($array_emails['bcc'] as $address){
     $email_bcc .= $address[0].", ";
 }
 
