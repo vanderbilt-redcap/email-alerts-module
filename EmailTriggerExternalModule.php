@@ -1089,6 +1089,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $formEventId = $project->getEventIdUsingUniqueEventName($matches[1][0]);
                 $instrumentForm = $matches[1][1];
                 $instance = 1;
+            } else if ((count($matches[1]) == 2) && is_numeric($matches[1][1])) {
+                $formEventId = $event_id;
+                $instrumentForm = $matches[1][0];
+                $instance = $matches[1][1];
             } else if (count($matches[1]) == 2) {
                 # all others - classical with non-numerical second term - should not happen
                 throw new \Exception("Improper term! $redcapLogic");
@@ -1096,7 +1100,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $project = new \Project($project_id);
                 $formEventId = $project->getEventIdUsingUniqueEventName($matches[1][0]);
                 $instrumentForm = $matches[1][1];
-                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrumentForm, $matches[1][2], $isLongitudinal);
+                if (is_numeric($matches[1][2])) {
+                    $instance = $matches[1][2];
+                } else {
+                    $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrumentForm, $matches[1][2], $isLongitudinal);
+                }
             } else {
                 $instrumentForm = $matches[1][0];
                 $formEventId = $event_id;
