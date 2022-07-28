@@ -498,7 +498,7 @@ foreach ($language_errors as $err){
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
                         if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]"){
-                            errMsg.push('<strong>Data Piping field</strong> must be follow the format: <i>[variable_name],label</i> .');
+                            errMsg.push('<strong>Data Piping field</strong> must follow the format: <i>[variable_name],label</i> .');
                         }
                     }
                 }
@@ -508,7 +508,7 @@ foreach ($language_errors as $err){
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
                         if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]"){
-                            errMsg.push('<strong>Data Piping Email field</strong> must be follow the format: <i>[variable_name],label</i> .');
+                            errMsg.push('<strong>Data Piping Email field</strong> must follow the format: <i>[variable_name],label</i> .');
                         }
                     }
                 }
@@ -517,7 +517,7 @@ foreach ($language_errors as $err){
                     var result = $('#emailFromForm_var').val().split(",");
                     for(var i=0;i<result.length;i++){
                         if(trim(result[i]).substring(0, 1) != "[" || trim(result[i]).substring(trim(result[i]).length-1, trim(result[i]).length) != "]"){
-                            errMsg.push('<strong>Email Addresses field</strong> must be follow the format: <i>[variable_name]</i>.');
+                            errMsg.push('<strong>Email Addresses field</strong> must follow the format: <i>[variable_name]</i>.');
                         }
                     }
                 }
@@ -544,12 +544,22 @@ foreach ($language_errors as $err){
 
                             if (isLongitudinal && matches && matches.length >1) {
 
-                                if(trim(matches[1]).substring(0, 1) != "[" || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]" || trim(matches[1]).substring(0, formPrefix.length) != formPrefix || trim(matches[0]).substring(0, 1) != "[" || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"){
-                                    errMsg.push('<strong>Longitudinal '+type+' Link field</strong> must be follow the format: <i>[event_name]['+formPrefix+'_variable_name],label</i> .');
+                                if(
+                                    trim(matches[1]).substring(0, 1) != "["
+                                    || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]"
+                                    || trim(matches[1]).substring(0, formPrefix.length) != formPrefix
+                                    || trim(matches[0]).substring(0, 1) != "["
+                                    || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"
+                                ){
+                                    errMsg.push('<strong>Longitudinal '+type+' Link field</strong> must follow the format: <i>[event_name]['+formPrefix+'_variable_name],label</i> .');
                                 }
                             }
-                            else if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]" || trim(pipeName[0]).substring(0, formPrefix.length) != formPrefix){
-                                errMsg.push('<strong>Link '+type+' field</strong> must be follow the format: <i>'+formPrefix+'variable_name],label</i> .');
+                            else if(
+                                trim(pipeName[0]).substring(0, 1) != "["
+                                || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]"
+                                || trim(pipeName[0]).substring(0, formPrefix.length) != formPrefix
+                            ){
+                                errMsg.push('<strong>Link '+type+' field</strong> must follow the format: <i>'+formPrefix+'variable_name],label</i> .');
                             }
                         }
                     }

@@ -10,6 +10,7 @@ require_once 'EmailTriggerExternalModule.php';
 $surveyLink_var = $_REQUEST['surveyLink_var'];
 $project_id = (int)$_REQUEST['project_id'];
 $message = '';
+$prefix = "__SURVEYLINK_";
 if(!empty($surveyLink_var)){
 
     $datasurvey = explode("\n", $surveyLink_var);
@@ -19,10 +20,14 @@ if(!empty($surveyLink_var)){
 
         preg_match_all("/\[[^\]]*\]/", $var, $matches);
 
-        if(sizeof($matches[0]) > 1){
-            $var = $matches[0][1];
+        if(sizeof($matches[0]) > 1) {
+            foreach ($matches[0] as $term) {
+                if (preg_match("/^\[$prefix/", $term)) {
+                    $var = $term;
+                }
+            }
         }
-        $instrument_form = str_replace('[__SURVEYLINK_', '', $var);
+        $instrument_form = str_replace('['.$prefix, '', $var);
         $instrument_form = db_escape(filter_var(str_replace(']', '', $instrument_form), FILTER_SANITIZE_STRING));
 
 

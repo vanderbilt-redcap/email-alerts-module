@@ -6,8 +6,10 @@ use ExternalModules\ExternalModules;
 
 require_once 'EmailTriggerExternalModule.php';
 
-$returnCode = \REDCap::getSurveyReturnCode($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']);
-$surveyLink = \REDCap::getSurveyLink($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']);
+$instance = $_REQUEST['instance'] ?: 1;
+
+$returnCode = \REDCap::getSurveyReturnCode($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], $instance);
+$surveyLink = \REDCap::getSurveyLink($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], $instance);
 
 if(strcasecmp($returnCode, $_REQUEST['returnCode']) == 0) {
 
@@ -17,10 +19,10 @@ if(strcasecmp($returnCode, $_REQUEST['returnCode']) == 0) {
     <html>
     <body>
     <form id='passthruform' name='passthruform' action='<?=$surveyLink?>' method='post' enctype='multipart/form-data'>
-             <?=$link?>
-            <input type='hidden' value='1' name='__prefill' />
+        <?=$link?>
+        <input type='hidden' value='1' name='__prefill' />
     </form>
-        <script type='text/javascript'>
+    <script type='text/javascript'>
         window.onload = function(){
             document.passthruform.submit();
         }
