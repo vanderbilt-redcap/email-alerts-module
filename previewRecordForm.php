@@ -18,6 +18,10 @@ $email_subject =  empty($module->getProjectSetting('email-subject'))?array():$mo
 $email_text =  empty($module->getProjectSetting('email-text'))?array():$module->getProjectSetting('email-text')[$index];
 $datapipe_var = $module->getProjectSetting("datapipe_var", $project_id);
 
+$email_from = htmlspecialchars($email_from);
+$email_subject = htmlspecialchars($email_subject);
+# TODO $email_text
+
 $data = \REDCap::getData($project_id,"array",$record);
 
 if(empty($form_name_event)){
@@ -74,9 +78,6 @@ if($email_bcc != ''){
 
 $isLongitudinal = \REDCap::isLongitudinal();
 $email_text = $module->setDataPiping($datapipe_var, $email_text, $project_id, $data, $record, $form_name_event, $form_name, 1, $isLongitudinal);
-# SJP TODO Remove
-$email_text = $module->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
-$email_text = $module->setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
 $email_subject = $module->setDataPiping($datapipe_var, $email_subject, $project_id, $data, $record, $form_name_event, $form_name, 1, $isLongitudinal);
 
 $preview .= "<tr><td>Subject:</td><td>".$email_subject."</td></tr>";
