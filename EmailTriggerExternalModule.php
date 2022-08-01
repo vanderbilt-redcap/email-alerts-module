@@ -998,11 +998,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                     //Repeatable instruments
                     $logic = $this->isRepeatingInstrument($project_id, $data, $record, $event_id, $instrument, $instance, $var,0, $isLongitudinal);
-                    $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance));
-
-                    if(!empty($label)){
-                        $logic = $label;
+                    if (is_array($logic)) {
+                        $correctLabels = [];
+                        foreach ($logic as $index => $value) {
+                            if ($value) {
+                                array_push($correctLabels, $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$index, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance)));
+                            }
+                        }
+                        $logic = implode(", ", $correctLabels);
+                    } else {
+                        $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance));
+                        if(!empty($label)){
+                            $logic = $label;
+                        }
                     }
+
 
                     $email_content = str_replace($var_replace, $logic, $email_content);
                 }
