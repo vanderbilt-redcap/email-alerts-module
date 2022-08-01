@@ -1432,7 +1432,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function recordExistsInRegisteredRecords($email_records_sent,$record){
-        $records_registered = array_map('trim', explode(',', ($email_records_sent !== NULL) ? $email_records_sent : []));
+        if (is_array($email_records_sent)) {
+            $records_registered = array_map('trim', $email_records_sent);
+        } else if (is_string($email_records_sent)) {
+            $records_registered = array_map('trim', explode(',', $email_records_sent));
+        } else if ($email_records_sent === NULL) {
+            $records_registered = [];
+        } else {
+            throw new \Exception("Invalid format");
+        }
         foreach ($records_registered as $record_registered){
             if($record == $record_registered){
                 return true;
