@@ -69,7 +69,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                             $isRepeatInstrumentComplete = $this->isRepeatInstrumentComplete($data, $record, $event_id, $form, $repeat_instance);
                             $isRepeatInstrument = false;
-                            if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
+                            if (
+                                array_key_exists('repeat_instances', $data[$record])
+                                && (
+                                    (
+                                        isset($data[$record]['repeat_instances'][$event_id][$form])
+                                        && $data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != ''
+                                    )
+                                    || (
+                                        isset($data[$record]['repeat_instances'][$event_id][""])
+                                        && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''
+                                    )
+                                )
+                            ) {
                                 $isRepeatInstrument = true;
                             }
                             $incompleteAry = $this->getProjectSetting("email-incomplete", $project_id);
@@ -246,7 +258,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
         $email_condition = htmlspecialchars_decode($this->getProjectSetting("email-condition", $project_id)[$id]);
         if(($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
-            $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance);
+            $recordEmailsSent = isset($email_records_sent[$id]) ? $email_records_sent[$id] : [];
+            $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$recordEmailsSent,$event_id, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance);
             if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery))) {
 
                 #If the condition is met or if we don't have any, we send the email
@@ -824,7 +837,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     ]);
                 }
 
-                $records = array_map('trim', explode(',', $email_records_sent[$id]));
+                $records = isset($email_records_sent[$id]) ? array_map('trim', explode(',', $email_records_sent[$id])) : [];
                 $record_found = false;
                 foreach ($records as $record_id) {
                     if ($record_id == $record) {
@@ -921,17 +934,20 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 				// Set the From email for this message
 				$this_from_email = (!$usingUniversalFrom ? $from_data[0] : $from_email);
 				// From, Reply-To, and Return-Path. Also, set Display Name if possible.
-				if ($from_data[1] == '""' || empty($from_data[1])) {
+				if (count($from_data) > 1 && ($from_data[1] == '""' || empty($from_data[1]))) {
 					// If no Display Name, then use the Sender address as the Display Name if using Universal FROM address
 					$fromDisplayName = $usingUniversalFrom ? $from_data[0] : "";
 					$replyToDisplayName = '';
-				} else {
+				} else if (count($from_data) > 1) {
 					// Clean the defined display name
 					$from_data[1] = str_replace('"', '', trim($from_data[1]));
 					// If has a Display Name, then use the Sender address+real Display Name if using Universal FROM address
 					$fromDisplayName = $usingUniversalFrom ? $from_data[1]." <".$from_data[0].">" : $from_data[1];
 					$replyToDisplayName = $from_data[1];
-				}
+				} else {
+                    $fromDisplayName = "";
+                    $replyToDisplayName = "";
+                }
                 $array_emails['from'] = $this_from_email;
                 $array_emails['fromName'] = $fromDisplayName;
             }else{
@@ -1341,8 +1357,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if (
             array_key_exists('repeat_instances',$data[$record])
             && (
-                $data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument.'_complete'] == '2'
-                || $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument.'_complete'] == '2'
+                (
+                    isset($data[$record]['repeat_instances'][$event_id][$instrument])
+                    && $data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument.'_complete'] == '2'
+                )
+                || (
+                    isset($data[$record]['repeat_instances'][$event_id][""])
+                    && $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument.'_complete'] == '2'
+                )
             )
         ){
             return true;
@@ -1490,10 +1512,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }else{
                 if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
-                }else{
+                }else {
                     preg_match_all("/\[[^\]]*\]/", $var, $matches);
-                    #Special case for radio buttons
-                    if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
+                    if (preg_match("/\(([^\)]+)\)/", $var_name, $checkboxMatches)) {
+                        #Special case for checkboxes
+                        $index = $checkboxMatches[1];
+                        $checkboxVarName = str_replace("($index)", "", $var_name);
+                        $logic = $data[$record][$event_id][$checkboxVarName][$index];
+                    } else if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
+                        #Special case for radio buttons
                         $logic = $data[$record][$event_id][$var_name];
                     }else{
                         $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
@@ -1501,9 +1528,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     }
                 }
 
-                if($logic == ""){
+                if($logic == "" && isset($data[$record]['repeat_instances'])){
                     #it's a repeating instance from a different form
-                    foreach ($data[$record]['repeat_instances'][$event_id] as $instrumentFound =>$instances){
+                    foreach ($data[$record]['repeat_instances'][$event_id] ?: [] as $instrumentFound =>$instances){
                         foreach ($instances as $instanceFound=>$p){
                             if($instanceFound == $repeat_instance){
                                 $logic = $data[$record]['repeat_instances'][$event_id][$instrumentFound][$repeat_instance][$var_name];
