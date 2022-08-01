@@ -497,8 +497,8 @@ foreach ($language_errors as $err){
                     var pipeVar = $('#datapipe_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
-                        if(pipeName !== '' && (trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]")){
-                            errMsg.push('<strong>Data Piping field</strong> must follow the format: <i>[variable_name],label</i> or <i>[variable_name][smart_variable],label</i>. '+JSON.stringify(pipeName));
+                        if(pipeName[0] !== '' && (trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]")){
+                            errMsg.push('<strong>Data Piping field</strong> must follow the format: <i>[variable_name],label</i> or <i>[variable_name][smart_variable],label</i>.');
                         }
                     }
                 }
@@ -507,7 +507,7 @@ foreach ($language_errors as $err){
                     var pipeVar = $('#datapipeEmail_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
-                        if(pipeName !== '' && (trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]")){
+                        if(pipeName[0] !== '' && (trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]")){
                             errMsg.push('<strong>Data Piping Email field</strong> must follow the format: <i>[variable_name],label</i> or <i>[variable_name][smart_variable],label</i>.');
                         }
                     }
@@ -516,7 +516,7 @@ foreach ($language_errors as $err){
                 if ($('#emailFromForm_var').val() != "" && $('#emailFromForm_var').val() != "0") {
                     var result = $('#emailFromForm_var').val().split(",");
                     for(var i=0;i<result.length;i++){
-                        if(pipeName !== '' && (trim(result[i]).substring(0, 1) != "[" || trim(result[i]).substring(trim(result[i]).length-1, trim(result[i]).length) != "]")){
+                        if(result[i] !== '' && (trim(result[i]).substring(0, 1) != "[" || trim(result[i]).substring(trim(result[i]).length-1, trim(result[i]).length) != "]")){
                             errMsg.push('<strong>Email Addresses field</strong> must follow the format: <i>[variable_name]</i> or <i>[variable_name][smart_variable]</i>.');
                         }
                     }
