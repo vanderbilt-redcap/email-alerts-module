@@ -19,7 +19,9 @@ $simple_config_update = $config;
 
 #Add DataBase values to settings
 for($i=0;$i<sizeof($config['email-dashboard-settings']);$i++){
-     $config['email-dashboard-settings'][$i]['value'] =  $projectData['settings'][$config['email-dashboard-settings'][$i]['key']]['value'];
+    if (isset($projectData['settings'][$config['email-dashboard-settings'][$i]['key']])) {
+        $config['email-dashboard-settings'][$i]['value'] =  $projectData['settings'][$config['email-dashboard-settings'][$i]['key']]['value'];
+    }
 }
 
 #Add choices values to settings
@@ -142,7 +144,7 @@ foreach ($language_errors as $err){
         var project_id = <?=$pid?>;
         var isLongitudinal = <?=json_encode(\REDCap::isLongitudinal())?>;
         var from_default = <?=json_encode($from_default)?>;
-        var message_letter = <?=json_encode(htmlspecialchars($_REQUEST['message'],ENT_QUOTES))?>;
+        var message_letter = <?=json_encode(htmlspecialchars(isset($_REQUEST['message']) ? $_REQUEST['message'] : "",ENT_QUOTES))?>;
         var isAdmin = <?=json_encode($isAdmin)?>;
 
         //Dashboard info
@@ -495,8 +497,8 @@ foreach ($language_errors as $err){
                     var pipeVar = $('#datapipe_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
-                        if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]"){
-                            errMsg.push('<strong>Data Piping field</strong> must be follow the format: <i>[variable_name],label</i> .');
+                        if(pipeName[0] !== '' && (trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]")){
+                            errMsg.push('<strong>Data Piping field</strong> must follow the format: <i>[variable_name],label</i> or <i>[variable_name][smart_variable],label</i>.');
                         }
                     }
                 }
@@ -505,8 +507,8 @@ foreach ($language_errors as $err){
                     var pipeVar = $('#datapipeEmail_var').val().split("\n");
                     for (var i = 0; i < pipeVar.length; i++) {
                         var pipeName = pipeVar[i].split(",");
-                        if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]"){
-                            errMsg.push('<strong>Data Piping Email field</strong> must be follow the format: <i>[variable_name],label</i> .');
+                        if(pipeName[0] !== '' && (trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]")){
+                            errMsg.push('<strong>Data Piping Email field</strong> must follow the format: <i>[variable_name],label</i> or <i>[variable_name][smart_variable],label</i>.');
                         }
                     }
                 }
@@ -514,8 +516,8 @@ foreach ($language_errors as $err){
                 if ($('#emailFromForm_var').val() != "" && $('#emailFromForm_var').val() != "0") {
                     var result = $('#emailFromForm_var').val().split(",");
                     for(var i=0;i<result.length;i++){
-                        if(trim(result[i]).substring(0, 1) != "[" || trim(result[i]).substring(trim(result[i]).length-1, trim(result[i]).length) != "]"){
-                            errMsg.push('<strong>Email Addresses field</strong> must be follow the format: <i>[variable_name]</i>.');
+                        if(result[i] !== '' && (trim(result[i]).substring(0, 1) != "[" || trim(result[i]).substring(trim(result[i]).length-1, trim(result[i]).length) != "]")){
+                            errMsg.push('<strong>Email Addresses field</strong> must follow the format: <i>[variable_name]</i> or <i>[variable_name][smart_variable]</i>.');
                         }
                     }
                 }
@@ -542,12 +544,22 @@ foreach ($language_errors as $err){
 
                             if (isLongitudinal && matches && matches.length >1) {
 
-                                if(trim(matches[1]).substring(0, 1) != "[" || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]" || trim(matches[1]).substring(0, formPrefix.length) != formPrefix || trim(matches[0]).substring(0, 1) != "[" || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"){
-                                    errMsg.push('<strong>Longitudinal '+type+' Link field</strong> must be follow the format: <i>[event_name]['+formPrefix+'_variable_name],label</i> .');
+                                if(
+                                    trim(matches[1]).substring(0, 1) != "["
+                                    || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]"
+                                    || trim(matches[1]).substring(0, formPrefix.length) != formPrefix
+                                    || trim(matches[0]).substring(0, 1) != "["
+                                    || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"
+                                ){
+                                    errMsg.push('<strong>Longitudinal '+type+' Link field</strong> must follow the format: <i>[event_name]['+formPrefix+'_variable_name],label</i> .');
                                 }
                             }
-                            else if(trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]" || trim(pipeName[0]).substring(0, formPrefix.length) != formPrefix){
-                                errMsg.push('<strong>Link '+type+' field</strong> must be follow the format: <i>'+formPrefix+'variable_name],label</i> .');
+                            else if(
+                                trim(pipeName[0]).substring(0, 1) != "["
+                                || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]"
+                                || trim(pipeName[0]).substring(0, formPrefix.length) != formPrefix
+                            ){
+                                errMsg.push('<strong>Link '+type+' field</strong> must follow the format: <i>'+formPrefix+'variable_name],label</i> .');
                             }
                         }
                     }
@@ -1127,9 +1139,17 @@ foreach ($language_errors as $err){
             $email_sent_all = $module->getProjectSettingLog($pid,"email-sent");
 
             $alert_id = $projectData['settings']['alert-id']['value'];
-            $email_queue = $projectData['settings']['email-queue']['value'];
+            if (isset($projectData['settings']['email-queue'])) {
+                $email_queue = $projectData['settings']['email-queue']['value'];
+            } else {
+                $email_queue = [];
+            }
             for ($index = 0; $index < $indexSubSet; $index++) {
-                $email_sent = $email_sent_all[$index];
+                if (isset($email_sent_all[$index])) {
+                    $email_sent = $email_sent_all[$index];
+                } else {
+                    $email_sent = "";
+                }
                 $message_sent = "";
                 if($email_sent == "1"){
                     if(!empty($email_timestamp_sent[$index])){
@@ -1349,7 +1369,7 @@ foreach ($language_errors as $err){
                     }
                     if($configRow['key'] == 'form-name' || $configRow['key'] == 'email-condition' || $configRow['key'] == 'email-subject' || $configRow['key'] == 'email-attachment-variable' || $configRow['key'] == 'cron-send-email-on-field' || $configRow['key'] == 'cron-queue-expiration-date-field'){
                         $info_modal[$index][$configRow['key']] = htmlspecialchars_decode($configRow['value'][$index],ENT_QUOTES);
-                    }else{
+                    }else if (isset($configRow['value'])) {
                         $info_modal[$index][$configRow['key']] = $configRow['value'][$index];
                     }
                 }

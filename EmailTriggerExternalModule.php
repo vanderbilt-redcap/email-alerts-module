@@ -16,7 +16,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		$this->disableUserBasedSettingPermissions();
 	}
 
-    function hook_survey_complete ($project_id,$record = null,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
+    function hook_survey_complete ($project_id,$record,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         if($record != "") {
             $this->deleteOldLogs($project_id);
             if(!$this->isProjectStatusCompleted($project_id)) {
@@ -50,7 +50,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
-    function hook_save_record ($project_id,$record = null,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
+    function hook_save_record ($project_id,$record,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         if($record != "") {
             $this->deleteOldLogs($project_id);
             if(!$this->isProjectStatusCompleted($project_id)) {
@@ -69,11 +69,38 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
                             $isRepeatInstrumentComplete = $this->isRepeatInstrumentComplete($data, $record, $event_id, $form, $repeat_instance);
                             $isRepeatInstrument = false;
-                            if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
+                            if (
+                                array_key_exists('repeat_instances', $data[$record])
+                                && (
+                                    (
+                                        isset($data[$record]['repeat_instances'][$event_id][$form])
+                                        && $data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != ''
+                                    )
+                                    || (
+                                        isset($data[$record]['repeat_instances'][$event_id][""])
+                                        && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''
+                                    )
+                                )
+                            ) {
                                 $isRepeatInstrument = true;
                             }
-                            $email_incomplete = $this->getProjectSetting("email-incomplete", $project_id)[$id];
-                            if (($email_incomplete == "1" && (($isRepeatInstrument && !$isRepeatInstrumentComplete) || (!$isRepeatInstrument && $data[$record][$event_id][$form . '_complete'] != '2'))) || (!$this->isSurveyPage() && ($data[$record][$event_id][$form . '_complete'] == '2' || $isRepeatInstrumentComplete))) {
+                            $incompleteAry = $this->getProjectSetting("email-incomplete", $project_id);
+                            $email_incomplete = isset($incompleteAry[$id]) ? $incompleteAry[$id] : "";
+                            if (
+                                (
+                                    $email_incomplete == "1"
+                                    && (
+                                        ($isRepeatInstrument && !$isRepeatInstrumentComplete)
+                                        || (!$isRepeatInstrument && $data[$record][$event_id][$form . '_complete'] != '2')
+                                    )
+                                )
+                                || (
+                                    !$this->isSurveyPage()
+                                    && isset($data[$record][$event_id])
+                                    && ($data[$record][$event_id][$form . '_complete'] == '2'
+                                        || $isRepeatInstrumentComplete)
+                                )
+                            ) {
                                 if (($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData) {
                                     if ($_REQUEST['page'] == $form) {
                                         $this->setEmailTriggerRequested(true);
@@ -124,7 +151,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $this->removeLogs("project_id = $project_id and message = 'email-records-sent'");
             $this->removeLogs("project_id = $project_id and message = 'email-sent'");
             $this->removeLogs("project_id = $project_id and message = 'email-timestamp-sent'");
-        }else if($_REQUEST['route'] == 'DataEntryController:deleteRecord' && $_REQUEST['record'] != ""){
+        }else if (
+            isset($_REQUEST['route'])
+            && isset($_REQUEST['record'])
+            && ($_REQUEST['route'] == 'DataEntryController:deleteRecord')
+            && ($_REQUEST['record'] != "")
+        ){
             #Button: Delete record
 
             $record_id = urldecode($_REQUEST['record']);
@@ -226,7 +258,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_records_sent = $this->getProjectSettingLog($project_id,"email-records-sent");
         $email_condition = htmlspecialchars_decode($this->getProjectSetting("email-condition", $project_id)[$id]);
         if(($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
-            $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$email_records_sent[$id],$event_id, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance);
+            $recordEmailsSent = isset($email_records_sent[$id]) ? $email_records_sent[$id] : [];
+            $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery($project_id,$email_repetitive_sent,$recordEmailsSent,$event_id, $record, $instrument,$id,$isRepeatInstrument,$repeat_instance);
             if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery))) {
 
                 #If the condition is met or if we don't have any, we send the email
@@ -568,6 +601,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function addQueueLog($pid,$action_description,$cron_send_email_on,$cron_send_email_on_field,$cron_repeat_for,$cron_queue_expiration_date,$cron_queue_expiration_date_field){
         #Add logs
+        $scheduled_email = "";
         if($cron_send_email_on == "now"){
             $scheduled_email = "Send ".$cron_send_email_on."";
         }else if($cron_send_email_on == "date"){
@@ -607,9 +641,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function getProjectSettingLog($project_id,$settingName,$isRepeatInstrument=""){
         $data = $this->getProjectSetting($settingName, $project_id);
+        if ($data === NULL) {
+            $data = [];
+        }
         if($settingName == "email-repetitive-sent"){
             $logs = $this->queryLogs("select instrument, alert, record_id, event, instance where project_id = $project_id and message = '$settingName'");
-            $data = json_decode($data,true);
+            $data = $data ? json_decode($data,true) : [];
             foreach($logs as $log){
                 $instrument = $log['instrument'];
                 $alert = $log['alert'];
@@ -620,6 +657,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }else {
             $logs = $this->queryLogs("select value,id where project_id = $project_id and message = '$settingName'");
+            if ($logs === NULL) {
+                $logs = [];
+            }
             if($settingName == "email-records-sent"){
                 if(!empty($data)){
                     $aux = $data;
@@ -642,7 +682,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $data = $aux;
                 }else{
                     foreach($logs as $log){
-                        if(strpos($data[$log['id']],$log['value']) === false){
+                        if(
+                            isset($data[$log['id']])
+                            && strpos($data[$log['id']],$log['value']) === false
+                        ){
                             $data[$log['id']] = $data[$log['id']].$log['value'] . ", ";
                         }
                     }
@@ -652,7 +695,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
             }else if($settingName == "email-timestamp-sent"){
                 foreach($logs as $log) {
-                    if($data[$log['id']] < $log['value'] || $data[$log['id']] == ''){
+                    if(
+                        !isset($data[$log['id']])
+                        || $data[$log['id']] < $log['value']
+                        || $data[$log['id']] == ''
+                    ){
                         $data[$log['id']] = $log['value'];
                     }
                 }
@@ -745,7 +792,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email->setFromName($array_emails['fromName']);
         $email->setSubject($email_subject);
         $email->setBody($email_text);
-        if (is_array($array_emails['attachments']) && !empty($array_emails['attachments'])) {
+        if (isset($array_emails['attachments']) && is_array($array_emails['attachments']) && !empty($array_emails['attachments'])) {
             foreach ($array_emails['attachments'] as $name=>$fullPath) {
                 $email->setAttachment($fullPath, $name);
             }
@@ -790,7 +837,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     ]);
                 }
 
-                $records = array_map('trim', explode(',', $email_records_sent[$id]));
+                $records = isset($email_records_sent[$id]) ? array_map('trim', explode(',', $email_records_sent[$id])) : [];
                 $record_found = false;
                 foreach ($records as $record_id) {
                     if ($record_id == $record) {
@@ -851,9 +898,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if (!empty($datapipeEmail_var)) {
             $email_form_var = explode("\n", $datapipeEmail_var);
 
-            $emailsTo = preg_split("/[;,]+/", $email_to);
-            $emailsCC = preg_split("/[;,]+/", $email_cc);
-            $emailsBCC = preg_split("/[;,]+/", $email_bcc);
+            $emailsTo = ($email_to !== "") ? preg_split("/[;,]+/", $email_to) : [];
+            $emailsCC = ($email_cc !== "") ? preg_split("/[;,]+/", $email_cc) : [];
+            $emailsBCC = ($email_bcc !== "") ? preg_split("/[;,]+/", $email_bcc) : [];
 
             $array_emails = $this->fill_emails($array_emails,$emailsTo, $email_form_var, $data, 'to',$project_id,$record, $event_id, $instrument, $instance, $isLongitudinal);
             $array_emails = $this->fill_emails($array_emails,$emailsCC, $email_form_var, $data, 'cc',$project_id,$record, $event_id, $instrument, $instance, $isLongitudinal);
@@ -887,17 +934,20 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 				// Set the From email for this message
 				$this_from_email = (!$usingUniversalFrom ? $from_data[0] : $from_email);
 				// From, Reply-To, and Return-Path. Also, set Display Name if possible.
-				if ($from_data[1] == '""' || empty($from_data[1])) {
+				if (count($from_data) > 1 && ($from_data[1] == '""' || empty($from_data[1]))) {
 					// If no Display Name, then use the Sender address as the Display Name if using Universal FROM address
 					$fromDisplayName = $usingUniversalFrom ? $from_data[0] : "";
 					$replyToDisplayName = '';
-				} else {
+				} else if (count($from_data) > 1) {
 					// Clean the defined display name
 					$from_data[1] = str_replace('"', '', trim($from_data[1]));
 					// If has a Display Name, then use the Sender address+real Display Name if using Universal FROM address
 					$fromDisplayName = $usingUniversalFrom ? $from_data[1]." <".$from_data[0].">" : $from_data[1];
 					$replyToDisplayName = $from_data[1];
-				}
+				} else {
+                    $fromDisplayName = "";
+                    $replyToDisplayName = "";
+                }
                 $array_emails['from'] = $this_from_email;
                 $array_emails['fromName'] = $fromDisplayName;
             }else{
@@ -928,9 +978,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             foreach ($datapipe as $emailvar) {
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
+                    $var_replace = $var;
+                    $var = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $instance, null, false, null, $instrument, false, false, false, false, false, true);
                     preg_match_all("/\\[(.*?)\\]/", $var, $matches);
 
-                    $var_replace = $var;
                     //For arms and different events
                     if(count($matches[1]) > 1){
                         $project = new \Project($project_id);
@@ -945,12 +996,26 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
 
-                    //Repeatable instruments
-                    $logic = $this->isRepeatingInstrument($project_id, $data, $record, $event_id, $instrument, $instance, $var,0, $isLongitudinal);
-                    $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance));
-
-                    if(!empty($label)){
-                        $logic = $label;
+                    if (!preg_match("/\[.+\]/", $var)) {
+                        # smart variable
+                        $logic = $var;
+                    } else {
+                        //Repeatable instruments
+                        $logic = $this->isRepeatingInstrument($project_id, $data, $record, $event_id, $instrument, $instance, $var,0, $isLongitudinal);
+                        if (is_array($logic)) {
+                            $correctLabels = [];
+                            foreach ($logic as $index => $value) {
+                                if ($value) {
+                                    array_push($correctLabels, $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$index, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance)));
+                                }
+                            }
+                            $logic = implode(", ", $correctLabels);
+                        } else {
+                            $label = $this->getChoiceLabel(array('field_name'=>$var, 'value'=>$logic, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$instance));
+                            if(!empty($label)){
+                                $logic = $label;
+                            }
+                        }
                     }
 
                     $email_content = str_replace($var_replace, $logic, $email_content);
@@ -958,6 +1023,28 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         return $email_content;
+    }
+
+    /**
+     * looks at list of variables and returns only the lines with smart variables
+     * @param $dataform - list of data
+     * @return array
+     */
+    static function getSmartVariablesFromVariableList($dataform) {
+        $newList = [];
+        foreach ($dataform as $formlink) {
+            $formlink = trim($formlink);
+            if ($formlink) {
+                $var = preg_split("/[;,]+/", $formlink)[0];
+                foreach (self::SMART_VARIABLES as $smartVariable) {
+                    if (strpos($var, $smartVariable) !== FALSE) {
+                        $newList[] = $formlink;
+                        break;
+                    }
+                }
+            }
+        }
+        return $newList;
     }
 
     /**
@@ -972,80 +1059,151 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     function setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal){
         $formLink_var = $this->getProjectSetting("formLink_var", $project_id);
         if(!empty($formLink_var)) {
-            $dataform = explode("\n", $formLink_var);
-            foreach ($dataform as $formlink) {
-                $var = preg_split("/[;,]+/", $formlink)[0];
+            $allDataforms = explode("\n", $formLink_var);
+            $smartDataForms = self::getSmartVariablesFromVariableList($allDataforms);
+            $normalDataForms = array_diff($allDataforms, $smartDataForms);
+            foreach ([$smartDataForms, $normalDataForms] AS $dataform) {
+                foreach ($dataform as $formlink) {
+                    $var = preg_split("/[;,]+/", $formlink)[0];
 
-                $instance = 1;
-                $form_event_id = $event_id;
-                if($isLongitudinal) {
-                    preg_match_all("/\[[^\]]*\]/", $var, $matches);
-                    $var = "";
-                    $ev = "";
-                    $smartInstance = "";
-                    if (sizeof($matches[0]) > 2) {
-                        $var = $matches[0][1];
-                        $ev = $matches[0][0];
-                        $smartInstance = $matches[0][2];
-                    }
-                    if (sizeof($matches[0]) == 2) {
-                        $smarts = array("[new-instance]", "[last-instance]", "[first-instance]");
-                        if (in_array($matches[0][1], $smarts)) {
-                             $var = $matches[0][0];
-                             $smartInstance = $matches[0][1];
-                        } else {
-                             $var = $matches[0][1];
-                             $ev = $matches[0][0];
+                    if($isLongitudinal) {
+                        preg_match_all("/\[[^\]]*\]/", $var, $matches);
+                        $var = "";
+                        if (sizeof($matches[0]) > 2) {
+                            $var = $matches[0][1];
+                        }
+                        if (sizeof($matches[0]) == 2) {
+                            $smarts = self::SMART_VARIABLES;
+                            foreach ($smarts as $i => $var) {
+                                $smarts[$i] = "[".$var."]";
+                            }
+                            if (in_array($matches[0][1], $smarts)) {
+                                $var = $matches[0][0];
+                            } else {
+                                $var = $matches[0][1];
+                            }
+                        }
+                        if (sizeof($matches[0]) == 1) {
+                            $var = $matches[0][0];
                         }
                     }
-                    if (sizeof($matches[0]) == 1) {
-                        $var = $matches[0][0];
-                    }
-                    if ($ev) {
-                        $form_name = str_replace('[', '', $matches[0][0]);
-                        $form_name = str_replace(']', '', $form_name);
-                        $project = new \Project($project_id);
-                        $form_event_id = $project->getEventIdUsingUniqueEventName($form_name);
-                    }
-                    if (count($matches[0]) > 2) {
-                        $instanceMin = 1;
-                        $sql = "SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = $project_id AND event_id = '$form_event_id' AND record = '" . db_real_escape_string($record) . "' ORDER BY instance DESC";
-                        $q = db_query($sql);
-                        $instanceMax = 1;
-                        $instanceNew = 1;
-                        if ($row = db_fetch_assoc($q)) {
-                            $instanceMax = $row['instance'];
-                            $instanceNew = $instanceMax + 1;
-                        }
 
-                        if ($smartInstance == '[new-instance]') {
-                            $instance = $instanceNew;
+                    if (strpos($email_text, $var) !== false) {
+                        list($form_event_id, $instrument_form, $instance) = $this->getEventIdInstrumentAndInstance($var, "__FORMLINK_", $project_id, $record, $event_id, $isLongitudinal);
+                        # get rid of extra /'s
+                        $dir = preg_replace("/\/$/", "", APP_PATH_WEBROOT_FULL.preg_replace("/^\//", "", APP_PATH_WEBROOT));
+                        if ( preg_match("/redcap_v[\d\.]+/", APP_PATH_WEBROOT, $matches)) {
+                            $dir = APP_PATH_WEBROOT_FULL.$matches[0];
                         }
-                        else if ($smartInstance == '[last-instance]') {
-                            $instance = $instanceMax;
-                        }
-                        else if ($smartInstance == '[first-instance]') {
-                            $instance = $instanceMin;
-                        }
+                        $url = $dir . "/DataEntry/index.php?pid=".$project_id."&event_id=".$form_event_id."&page=".$instrument_form."&id=".$record."&instance=".$instance;
+                        $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
+                        $email_text = str_replace( preg_split("/[;,]+/", $formlink)[0], $link, $email_text);
                     }
-                }
-
-                if (strpos($email_text, $var) !== false) {
-                    $instrument_form = str_replace('[__FORMLINK_', '', $var);
-                    $instrument_form = str_replace(']', '', $instrument_form);
-
-                    # get rid of extra /'s
-                    $dir = preg_replace("/\/$/", "", APP_PATH_WEBROOT_FULL.preg_replace("/^\//", "", APP_PATH_WEBROOT));
-                    if ( preg_match("/redcap_v[\d\.]+/", APP_PATH_WEBROOT, $matches)) {
-                        $dir = APP_PATH_WEBROOT_FULL.$matches[0];
-                    }
-                    $url = $dir . "/DataEntry/index.php?pid=".$project_id."&event_id=".$form_event_id."&page=".$instrument_form."&id=".$record."&instance=".$instance;
-                    $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
-                    $email_text = str_replace( preg_split("/[;,]+/", $formlink)[0], $link, $email_text);
                 }
             }
         }
         return $email_text;
+    }
+
+    private function getEventIdInstrumentAndInstance($var, $codeToReplace, $project_id, $record, $event_id, $isLongitudinal) {
+        $redcapLogic = str_replace($codeToReplace, '', $var);
+        $redcapLogic = \Piping::pipeSpecialTags($redcapLogic, $project_id, $record, $event_id);
+        preg_match_all("/\\[(.*?)\\]/", $redcapLogic, $matches);
+        if (count($matches[1]) >= 1) {
+            if ((count($matches[1]) == 2) && in_array($matches[1][1], self::SMART_VARIABLES)) {
+                $formEventId = $event_id;
+                $instrumentForm = $matches[1][0];
+                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrumentForm, $matches[1][1], $isLongitudinal);
+            } else if ((count($matches[1]) == 2) && $isLongitudinal) {
+                $project = new \Project($project_id);
+                $formEventId = $project->getEventIdUsingUniqueEventName($matches[1][0]);
+                $instrumentForm = $matches[1][1];
+                $instance = 1;
+            } else if ((count($matches[1]) == 2) && is_numeric($matches[1][1])) {
+                $formEventId = $event_id;
+                $instrumentForm = $matches[1][0];
+                $instance = $matches[1][1];
+            } else if (count($matches[1]) == 2) {
+                # all others - classical with non-numerical second term - should not happen
+                throw new \Exception("Improper term! $redcapLogic");
+            } else if (count($matches[1]) == 3) {
+                $project = new \Project($project_id);
+                $formEventId = $project->getEventIdUsingUniqueEventName($matches[1][0]);
+                $instrumentForm = $matches[1][1];
+                if (is_numeric($matches[1][2])) {
+                    $instance = $matches[1][2];
+                } else {
+                    $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrumentForm, $matches[1][2], $isLongitudinal);
+                }
+            } else {
+                $instrumentForm = $matches[1][0];
+                $formEventId = $event_id;
+                $instance = 1;
+            }
+        } else {
+            $formEventId = $event_id;
+            $instrumentForm = str_replace(['[', ']'], "", $redcapLogic);
+            $instance = 1;
+        }
+        return [$formEventId, $instrumentForm, $instance];
+    }
+
+    /**
+     * Function that tells if an instrument is repeating. If the event is repeating (not the instrument),
+     * it returns FALSE.
+     * @param $event_id
+     * @param $instrument
+     * @param $smartVariable (one of SMART_VARIABLES)
+     * @return bool
+     */
+    static function isRepeatingInstrumentInEvent($event_id, $instrument) {
+        $sql = "SELECT COUNT(form_name) AS cnt FROM redcap_events_repeat WHERE event_id='".db_real_escape_string($event_id)."' AND form_name='".db_real_escape_string($instrument)."'";
+        $q = db_query($sql);
+        if ($row = db_fetch_assoc($q)) {
+            return ($row['cnt'] > 0);
+        }
+        return FALSE;
+    }
+
+    /**
+     * Function that transforms a smart variable into a numerical instance
+     * @param $project_id
+     * @param $record
+     * @param $form_event_id
+     * @param $instrument_form
+     * @param $smartVariable (one of SMART_VARIABLES)
+     * @return int
+     */
+     function getNumericalInstanceForForm($project_id, $record, $form_event_id, $instrument_form, $smartVariable, $isLongitudinal) {
+        $smartVariable = preg_replace("/\]$/", "", preg_replace("/^\[/", "", $smartVariable));
+
+        $instanceMin = 1;
+        if ($isLongitudinal && !self::isRepeatingInstrumentInEvent($form_event_id, $instrument_form)) {
+            # get max instance for event
+            $sql = "SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = $project_id AND event_id = '$form_event_id' AND record = '" . db_real_escape_string($record) . "' ORDER BY instance DESC";
+        } else {
+            # get max instance for instrument
+            $sql = "SELECT DISTINCT(d.instance) AS instance FROM redcap_data AS d INNER JOIN redcap_metadata AS m ON ((d.project_id = m.project_id) AND (m.form_name = '".db_real_escape_string($instrument_form)."')) WHERE d.project_id = $project_id AND d.event_id = '$form_event_id' AND d.record = '" . db_real_escape_string($record) . "' ORDER BY d.instance DESC";
+        }
+        $q = db_query($sql);
+        $instanceMax = 1;
+        $instanceNew = 1;
+        if ($row = db_fetch_assoc($q)) {
+            $instanceMax = $row['instance'] ?: 1;
+            $instanceNew = $instanceMax + 1;
+        }
+
+        if ($smartVariable == 'new-instance') {
+            return $instanceNew;
+        }
+        else if ($smartVariable == 'last-instance') {
+            return $instanceMax;
+        }
+        else if ($smartVariable == 'first-instance') {
+            return $instanceMin;
+        } else {
+            throw new \Exception("Invalid smart variable $smartVariable");
+        }
     }
 
     /**
@@ -1077,33 +1235,45 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             foreach ($datasurvey as $surveylink) {
                 $var = preg_split("/[;,]+/", $surveylink)[0];
                 $var_replace = $var;
-                $form_event_id = $event_id;
 
                 preg_match_all("/\\[(.*?)\\]/", $var, $matches);
                 //For arms and different events
                 if(count($matches[1]) > 1){
                     $project = new \Project($project_id);
                     $form_event_id = $project->getEventIdUsingUniqueEventName($matches[1][0]);
-                    $var = $matches[1][1];
+                    if ($form_event_id) {
+                        $var = $matches[1][1];
+                    }
                 }
 
                 #only if the variable is in the text we reset the survey link status
                 if (strpos($email_text, $var) !== false) {
-                    $instrument_form = str_replace('__SURVEYLINK_', '', $var);
-					$instrument_form = str_replace(['[',']'], '', $instrument_form);
-                    $passthruData = $this->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
+                    list($form_event_id, $instrument_form, $instance) = $this->getEventIdInstrumentAndInstance($var_replace, "__SURVEYLINK_", $project_id, $record, $event_id, $isLongitudinal);
+                    if ($instance == 1) {
+                        $passthruData = $this->resetSurveyAndGetCodes($project_id, $record, $instrument_form, $form_event_id);
 
-                    $returnCode = $passthruData['return_code'];
-                    $hash = $passthruData['hash'];
+                        $returnCode = $passthruData['return_code'];
+                        $hash = $passthruData['hash'];
 
+                    } else {
+                        # repeating instances - assume no need to reset survey since they're looking at a specific instance
+                        # must generate link in DB, but this will use a return-code because save-and-return is enabled
+                        $linkURL = \REDCap::getSurveyLink($record, $instrument_form, $form_event_id, $instance);
+                        $sql = "SELECT r.return_code FROM redcap_surveys_response AS r INNER JOIN redcap_surveys_participants AS p ON (p.participant_id = r.participant_id) WHERE p.event_id = '".db_real_escape_string($form_event_id)."' AND r.record='".db_real_escape_string($record)."' AND r.instance='".db_real_escape_string($instance)."' LIMIT 1";
+                        $q = db_query($sql);
+                        if ($row = db_fetch_assoc($q)) {
+                            $returnCode = $row['return_code'];
+                        } else {
+                            $returnCode = "";
+                        }
+                    }
                     ## getUrl doesn't append a pid when accessed through the cron, add pid if it's not there already
                     $baseUrl = $this->getUrl('surveyPassthru.php');
                     if(!preg_match("/[\&\?]pid=/", $baseUrl)) {
                         $baseUrl .= "&pid=".$project_id;
                     }
 
-
-                    $url = $baseUrl . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&event=".$form_event_id."&NOAUTH";
+                    $url = $baseUrl . "&instrument=" . $instrument_form . "&record=" . $record . "&returnCode=" . $returnCode."&event=".$form_event_id."&instance=".$instance."&NOAUTH";
                     $link = "<a href='" . $url . "' target='_blank'>" . $url . "</a>";
                     $email_text = str_replace( $var_replace, $link, $email_text);
                 }
@@ -1122,7 +1292,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function setAttachments($array_emails, $project_id, $id){
         for($i=1; $i<6 ; $i++){
-            $edoc = $this->getProjectSetting("email-attachment".$i,$project_id)[$id];
+            $attachmentAry = $this->getProjectSetting("email-attachment".$i,$project_id);
+            $edoc = isset($attachmentAry[$id]) ? $attachmentAry[$id] : FALSE;
             if(is_numeric($edoc)){
                 $array_emails = $this->addNewAttachment($array_emails,$edoc,$project_id,'files');
             }
@@ -1149,7 +1320,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if(!empty($email_attachment_variable)){
             $var = preg_split("/[;,]+/", $email_attachment_variable);
             foreach ($var as $attachment) {
-                if(\LogicTester::isValid(trim($attachment))) {
+                $attachment = trim($attachment);
+                if(\LogicTester::isValid($attachment)) {
                     $edoc = $this->isRepeatingInstrument($project_id,$data, $record, $event_id, $instrument, $repeat_instance, $attachment,0, $isLongitudinal);
                     if(is_numeric($edoc)) {
                         $array_emails = $this->addNewAttachment($array_emails,$edoc,$project_id,'files');
@@ -1196,7 +1368,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function isRepeatInstrumentComplete($data, $record, $event_id, $instrument, $instance){
-        if((array_key_exists('repeat_instances',$data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument.'_complete'] == '2' || $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument.'_complete'] == '2'))){
+        if (
+            array_key_exists('repeat_instances',$data[$record])
+            && (
+                (
+                    isset($data[$record]['repeat_instances'][$event_id][$instrument])
+                    && $data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument.'_complete'] == '2'
+                )
+                || (
+                    isset($data[$record]['repeat_instances'][$event_id][""])
+                    && $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument.'_complete'] == '2'
+                )
+            )
+        ){
             return true;
         }
         return false;
@@ -1284,7 +1468,15 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     function recordExistsInRegisteredRecords($email_records_sent,$record){
-        $records_registered = array_map('trim', explode(',', $email_records_sent));
+        if (is_array($email_records_sent)) {
+            $records_registered = array_map('trim', $email_records_sent);
+        } else if (is_string($email_records_sent)) {
+            $records_registered = array_map('trim', explode(',', $email_records_sent));
+        } else if ($email_records_sent === NULL) {
+            $records_registered = [];
+        } else {
+            throw new \Exception("Invalid format");
+        }
         foreach ($records_registered as $record_registered){
             if($record == $record_registered){
                 return true;
@@ -1308,10 +1500,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $var_name = str_replace('[', '', $var);
         $var_name = str_replace(']', '', $var_name);
         $logic = "";
-        if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name] != "") {
+        if(
+            array_key_exists('repeat_instances',$data[$record])
+            && isset($data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name])
+            && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name] != ""
+        ) {
             #Repeating instruments by form
             $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
-        }else if(array_key_exists('repeat_instances',$data[$record]) && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name] != "") {
+        }else if(
+            array_key_exists('repeat_instances',$data[$record])
+            && isset($data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name])
+            && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name] != ""
+        ) {
             #Repeating instruments by event
             $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
         }else{
@@ -1320,26 +1520,33 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
                 }else{
-                    $logic = \LogicTester::apply($var, $data[$record], $project, true, true);
+                    $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
+                    $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
                 }
             }else{
                 if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
-                }else{
+                }else {
                     preg_match_all("/\[[^\]]*\]/", $var, $matches);
-                    #Special case for radio buttons
-                    if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
+                    if (preg_match("/\(([^\)]+)\)/", $var_name, $checkboxMatches)) {
+                        #Special case for checkboxes
+                        $index = $checkboxMatches[1];
+                        $checkboxVarName = str_replace("($index)", "", $var_name);
+                        $logic = $data[$record][$event_id][$checkboxVarName][$index];
+                    } else if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
+                        #Special case for radio buttons
                         $logic = $data[$record][$event_id][$var_name];
                     }else{
-                        $logic = \LogicTester::apply($var, $data[$record], $project, true, true);
+                        $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
+                        $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
                     }
                 }
 
-                if($logic == ""){
+                if($logic == "" && isset($data[$record]['repeat_instances'])){
                     #it's a repeating instance from a different form
-                    foreach ($data[$record]['repeat_instances'][$event_id] as $instrumentFound =>$instances){
-                        foreach ($instances as $intanceFound=>$p){
-                            if($intanceFound == $repeat_instance){
+                    foreach ($data[$record]['repeat_instances'][$event_id] ?: [] as $instrumentFound =>$instances){
+                        foreach ($instances as $instanceFound=>$p){
+                            if($instanceFound == $repeat_instance){
                                 $logic = $data[$record]['repeat_instances'][$event_id][$instrumentFound][$repeat_instance][$var_name];
                             }
                         }
@@ -1389,9 +1596,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                }
                            }
                        }else{
-                           $parsed_email = trim(preg_split('/\s*<([^>]*)>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE)[1]);
-                           if(filter_var($parsed_email)){
-                               array_push($array_emails_aux,$parsed_email);
+                           $ary = preg_split('/\s*<([^>]*)>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+                           if (count($ary) >= 2) {
+                               $parsed_email = trim($ary[1]);
+                               if(filter_var($parsed_email)){
+                                   array_push($array_emails_aux,$parsed_email);
+                               }
                            }
                        }
                     } else {
@@ -1582,12 +1792,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function addArrayInfo($addRepeat,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id){
         if($addRepeat){
-            if(!is_array($email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record][$event_id])){
+            if(
+                !isset($email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record][$event_id])
+                || !is_array($email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record][$event_id])
+            ){
                 $email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record][$event_id] = array();
             }
             array_push($email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record][$event_id],$repeat_instance);
         }else{
-            if(!is_array($email_repetitive_sent_aux[$instrument][$alertid][$new_record][$event_id])){
+            if(
+                !isset($email_repetitive_sent_aux[$instrument][$alertid][$new_record][$event_id])
+                || !is_array($email_repetitive_sent_aux[$instrument][$alertid][$new_record][$event_id])
+            ){
                 $email_repetitive_sent_aux[$instrument][$alertid][$new_record][$event_id] = array();
             }
             array_push($email_repetitive_sent_aux[$instrument][$alertid][$new_record][$event_id],$repeat_instance);
@@ -1837,6 +2053,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
         return false;
     }
+
+    const SMART_VARIABLES = ["new-instance", "last-instance", "first-instance"];
 }
 
 

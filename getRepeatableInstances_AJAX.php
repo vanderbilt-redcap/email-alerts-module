@@ -23,7 +23,7 @@ if (db_num_rows($q)) {
             $q = db_query($sql);
             $row = db_fetch_assoc($q);
             if ($row) {
-                $show_instance = '<div style="float:left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Add Instances<br><span style="color:red">*If none is typed, only the first instance added</span></label></div><div style="float:left;"><textarea class="form-control" id="queue_instances" rows="6"></textarea></div>';
+                $show_instance = '<div style="float:left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Add Instances<br><span style="color:red">*If none is typed and if smart variables are not used, only the first instance added</span></label></div><div style="float:left;"><textarea class="form-control" id="queue_instances" rows="6"></textarea></div>';
             }
         }
     }
