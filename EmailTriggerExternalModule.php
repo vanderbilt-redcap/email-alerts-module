@@ -1505,7 +1505,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             && isset($data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name])
             && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name] != ""
         ) {
-            error_log("Path A $var");
             #Repeating instruments by form
             $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
         }else if(
@@ -1513,40 +1512,33 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             && isset($data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name])
             && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name] != ""
         ) {
-            error_log("Path B $var");
             #Repeating instruments by event
             $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
         }else{
             $project = new \Project($project_id);
             if($option == '1'){
                 if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
-                    error_log("Path C $var");
                     $logic = $data[$record][$event_id][$var_name];
                 }else{
-                    error_log("Path D $var");
                     $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
                     $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
                 }
             }else{
                 if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
-                    error_log("Path E $var");
                     $logic = $data[$record][$event_id][$var_name];
                 }else {
                     preg_match_all("/\[[^\]]*\]/", $var, $matches);
                     if (preg_match("/\(([^\)]+)\)/", $var_name, $checkboxMatches)) {
-                        error_log("Path F $var");
                         #Special case for checkboxes
                         $index = $checkboxMatches[1];
                         $checkboxVarName = str_replace("($index)", "", $var_name);
                         $logic = $data[$record][$event_id][$checkboxVarName][$index];
                     } else if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
-                        error_log("Path G $var");
                         #Special case for radio buttons
                         $logic = $data[$record][$event_id][$var_name];
                     }else{
                         $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
                         $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
-                        error_log("Path H $var $dumbVar $logic");
                     }
                 }
 
@@ -1555,7 +1547,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     foreach ($data[$record]['repeat_instances'][$event_id] ?: [] as $instrumentFound =>$instances){
                         foreach ($instances as $instanceFound=>$p){
                             if($instanceFound == $repeat_instance){
-                                error_log("Path I $var");
                                 $logic = $data[$record]['repeat_instances'][$event_id][$instrumentFound][$repeat_instance][$var_name];
                             }
                         }
