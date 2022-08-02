@@ -979,7 +979,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
                     $var_replace = $var;
-                    $var = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $instance, null, false, null, $instrument);
+                    $var = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $instance, null, false, null, $instrument, false, false, false, false, false, true);
                     preg_match_all("/\\[(.*?)\\]/", $var, $matches);
 
                     //For arms and different events
@@ -1107,7 +1107,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     private function getEventIdInstrumentAndInstance($var, $codeToReplace, $project_id, $record, $event_id, $isLongitudinal) {
         $redcapLogic = str_replace($codeToReplace, '', $var);
-        $redcapLogic = \Piping::pipeSpecialTags($redcapLogic, $project_id, $record, $event_id);
+        $redcapLogic = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $instance, null, false, null, $instrument, false, false, false, false, false, true);
         preg_match_all("/\\[(.*?)\\]/", $redcapLogic, $matches);
         if (count($matches[1]) >= 1) {
             if ((count($matches[1]) == 2) && in_array($matches[1][1], self::SMART_VARIABLES)) {
@@ -1520,7 +1520,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
                     $logic = $data[$record][$event_id][$var_name];
                 }else{
-                    $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
+                    $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $instance, null, false, null, $instrument, false, false, false, false, false, true);
                     $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
                 }
             }else{
@@ -1537,7 +1537,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         #Special case for radio buttons
                         $logic = $data[$record][$event_id][$var_name];
                     }else{
-                        $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
+                        $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $instance, null, false, null, $instrument, false, false, false, false, false, true);
                         $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
                     }
                 }
