@@ -979,7 +979,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $var = preg_split("/[;,]+/", $emailvar)[0];
                 if (\LogicTester::isValid($var)) {
                     $var_replace = $var;
-                    $var = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $instance);
+                    $var = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $instance, null, false, null, $instrument);
                     preg_match_all("/\\[(.*?)\\]/", $var, $matches);
 
                     //For arms and different events
