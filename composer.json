@@ -1,7 +1,4 @@
 {
-    "require": {
-        "phpmailer/phpmailer": "^6.5"
-    },
     "config": {
         "platform": {
             "php": "7.3.29"

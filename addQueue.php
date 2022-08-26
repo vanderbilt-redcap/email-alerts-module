@@ -6,13 +6,13 @@ use ExternalModules\ExternalModules;
 
 require_once __DIR__.'/vendor/autoload.php';
 
-$project_id = $_GET['pid'];
-$index =  $_REQUEST['index_modal_queue'];
-$times_sent =  $_REQUEST['times_sent'];
-$last_sent =  $_REQUEST['last_sent'];
-$queue_ids = $_POST['queue_ids'];
-$event_id = $_POST['queue_event_select'];
-$queue_instances = $_POST['queue_instances'];
+$project_id = (int)$_GET['pid'];
+$index =  htmlentities($_REQUEST['index_modal_queue'],ENT_QUOTES);
+$times_sent =  htmlentities($_REQUEST['times_sent'],ENT_QUOTES);
+$last_sent =  htmlentities($_REQUEST['last_sent'],ENT_QUOTES);
+$queue_ids = htmlentities($_POST['queue_ids'],ENT_QUOTES);
+$event_id = htmlentities($_POST['queue_event_select'],ENT_QUOTES);
+$queue_instances = htmlentities($_POST['queue_instances'],ENT_QUOTES);
 
 if($queue_instances == "") {
     $instance = "1";

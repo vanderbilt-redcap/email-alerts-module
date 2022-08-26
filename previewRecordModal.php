@@ -6,8 +6,8 @@ use ExternalModules\ExternalModules;
 
 require_once __DIR__.'/vendor/autoload.php';
 
-$project_id = $_GET['pid'];
-$index =  $_REQUEST['index_modal_alert'];
+$project_id = (int)$_GET['pid'];
+$index =  htmlentities($_REQUEST['index_modal_alert'],ENT_QUOTES);
 
 #get data from the DB
 $form_name_event =  empty($module->getProjectSetting('form-name-event'))?array():$module->getProjectSetting('form-name-event')[$index];

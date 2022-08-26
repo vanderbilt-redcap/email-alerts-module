@@ -1868,7 +1868,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $result = $this->query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
-                $row['element_label'] = strip_tags(nl2br($row['element_label']));
+                $row['element_label'] = htmlentities(strip_tags(nl2br($row['element_label'])),ENT_QUOTES);
                 if (strlen($row['element_label']) > 30) {
                     $row['element_label'] = substr($row['element_label'], 0, 20) . "... " . substr($row['element_label'], -8);
                 }
@@ -1960,8 +1960,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $projectName = htmlspecialchars_decode($projectName, ENT_QUOTES);
 
                 $matchingProjects[] = [
-                    "value" => $row["project_id"],
-                    "name" => "(" . $row["project_id"] . ") " . $projectName,
+                    "value" => htmlentities($row["project_id"],ENT_QUOTES),
+                    "name" => "(" . htmlentities($row["project_id"],ENT_QUOTES) . ") " . $projectName,
                 ];
             }
             $configRow['choices'] = $matchingProjects;

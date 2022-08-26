@@ -6,9 +6,9 @@ use ExternalModules\ExternalModules;
 
 require_once __DIR__.'/vendor/autoload.php';
 
-$project_id = $_GET['pid'];
-$index =  $_REQUEST['index_modal_record_preview'];
-$record =  $_REQUEST['preview_record_id'];
+$project_id = (int)$_GET['pid'];
+$index =  htmlentities($_REQUEST['index_modal_record_preview'],ENT_QUOTES);
+$record =  htmlentities($_REQUEST['preview_record_id'],ENT_QUOTES);
 
 #get data from the DB
 $form_name = empty($module->getProjectSetting('form-name'))?array():$module->getProjectSetting('form-name')[$index];

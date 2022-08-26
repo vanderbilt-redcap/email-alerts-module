@@ -26,12 +26,12 @@ for($i=0;$i<sizeof($config['email-dashboard-settings']);$i++){
 
 #Add choices values to settings
 foreach($config['email-dashboard-settings'] as $configKey => $configRow) {
-    $config['email-dashboard-settings'][$configKey] = $module->getAdditionalFieldChoices($configRow,$_GET['pid']);
+    $config['email-dashboard-settings'][$configKey] = $module->getAdditionalFieldChoices($configRow,$pid);
 }
 
 #Add choices values to simple settings
 foreach($simple_config['email-dashboard-settings'] as $configKey => $configRow) {
-    $simple_config['email-dashboard-settings'][$configKey] = $module->getAdditionalFieldChoices($configRow,$_GET['pid']);
+    $simple_config['email-dashboard-settings'][$configKey] = $module->getAdditionalFieldChoices($configRow,$pid);
     $simple_config_update['email-dashboard-settings'][$configKey]['key'] = $configRow['key']."-update";
 }
 
