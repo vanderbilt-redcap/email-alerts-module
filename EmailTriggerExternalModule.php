@@ -1852,7 +1852,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if (strlen($row['element_label']) > 30) {
                     $row['element_label'] = substr($row['element_label'], 0, 20) . "... " . substr($row['element_label'], -8);
                 }
-                $choices[] = ['value' => $row['field_name'], 'name' => $row['field_name'] . " - " . htmlspecialchars($row['element_label'])];
+                $choices[] = ['value' => htmlentities($row['field_name'],ENT_QUOTES), 'name' => htmlentities($row['field_name'],ENT_QUOTES) . " - " . htmlspecialchars($row['element_label'])];
             }
 
             $configRow['choices'] = $choices;
@@ -1882,7 +1882,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $result = $this->query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
-                $choices[] = ['value' => htmlentities($row['arm_id'],ENT_QUOTES), 'name' => $row['arm_name']];
+                $choices[] = ['value' => htmlentities($row['arm_id'],ENT_QUOTES), 'name' => htmlentities($row['arm_name'],ENT_QUOTES)];
             }
 
             $configRow['choices'] = $choices;
