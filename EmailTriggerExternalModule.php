@@ -1802,7 +1802,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $result = $this->query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
-                $choices[] = ['value' => $row['role_id'], 'name' => strip_tags(nl2br($row['role_name']))];
+                $choices[] = ['value' => htmlentities($row['role_id'],ENT_QUOTES), 'name' => htmlentities(strip_tags(nl2br($row['role_name'])),ENT_QUOTES)];
             }
 
             $configRow['choices'] = $choices;
@@ -1818,7 +1818,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $result = $this->query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
-                $choices[] = ['value' => strtolower($row['username']), 'name' => $row['user_firstname'] . ' ' . $row['user_lastname']];
+                $choices[] = ['value' => htmlentities(strtolower($row['username'],ENT_QUOTES)), 'name' => htmlentities($row['user_firstname'],ENT_QUOTES) . ' ' . htmlentities($row['user_lastname'],ENT_QUOTES)];
             }
 
             $configRow['choices'] = $choices;
@@ -1833,7 +1833,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $result = $this->query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
-                $choices[] = ['value' => $row['group_id'], 'name' => strip_tags(nl2br($row['group_name']))];
+                $choices[] = ['value' => htmlentities($row['group_id'],ENT_QUOTES), 'name' => strip_tags(nl2br(htmlentities($row['group_name'],ENT_QUOTES)))];
             }
 
             $configRow['choices'] = $choices;
