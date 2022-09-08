@@ -373,7 +373,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $q = $this->query("SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = ? AND (m.directory_prefix = ? OR m.directory_prefix = ?) AND s.`key` = ?", ['true','vanderbilt_emailTrigger','email_alerts','enabled']);
 
         while($row = $q->fetch_assoc()){
-            $project_id = $row['project_id'];
+            $project_id = (int)$row['project_id'];
             if($project_id != "") {
                 $this->deleteOldLogs($project_id);
                 if(!$this->isProjectStatusCompleted($project_id)) {
@@ -727,9 +727,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         $isLongitudinal = false;
         if($isCron){
-            $sql = "SELECT count(e.event_id) as number_events FROM redcap_projects p, redcap_events_metadata e, redcap_events_arms a WHERE p.project_id='".$project_id."' AND p.repeatforms='1' AND a.arm_id = e.arm_id AND p.project_id=a.project_id";
-            $result = $this->query($sql);
-            if($row = db_fetch_assoc($result)) {
+            $q = $this->query("SELECT count(e.event_id) as number_events FROM redcap_projects p, redcap_events_metadata e, redcap_events_arms a WHERE p.project_id=? AND p.repeatforms=? AND a.arm_id = e.arm_id AND p.project_id=a.project_id", [$project_id,'1']);
+            if($row = $q->fetch_assoc()) {
                 if($row['number_events'] >= "2") {
                     $isLongitudinal = true;
                 }
@@ -1147,9 +1146,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     static function isRepeatingInstrumentInEvent($event_id, $instrument) {
-        $sql = "SELECT COUNT(form_name) AS cnt FROM redcap_events_repeat WHERE event_id='".db_real_escape_string($event_id)."' AND form_name='".db_real_escape_string($instrument)."'";
-        $q = db_query($sql);
-        if ($row = db_fetch_assoc($q)) {
+        $q = ExternalModules::query("SELECT COUNT(form_name) AS cnt FROM redcap_events_repeat WHERE event_id=? AND form_name=?", [$event_id,$instrument]);
+        if($row = $q->fetch_assoc()) {
             return ($row['cnt'] > 0);
         }
         return FALSE;
@@ -1170,15 +1168,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $instanceMin = 1;
         if ($isLongitudinal && !self::isRepeatingInstrumentInEvent($form_event_id, $instrument_form)) {
             # get max instance for event
-            $sql = "SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = $project_id AND event_id = '$form_event_id' AND record = '" . db_real_escape_string($record) . "' ORDER BY instance DESC";
+            $q = $this->query("SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = ? AND event_id = ? AND record = ? ORDER BY instance DESC", [$project_id,$form_event_id,$record]);
         } else {
             # get max instance for instrument
-            $sql = "SELECT DISTINCT(d.instance) AS instance FROM redcap_data AS d INNER JOIN redcap_metadata AS m ON ((d.project_id = m.project_id) AND (m.form_name = '".db_real_escape_string($instrument_form)."')) WHERE d.project_id = $project_id AND d.event_id = '$form_event_id' AND d.record = '" . db_real_escape_string($record) . "' ORDER BY d.instance DESC";
+            $q = $this->query("SELECT DISTINCT(d.instance) AS instance FROM redcap_data AS d INNER JOIN redcap_metadata AS m ON ((d.project_id = m.project_id) AND (m.form_name = ?)) WHERE d.project_id = ? AND d.event_id = ? AND d.record = ? ORDER BY d.instance DESC", [$instrument_form,$project_id,$form_event_id,$record]);
         }
-        $q = db_query($sql);
         $instanceMax = 1;
         $instanceNew = 1;
-        if ($row = db_fetch_assoc($q)) {
+        if ($row = $q->fetch_assoc()) {
             $instanceMax = $row['instance'] ?: 1;
             $instanceNew = $instanceMax + 1;
         }
@@ -1249,9 +1246,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         # repeating instances - assume no need to reset survey since they're looking at a specific instance
                         # must generate link in DB, but this will use a return-code because save-and-return is enabled
                         $linkURL = \REDCap::getSurveyLink($record, $instrument_form, $form_event_id, $instance);
-                        $sql = "SELECT r.return_code FROM redcap_surveys_response AS r INNER JOIN redcap_surveys_participants AS p ON (p.participant_id = r.participant_id) WHERE p.event_id = '".db_real_escape_string($form_event_id)."' AND r.record='".db_real_escape_string($record)."' AND r.instance='".db_real_escape_string($instance)."' LIMIT 1";
-                        $q = db_query($sql);
-                        if ($row = db_fetch_assoc($q)) {
+                        $q = $this->query("SELECT r.return_code FROM redcap_surveys_response AS r INNER JOIN redcap_surveys_participants AS p ON (p.participant_id = r.participant_id) WHERE p.event_id = ? AND r.record=? AND r.instance=? LIMIT 1", [$form_event_id,$record,$instance]);
+                        if ($row = $q->fetch_assoc()) {
                             $returnCode = $row['return_code'];
                         } else {
                             $returnCode = "";
@@ -1654,14 +1650,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     function addNewAttachment($array_emails,$edoc,$project_id){
         if(!empty($edoc)) {
-            $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id='" . db_escape($edoc)."' AND project_id='".db_escape($project_id)."'";
-            $q = $this->query($sql);
-
-            if ($error = db_error()) {
-                throw new \Exception($sql . ': ' . $error);
-            }
-
-            while ($row = db_fetch_assoc($q)) {
+            $q = $this->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=? AND project_id=?", [$edoc,$project_id]);
+            while ($row = $q->fetch_assoc()) {
                 if($row['doc_size'] > 3145728 ){
                    $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $project_id),"File Size too big" ,"One or more ".$type." in the project ".$project_id.", are too big to be sent.");
                 }else{
