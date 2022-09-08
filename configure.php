@@ -1300,7 +1300,7 @@ foreach ($language_errors as $err){
                                 $fileAttachments++;
 
                                 if (!empty($configRow['value'][$index])) {
-                                    $q = $this->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=?", [$configRow['value'][$index]]);
+                                    $q = $module->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=?", [$configRow['value'][$index]]);
 
                                     while ($row = $q->fetch_assoc()) {
                                         $url = "downloadFile.php?sname=".htmlentities($row['stored_name'],ENT_QUOTES)."&file=".htmlentities($row['doc_name'],ENT_QUOTES)."&NOAUTH";
