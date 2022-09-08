@@ -1299,17 +1299,12 @@ foreach ($language_errors as $err){
                             if(!empty($configRow['value'][$index])) {
                                 $fileAttachments++;
 
-                            if (!empty($configRow['value'][$index])) {
-                                $sql = "SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id='" . db_escape($configRow['value'][$index])."'";
-                                $q = $module->query($sql);
+                                if (!empty($configRow['value'][$index])) {
+                                    $q = $this->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=?", [$configRow['value'][$index]]);
 
-                                    if ($error = db_error()) {
-                                        die($sql . ': ' . $error);
-                                    }
-
-                                    while ($row = db_fetch_assoc($q)) {
-                                        $url = "downloadFile.php?sname=".$row['stored_name']."&file=".$row['doc_name']."&NOAUTH";
-                                        $attachmentFile .= '- <a href="'.$module->getUrl($url).'" target="_blank">'.$row['doc_name'].'</a><br/>';
+                                    while ($row = $q->fetch_assoc()) {
+                                        $url = "downloadFile.php?sname=".htmlentities($row['stored_name'],ENT_QUOTES)."&file=".htmlentities($row['doc_name'],ENT_QUOTES)."&NOAUTH";
+                                        $attachmentFile .= '- <a href="'.$module->getUrl($url).'" target="_blank">'.htmlentities($row['doc_name'],ENT_QUOTES).'</a><br/>';
                                     }
                                 }
                             }

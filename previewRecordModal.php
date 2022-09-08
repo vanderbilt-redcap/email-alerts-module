@@ -58,7 +58,7 @@ if(\REDCap::isLongitudinal() || $repeatable){
             $event_selector = '<div style="padding-bottom:10px">'.
                                 '<select class="external-modules-input-element" name="preview_record_id" onchange="loadPreviewEmailAlertRecord()"><option value="">Select a Record</option>';
             foreach ($events_array as $id) {
-                $event_selector .= '<option value="' . $id . '" >' . $id . '</option>';
+                $event_selector .= '<option value="' . htmlentities($id,ENT_QUOTES) . '" >' . htmlentities($id,ENT_QUOTES) . '</option>';
             }
             $event_selector .= '</select></div>';
         }

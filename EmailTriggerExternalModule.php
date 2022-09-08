@@ -118,14 +118,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     function sendEmailFromSurveyCode($surveyCode, $project_id, $id, $data, $record, $event_id, $instrument, $repeat_instance, $isRepeatInstrumentComplete, $form){
-        $sql="SELECT s.form_name FROM redcap_surveys_participants as sp LEFT JOIN redcap_surveys s ON (sp.survey_id = s.survey_id ) where s.project_id ='".db_escape($project_id)."' AND sp.hash='".db_escape($surveyCode)."'";
-        $q = $this->query($sql);
+        $q = $this->query("SELECT s.form_name FROM redcap_surveys_participants as sp LEFT JOIN redcap_surveys s ON (sp.survey_id = s.survey_id ) where s.project_id =? AND sp.hash=?", [$project_id,$surveyCode]);
 
-        if($error = db_error()){
-            throw new \Exception($sql.': '.$error);
-        }
-
-        if($row = db_fetch_assoc($q)){
+        if($row = $q->fetch_assoc()){
             if ($row['form_name'] == $form) {
                 $this->setEmailTriggerRequested(true);
                 $this->sendEmailAlert($project_id, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrumentComplete);
@@ -375,14 +370,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     function scheduledemails(){
-        $sql="SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = 'true' AND (m.directory_prefix = 'vanderbilt_emailTrigger' OR m.directory_prefix = 'email_alerts') AND s.`key` = 'enabled'";
-        $q = $this->query($sql);
+        $q = $this->query("SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = ? AND (m.directory_prefix = ? OR m.directory_prefix = ?) AND s.`key` = ?", ['true','vanderbilt_emailTrigger','email_alerts','enabled']);
 
-        if($error = db_error()){
-            throw new \Exception($sql.': '.$error);
-        }
-
-        while($row = db_fetch_assoc($q)){
+        while($row = $q->fetch_assoc()){
             $project_id = $row['project_id'];
             if($project_id != "") {
                 $this->deleteOldLogs($project_id);
@@ -1554,7 +1544,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
             }
         }
-        return $logic;
+        return htmlentities($logic,ENT_QUOTES);
     }
 
     /**
@@ -1868,7 +1858,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $result = $this->query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
-                $row['element_label'] = htmlentities(strip_tags(nl2br($row['element_label'])),ENT_QUOTES);
+                $row['element_label'] = strip_tags(nl2br(htmlentities($row['element_label'],ENT_QUOTES)));
                 if (strlen($row['element_label']) > 30) {
                     $row['element_label'] = substr($row['element_label'], 0, 20) . "... " . substr($row['element_label'], -8);
                 }
@@ -1918,7 +1908,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $result = $this->query($sql, [$pid]);
 
             while ($row = $result->fetch_assoc()) {
-                $choices[] = ['value' => $row['event_id'], 'name' => "Arm: ".strip_tags(nl2br($row['arm_name']))." - Event: ".strip_tags(nl2br($row['descrip']))];
+                $choices[] = ['value' => htmlentities($row['event_id'],ENT_QUOTES), 'name' => "Arm: ".strip_tags(nl2br(htmlentities($row['arm_name'],ENT_QUOTES)))." - Event: ".strip_tags(nl2br(htmlentities($row['descrip'],ENT_QUOTES)))];
             }
 
             $configRow['choices'] = $choices;
