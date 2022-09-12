@@ -982,6 +982,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $instance = $matches[1][1];
                         }else{
                             $event_id = $event_id_repeating;
+                            if (count($matches[1]) == 3) {
+                                $instance = $matches[1][2];
+                            }
                         }
                     }
 
