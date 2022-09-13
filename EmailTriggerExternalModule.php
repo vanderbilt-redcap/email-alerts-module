@@ -975,13 +975,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     if(count($matches[1]) > 1){
                         $project = new \Project($project_id);
                         $event_id_repeating = $project->getEventIdUsingUniqueEventName($matches[1][0]);
-                        $var = $matches[1][1];
+                        $var = "[".$matches[1][1]."]";
                         if($event_id_repeating == "") {
                             #Repeating instances
-                            $var = $matches[1][0];
+                            $var = "[".$matches[1][0]."]";
                             $instance = $matches[1][1];
                         }else{
                             $event_id = $event_id_repeating;
+                            if (count($matches[1]) == 3) {
+                                $instance = $matches[1][2];
+                            }
                         }
                     }
 
@@ -1493,55 +1496,55 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         ) {
             #Repeating instruments by form
             $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
-        }else if(
+		}else if(
             array_key_exists('repeat_instances',$data[$record])
             && isset($data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name])
             && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name] != ""
         ) {
-            #Repeating instruments by event
-            $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
-        }else{
-            $project = new \Project($project_id);
-            if($option == '1'){
-                if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
-                    $logic = $data[$record][$event_id][$var_name];
-                }else{
-                    $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
-                    $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
-                }
-            }else{
-                if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
-                    $logic = $data[$record][$event_id][$var_name];
-                }else {
-                    preg_match_all("/\[[^\]]*\]/", $var, $matches);
-                    if (preg_match("/\(([^\)]+)\)/", $var_name, $checkboxMatches)) {
-                        #Special case for checkboxes
-                        $index = $checkboxMatches[1];
-                        $checkboxVarName = str_replace("($index)", "", $var_name);
-                        $logic = $data[$record][$event_id][$checkboxVarName][$index];
-                    } else if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
-                        #Special case for radio buttons
-                        $logic = $data[$record][$event_id][$var_name];
-                    }else{
-                        $dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
-                        $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
-                    }
-                }
-
-                if($logic == "" && isset($data[$record]['repeat_instances'])){
-                    #it's a repeating instance from a different form
-                    foreach ($data[$record]['repeat_instances'][$event_id] ?: [] as $instrumentFound =>$instances){
-                        foreach ($instances as $instanceFound=>$p){
-                            if($instanceFound == $repeat_instance){
-                                $logic = $data[$record]['repeat_instances'][$event_id][$instrumentFound][$repeat_instance][$var_name];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return htmlentities($logic,ENT_QUOTES);
-    }
+			#Repeating instruments by event
+			$logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
+		}else{
+			$project = new \Project($project_id);
+			if($option == '1'){
+				if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
+					$logic = $data[$record][$event_id][$var_name];
+				}else{
+					$dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
+					$logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
+				}
+			}else{
+				if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
+					$logic = $data[$record][$event_id][$var_name];
+				}else {
+					preg_match_all("/\[[^\]]*\]/", $var, $matches);
+					if (preg_match("/\(([^\)]+)\)/", $var_name, $checkboxMatches)) {
+						#Special case for checkboxes
+						$index = $checkboxMatches[1];
+						$checkboxVarName = str_replace("($index)", "", $var_name);
+						$logic = $data[$record][$event_id][$checkboxVarName][$index];
+					} else if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($project_id,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
+						#Special case for radio buttons
+						$logic = $data[$record][$event_id][$var_name];
+					}else{
+						$dumbVar = \Piping::pipeSpecialTags($var, $project_id, $record, $event_id, $repeat_instance);
+						$logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
+					}
+				}
+				
+				if($logic == "" && isset($data[$record]['repeat_instances'])){
+					#it's a repeating instance from a different form
+					foreach ($data[$record]['repeat_instances'][$event_id] ?: [] as $instrumentFound =>$instances){
+						foreach ($instances as $instanceFound=>$p){
+							if($instanceFound == $repeat_instance){
+								$logic = $data[$record]['repeat_instances'][$event_id][$instrumentFound][$repeat_instance][$var_name];
+							}
+						}
+					}
+				}
+			}
+		}
+		return htmlentities($logic,ENT_QUOTES);
+	}
 
     /**
      * Function that replaces the logic variables for email values and checks if they are valid
