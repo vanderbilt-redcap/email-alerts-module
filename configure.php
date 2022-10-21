@@ -595,7 +595,7 @@ foreach ($language_errors as $err){
             });
 
             /***SCHEDULED EMAIL OPTIONS***/
-            $('[name="cron-send-email-on"],[name="cron-send-email-on-update"]').on('click', function(e){
+            $('[name="cron-send-email-on"],[field="cron-send-email-on-update"]').on('click', function(e){
                 var suffix = '';
                 if($(this).attr('name').includes("-update")){
                     suffix = '-update';
