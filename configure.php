@@ -727,7 +727,7 @@ foreach ($language_errors as $err){
                 });
 
                 if(checkRequiredFieldsAndLoadOption('-update','Update')){
-                    var checkBranchingLogic = '&logic='+$('[name=email-condition-update]').val()+'&logicQueueField='+$('[name=cron-send-email-on-field-update]').val()+'&logicQueueCond='+$('[name=cron-send-email-on-update]:checked').val()+'&logicExpQueueField='+$('[name=cron-queue-expiration-date-field-update]').val()+'&logicExpQueueCond='+$('[name=cron-queue-expiration-date-update]:checked').val();
+                    var checkBranchingLogic = '&logic='+$('[name=email-condition-update]').val()+'&logicQueueField='+$('[name=cron-send-email-on-field-update]').val()+'&logicQueueCond='+$('[field=cron-send-email-on-update]:checked').val()+'&logicExpQueueField='+$('[name=cron-queue-expiration-date-field-update]').val()+'&logicExpQueueCond='+$('[name=cron-queue-expiration-date-update]:checked').val();
                     var urlFile = '<?=$module->getUrl('save-file.php')?>';
                     var urlUpdateForm = '<?=$module->getUrl('updateForm.php')?>';
                     var logic = checkBranchingLogicValidAndSave(data, checkBranchingLogic,'<?=$module->getUrl('isBranchingLogicValid.php')?>',urlFile, urlUpdateForm, files, '-update','Update', "U");
