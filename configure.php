@@ -595,7 +595,7 @@ foreach ($language_errors as $err){
             });
 
             /***SCHEDULED EMAIL OPTIONS***/
-            $('[name="cron-send-email-on"],[field="cron-send-email-on-update"]').on('click', function(e){
+            $('[name="cron-send-email-on"],[name="cron-send-email-on-update"]').on('click', function(e){
                 var suffix = '';
                 if($(this).attr('name').includes("-update")){
                     suffix = '-update';
@@ -708,6 +708,8 @@ foreach ($language_errors as $err){
                 data += "&email-to-update="+ encodeURIComponent($('#email-to-update').val());
                 data += "&email-cc-update="+encodeURIComponent($('#email-cc-update').val());
                 data += "&email-bcc-update="+encodeURIComponent($('#email-bcc-update').val());
+                data += "&cron-send-email-on-update="+encodeURIComponent($('input[name="cron-send-email-on-update"]:checked').val());
+                data += "&cron-queue-expiration-date="+encodeURIComponent($('input[name="cron-queue-expiration-date"]:checked').val());
 
                 var files = {};
                 $('#updateForm').find('input, select, textarea').each(function(index, element){
@@ -727,7 +729,7 @@ foreach ($language_errors as $err){
                 });
 
                 if(checkRequiredFieldsAndLoadOption('-update','Update')){
-                    var checkBranchingLogic = '&logic='+$('[name=email-condition-update]').val()+'&logicQueueField='+$('[name=cron-send-email-on-field-update]').val()+'&logicQueueCond='+$('[field=cron-send-email-on-update]:checked').val()+'&logicExpQueueField='+$('[name=cron-queue-expiration-date-field-update]').val()+'&logicExpQueueCond='+$('[name=cron-queue-expiration-date-update]:checked').val();
+                    var checkBranchingLogic = '&logic='+$('[name=email-condition-update]').val()+'&logicQueueField='+$('[name=cron-send-email-on-field-update]').val()+'&logicQueueCond='+$('[name=cron-send-email-on-update]:checked').val()+'&logicExpQueueField='+$('[name=cron-queue-expiration-date-field-update]').val()+'&logicExpQueueCond='+$('[name=cron-queue-expiration-date-update]:checked').val();
                     var urlFile = '<?=$module->getUrl('save-file.php')?>';
                     var urlUpdateForm = '<?=$module->getUrl('updateForm.php')?>';
                     var logic = checkBranchingLogicValidAndSave(data, checkBranchingLogic,'<?=$module->getUrl('isBranchingLogicValid.php')?>',urlFile, urlUpdateForm, files, '-update','Update', "U");
