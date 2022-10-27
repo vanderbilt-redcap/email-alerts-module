@@ -1569,16 +1569,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                            $email_redcap = $this->getChoiceLabel(array('field_name'=>$email, 'value'=>$email_redcap, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$repeat_instance));
                        }
 
-                       if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email) && !$isLabel) {
+                       if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email) && !$isLabel && !in_array($email_redcap,$array_emails_aux)) {
                            array_push($array_emails_aux,$email_redcap);
-                       } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap)){
+                       } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap) && !in_array($email,$array_emails_aux)){
                            array_push($array_emails_aux,$email);
-                       }else if(filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL) && $email == $var[0] && $isLabel){
+                       }else if(filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL) && $email == $var[0] && $isLabel && !in_array($email_redcap,$array_emails_aux)){
                            array_push($array_emails_aux,$email_redcap);
                        }else if($email == $var[0] && $isLabel){
                            $email_redcap_checkboxes = preg_split("/[;,]+/", $email_redcap);
                            foreach ($email_redcap_checkboxes as $email_ck){
-                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL)){
+                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL) && !in_array($email_ck,$array_emails_aux)){
                                    array_push($array_emails_aux,$email_ck);
                                }
                            }
@@ -1586,12 +1586,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                            $ary = preg_split('/\s*<([^>]*)>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
                            if (count($ary) >= 2) {
                                $parsed_email = trim($ary[1]);
-                               if(filter_var($parsed_email)){
+                               if(filter_var($parsed_email) && !in_array($parsed_email,$array_emails_aux)){
                                    array_push($array_emails_aux,$parsed_email);
                                }
                            }
                        }
-                    } else {
+                    } else if(!in_array($email,$array_emails_aux) && $email != ""){
                         array_push($array_emails_aux,$email);
                     }
                 }
