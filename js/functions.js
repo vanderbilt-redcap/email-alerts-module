@@ -549,8 +549,10 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
 
     var editor_text = tinymce.activeEditor.getContent();
     if(editor_text == ""){
-        errMsg.push('Please insert an <strong>email message</strong>.');
-        $('#external-modules-rich-text-field_email-text'+suffix+'_ifr').addClass('alert');
+        if($('.external-modules-rich-text-field').val() == "") {
+            errMsg.push('Please insert an <strong>email message</strong>.');
+            $('#external-modules-rich-text-field_email-text' + suffix + '_ifr').addClass('alert');
+        }
     }else{ $('#external-modules-rich-text-field_email-text'+suffix+'_ifr').removeClass('alert');}
 
     if (errMsg.length > 0) {
