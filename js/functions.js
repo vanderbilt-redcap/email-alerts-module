@@ -185,8 +185,9 @@ function editEmailAlert(modal, index){
     }
     $("#index_modal_update").val(index);
 
-    $('[name="email-attachment-variable-update"]').attr('placeholder','[variable1], [variable2], ...')
+    $('[name="email-attachment-variable-update"]').attr('placeholder','[variable1], [variable2], ...');
     $('[name="email-from-update"]').attr('placeholder','myemail@server.com, "Sender name"');
+    $('[name="cron-queue-update"]').prop('checked',false);
 
     //Add values
     $('[name=external-modules-configure-modal-update] input[name="alert-name-update"]').val(modal['alert-name']);

@@ -1,3 +1,4 @@
+.modal {overflow-y:auto;}
 .alert{border: 1px solid red;}
 /***TABLE***/
 .table_header{
