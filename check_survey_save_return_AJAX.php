@@ -10,7 +10,16 @@ require_once 'EmailTriggerExternalModule.php';
 $surveyLink_var = $_REQUEST['surveyLink_var'];
 $project_id = (int)$_REQUEST['project_id'];
 $message = '';
-$prefix = "__SURVEYLINK_";
+$prefixes = [
+    "__SURVEYLINK_",
+    "survey-link:",
+    "survey-url:",
+    "survey-return-code:",
+];
+$skipPrefixes = [
+    "survey-queue-link:",
+    "survey-queue-url",
+];
 if(!empty($surveyLink_var)){
 
     $datasurvey = explode("\n", $surveyLink_var);
@@ -20,32 +29,47 @@ if(!empty($surveyLink_var)){
 
         preg_match_all("/\[[^\]]*\]/", $var, $matches);
 
-        if(sizeof($matches[0]) > 1) {
+        $instrument_form = "";
+        $skipFound = FALSE;
+        if(sizeof($matches[0]) >= 1) {
             foreach ($matches[0] as $term) {
-                if (preg_match("/^\[$prefix/", $term)) {
-                    $var = $term;
+                foreach ($prefixes as $prefix) {
+                    if (preg_match("/^\[$prefix/", $term)) {
+                        $var = $term;
+                        $instrument_form = str_replace('['.$prefix, '', $var);
+                        $instrument_form = preg_replace("/:[^:]+\]$/", "", $instrument_form);
+                        $instrument_form = filter_var(str_replace(']', '', $instrument_form), FILTER_SANITIZE_STRING);
+                        break;
+                    }
+                }
+                foreach ($skipPrefixes as $prefix) {
+                    if (preg_match("/^\[$prefix/", $term)) {
+                        $skipFound = TRUE;
+                        break;
+                    }
                 }
             }
         }
-        $instrument_form = str_replace('['.$prefix, '', $var);
-        $instrument_form = db_escape(filter_var(str_replace(']', '', $instrument_form), FILTER_SANITIZE_STRING));
+        if (!$skipFound) {
+            $sql = "SELECT save_and_return from `redcap_surveys` where project_id = ? AND form_name = ?";
+            $result = $module->query($sql, [$project_id, $instrument_form]);
 
+            if(APP_PATH_WEBROOT[0] == '/'){
+                $APP_PATH_WEBROOT_ALL = substr(APP_PATH_WEBROOT, 1);
+            }
+            $server = (isset($_SERVER['HTTPS']) ? "https://" : "http://").SERVER_NAME."/";
 
-        $sql = "SELECT save_and_return from `redcap_surveys` where project_id = ".db_escape($project_id)." AND form_name ='".db_escape($instrument_form)."'";
-        $result = $module->query($sql);
-
-        if(APP_PATH_WEBROOT[0] == '/'){
-            $APP_PATH_WEBROOT_ALL = substr(APP_PATH_WEBROOT, 1);
-        }
-
-        if(!empty($row = db_fetch_assoc($result))) {
-            if($row['save_and_return'] == 0){
-                $link = '<a href="' .APP_PATH_WEBROOT_FULL.$APP_PATH_WEBROOT_ALL. 'Surveys/edit_info.php?pid=' . $project_id . '&view=showform&page='.$instrument_form.'&redirectDesigner=1" target="_blank"><u>enable "<strong>Save and Return</strong>" in Survey Settings</u></a>';
+            $row = db_fetch_assoc($result);
+            if(
+                (
+                    !empty($row)
+                    && ($row['save_and_return'] == 0)
+                )
+                || (empty($row))
+            ) {
+                $link = '<a href="' .$server.$APP_PATH_WEBROOT_ALL. 'Surveys/edit_info.php?pid=' . $project_id . '&view=showform&page='.$instrument_form.'&redirectDesigner=1" target="_blank"><u>enable "<strong>Save and Return</strong>" in Survey Settings</u></a>';
                 $message .= 'The survey titled "<strong>'.$instrument_form.'</strong>" is not activated as a Save and Return survey. Please ' . $link . ' to use the link. If you want the survey to be editable, also select "Allow respondents to modify completed responses."<br/>';
             }
-        }else{
-            $link = '<a href="' .APP_PATH_WEBROOT_FULL. $APP_PATH_WEBROOT_ALL. 'Surveys/edit_info.php?pid=' . $project_id . '&view=showform&page='.$instrument_form.'&redirectDesigner=1" target="_blank"><u>enable "<strong>Save and Return</strong>" in Survey Settings</u></a>';
-            $message .= 'The survey titled "<strong>'.$instrument_form.'</strong>" is not activated as a Save and Return survey. Please ' . $link . ' to use the link. If you want the survey to be editable, also select "Allow respondents to modify completed responses."<br/>';
         }
     }
 

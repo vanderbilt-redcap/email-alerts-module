@@ -492,82 +492,114 @@ foreach ($language_errors as $err){
                 $('#errMsgContainer').hide();
                 $('#succMsgContainer').hide();
 
-                var errMsg = [];
-                if ($('#datapipe_var').val() != "" && $('#datapipe_var').val() != "0") {
-                    var pipeVar = $('#datapipe_var').val().split("\n");
-                    for (var i = 0; i < pipeVar.length; i++) {
-                        var pipeName = pipeVar[i].split(",");
-                        if(pipeName[0] !== '' && (trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]")){
+                const errMsg = [];
+                if ($('#datapipe_var').val() !== "" && $('#datapipe_var').val() !== "0") {
+                    const pipeVar = $('#datapipe_var').val().split("\n");
+                    for (let i = 0; i < pipeVar.length; i++) {
+                        const pipeName = pipeVar[i].split(",");
+                        if(pipeName[0] !== '' && (trim(pipeName[0]).substring(0, 1) !== "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) !== "]")){
                             errMsg.push('<strong>Data Piping field</strong> must follow the format: <i>[variable_name],label</i> or <i>[variable_name][smart_variable],label</i>.');
                         }
                     }
                 }
 
-                if ($('#datapipeEmail_var').val() != "" && $('#datapipeEmail_var').val() != "0") {
-                    var pipeVar = $('#datapipeEmail_var').val().split("\n");
-                    for (var i = 0; i < pipeVar.length; i++) {
-                        var pipeName = pipeVar[i].split(",");
-                        if(pipeName[0] !== '' && (trim(pipeName[0]).substring(0, 1) != "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]")){
+                if ($('#datapipeEmail_var').val() !== "" && $('#datapipeEmail_var').val() !== "0") {
+                    const pipeVar = $('#datapipeEmail_var').val().split("\n");
+                    for (let i = 0; i < pipeVar.length; i++) {
+                        const pipeName = pipeVar[i].split(",");
+                        if(pipeName[0] !== '' && (trim(pipeName[0]).substring(0, 1) !== "[" || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) !== "]")){
                             errMsg.push('<strong>Data Piping Email field</strong> must follow the format: <i>[variable_name],label</i> or <i>[variable_name][smart_variable],label</i>.');
                         }
                     }
                 }
 
                 if ($('#emailFromForm_var').val() != "" && $('#emailFromForm_var').val() != "0") {
-                    var result = $('#emailFromForm_var').val().split(",");
-                    for(var i=0;i<result.length;i++){
-                        if(result[i] !== '' && (trim(result[i]).substring(0, 1) != "[" || trim(result[i]).substring(trim(result[i]).length-1, trim(result[i]).length) != "]")){
+                    const result = $('#emailFromForm_var').val().split(",");
+                    for(let i=0;i<result.length;i++){
+                        if(result[i] !== '' && (trim(result[i]).substring(0, 1) !== "[" || trim(result[i]).substring(trim(result[i]).length-1, trim(result[i]).length) != "]")){
                             errMsg.push('<strong>Email Addresses field</strong> must follow the format: <i>[variable_name]</i> or <i>[variable_name][smart_variable]</i>.');
                         }
                     }
                 }
 
-                var pipeVarLocs = { "#surveyLink_var" :
+                const pipeVarLocs = { "#surveyLink_var" :
                                                           {
-                                                              "prefix" : "[__SURVEYLINK_",
+                                                              "prefixes" : [
+                                                                  "[__SURVEYLINK_",
+                                                                  "[survey-link:",
+                                                                  "[survey-url:",
+                                                                  "[survey-queue-link:",
+                                                                  "[survey-queue-url]",
+                                                                  "[survey-return-code:",
+                                                              ],
                                                               "type" : "Survey"
                                                           },
                                     "#formLink_var" :
                                                           {
-                                                              "prefix" : "[__FORMLINK_",
+                                                              "prefixes" : [
+                                                                  "[__FORMLINK_",
+                                                              ],
                                                               "type" : "Data-Form"
                                                           }
                                   }
-                for (var pipeVarLoc in pipeVarLocs) {
-                    var formPrefix = pipeVarLocs[pipeVarLoc]['prefix'];
-                    var type = pipeVarLocs[pipeVarLoc]['type'];
-                    if ($(pipeVarLoc).val() != "" && $(pipeVarLoc).val() != "0") {
-                        var pipeVar = $(pipeVarLoc).val().split("\n");
-                        for (var i = 0; i < pipeVar.length; i++) {
-                            var pipeName = pipeVar[i].split(",");
-                            var matches = pipeName[0].match(/\[(.*?)\]/g);
+                for (const pipeVarLoc in pipeVarLocs) {
+                    const formPrefixes = pipeVarLocs[pipeVarLoc]['prefixes'];
+                    const options = [];
+                    for (let j = 0; j < formPrefixes.length; j++) {
+                        const formPrefix = formPrefixes[j];
+                        if ((formPrefix === "[__SURVEYLINK_") || (formPrefix === "[__FORMLINK_")) {
+                            options.push('['+formPrefix+'variable_name],label');
+                        } else if (formPrefix === "[survey-link:") {
+                            options.push('['+formPrefix+'instrument:Custom Text for Link],label');
+                        } else if ((formPrefix === "[survey-url:") || (formPrefix === "[survey-return-code:")) {
+                            options.push('['+formPrefix+'instrument],label');
+                        } else if (formPrefix === "[survey-queue-link:") {
+                            options.push('['+formPrefix+'Custom Text for Link],label');
+                        } else if (formPrefix === "[survey-queue-url]") {
+                            options.push('['+formPrefix+',label');
+                        }
+                    }
 
-                            if (isLongitudinal && matches && matches.length >1) {
-
-                                if(
-                                    trim(matches[1]).substring(0, 1) != "["
-                                    || trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) != "]"
-                                    || trim(matches[1]).substring(0, formPrefix.length) != formPrefix
-                                    || trim(matches[0]).substring(0, 1) != "["
-                                    || trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) != "]"
+                    const type = pipeVarLocs[pipeVarLoc]['type'];
+                    if ($(pipeVarLoc).val() !== "" && $(pipeVarLoc).val() !== "0") {
+                        const pipeVar = $(pipeVarLoc).val().split("\n");
+                        for (let i = 0; i < pipeVar.length; i++) {
+                            const pipeName = pipeVar[i].split(",");
+                            const matches = pipeName[0].match(/\[(.*?)\]/g);
+                            let found = false;
+                            for (let j = 0; j < formPrefixes.length; j++) {
+                                const formPrefix = formPrefixes[j];
+                                if (isLongitudinal && matches && (matches.length >1)) {
+                                    if(
+                                        trim(matches[1]).substring(0, 1) === "["
+                                        && trim(matches[1]).substring(trim(matches[1]).length-1, trim(matches[1]).length) === "]"
+                                        && trim(matches[1]).substring(0, formPrefix.length) === formPrefix
+                                        && trim(matches[0]).substring(0, 1) === "["
+                                        && trim(matches[0]).substring(trim(matches[0]).length-1, trim(matches[0]).length) === "]"
+                                    ){
+                                        found = true;
+                                    }
+                                }
+                                else if(
+                                    trim(pipeName[0]).substring(0, 1) === "["
+                                    && trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) === "]"
+                                    && trim(pipeName[0]).substring(0, formPrefix.length) === formPrefix
                                 ){
-                                    errMsg.push('<strong>Longitudinal '+type+' Link field</strong> must follow the format: <i>[event_name]['+formPrefix+'_variable_name],label</i> .');
+                                    found = true;
                                 }
                             }
-                            else if(
-                                trim(pipeName[0]).substring(0, 1) != "["
-                                || trim(pipeName[0]).substring(trim(pipeName[0]).length-1, trim(pipeName[0]).length) != "]"
-                                || trim(pipeName[0]).substring(0, formPrefix.length) != formPrefix
-                            ){
-                                errMsg.push('<strong>Link '+type+' field</strong> must follow the format: <i>'+formPrefix+'variable_name],label</i> .');
+                            if (!found && isLongitudinal) {
+                                errMsg.push('<strong>Longitudinal '+type+' Link field</strong> must follow one of the following formats: <i>[event_name]'+options.join('</i>; <i>[event_name]')+'</i>.');
+                            } else if (!found) {
+                                errMsg.push('<strong>Link '+type+' field</strong> must follow one of the following formats: <i>'+options.join('</i>; <i>')+'</i> .');
                             }
                         }
                     }
                 }
 
-                if ($('#emailFailed_var').val() != "" && $('#emailFailed_var').val() != "0") {
-                    var result = $('#emailFailed_var').val().split(/[;,]+/);
-                    for(var i=0;i<result.length;i++){
+                if ($('#emailFailed_var').val() !== "" && $('#emailFailed_var').val() !== "0") {
+                    const result = $('#emailFailed_var').val().split(/[;,]+/);
+                    for(let i=0;i<result.length;i++){
                         if(!validateEmail(trim(result[i]))){
                             errMsg.push('<strong>Email '+result[i]+'</strong> is not a valid email.');
                             break;
@@ -587,7 +619,7 @@ foreach ($language_errors as $err){
                     if ($('#surveyLink_var').val() != "" && $('#surveyLink_var').val() != "0") {
                         checkIfSurveyIsSaveAndReturn("surveyLink_var="+$('#surveyLink_var').val()+'&project_id='+project_id,'<?=$module->getUrl('check_survey_save_return_AJAX.php')?>','<?=$module->getUrl('configureAJAX.php')?>');
                     }else{
-                        var data = $('#mainForm').serialize();
+                        const data = $('#mainForm').serialize();
                         ajaxLoadOptionAndMessage(data, '<?=$module->getUrl('configureAJAX.php')?>', "C");
                     }
                 }
@@ -1063,7 +1095,12 @@ foreach ($language_errors as $err){
                     <tr class="panel-collapse collapse EC_collapsed <?=$tr_class?>" aria-expanded="true">
                         <td style="width: 15%;"><span style="padding-left: 5px;">Enable <strong>Survey Links</strong> in email content</span><div class="description_config">Allows links to REDCap surveys for any survey-enabled form to be inserted into email messages.</div></td>
                         <td style="width: 25%;padding: 10px 30px;">
-                            <span class="table_example">Example: [__SURVEYLINK_form_name], name ...</span><br/>
+                            <span class="table_example">Examples: [__SURVEYLINK_form_name], name ...<br/>
+                                [survey-link:instrument:Custom Text for Link], button name ...<br/>
+                                [survey-url:instrument], button name ...<br/>
+                                [survey-queue-link:Custom Text for Link], button name ...<br/>
+                                [survey-queue-url], button name ...<br/>
+                                [survey-return-code:instrument], button name ...</span><br/>
                             <a id="addLinkBtn" onclick="javascript:$('#addSurveyLink').modal('show');" type="button" class="btn btn-sm pull-right btn_color_surveyLink open-codesModal btn_datapiping" style="margin-bottom:5px;">Add Link</a>
                             <textarea type="text"  name="surveyLink_var" id="surveyLink_var" style="width: 100%;height: 100px;" placeholder="[__SURVEYLINK_form_name], name ..." value="<?=$module->getProjectSetting('surveyLink_var');?>"><?=$module->getProjectSetting('surveyLink_var');?></textarea>
                             <div class="btn_color_square btn_color_surveyLink"></div>Survey link button (orange)
