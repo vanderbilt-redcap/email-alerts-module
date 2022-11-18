@@ -1322,11 +1322,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $email_text;
     }
 
-    function getReturnCode($record, $instrument, $event_id, $instance) {
+    private function getReturnCode($record, $instrument, $eventId, $instance)
+    {
         if (method_exists("\REDCap", "getSurveyReturnCode")) {
-            return \REDCap::getSurveyReturnCode($record, $instrument, $event_id, $instance);
+            return \REDCap::getSurveyReturnCode($record, $instrument, $eventId, $instance);
         }
-        $q = $this->query("SELECT r.return_code FROM redcap_surveys_response AS r INNER JOIN redcap_surveys_participants AS p ON (p.participant_id = r.participant_id) WHERE p.event_id = ? AND r.record=? AND r.instance=? LIMIT 1", [$event_id,$record,$instance]);
+        $sql = "SELECT r.return_code
+        FROM redcap_surveys_response AS r
+        INNER JOIN redcap_surveys_participants AS p
+        ON (p.participant_id = r.participant_id)
+        WHERE
+            p.event_id = ?
+            AND r.record=?
+            AND r.instance=?
+        LIMIT 1";
+        $q = $this->query($sql, [$eventId,$record,$instance]);
         if ($row = $q->fetch_assoc()) {
             return $row['return_code'];
         }
@@ -1703,30 +1713,50 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                            $email_redcap = $this->getChoiceLabel(array('field_name'=>$email, 'value'=>$email_redcap, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$repeat_instance));
                        }
 
-                       if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email) && !$isLabel) {
-                           array_push($array_emails_aux,$email_redcap);
-                       } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap)){
-                           array_push($array_emails_aux,$email);
-                       }else if(filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL) && $email == $var[0] && $isLabel){
-                           array_push($array_emails_aux,$email_redcap);
-                       }else if($email == $var[0] && $isLabel){
+                       if (
+                           !empty($email_redcap)
+                           && (
+                               strpos($email, $var[0]) !== false
+                               || $email_redcap == $email
+                           )
+                           && !$isLabel
+                       ) {
+                           $array_emails_aux[] = $email_redcap;
+                       } else if(
+                           filter_var(trim($email), FILTER_VALIDATE_EMAIL)
+                           && (
+                               empty($email_redcap)
+                               || $email != $email_redcap
+                           )
+                       ) {
+                           $array_emails_aux[] = $email;
+                       }else if(
+                           filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL)
+                           && $email == $var[0]
+                           && $isLabel
+                       ) {
+                           $array_emails_aux[] = $email_redcap;
+                       } else if(
+                           $email == $var[0]
+                           && $isLabel
+                       ) {
                            $email_redcap_checkboxes = preg_split("/[;,]+/", $email_redcap);
                            foreach ($email_redcap_checkboxes as $email_ck){
                                if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL)){
-                                   array_push($array_emails_aux,$email_ck);
+                                   $array_emails_aux[] = $email_ck;
                                }
                            }
-                       }else{
+                       } else {
                            $ary = preg_split('/\s*<([^>]*)>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
                            if (count($ary) >= 2) {
                                $parsed_email = trim($ary[1]);
                                if(filter_var($parsed_email)){
-                                   array_push($array_emails_aux,$parsed_email);
+                                   $array_emails_aux[] = $parsed_email;
                                }
                            }
                        }
                     } else {
-                        array_push($array_emails_aux,$email);
+                        $array_emails_aux[] = $email;
                     }
                 }
             }
