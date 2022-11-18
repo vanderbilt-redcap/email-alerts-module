@@ -740,6 +740,8 @@ foreach ($language_errors as $err){
                 data += "&email-to-update="+ encodeURIComponent($('#email-to-update').val());
                 data += "&email-cc-update="+encodeURIComponent($('#email-cc-update').val());
                 data += "&email-bcc-update="+encodeURIComponent($('#email-bcc-update').val());
+                data += "&cron-send-email-on-update="+encodeURIComponent($('input[name="cron-send-email-on-update"]:checked').val());
+                data += "&cron-queue-expiration-date="+encodeURIComponent($('input[name="cron-queue-expiration-date"]:checked').val());
 
                 var files = {};
                 $('#updateForm').find('input, select, textarea').each(function(index, element){

@@ -18,7 +18,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function hook_survey_complete ($project_id,$record,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         if($record != "") {
-            $this->deleteOldLogs($project_id);
             if(!$this->isProjectStatusCompleted($project_id)) {
                 $data = \REDCap::getData($project_id, "array", $record);
                 $this->setEmailTriggerRequested(false);
@@ -52,7 +51,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     function hook_save_record ($project_id,$record,$instrument,$event_id, $group_id, $survey_hash,$response_id, $repeat_instance){
         if($record != "") {
-            $this->deleteOldLogs($project_id);
             if(!$this->isProjectStatusCompleted($project_id)) {
                 $data = \REDCap::getData($project_id, "array", $record);
                 $this->setEmailTriggerRequested(false);
@@ -1685,7 +1683,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 				}
 			}
 		}
-		return htmlentities($logic,ENT_QUOTES);
+		return htmlentities($logic ?? '', ENT_QUOTES);
 	}
 
     /**
@@ -2156,12 +2154,19 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 	}
 
 	function deleteOldLogs($project_id){
-        #If logs are older than a month, delete them. Only delete the scheduledemails log data
-        $this->removeLogs('
+        $remove_logs_date = strtotime($this->getProjectSetting("remove-logs-date",$project_id));
+        $today = strtotime(date('Y-m-d'));
+
+        #Make sure we only remove logs once a day
+        if($remove_logs_date == "" || $remove_logs_date < $today) {
+            #If logs are older than a month, delete them. Only delete the scheduledemails log data
+            $this->removeLogs('
                 project_id = ?
                 and scheduledemails = 1
                 and timestamp < date_sub(now(), interval 1 month)
                 ', [$project_id]);
+            $this->setProjectSetting('remove-logs-date', date('Y-m-d'), $project_id);
+        }
     }
 
     function isProjectStatusCompleted ($project_id){
