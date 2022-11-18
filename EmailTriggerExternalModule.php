@@ -746,7 +746,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_text = $this->setREDCapSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
         $email_text = $this->setPassthroughSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
         $email_text = $this->setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
-        error_log("Email Text: $email_text");
 
         #Email Data structure
         $array_emails = [];
@@ -1262,7 +1261,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrument, $smartVariable, $isLongitudinal);;
                 if ($instance) {
                     $url = \REDCap::getSurveyLink($record, $instrument, $event_id, $instance, $project_id);
-                    error_log("Instance $instance: $url");
                     $email_text = str_replace($fullTextMatch, $url, $email_text);
                 }
             }
