@@ -4,13 +4,11 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-use PHPMailer\PHPMailer\PHPMailer;
-
 require_once __DIR__.'/vendor/autoload.php';
 
-$project_id = $_GET['pid'];
-$index =  $_REQUEST['index_modal_record_preview'];
-$record =  $_REQUEST['preview_record_id'];
+$project_id = (int)$_GET['pid'];
+$index =  htmlentities($_REQUEST['index_modal_record_preview'],ENT_QUOTES);
+$record =  htmlentities($_REQUEST['preview_record_id'],ENT_QUOTES);
 
 #get data from the DB
 $form_name = empty($module->getProjectSetting('form-name'))?array():$module->getProjectSetting('form-name')[$index];
@@ -19,6 +17,10 @@ $email_from = empty($module->getProjectSetting('email-from'))?array():$module->g
 $email_subject =  empty($module->getProjectSetting('email-subject'))?array():$module->getProjectSetting('email-subject')[$index];
 $email_text =  empty($module->getProjectSetting('email-text'))?array():$module->getProjectSetting('email-text')[$index];
 $datapipe_var = $module->getProjectSetting("datapipe_var", $project_id);
+
+$email_from = htmlspecialchars($email_from);
+$email_subject = htmlspecialchars($email_subject);
+# TODO $email_text
 
 $data = \REDCap::getData($project_id,"array",$record);
 
@@ -36,25 +38,32 @@ if(empty($form_name_event)){
     }
 }
 
-$mail = new PHPMailer;
-
 #Email Addresses
-$mail = $module->setEmailAddresses($mail, $project_id, $record, $form_name_event, $form_name, 1, $data, $index,\REDCap::isLongitudinal());
+$array_emails = array();
+$array_emails = $module->setEmailAddresses($array_emails, $project_id, $record, $event_id, $form_name, 1, $data, $index, \REDCap::isLongitudinal());
+foreach ($array_emails as $key => $value) {
+    if ($value === "") {
+        $array_emails[$key] = [];
+    } else if (is_string($value)) {
+        $array_emails[$key] = preg_split("/[,;]/", $value);
+    }
+}
 
 $email_to = "";
-foreach ($mail->getToAddresses() as $address){
-    $email_to .= $address[0].", ";
+foreach ($array_emails['to'] as $address){
+    $email_to .= $address.", ";
 }
 
 $email_cc = "";
-foreach ($mail->getCcAddresses() as $address){
-    $email_cc .= $address[0].", ";
+foreach ($array_emails['cc'] as $address){
+    $email_cc .= $address.", ";
 }
 
 $email_bcc = "";
-foreach ($mail->getBccAddresses() as $address){
-    $email_bcc .= $address[0].", ";
+foreach ($array_emails['bcc'] as $address){
+    $email_bcc .= $address.", ";
 }
+
 
 
 $preview = "<table style='margin:0 auto;width:100%'><tr><td>From:</td><td>".preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', $email_from)."</td></tr>";
@@ -67,8 +76,9 @@ if($email_bcc != ''){
     $preview = "<tr><td>BCC:</td><td>".str_replace(',',', ',preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', rtrim($email_bcc,', ')))."</td></tr>";
 }
 
-$email_text = $module->setDataPiping($datapipe_var, $email_text, $project_id, $data, $record, $form_name_event, $form_name, 1,\REDCap::isLongitudinal());
-$email_subject = $module->setDataPiping($datapipe_var, $email_subject, $project_id, $data, $record, $form_name_event, $form_name, 1,\REDCap::isLongitudinal());
+$isLongitudinal = \REDCap::isLongitudinal();
+$email_text = $module->setDataPiping($datapipe_var, $email_text, $project_id, $data, $record, $form_name_event, $form_name, 1, $isLongitudinal);
+$email_subject = $module->setDataPiping($datapipe_var, $email_subject, $project_id, $data, $record, $form_name_event, $form_name, 1, $isLongitudinal);
 
 $preview .= "<tr><td>Subject:</td><td>".$email_subject."</td></tr>";
 $preview .= "<tr><td>Message:</td><td>".$email_text."</td></tr></table>";

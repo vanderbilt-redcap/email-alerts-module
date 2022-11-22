@@ -38,12 +38,6 @@ if(!isset($_REQUEST['email-incomplete'])){
     $incomplete = "1";
 }
 
-if(!isset($_REQUEST['cron-repeat-email'])){
-    $cron_repeat = "0";
-}else{
-    $cron_repeat = "1";
-}
-
 //If first time new alert naming, update all.
 if(empty($alert_id)){
     foreach ($form_name as $index=>$value){
@@ -52,7 +46,12 @@ if(empty($alert_id)){
     $module->setProjectSetting('alert-id', $alert_id);
 }
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
-$new_alert_id = max($alert_id) + 1;
+if($alert_id != null) {
+    $new_alert_id = max($alert_id) + 1;
+}else{
+    $new_alert_id = 1;
+}
+
 
 #Add new data with old
 array_push($form_name,htmlspecialchars($_REQUEST['form-name']));

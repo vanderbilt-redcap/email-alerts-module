@@ -6,14 +6,17 @@ use ExternalModules\ExternalModules;
 
 require_once 'EmailTriggerExternalModule.php';
 
+$instance = $_REQUEST['instance'] ?: 1;
+
 /* version 10.6 introduces new params for REDCap::getSurveyLink */
 $funcArray = [$_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']];
 
 if(\REDCap::versionCompare(REDCAP_VERSION, '10.6.1') >= 0) {
-        $funcArray = [$_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], 1, '', false];
+        $funcArray = [$_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], $instance, '', false];
 } else {
-        $funcArray = [$_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']];
+        $funcArray = [$_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], $instance];
 }
+
 $returnCode = \REDCap::getSurveyReturnCode($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event']);
 $surveyLink = call_user_func_array(['REDCap', 'getSurveyLink'], $funcArray);
 
@@ -25,10 +28,10 @@ if(strcasecmp($returnCode, $_REQUEST['returnCode']) == 0) {
     <html>
     <body>
     <form id='passthruform' name='passthruform' action='<?=$surveyLink?>' method='post' enctype='multipart/form-data'>
-             <?=$link?>
-            <input type='hidden' value='1' name='__prefill' />
+        <?=$link?>
+        <input type='hidden' value='1' name='__prefill' />
     </form>
-        <script type='text/javascript'>
+    <script type='text/javascript'>
         window.onload = function(){
             document.passthruform.submit();
         }

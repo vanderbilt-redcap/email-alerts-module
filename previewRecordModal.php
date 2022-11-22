@@ -6,8 +6,8 @@ use ExternalModules\ExternalModules;
 
 require_once __DIR__.'/vendor/autoload.php';
 
-$project_id = $_GET['pid'];
-$index =  $_REQUEST['index_modal_alert'];
+$project_id = (int)$_GET['pid'];
+$index =  htmlentities($_REQUEST['index_modal_alert'],ENT_QUOTES);
 
 #get data from the DB
 $form_name_event =  empty($module->getProjectSetting('form-name-event'))?array():$module->getProjectSetting('form-name-event')[$index];
@@ -58,7 +58,7 @@ if(\REDCap::isLongitudinal() || $repeatable){
             $event_selector = '<div style="padding-bottom:10px">'.
                                 '<select class="external-modules-input-element" name="preview_record_id" onchange="loadPreviewEmailAlertRecord()"><option value="">Select a Record</option>';
             foreach ($events_array as $id) {
-                $event_selector .= '<option value="' . $id . '" >' . $id . '</option>';
+                $event_selector .= '<option value="' . htmlentities($id,ENT_QUOTES) . '" >' . htmlentities($id,ENT_QUOTES) . '</option>';
             }
             $event_selector .= '</select></div>';
         }

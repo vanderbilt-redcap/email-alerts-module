@@ -185,8 +185,9 @@ function editEmailAlert(modal, index){
     }
     $("#index_modal_update").val(index);
 
-    $('[name="email-attachment-variable-update"]').attr('placeholder','[variable1], [variable2], ...')
+    $('[name="email-attachment-variable-update"]').attr('placeholder','[variable1], [variable2], ...');
     $('[name="email-from-update"]').attr('placeholder','myemail@server.com, "Sender name"');
+    $('[name="cron-queue-update"]').prop('checked',false);
 
     //Add values
     $('[name=external-modules-configure-modal-update] input[name="alert-name-update"]').val(modal['alert-name']);
@@ -206,6 +207,29 @@ function editEmailAlert(modal, index){
     $('[name=external-modules-configure-modal-update] input[name="email-condition-update"]').val(modal['email-condition']);
     $('[name=external-modules-configure-modal-update] input[name="email-incomplete-update"]').val(modal['email-incomplete']);
     $('[name=external-modules-configure-modal-update] input[name="cron-queue-update"]').val(modal['cron-queue-update']);
+
+
+    //If logic fails due to quotes and single quotes together. Remove double quotes and reassess option
+    modal['cron-send-email-on'].replaceAll('"', "'")
+    if(modal['cron-send-email-on'] != 'date' && modal['cron-send-email-on'] != 'calc' && modal['cron-send-email-on'] != 'now'){
+        if(dateIsValid(modal['cron-send-email-on-field'])){
+            modal['cron-send-email-on'] = "date";
+        }else if(modal['cron-send-email-on-field'] != ""){
+            modal['cron-send-email-on'] = "calc";
+        }else{
+            modal['cron-send-email-on'] = "now";
+        }
+    }
+    modal['cron-queue-expiration-date'].replaceAll('"', "'")
+    if(modal['cron-queue-expiration-date'] != 'date' && modal['cron-queue-expiration-date'] != 'cond' && modal['cron-queue-expiration-date'] != 'never'){
+        if(dateIsValid(modal['cron-queue-expiration-date-field'])){
+            modal['cron-queue-expiration-date'] = "date";
+        }else if(modal['cron-queue-expiration-date-field'] != ""){
+            modal['cron-queue-expiration-date'] = "cond";
+        }else{
+            modal['cron-queue-expiration-date'] = "never";
+        }
+    }
 
     checkSchedule(modal['email-repetitive'],'-update',modal['cron-send-email-on'],modal['cron-send-email-on-field'],modal['cron-repeat-for'],modal['cron-queue-expiration-date'],modal['cron-queue-expiration-date-field']);
 
@@ -526,8 +550,10 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
 
     var editor_text = tinymce.activeEditor.getContent();
     if(editor_text == ""){
-        errMsg.push('Please insert an <strong>email message</strong>.');
-        $('#external-modules-rich-text-field_email-text'+suffix+'_ifr').addClass('alert');
+        if($('.external-modules-rich-text-field').val() == "") {
+            errMsg.push('Please insert an <strong>email message</strong>.');
+            $('#external-modules-rich-text-field_email-text' + suffix + '_ifr').addClass('alert');
+        }
     }else{ $('#external-modules-rich-text-field_email-text'+suffix+'_ifr').removeClass('alert');}
 
     if (errMsg.length > 0) {
@@ -740,4 +766,23 @@ function showIfRepeatingForm(data, field){
 
 function deleteAllQueue(){
     ajaxLoadOptionAndMessage("&pid="+project_id+"&alertid="+$('#alertid').val(),_delete_queue_all_url,"O");
+}
+
+function dateIsValid(dateStr) {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+
+    if (dateStr.match(regex) === null) {
+        return false;
+    }
+
+    const date = new Date(dateStr);
+
+    const timestamp = date.getTime();
+
+    if (typeof timestamp !== 'number' || Number.isNaN(timestamp)) {
+        // 👇️ this runs
+        return false;
+    }
+
+    return date.toISOString().startsWith(dateStr);
 }

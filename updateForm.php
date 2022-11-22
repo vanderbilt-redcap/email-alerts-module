@@ -62,9 +62,28 @@ if(empty($alert_id)){
 #Add logs
 $action_description = "Modifications on Scheduled Alert ".$index;
 $schedule_changed = false;
-if($cron_send_email_on[$index] != $_REQUEST['cron-send-email-on-update'] || $cron_send_email_on_field[$index] != $_REQUEST['cron-send-email-on-field-update'] ||
-    $cron_repeat_for[$index] != $_REQUEST['cron-repeat-for-update'] ||
-    $cron_queue_expiration_date[$index] != $_REQUEST['cron-queue-expiration-date-update'] || $cron_queue_expiration_date_field[$index] != $_REQUEST['cron-queue-expiration-date-field-update']){
+if(
+    (
+        isset($_REQUEST['cron-send-email-on-update'])
+        && $cron_send_email_on[$index] != $_REQUEST['cron-send-email-on-update']
+    )
+    || (
+        isset($_REQUEST['cron-send-email-on-field-update'])
+        && $cron_send_email_on_field[$index] != $_REQUEST['cron-send-email-on-field-update']
+    )
+    || (
+        isset($_REQUEST['cron-repeat-for-update'])
+        && $cron_repeat_for[$index] != $_REQUEST['cron-repeat-for-update']
+    )
+    || (
+        isset($_REQUEST['cron-queue-expiration-date-update'])
+        && $cron_queue_expiration_date[$index] != $_REQUEST['cron-queue-expiration-date-update']
+    )
+    || (
+        isset($_REQUEST['cron-queue-expiration-date-field-update'])
+        && $cron_queue_expiration_date_field[$index] != $_REQUEST['cron-queue-expiration-date-field-update']
+    )
+) {
     $schedule_changed = true;
     $module->addQueueLog($pid, $action_description." - Old Settings", $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_for[$index], $cron_queue_expiration_date[$index], $cron_queue_expiration_date_field[$index]);
 }
@@ -89,26 +108,26 @@ if($email_repetitive[$index] == "0" && $repetitive == "1" || $email_repetitive[$
 }
 
 #Replace new data with old
-$form_name[$index] = htmlspecialchars($_REQUEST['form-name-update'],ENT_QUOTES);
-$form_name_event[$index] = $_REQUEST['form-name-event'];
-$email_from[$index] = $_REQUEST['email-from-update'];
-$email_to[$index] = $_REQUEST['email-to-update'];
-$email_cc[$index] = $_REQUEST['email-cc-update'];
-$email_bcc[$index] = $_REQUEST['email-bcc-update'];
-$email_subject[$index] = htmlspecialchars($_REQUEST['email-subject-update'],ENT_QUOTES);
-$email_text[$index] = $_REQUEST['email-text-update-editor'];
-$email_attachment_variable[$index] = htmlspecialchars($_REQUEST['email-attachment-variable-update'],ENT_QUOTES);
+$form_name[$index] = htmlspecialchars(isset($_REQUEST['form-name-update']) ? $_REQUEST['form-name-update'] : "",ENT_QUOTES);
+$form_name_event[$index] = isset($_REQUEST['form-name-event']) ? $_REQUEST['form-name-event'] : "";
+$email_from[$index] = isset($_REQUEST['email-from-update']) ? $_REQUEST['email-from-update'] : "";
+$email_to[$index] = isset($_REQUEST['email-to-update']) ? $_REQUEST['email-to-update'] : "";
+$email_cc[$index] = isset($_REQUEST['email-cc-update']) ? $_REQUEST['email-cc-update'] : "";
+$email_bcc[$index] = isset($_REQUEST['email-bcc-update']) ? $_REQUEST['email-bcc-update'] : "";
+$email_subject[$index] = htmlspecialchars(isset($_REQUEST['email-subject-update']) ? $_REQUEST['email-subject-update'] : "",ENT_QUOTES);
+$email_text[$index] = isset($_REQUEST['email-text-update-editor']) ? $_REQUEST['email-text-update-editor'] : "";
+$email_attachment_variable[$index] = htmlspecialchars(isset($_REQUEST['email-attachment-variable-update']) ? $_REQUEST['email-attachment-variable-update'] : "",ENT_QUOTES);
 $email_repetitive[$index] = $repetitive;
-$email_condition[$index] = htmlspecialchars($_REQUEST['email-condition-update'],ENT_QUOTES);
+$email_condition[$index] = htmlspecialchars(isset($_REQUEST['email-condition-update']) ? $_REQUEST['email-condition-update'] : "",ENT_QUOTES);
 $email_incomplete[$index] = $incomplete;
-$cron_send_email_on[$index] = $_REQUEST['cron-send-email-on-update'];
-$cron_send_email_on_field[$index] = $_REQUEST['cron-send-email-on-field-update'];
-$cron_repeat_for[$index] = $_REQUEST['cron-repeat-for-update'];
-$cron_repeat_until[$index] = $_REQUEST['cron-repeat-until-update'];
-$cron_repeat_until_field[$index] = htmlspecialchars($_REQUEST['cron-repeat-until-field-update'],ENT_QUOTES);
-$cron_queue_expiration_date[$index] = $_REQUEST['cron-queue-expiration-date-update'];
-$cron_queue_expiration_date_field[$index] = htmlspecialchars($_REQUEST['cron-queue-expiration-date-field-update'],ENT_QUOTES);
-$alert_name[$index] = $_REQUEST['alert-name-update'];
+$cron_send_email_on[$index] = isset($_REQUEST['cron-send-email-on-update']) ? $_REQUEST['cron-send-email-on-update'] : "";
+$cron_send_email_on_field[$index] = isset($_REQUEST['cron-send-email-on-field-update']) ? $_REQUEST['cron-send-email-on-field-update'] : "";
+$cron_repeat_for[$index] = isset($_REQUEST['cron-repeat-for-update']) ? $_REQUEST['cron-repeat-for-update'] : "";
+$cron_repeat_until[$index] = isset($_REQUEST['cron-repeat-until-update']) ? $_REQUEST['cron-repeat-until-update'] : "";
+$cron_repeat_until_field[$index] = htmlspecialchars(isset($_REQUEST['cron-repeat-until-field-update']) ? $_REQUEST['cron-repeat-until-field-update'] : "",ENT_QUOTES);
+$cron_queue_expiration_date[$index] = isset($_REQUEST['cron-queue-expiration-date-update']) ? $_REQUEST['cron-queue-expiration-date-update'] : "";
+$cron_queue_expiration_date_field[$index] = htmlspecialchars(isset($_REQUEST['cron-queue-expiration-date-field-update']) ? $_REQUEST['cron-queue-expiration-date-field-update'] : "",ENT_QUOTES);
+$alert_name[$index] = isset($_REQUEST['alert-name-update']) ? $_REQUEST['alert-name-update'] : "";
 
 if($schedule_changed){
     $module->addQueueLog($pid, $action_description, $cron_send_email_on[$index], $cron_send_email_on_field[$index], $cron_repeat_for[$index], $cron_queue_expiration_date[$index], $cron_queue_expiration_date_field[$index]);
