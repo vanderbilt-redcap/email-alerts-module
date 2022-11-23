@@ -1683,6 +1683,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 				}
 			}
 		}
+        if (is_array($logic)) {
+            $logic = "";
+        }
 		return htmlentities($logic ?? '', ENT_QUOTES);
 	}
 
