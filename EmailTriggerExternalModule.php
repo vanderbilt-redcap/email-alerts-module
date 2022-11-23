@@ -741,11 +741,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_subject = $this->setDataPiping($datapipe_var, $email_subject, $project_id, $data, $record, $event_id, $instrument, $instance, $isLongitudinal);
 
         #Survey and Data-Form Links
-        $email_text = $this->setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
+        $email_text = $this->setREDCapSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
+        $email_text = $this->setPassthroughSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
         $email_text = $this->setFormLink($email_text, $project_id, $record, $event_id, $isLongitudinal);
 
         #Email Data structure
-        $array_emails = array();
+        $array_emails = [];
 
         #Email Addresses
         $array_emails = $this->setEmailAddresses($array_emails, $project_id, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal);
@@ -1164,34 +1165,180 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return int
      */
      function getNumericalInstanceForForm($project_id, $record, $form_event_id, $instrument_form, $smartVariable, $isLongitudinal) {
-        $smartVariable = preg_replace("/\]$/", "", preg_replace("/^\[/", "", $smartVariable));
+         if (is_integer($smartVariable) || ctype_digit($smartVariable)) {
+             return $smartVariable;
+         }
+         $smartVariable = preg_replace("/\]$/", "", preg_replace("/^\[/", "", $smartVariable));
 
-        $instanceMin = 1;
-        if ($isLongitudinal && !self::isRepeatingInstrumentInEvent($form_event_id, $instrument_form)) {
-            # get max instance for event
-            $q = $this->query("SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = ? AND event_id = ? AND record = ? ORDER BY instance DESC", [$project_id,$form_event_id,$record]);
-        } else {
-            # get max instance for instrument
-            $q = $this->query("SELECT DISTINCT(d.instance) AS instance FROM redcap_data AS d INNER JOIN redcap_metadata AS m ON ((d.project_id = m.project_id) AND (m.form_name = ?)) WHERE d.project_id = ? AND d.event_id = ? AND d.record = ? ORDER BY d.instance DESC", [$instrument_form,$project_id,$form_event_id,$record]);
+         $instanceMin = 1;
+         if ($isLongitudinal && !self::isRepeatingInstrumentInEvent($form_event_id, $instrument_form)) {
+             # get max instance for event
+             $q = $this->query("SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = ? AND event_id = ? AND record = ? ORDER BY instance DESC", [$project_id,$form_event_id,$record]);
+         } else {
+             # get max instance for instrument
+             $q = $this->query("SELECT DISTINCT(d.instance) AS instance FROM redcap_data AS d INNER JOIN redcap_metadata AS m ON ((d.project_id = m.project_id) AND (d.field_name = m.field_name)) WHERE m.form_name = ? AND d.project_id = ? AND d.event_id = ? AND d.record = ? ORDER BY d.instance DESC", [$instrument_form,$project_id,$form_event_id,$record]);
+         }
+         $instanceMax = 1;
+         $instanceNew = 1;
+         if ($row = $q->fetch_assoc()) {
+             $instanceMax = $row['instance'] ?: 1;
+             $instanceNew = $instanceMax + 1;
+         }
+
+         if ($smartVariable == 'new-instance') {
+             return $instanceNew;
+         }
+         else if ($smartVariable == 'last-instance') {
+             return $instanceMax;
+         }
+         else if ($smartVariable == 'first-instance') {
+             return $instanceMin;
+         } else {
+             throw new \Exception("Invalid smart variable $smartVariable");
+         }
+     }
+
+    /**
+     * Function that transforms the results of preg_match_all into a more parseable format
+     * @param $matches
+     */
+    private static function transformMatches(&$matches) {
+        $newMatches = [];
+        foreach ($matches as $i => $itemMatches) {
+            foreach ($itemMatches as $j => $match) {
+                if (!isset($newMatches[$j])) {
+                    $newMatches[$j] = [];
+                }
+                $newMatches[$j][$i] = $match;
+            }
         }
-        $instanceMax = 1;
-        $instanceNew = 1;
+        $matches = $newMatches;
+    }
+    /**
+     * Function that adds the survey link into the mail content
+     * @param $email_text
+     * @param $project_id
+     * @param $record
+     * @param $event_id
+     * @param $isLongitudinal
+     * @return mixed
+     */
+    private function setREDCapSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal){
+        if (preg_match_all("/\[survey-link:(\w+):\s*([^\]]+)\]\[([^\]]+)\]/", $email_text, $matches)) {
+            self::transformMatches($matches);
+            foreach (array_values($matches) as $match) {
+                $fullTextMatch = $match[0];
+                $instrument = $match[1];
+                $textForLink = $match[2];
+                $smartVariable = $match[3];
+                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrument, $smartVariable, $isLongitudinal);;
+                if ($instance) {
+                    $url = \REDCap::getSurveyLink($record, $instrument, $event_id, $instance, $project_id);
+                    $text = "<a href='$url'>$textForLink</a>";
+                    $email_text = str_replace($fullTextMatch, $text, $email_text);
+                }
+            }
+        }
+        if (preg_match_all("/\[survey-link:(\w+):\s*([^\]]+)\]/", $email_text, $matches)) {
+            self::transformMatches($matches);
+            foreach (array_values($matches) as $match) {
+                $fullTextMatch = $match[0];
+                $instrument = $match[1];
+                $textForLink = $match[2];
+                $url = \REDCap::getSurveyLink($record, $instrument, $event_id, 1, $project_id);
+                $text = "<a href='$url'>$textForLink</a>";
+                $email_text = str_replace($fullTextMatch, $text, $email_text);
+            }
+        }
+        if (preg_match_all("/\[survey-url:(\w+)\]\[([^\]]+)\]/", $email_text, $matches)) {
+            self::transformMatches($matches);
+            foreach (array_values($matches) as $match) {
+                $fullTextMatch = $match[0];
+                $instrument = $match[1];
+                $smartVariable = $match[2];
+                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrument, $smartVariable, $isLongitudinal);;
+                if ($instance) {
+                    $url = \REDCap::getSurveyLink($record, $instrument, $event_id, $instance, $project_id);
+                    $email_text = str_replace($fullTextMatch, $url, $email_text);
+                }
+            }
+        }
+        if (preg_match_all("/\[survey-url:(\w+)\]/", $email_text, $matches)) {
+            self::transformMatches($matches);
+            foreach (array_values($matches) as $match) {
+                $fullTextMatch = $match[0];
+                $instrument = $match[1];
+                $url = \REDCap::getSurveyLink($record, $instrument, $event_id, 1, $project_id);
+                $email_text = str_replace($fullTextMatch, $url, $email_text);
+            }
+        }
+        if (preg_match_all("/\[survey-queue-link:\s*([^\]]+)\]/", $email_text, $matches)) {
+            self::transformMatches($matches);
+            foreach (array_values($matches) as $match) {
+                $fullTextMatch = $match[0];
+                $textForLink = $match[1];
+                $url = \REDCap::getSurveyQueueLink($record, $project_id);
+                if ($url) {
+                    $text = "<a href='$url'>$textForLink</a>";
+                    $email_text = str_replace($fullTextMatch, $text, $email_text);
+                }
+            }
+        }
+        if (preg_match("/\[survey-queue-url\]/", $email_text)) {
+            $fullTextMatch = "[survey-queue-url]";
+            $url = \REDCap::getSurveyQueueLink($record, $project_id);
+            if ($url) {
+                $email_text = str_replace($fullTextMatch, $url, $email_text);
+            }
+        }
+        if (preg_match_all("/\[survey-return-code:(\w+)\]\[([^\]]+)\]/", $email_text, $matches)) {
+            self::transformMatches($matches);
+            foreach (array_values($matches) as $match) {
+                $fullTextMatch = $match[0];
+                $instrument = $match[1];
+                $smartVariable = $match[2];
+                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrument, $smartVariable, $isLongitudinal);;
+                if ($instance) {
+                    $returnCode = $this->getReturnCode($record, $instrument, $event_id, $instance);
+                    if ($returnCode) {
+                        $email_text = str_replace($fullTextMatch, $returnCode, $email_text);
+                    }
+                }
+            }
+        }
+        if (preg_match_all("/\[survey-return-code:(\w+)\]/", $email_text, $matches)) {
+            self::transformMatches($matches);
+            foreach (array_values($matches) as $match) {
+                $fullTextMatch = $match[0];
+                $instrument = $match[1];
+                $returnCode = $this->getReturnCode($record, $instrument, $event_id, 1);
+                if ($returnCode) {
+                    $email_text = str_replace($fullTextMatch, $returnCode, $email_text);
+                }
+            }
+        }
+        return $email_text;
+    }
+
+    private function getReturnCode($record, $instrument, $eventId, $instance)
+    {
+        if (method_exists("\REDCap", "getSurveyReturnCode")) {
+            return \REDCap::getSurveyReturnCode($record, $instrument, $eventId, $instance);
+        }
+        $sql = "SELECT r.return_code
+        FROM redcap_surveys_response AS r
+        INNER JOIN redcap_surveys_participants AS p
+        ON (p.participant_id = r.participant_id)
+        WHERE
+            p.event_id = ?
+            AND r.record=?
+            AND r.instance=?
+        LIMIT 1";
+        $q = $this->query($sql, [$eventId,$record,$instance]);
         if ($row = $q->fetch_assoc()) {
-            $instanceMax = $row['instance'] ?: 1;
-            $instanceNew = $instanceMax + 1;
+            return $row['return_code'];
         }
-
-        if ($smartVariable == 'new-instance') {
-            return $instanceNew;
-        }
-        else if ($smartVariable == 'last-instance') {
-            return $instanceMax;
-        }
-        else if ($smartVariable == 'first-instance') {
-            return $instanceMin;
-        } else {
-            throw new \Exception("Invalid smart variable $smartVariable");
-        }
+        return "";
     }
 
     /**
@@ -1203,7 +1350,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $isLongitudinal
      * @return mixed
      */
-    function setSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal){
+    private function setPassthroughSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal){
         $surveyLink_var = $this->getProjectSetting("surveyLink_var", $project_id);
         if(!empty($surveyLink_var)) {
 			## Sort survey links by reverse string lengths to prevent shorter links from
@@ -1247,12 +1394,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         # repeating instances - assume no need to reset survey since they're looking at a specific instance
                         # must generate link in DB, but this will use a return-code because save-and-return is enabled
                         $linkURL = \REDCap::getSurveyLink($record, $instrument_form, $form_event_id, $instance);
-                        $q = $this->query("SELECT r.return_code FROM redcap_surveys_response AS r INNER JOIN redcap_surveys_participants AS p ON (p.participant_id = r.participant_id) WHERE p.event_id = ? AND r.record=? AND r.instance=? LIMIT 1", [$form_event_id,$record,$instance]);
-                        if ($row = $q->fetch_assoc()) {
-                            $returnCode = $row['return_code'];
-                        } else {
-                            $returnCode = "";
-                        }
+                        $returnCode = $this->getReturnCode($record, $instrument_form, $form_event_id, $instance);
                     }
                     ## getUrl doesn't append a pid when accessed through the cron, add pid if it's not there already
                     $baseUrl = $this->getUrl('surveyPassthru.php');
@@ -1541,6 +1683,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 				}
 			}
 		}
+        if (is_array($logic)) {
+            $logic = "";
+        }
 		return htmlentities($logic ?? '', ENT_QUOTES);
 	}
 
@@ -1569,30 +1714,50 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                            $email_redcap = $this->getChoiceLabel(array('field_name'=>$email, 'value'=>$email_redcap, 'project_id'=>$project_id, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$repeat_instance));
                        }
 
-                       if (!empty($email_redcap) && (strpos($email, $var[0]) !== false || $email_redcap == $email) && !$isLabel && !in_array($email_redcap,$array_emails_aux)) {
-                           array_push($array_emails_aux,$email_redcap);
-                       } else if(filter_var(trim($email), FILTER_VALIDATE_EMAIL) && (empty($email_redcap) || $email != $email_redcap) && !in_array($email,$array_emails_aux)){
-                           array_push($array_emails_aux,$email);
-                       }else if(filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL) && $email == $var[0] && $isLabel && !in_array($email_redcap,$array_emails_aux)){
-                           array_push($array_emails_aux,$email_redcap);
-                       }else if($email == $var[0] && $isLabel){
+                       if (
+                           !empty($email_redcap)
+                           && (
+                               strpos($email, $var[0]) !== false
+                               || $email_redcap == $email
+                           )
+                           && !$isLabel
+                       ) {
+                           $array_emails_aux[] = $email_redcap;
+                       } else if(
+                           filter_var(trim($email), FILTER_VALIDATE_EMAIL)
+                           && (
+                               empty($email_redcap)
+                               || $email != $email_redcap
+                           )
+                       ) {
+                           $array_emails_aux[] = $email;
+                       }else if(
+                           filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL)
+                           && $email == $var[0]
+                           && $isLabel
+                       ) {
+                           $array_emails_aux[] = $email_redcap;
+                       } else if(
+                           $email == $var[0]
+                           && $isLabel
+                       ) {
                            $email_redcap_checkboxes = preg_split("/[;,]+/", $email_redcap);
                            foreach ($email_redcap_checkboxes as $email_ck){
-                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL) && !in_array($email_ck,$array_emails_aux)){
-                                   array_push($array_emails_aux,$email_ck);
+                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL)){
+                                   $array_emails_aux[] = $email_ck;
                                }
                            }
-                       }else{
+                       } else {
                            $ary = preg_split('/\s*<([^>]*)>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
                            if (count($ary) >= 2) {
                                $parsed_email = trim($ary[1]);
-                               if(filter_var($parsed_email) && !in_array($parsed_email,$array_emails_aux)){
-                                   array_push($array_emails_aux,$parsed_email);
+                               if(filter_var($parsed_email)){
+                                   $array_emails_aux[] = $parsed_email;
                                }
                            }
                        }
-                    } else if(!in_array($email,$array_emails_aux) && $email != ""){
-                        array_push($array_emails_aux,$email);
+                    } else {
+                        $array_emails_aux[] = $email;
                     }
                 }
             }
