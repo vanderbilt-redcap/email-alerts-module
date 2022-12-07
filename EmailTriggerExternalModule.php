@@ -1224,6 +1224,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      */
     private function setREDCapSurveyLink($email_text, $project_id, $record, $event_id, $isLongitudinal){
+        $originalPid = $_GET['pid'] ?? FALSE;
+        $_GET['pid'] = $project_id;
         if (preg_match_all("/\[survey-link:(\w+):\s*([^\]]+)\]\[([^\]]+)\]/", $email_text, $matches)) {
             self::transformMatches($matches);
             foreach (array_values($matches) as $match) {
@@ -1317,6 +1319,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 }
             }
         }
+        if (!$originalPid) {
+            unset($_GET['pid']);
+        } else {
+            $_GET['pid'] = $originalPid;
+        }
         return $email_text;
     }
 
@@ -1393,7 +1400,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     } else {
                         # repeating instances - assume no need to reset survey since they're looking at a specific instance
                         # must generate link in DB, but this will use a return-code because save-and-return is enabled
+                        $originalPid = $_GET['pid'] ?? FALSE;
+                        $_GET['pid'] = $project_id;
                         $linkURL = \REDCap::getSurveyLink($record, $instrument_form, $form_event_id, $instance);
+                        if (!$originalPid) {
+                            unset($_GET['pid']);
+                        } else {
+                            $_GET['pid'] = $originalPid;
+                        }
                         $returnCode = $this->getReturnCode($record, $instrument_form, $form_event_id, $instance);
                     }
                     ## getUrl doesn't append a pid when accessed through the cron, add pid if it's not there already
