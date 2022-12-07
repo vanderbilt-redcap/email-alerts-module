@@ -1238,6 +1238,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_text = str_replace($fullTextMatch, $text, $email_text);
                 }
             }
+        } else if (preg_match_all("/\[survey-link:(\w+)\]\[([^\]]+)\]/", $email_text, $matches)) {
+            self::transformMatches($matches);
+            foreach (array_values($matches) as $match) {
+                $fullTextMatch = $match[0];
+                $instrument = $match[1];
+                $smartVariable = $match[2];
+                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrument, $smartVariable, $isLongitudinal);;
+                if ($instance) {
+                    $url = \REDCap::getSurveyLink($record, $instrument, $event_id, $instance, $project_id);
+                    $email_text = str_replace($fullTextMatch, $url, $email_text);
+                }
+            }
         }
         if (preg_match_all("/\[survey-link:(\w+):\s*([^\]]+)\]/", $email_text, $matches)) {
             self::transformMatches($matches);
@@ -1248,6 +1260,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $url = \REDCap::getSurveyLink($record, $instrument, $event_id, 1, $project_id);
                 $text = "<a href='$url'>$textForLink</a>";
                 $email_text = str_replace($fullTextMatch, $text, $email_text);
+            }
+        } else if (preg_match_all("/\[survey-link:(\w+)\]/", $email_text, $matches)) {
+            self::transformMatches($matches);
+            foreach (array_values($matches) as $match) {
+                $fullTextMatch = $match[0];
+                $instrument = $match[1];
+                $url = \REDCap::getSurveyLink($record, $instrument, $event_id, 1, $project_id);
+                $email_text = str_replace($fullTextMatch, $url, $email_text);
             }
         }
         if (preg_match_all("/\[survey-url:(\w+)\]\[([^\]]+)\]/", $email_text, $matches)) {
