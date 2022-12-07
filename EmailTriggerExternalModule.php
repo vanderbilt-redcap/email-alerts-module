@@ -1299,7 +1299,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $smartVariable = $match[2];
                 $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrument, $smartVariable, $isLongitudinal);;
                 if ($instance) {
-                    $returnCode = $this->getReturnCode($record, $instrument, $event_id, $instance);
+                    $returnCode = $this->getReturnCode($record, $instrument, $event_id, $instance, $project_id);
                     if ($returnCode) {
                         $email_text = str_replace($fullTextMatch, $returnCode, $email_text);
                     }
@@ -1311,7 +1311,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             foreach (array_values($matches) as $match) {
                 $fullTextMatch = $match[0];
                 $instrument = $match[1];
-                $returnCode = $this->getReturnCode($record, $instrument, $event_id, 1);
+                $returnCode = $this->getReturnCode($record, $instrument, $event_id, 1, $project_id);
                 if ($returnCode) {
                     $email_text = str_replace($fullTextMatch, $returnCode, $email_text);
                 }
@@ -1320,10 +1320,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $email_text;
     }
 
-    private function getReturnCode($record, $instrument, $eventId, $instance)
+    private function getReturnCode($record, $instrument, $eventId, $instance, $project_id)
     {
         if (method_exists("\REDCap", "getSurveyReturnCode")) {
-            return \REDCap::getSurveyReturnCode($record, $instrument, $eventId, $instance);
+            return \REDCap::getSurveyReturnCode($record, $instrument, $eventId, $instance, $project_id);
         }
         $sql = "SELECT r.return_code
         FROM redcap_surveys_response AS r
