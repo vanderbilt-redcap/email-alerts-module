@@ -1394,7 +1394,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         # repeating instances - assume no need to reset survey since they're looking at a specific instance
                         # must generate link in DB, but this will use a return-code because save-and-return is enabled
                         $linkURL = \REDCap::getSurveyLink($record, $instrument_form, $form_event_id, $instance, $project_id);
-                        $returnCode = $this->getReturnCode($record, $instrument_form, $form_event_id, $instance);
+                        $returnCode = $this->getReturnCode($record, $instrument_form, $form_event_id, $instance, $project_id);
                     }
                     ## getUrl doesn't append a pid when accessed through the cron, add pid if it's not there already
                     $baseUrl = $this->getUrl('surveyPassthru.php');
