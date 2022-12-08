@@ -1893,7 +1893,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $q = $this->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=? AND project_id=?", [$edoc,$projectId]);
             while ($row = $q->fetch_assoc()) {
                 if($row['doc_size'] > 3145728 ){
-                   $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"File Size too big" ,"One or more ".$type." in the project ".$projectId.", are too big to be sent.");
+                   $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"File Size too big" ,"One or more files in the project ".$projectId.", are too big to be sent.");
                 }else{
                     //attach file with name as index
                     $array_emails['attachments'][$row['doc_name']] = EDOC_PATH . $row['stored_name'];
