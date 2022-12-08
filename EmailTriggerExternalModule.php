@@ -16,7 +16,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		$this->disableUserBasedSettingPermissions();
 	}
 
-    function hook_survey_complete (
+    public function hook_survey_complete (
         $projectId,
         $record,
         $instrument,
@@ -69,7 +69,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
-    function hook_save_record (
+    public function hook_save_record (
         $projectId,
         $record,
         $instrument,
@@ -164,7 +164,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
-    function sendEmailFromSurveyCode(
+    public function sendEmailFromSurveyCode(
         $surveyCode,
         $projectId,
         $id,
@@ -204,7 +204,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * Function that deletes information when we click on the REDCap buttons: Delete the project, Erase all data, Delete record
      * @param null $projectId
      */
-    function hook_every_page_before_render($projectId = null){
+    public function hook_every_page_before_render($projectId = null){
         if(strpos($_SERVER['REQUEST_URI'],'delete_project.php') !== false && $_POST['action'] == 'delete') {
             #Button: Delete the project
             $this->setProjectSetting('email-queue', '');
@@ -295,11 +295,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * It is used in other Plugins
      *
      */
-    function getEmailTriggerRequested(){
+    public function getEmailTriggerRequested(){
         return $this->email_requested;
     }
 
-    function setEmailTriggerRequested($email_requested){
+    public function setEmailTriggerRequested($email_requested){
        $this->email_requested =  $email_requested;
     }
 
@@ -315,7 +315,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $isRepeatInstrument
      * @throws \Exception
      */
-    function sendEmailAlert($projectId, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument){
+    public function sendEmailAlert($projectId, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument){
         #To ensure it's the last module called
         $delayedSuccessful = $this->delayModuleExecution();
         if ($delayedSuccessful) {
@@ -416,7 +416,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $record
      * @param $times_sent
      */
-    function addQueueEmailFromInterface($projectId, $alert, $record, $times_sent, $event_id, $last_sent,$instance){
+    public function addQueueEmailFromInterface($projectId, $alert, $record, $times_sent, $event_id, $last_sent,$instance){
         if($record != "") {
             $data = \REDCap::getData($projectId, "array", $record);
 
@@ -471,7 +471,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $id
      * @return bool
      */
-    function isQueueExpired($projectId, $record, $event_id, $instance, $instrument, $isRepeatInstrument, $id){
+    public function isQueueExpired($projectId, $record, $event_id, $instance, $instrument, $isRepeatInstrument, $id){
         $cron_queue_expiration_date =  $this->getProjectSetting('cron-queue-expiration-date',$projectId)[$id];
         $cron_queue_expiration_date_field =  htmlspecialchars_decode(
             $this->getProjectSetting('cron-queue-expiration-date-field',$projectId)[$id]
@@ -512,7 +512,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
     }
 
-    function isAlreadyInQueue($alert, $projectId, $record, $instance){
+    public function isAlreadyInQueue($alert, $projectId, $record, $instance){
         $email_queue = $this->getProjectSetting('email-queue');
         $found = false;
         foreach ($email_queue as $index=>$queue){
@@ -534,7 +534,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * Function called by the CRON to send the scheduled email alerts
      * @throws \Exception
      */
-    function scheduledemails(){
+    public function scheduledemails(){
         $q = $this->query("SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = ? AND (m.directory_prefix = ? OR m.directory_prefix = ?) AND s.`key` = ?", ['true','vanderbilt_emailTrigger','email_alerts','enabled']);
 
         while($row = $q->fetch_assoc()){
@@ -607,7 +607,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $index, the queue index
      * @return bool
      */
-    function sendToday($queue,$projectId)
+    public function sendToday($queue,$projectId)
     {
         $cron_send_email_on_field = htmlspecialchars_decode(
             $this->getProjectSetting('cron-send-email-on-field',$projectId)[$queue['alert']]
@@ -662,7 +662,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $index, queue index
      * @return mixed
      */
-    function stopRepeat($queue,$index,$projectId){
+    public function stopRepeat($queue,$index,$projectId){
         $cron_repeat_for = $this->getProjectSetting('cron-repeat-for',$queue['project_id'])[$queue['alert']];
         if($cron_repeat_for == "" || $cron_repeat_for == "0" && $queue['last_sent'] != ""){
             $this->deleteQueuedEmail($index, $projectId);
@@ -677,7 +677,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $projectId
      * @return bool
      */
-    function hasQueueExpired($queue,$index,$projectId){
+    public function hasQueueExpired($queue,$index,$projectId){
         $cron_queue_expiration_date =  $this->getProjectSetting(
             'cron-queue-expiration-date',
             $projectId
@@ -768,7 +768,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $instance
      * @param $isRepeatInstrument
      */
-    function addQueuedEmail(
+    public function addQueuedEmail(
         $alert,
         $projectId,
         $record,
@@ -809,7 +809,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $index
      * @param $projectId
      */
-    function deleteQueuedEmail($index, $projectId){
+    public function deleteQueuedEmail($index, $projectId){
         $email_queue =  empty(
             $this->getProjectSetting('email-queue',$projectId))?
             array():
@@ -837,7 +837,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $event_id
      * @return bool
      */
-    function sendQueuedEmail($index,$projectId, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
+    public function sendQueuedEmail($index,$projectId, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
         $data = \REDCap::getData($projectId,"array",$record);
         $email_repetitive_sent = $this->getProjectSettingLog($projectId,"email-repetitive-sent",$isRepeatInstrument);
         $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent");
@@ -888,7 +888,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $cron_repeat_until
      * @param $cron_repeat_until_field
      */
-    function addQueueLog($pid,$action_description,$cron_send_email_on,$cron_send_email_on_field,$cron_repeat_for,$cron_queue_expiration_date,$cron_queue_expiration_date_field){
+    public function addQueueLog($pid,$action_description,$cron_send_email_on,$cron_send_email_on_field,$cron_repeat_for,$cron_queue_expiration_date,$cron_queue_expiration_date_field){
         #Add logs
         $scheduled_email = "";
         if($cron_send_email_on == "now"){
@@ -928,7 +928,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         \REDCap::logEvent($action_description,$changes_made,null,null,null,$pid);
     }
 
-    function getProjectSettingLog($projectId,$settingName,$isRepeatInstrument=""){
+    public function getProjectSettingLog($projectId,$settingName,$isRepeatInstrument=""){
         $data = $this->getProjectSetting($settingName, $projectId);
         if ($data === NULL) {
             $data = [];
@@ -1018,7 +1018,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $isCron
      * @return bool
      */
-    function createAndSendEmail($data, $projectId, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron,$isEmailAlreadySentForThisSurvery=false){
+    public function createAndSendEmail($data, $projectId, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id,$isCron,$isEmailAlreadySentForThisSurvery=false){
         //memory increase
         ini_set('memory_limit', '4096M');
 
@@ -1245,7 +1245,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param bool $isLongitudinal
      * @return mixed
      */
-    function setEmailAddresses($array_emails, $projectId, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal=false){
+    public function setEmailAddresses($array_emails, $projectId, $record, $event_id, $instrument, $instance, $data, $id, $isLongitudinal=false){
         $datapipeEmail_var = $this->getProjectSetting("datapipeEmail_var", $projectId);
         $email_to = $this->getProjectSetting("email-to", $projectId)[$id];
         $email_cc = $this->getProjectSetting("email-cc", $projectId)[$id];
@@ -1278,7 +1278,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $id
      * @return mixed
      */
-    function setFrom($array_emails, $projectId, $record, $id){
+    public function setFrom($array_emails, $projectId, $record, $id){
     	global $from_email;
 		// Using the Universal From Email Address?
 		$usingUniversalFrom = ($from_email != '');
@@ -1328,7 +1328,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $isLongitudinal
      * @return mixed
      */
-    function setDataPiping($datapipe_var, $email_content, $projectId, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
+    public function setDataPiping($datapipe_var, $email_content, $projectId, $data, $record, $event_id, $instrument, $instance, $isLongitudinal){
         if (!empty($datapipe_var)) {
             $datapipe = explode("\n", $datapipe_var);
             foreach ($datapipe as $emailvar) {
@@ -1415,7 +1415,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $isLongitudinal
      * @return mixed
      */
-    function setFormLink($email_text, $projectId, $record, $event_id, $isLongitudinal){
+    public function setFormLink($email_text, $projectId, $record, $event_id, $isLongitudinal){
         $formLink_var = $this->getProjectSetting("formLink_var", $projectId);
         if(!empty($formLink_var)) {
             $allDataforms = explode("\n", $formLink_var);
@@ -1938,7 +1938,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $instance
      * @return bool
      */
-    function isRepeatInstrumentComplete($data, $record, $event_id, $instrument, $instance){
+    public function isRepeatInstrumentComplete($data, $record, $event_id, $instrument, $instance){
         if (
             array_key_exists('repeat_instances',$data[$record])
             && (
@@ -2038,7 +2038,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $record
      * @return bool
      */
-    function recordExistsInRegisteredRecords($email_records_sent,$record){
+    public function recordExistsInRegisteredRecords($email_records_sent,$record){
         if (is_array($email_records_sent)) {
             $records_registered = array_map('trim', $email_records_sent);
         } else if (is_string($email_records_sent)) {
@@ -2214,7 +2214,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $subject
      * @param $message
      */
-    function sendFailedEmailRecipient($emailFailed_var, $subject, $message){
+    public function sendFailedEmailRecipient($emailFailed_var, $subject, $message){
         if(!empty($emailFailed_var)){
             $emailsFailed = preg_split("/[;,]+/", $emailFailed_var);
             foreach ($emailsFailed as $failed){
@@ -2279,7 +2279,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $alertid, the email alert
      * @return string
      */
-    function addRecordSent($email_repetitive_sent, $new_record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id){
+    public function addRecordSent($email_repetitive_sent, $new_record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance,$event_id){
         $email_repetitive_sent_aux = $email_repetitive_sent;
         if(!empty($email_repetitive_sent)) {
             $found_new_instrument = true;
@@ -2351,7 +2351,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $found_is_repeat
      * @return string
      */
-    function addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id, $found_is_repeat){
+    public function addJSONInfo($isRepeatInstrument,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id, $found_is_repeat){
         if($instrument != "" && $new_record != "" & $alertid != "" && $event_id != "") {
             if ($isRepeatInstrument) {
                 #NEW REPEAT INSTANCE
@@ -2378,7 +2378,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $event_id
      * @return string
      */
-    function addArrayInfo($addRepeat,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id){
+    public function addArrayInfo($addRepeat,$email_repetitive_sent_aux,$instrument,$alertid,$new_record, $repeat_instance,$event_id){
         if($addRepeat){
             if(
                 !isset($email_repetitive_sent_aux[$instrument][$alertid]['repeat_instances'][$new_record][$event_id])
@@ -2399,7 +2399,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return $email_repetitive_sent_aux;
     }
 
-    function getAdditionalFieldChoices($configRow,$pid) {
+    public function getAdditionalFieldChoices($configRow,$pid) {
         if ($configRow['type'] == 'user-role-list') {
             $choices = [];
 
