@@ -1104,7 +1104,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             if ((count($matches[1]) == 2) && in_array($matches[1][1], self::SMART_VARIABLES)) {
                 $formEventId = $event_id;
                 $instrumentForm = $matches[1][0];
-                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrumentForm, $matches[1][1], $isLongitudinal);
+                $instance = $this->getNumericalInstanceForForm(
+                    $project_id,
+                    $record,
+                    $event_id,
+                    $instrumentForm,
+                    $matches[1][1],
+                    $isLongitudinal
+                );
             } else if ((count($matches[1]) == 2) && $isLongitudinal) {
                 $project = new \Project($project_id);
                 $formEventId = $project->getEventIdUsingUniqueEventName($matches[1][0]);
@@ -1124,7 +1131,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if (is_numeric($matches[1][2])) {
                     $instance = $matches[1][2];
                 } else {
-                    $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id, $instrumentForm, $matches[1][2], $isLongitudinal);
+                    $instance = $this->getNumericalInstanceForForm(
+                        $project_id,
+                        $record,
+                        $event_id,
+                        $instrumentForm,
+                        $matches[1][2],
+                        $isLongitudinal
+                    );
                 }
             } else {
                 $instrumentForm = $matches[1][0];
@@ -1231,8 +1245,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $instrument = $match[1];
                 $textForLink = $match[2];
                 $smartVariable = $match[3];
-                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id,
-                    $instrument, $smartVariable, $isLongitudinal);
+                $instance = $this->getNumericalInstanceForForm(
+                    $project_id,
+                    $record,
+                    $event_id,
+                    $instrument,
+                    $smartVariable,
+                    $isLongitudinal
+                );
                 if ($instance) {
                     $url = \REDCap::getSurveyLink($record, $instrument, $event_id, $instance, $project_id);
                     $text = "<a href='$url'>$textForLink</a>";
@@ -1245,8 +1265,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $fullTextMatch = $match[0];
                 $instrument = $match[1];
                 $smartVariable = $match[2];
-                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id,
-                    $instrument, $smartVariable, $isLongitudinal);
+                $instance = $this->getNumericalInstanceForForm(
+                    $project_id,
+                    $record,
+                    $event_id,
+                    $instrument,
+                    $smartVariable,
+                    $isLongitudinal
+                );
                 if ($instance) {
                     $url = \REDCap::getSurveyLink($record, $instrument, $event_id, $instance, $project_id);
                     $email_text = str_replace($fullTextMatch, $url, $email_text);
@@ -1278,8 +1304,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $fullTextMatch = $match[0];
                 $instrument = $match[1];
                 $smartVariable = $match[2];
-                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id,
-                    $instrument, $smartVariable, $isLongitudinal);
+                $instance = $this->getNumericalInstanceForForm(
+                    $project_id,
+                    $record,
+                    $event_id,
+                    $instrument,
+                    $smartVariable,
+                    $isLongitudinal
+                );
                 if ($instance) {
                     $url = \REDCap::getSurveyLink($record, $instrument, $event_id, $instance, $project_id);
                     $email_text = str_replace($fullTextMatch, $url, $email_text);
@@ -1320,8 +1352,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $fullTextMatch = $match[0];
                 $instrument = $match[1];
                 $smartVariable = $match[2];
-                $instance = $this->getNumericalInstanceForForm($project_id, $record, $event_id,
-                    $instrument, $smartVariable, $isLongitudinal);;
+                $instance = $this->getNumericalInstanceForForm(
+                    $project_id,
+                    $record,
+                    $event_id,
+                    $instrument,
+                    $smartVariable,
+                    $isLongitudinal
+                );
                 if ($instance) {
                     $returnCode = $this->getReturnCode($record, $instrument, $event_id, $instance, $project_id);
                     if ($returnCode) {
