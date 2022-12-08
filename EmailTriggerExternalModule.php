@@ -1178,7 +1178,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $smartVariable (one of SMART_VARIABLES)
      * @return int
      */
-     function getNumericalInstanceForForm($projectId, $record, $form_event_id, $instrument_form, $smartVariable, $isLongitudinal) {
+     public function getNumericalInstanceForForm($projectId, $record, $form_event_id, $instrument_form, $smartVariable, $isLongitudinal) {
          if (is_integer($smartVariable) || ctype_digit($smartVariable)) {
              return $smartVariable;
          }
@@ -1493,7 +1493,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      * @throws \Exception
      */
-    function setAttachments($array_emails, $projectId, $id){
+    public function setAttachments($array_emails, $projectId, $id){
         for($i=1; $i<6 ; $i++){
             $attachmentAry = $this->getProjectSetting("email-attachment".$i,$projectId);
             $edoc = isset($attachmentAry[$id]) ? $attachmentAry[$id] : FALSE;
@@ -1518,7 +1518,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      * @throws \Exception
      */
-    function setAttachmentsREDCapVar($array_emails,$projectId,$data, $record, $event_id, $instrument, $repeat_instance, $id, $isLongitudinal=false){
+    public function setAttachmentsREDCapVar($array_emails,$projectId,$data, $record, $event_id, $instrument, $repeat_instance, $id, $isLongitudinal=false){
         $email_attachment_variable = htmlspecialchars_decode($this->getProjectSetting("email-attachment-variable", $projectId)[$id]);
         if(!empty($email_attachment_variable)){
             $var = preg_split("/[;,]+/", $email_attachment_variable);
@@ -1543,7 +1543,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      * @throws \Exception
      */
-    function setEmbeddedImages($mail,$projectId,$email_text){
+    public function setEmbeddedImages($mail,$projectId,$email_text){
         preg_match_all('/src=[\"\'](.+?)[\"\'].*?/i',$email_text, $result);
         $result = array_unique($result[1]);
         foreach ($result as $img_src){
@@ -1597,7 +1597,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $alertid, the email alert
      * @return bool
      */
-    function isEmailAlreadySentForThisSurvery($projectId,$email_repetitive_sent, $email_records_sent,$event_id, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
+    public function isEmailAlreadySentForThisSurvery($projectId,$email_repetitive_sent, $email_records_sent,$event_id, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
         if(!empty($email_repetitive_sent)){
             if(array_key_exists($instrument,$email_repetitive_sent)){
                 if(array_key_exists($alertid,$email_repetitive_sent[$instrument])){
@@ -1699,7 +1699,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $var
      * @return mixed
      */
-    function isRepeatingInstrument($projectId,$data, $record, $event_id, $instrument, $repeat_instance, $var, $option=null, $isLongitudinal=false){
+    public function isRepeatingInstrument($projectId,$data, $record, $event_id, $instrument, $repeat_instance, $var, $option=null, $isLongitudinal=false){
         $var_name = str_replace('[', '', $var);
         $var_name = str_replace(']', '', $var_name);
         $logic = "";
@@ -1773,7 +1773,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $projectId
      * @return mixed
      */
-    function fill_emails($array_emails, $emailsTo, $email_form_var, $data, $option, $projectId, $record, $event_id, $instrument, $repeat_instance, $isLongitudinal=false){
+    public function fill_emails($array_emails, $emailsTo, $email_form_var, $data, $option, $projectId, $record, $event_id, $instrument, $repeat_instance, $isLongitudinal=false){
         $array_emails_aux = array();
         foreach ($emailsTo as $email){
             foreach ($email_form_var as $email_var) {
@@ -1861,7 +1861,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $projectId
      * @return array|string
      */
-    function check_email($emails, $projectId){
+    public function check_email($emails, $projectId){
         $email_list = array();
         $email_list_error = array();
         $emails = preg_split("/[;,]+/", $emails);
@@ -1888,7 +1888,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $projectId
      * @return mixed
      */
-    function addNewAttachment($array_emails,$edoc,$projectId){
+    public function addNewAttachment($array_emails,$edoc,$projectId){
         if(!empty($edoc)) {
             $q = $this->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=? AND project_id=?", [$edoc,$projectId]);
             while ($row = $q->fetch_assoc()) {
@@ -2230,7 +2230,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 		return $fullPath;
 	}
 
-	function deleteOldLogs($projectId){
+	public function deleteOldLogs($projectId){
         $remove_logs_date = strtotime($this->getProjectSetting("remove-logs-date",$projectId));
         $today = strtotime(date('Y-m-d'));
 
@@ -2246,7 +2246,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
     }
 
-    function isProjectStatusCompleted ($projectId){
+    public function isProjectStatusCompleted ($projectId){
         #project is completed, deactivate all alerts
         $email_deactivate = $this->getProjectSetting("email-deactivate",$projectId);
         $project = new \Project($projectId);
