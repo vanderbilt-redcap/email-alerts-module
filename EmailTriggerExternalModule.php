@@ -1032,8 +1032,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $q = $this->query(
                 "SELECT count(e.event_id) as number_events 
                 FROM redcap_projects p, redcap_events_metadata e, redcap_events_arms a 
-                WHERE p.project_id=? AND p.repeatforms=? A
-                ND a.arm_id = e.arm_id AND p.project_id=a.project_id",
+                WHERE p.project_id=? AND p.repeatforms=? AND a.arm_id = e.arm_id AND p.project_id=a.project_id",
                 [$projectId,'1']
             );
             if($row = $q->fetch_assoc()) {
