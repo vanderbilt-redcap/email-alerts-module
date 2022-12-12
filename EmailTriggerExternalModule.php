@@ -1626,7 +1626,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_text = str_replace($fullTextMatch, $text, $email_text);
                 }
             }
-        } elseif (preg_match_all("/\[survey-link:(\w+)\]\[([^\]]+)\]/", $email_text, $matches)) {
+        }
+        if (preg_match_all("/\[survey-link:(\w+)\]\[([^\]]+)\]/", $email_text, $matches)) {
             self::transformMatches($matches);
             foreach (array_values($matches) as $match) {
                 $fullTextMatch = $match[0];
