@@ -17,7 +17,7 @@ while($row = $q->fetch_assoc()) {
     if ($row['event_id'] == $event_id) {
         $project_name = db_escape(\Project::getValidProjectName($form_name));
         $event_id = $row['event_id'];
-        $q2 = $module->query("SELECT * FROM redcap_events_repeat WHERE event_id='$event_id' AND form_name=?", [$project_name]);
+        $q2 = $module->query("SELECT * FROM redcap_events_repeat WHERE event_id=? AND form_name=?", [$event_id, $project_name]);
         $row2 = $q2->fetch_assoc();
         if ($row2) {
             $show_instance = '<div style="float:left;width: 280px;"><label style="font-weight: normal;padding-left: 15px;padding-right: 15px">Add Instances<br><span style="color:red">*If none is typed and if smart variables are not used, only the first instance added</span></label></div><div style="float:left;"><textarea class="form-control" id="queue_instances" rows="6"></textarea></div>';
