@@ -1395,7 +1395,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $formlink = trim($formlink);
             if ($formlink) {
                 $var = preg_split("/[;,]+/", $formlink)[0];
-                foreach (self::SMART_VARIABLES as $smartVariable) {
+                foreach (self::$SMART_VARIABLES as $smartVariable) {
                     if (strpos($var, $smartVariable) !== FALSE) {
                         $newList[] = $formlink;
                         break;
@@ -1432,7 +1432,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $var = $matches[0][1];
                         }
                         if (sizeof($matches[0]) == 2) {
-                            $smarts = self::SMART_VARIABLES;
+                            $smarts = self::$SMART_VARIABLES;
                             foreach ($smarts as $i => $var) {
                                 $smarts[$i] = "[".$var."]";
                             }
@@ -1469,7 +1469,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $redcapLogic = \Piping::pipeSpecialTags($redcapLogic, $projectId, $record, $event_id);
         preg_match_all("/\\[(.*?)\\]/", $redcapLogic, $matches);
         if (count($matches[1]) >= 1) {
-            if ((count($matches[1]) == 2) && in_array($matches[1][1], self::SMART_VARIABLES)) {
+            if ((count($matches[1]) == 2) && in_array($matches[1][1], self::$SMART_VARIABLES)) {
                 $formEventId = $event_id;
                 $instrumentForm = $matches[1][0];
                 $instance = $this->getNumericalInstanceForForm(
@@ -2129,7 +2129,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if (is_array($logic)) {
             $logic = "";
         }
-		return htmlentities($logic ?? '', ENT_QUOTES);
+		return htmlentities(isset($logic) ? $logic : '', ENT_QUOTES);
 	}
 
     /**
@@ -2650,7 +2650,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return false;
     }
 
-    const SMART_VARIABLES = ["new-instance", "last-instance", "first-instance"];
+    private static $SMART_VARIABLES = ["new-instance", "last-instance", "first-instance"];
 }
 
 
