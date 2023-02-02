@@ -539,6 +539,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         while($row = $q->fetch_assoc()){
             $projectId = (int)$row['project_id'];
+            \ExternalModules\ExternalModules::setProjectId($projectId);
             if($projectId != "") {
                 $this->deleteOldLogs($projectId);
                 if(!$this->isProjectStatusCompleted($projectId)) {
