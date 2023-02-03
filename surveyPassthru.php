@@ -6,10 +6,11 @@ use ExternalModules\ExternalModules;
 
 require_once 'EmailTriggerExternalModule.php';
 
-$instance = $_REQUEST['instance'] ?: 1;
+$project_id = (int)$_REQUEST['pid'];
+$instance = (int)$_REQUEST['instance'] ?: 1;
 
 $returnCode = \REDCap::getSurveyReturnCode($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], $instance);
-$surveyLink = \REDCap::getSurveyLink($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], $instance);
+$surveyLink = \REDCap::getSurveyLink($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], $instance, $project_id, false);
 
 if(strcasecmp($returnCode, $_REQUEST['returnCode']) == 0) {
 
