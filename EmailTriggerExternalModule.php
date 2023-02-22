@@ -5,7 +5,6 @@ use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
-require_once 'vendor/autoload.php';
 
 class EmailTriggerExternalModule extends AbstractExternalModule
 {
