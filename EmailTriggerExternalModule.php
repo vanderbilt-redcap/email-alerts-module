@@ -1306,10 +1306,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $array_emails['from'] = $this_from_email;
                 $array_emails['fromName'] = $fromDisplayName;
             }else{
-                $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"Wrong recipient" ,"The email ".$from_data[0]." in Project: ".$projectId.", Record: ".$record." Alert #".$id.", does not exist");
+                $alertId = $this->getProjectSetting("alert-id", $projectId)[$id];
+                $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"Wrong recipient in FROM" ,"The email <strong>".$from_data[0]."</strong> in Project: ".$projectId.", Record: ".$record." Alert #".$alertId.", does not exist");
             }
         }else{
-            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"Sender is empty" ,"The sender in Project: ".$projectId.", Record: ".$record." Alert #".$id.", is empty.");
+            $alertId = $this->getProjectSetting("alert-id", $projectId)[$id];
+            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"Sender is empty" ,"The sender in Project: ".$projectId.", Record: ".$record." Alert #".$alertId.", is empty.");
         }
         return $array_emails;
     }
@@ -2163,6 +2165,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                || $email_redcap == $email
                            )
                            && !$isLabel
+                           && !in_array($email_redcap,$array_emails_aux)
                        ) {
                            $array_emails_aux[] = $email_redcap;
                        } else if(
@@ -2171,12 +2174,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                empty($email_redcap)
                                || $email != $email_redcap
                            )
+                           && !in_array($email,$array_emails_aux)
                        ) {
                            $array_emails_aux[] = $email;
                        }else if(
                            filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL)
                            && $email == $var[0]
                            && $isLabel
+                           && !in_array($email_redcap,$array_emails_aux)
                        ) {
                            $array_emails_aux[] = $email_redcap;
                        } else if(
@@ -2185,7 +2190,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                        ) {
                            $email_redcap_checkboxes = preg_split("/[;,]+/", $email_redcap);
                            foreach ($email_redcap_checkboxes as $email_ck){
-                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL)){
+                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL) && !in_array($email_ck,$array_emails_aux)){
                                    $array_emails_aux[] = $email_ck;
                                }
                            }
@@ -2193,12 +2198,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                            $ary = preg_split('/\s*<([^>]*)>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
                            if (count($ary) >= 2) {
                                $parsed_email = trim($ary[1]);
-                               if(filter_var($parsed_email)){
+                               if(filter_var($parsed_email) && !in_array($parsed_email,$array_emails_aux)){
                                    $array_emails_aux[] = $parsed_email;
                                }
                            }
                        }
-                    } else {
+                    } else if(!in_array($email,$array_emails_aux) && $email != ""){
                         $array_emails_aux[] = $email;
                     }
                 }
