@@ -1307,7 +1307,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $array_emails['fromName'] = $fromDisplayName;
             }else{
                 $alertId = $this->getProjectSetting("alert-id", $projectId)[$id];
-                $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"Wrong recipient in FROM" ,"The email <strong>".$from_data[0]."</strong> in Project: ".$projectId.", Record: ".$record." Alert #".$alertId.", does not exist");
+                $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"Wrong sender in FROM" ,"The email <strong>".$from_data[0]."</strong> in Project: ".$projectId.", Record: ".$record." Alert #".$alertId.", does not exist");
             }
         }else{
             $alertId = $this->getProjectSetting("alert-id", $projectId)[$id];
