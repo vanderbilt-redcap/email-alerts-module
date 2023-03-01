@@ -1122,6 +1122,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         #We use the message class so the emails get recorded in the Email Logging section in REDCap
         $email = new \Message($projectId, $record, $event_id, $instrument, $instance);
+        error_log("EmailAlertsTest PID: ".$projectId.", record: ".$record.", event_id: ".$event_id.", instrument: ".$instrument.", instance: ".$instance);
         $email->setTo($array_emails['to']);
         if ($array_emails['cc'] != '') $email->setCc($array_emails['cc']);
         if ($array_emails['bcc'] != '') $email->setBcc($array_emails['bcc']);
@@ -1135,6 +1136,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         $send = $email->send();
+        error_log("EmailAlertsTest send: ".$send);
 
         if (!$send) {
             $this->log(
