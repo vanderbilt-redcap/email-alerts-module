@@ -25,7 +25,7 @@ if(!empty($_REQUEST['variables'])){
 
     $q = $module->query("SELECT DISTINCT(value) from `redcap_data` where project_id = ? AND field_name in (?) AND value LIKE '?%' ", [$project_id,$sqlvariables,$searchTerms]);
     while($row = $q->fetch_assoc()) {
-        $matchingProjects .= "<option value='".$row['value']."'>";
+        $matchingProjects .= "<option value='".htmlspecialchars($row['value'],ENT_QUOTES)."'>";
     }
 }
 
