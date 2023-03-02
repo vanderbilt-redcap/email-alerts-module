@@ -5,8 +5,8 @@ use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
 
-$searchTerms = $_REQUEST['parameters'];
-$project_id = $_REQUEST['project_id'];
+$searchTerms = htmlspecialchars($_REQUEST['parameters'],ENT_QUOTES);
+$project_id = htmlspecialchars($_REQUEST['project_id'],ENT_QUOTES);
 
 $matchingProjects = '';
 if(!empty($_REQUEST['variables'])){
