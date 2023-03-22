@@ -4,8 +4,6 @@ namespace Vanderbilt\EmailTriggerExternalModule;
 use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
-require_once __DIR__.'/vendor/autoload.php';
-
 $project_id = $_GET['pid'];
 $alert =  $_REQUEST['index_modal_queue'];
 
