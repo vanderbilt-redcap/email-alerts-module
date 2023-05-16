@@ -2613,7 +2613,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $this->removeLogs('
                 project_id = ?
                 and scheduledemails = 1
-                and timestamp < date_sub(now(), interval 1 month
+                and timestamp < date_sub(now(), interval 1 month)
                 ', [$projectId]);
             $this->setProjectSetting('remove-logs-date', date('Y-m-d'), $projectId);
         }
