@@ -202,16 +202,6 @@ foreach ($language_errors as $err){
                 });
 
             });
-            //We add this or the second time we click it won't work. It's a bug in bootstrap
-            $('[data-toggle="popover"]').on("hidden.bs.popover", function() {
-                if($(this).data("bs.popover").inState == undefined){
-                    //BOOTSTRAP 4
-                    $(this).data("bs.popover")._activeTrigger.click = false;
-                }else{
-                    //BOOTSTRAP 3
-                    $(this).data("bs.popover").inState.click = false;
-                }
-            });
 
             //To prevent the popover from scrolling up on click
             $("a[rel=popover]")
@@ -1159,7 +1149,7 @@ foreach ($language_errors as $err){
         <table class="table table-bordered table-hover email_preview_forms_table" id="customizedAlertsPreview" style="width: 100%;">
             <thead>
             <tr class="table_header">
-                <th>Form</th>
+                <th style="min-width: 130px">Form</th>
                 <th>Scheduled for</th>
                 <th>Message</th>
                 <th>Attachments</th>
@@ -1249,7 +1239,7 @@ foreach ($language_errors as $err){
                     if(array_key_exists($projectData['settings']['form-name']['value'][$index],$email_repetitive_sent)){
                         $form = $email_repetitive_sent[$projectData['settings']['form-name']['value'][$index]];
                         foreach ($form as $alert =>$value){
-                            if($alert == $index){
+                            if((int)$alert == (int)$index){
                                 if(!empty($email_records_sent[$alert])){
                                     $total_activated = count(explode(',',$email_records_sent[$index]));
                                     $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-target-selector="#records-activated'.$index.'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
@@ -1257,7 +1247,30 @@ foreach ($language_errors as $err){
                                                             <p>'.$email_records_sent[$index].'</p>
                                                        </div>';
                                 }else{
-                                    $message_sent .= "<div style='float:left'>Records activated: ".count((array)$form[$alert])."</div><br/>";
+                                    $results = $module->queryLogs("
+                                        select log_id, message, id, value 
+                                        where project_id = ? and id = ?
+                                        and message = ?
+                                        order by log_id desc
+                                        limit 2000
+                                    ",[$pid,$alert,"email-records-sent"]);
+
+                                    $record_sent_list = array();
+                                    while($row = $results->fetch_assoc()){
+                                        if(!in_array($row['value'], $record_sent_list, true)){
+                                            array_push($record_sent_list, $row['value']);
+                                        }
+                                    }
+
+                                    $total_activated = count((array)$form[$alert]);
+                                    if(!empty($record_sent_list) && $record_sent_list != ""){
+                                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-target-selector="#records-activated'.$alert.'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
+                                        $message_sent .= '<div id="records-activated'.$alert.'" class="hidden">
+                                                            <p>'.implode(", ",$record_sent_list).'</p>
+                                                       </div>';
+                                    }else{
+                                        $message_sent .= "<div style='float:left'>Records activated: ".$total_activated."</div><br/>";
+                                    }
                                 }
                             }
                         }
