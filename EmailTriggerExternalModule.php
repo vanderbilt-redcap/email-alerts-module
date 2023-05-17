@@ -534,10 +534,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     public function scheduledemails(){
-        $q = $this->query("SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = ? AND (m.directory_prefix = ? OR m.directory_prefix = ?) AND s.`key` = ?", ['true','vanderbilt_emailTrigger','email_alerts','enabled']);
-
-        while($row = $q->fetch_assoc()){
-            $projectId = (int)$row['project_id'];
+        foreach ($this->getProjectsWithModuleEnabled() as $projectId){
             $_GET['pid'] = $projectId;    // might change in future to $this->setProjectId($projectId);
             if($projectId != "") {
                 $this->deleteOldLogs($projectId);
