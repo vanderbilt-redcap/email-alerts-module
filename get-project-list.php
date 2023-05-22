@@ -20,8 +20,8 @@ if(!empty($_REQUEST['variables'])){
 		$sqlParams[] = $var;
         $i++;
     }
-	$sql .= ") AND value LIKE '?%'";
-	$sqlParams[] = $searchTerms;
+	$sql .= ") AND value LIKE ?";
+	$sqlParams[] = "%".$searchTerms."%";
 
     $q = $module->query($sql, $sqlParams);
     while($row = $q->fetch_assoc()) {
