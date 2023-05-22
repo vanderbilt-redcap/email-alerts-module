@@ -13,17 +13,17 @@ if(!empty($_REQUEST['variables'])){
     $variables = explode(',',$_REQUEST['variables']);
     $numItems = count($variables);
     $i = 0;
-	$variables = [$project_id];
+	$sqlParams = [$project_id];
 	$sql = "SELECT DISTINCT(value) from `redcap_data` where project_id = ? AND field_name in (";
     foreach ($variables as $var){
 		$sql .= "?".(($i == $numItems - 1) ? "" : ",");
-		$variables[] = $var;
+		$sqlParams[] = $var;
         $i++;
     }
 	$sql .= ") AND value LIKE '?%'";
-	$variables[] = $searchTerms;
+	$sqlParams[] = $searchTerms;
 
-    $q = $module->query($sql, $variables);
+    $q = $module->query($sql, $sqlParams);
     while($row = $q->fetch_assoc()) {
         $matchingProjects .= "<option value='".htmlspecialchars($row['value'],ENT_QUOTES)."'>";
     }
