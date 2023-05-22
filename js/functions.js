@@ -210,7 +210,9 @@ function editEmailAlert(modal, index){
 
 
     //If logic fails due to quotes and single quotes together. Remove double quotes and reassess option
-    modal['cron-send-email-on'].replaceAll('"', "'")
+    if(modal['cron-send-email-on']) {
+        modal['cron-send-email-on'].replaceAll('"', "'")
+    }
     if(modal['cron-send-email-on'] != 'date' && modal['cron-send-email-on'] != 'calc' && modal['cron-send-email-on'] != 'now'){
         if(dateIsValid(modal['cron-send-email-on-field'])){
             modal['cron-send-email-on'] = "date";
@@ -220,7 +222,10 @@ function editEmailAlert(modal, index){
             modal['cron-send-email-on'] = "now";
         }
     }
-    modal['cron-queue-expiration-date'].replaceAll('"', "'")
+
+    if(modal['cron-queue-expiration-date']) {
+        modal['cron-queue-expiration-date'].replaceAll('"', "'")
+    }
     if(modal['cron-queue-expiration-date'] != 'date' && modal['cron-queue-expiration-date'] != 'cond' && modal['cron-queue-expiration-date'] != 'never'){
         if(dateIsValid(modal['cron-queue-expiration-date-field'])){
             modal['cron-queue-expiration-date'] = "date";
