@@ -3,7 +3,7 @@
 
 	"namespace": "Vanderbilt\\EmailTriggerExternalModule",
 
-	"framework-version": 5,
+	"framework-version": 3,
 
 	"authors": [
 		{

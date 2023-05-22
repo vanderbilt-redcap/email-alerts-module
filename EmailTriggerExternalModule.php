@@ -534,7 +534,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     public function scheduledemails(){
-        foreach ($this->getProjectsWithModuleEnabled() as $projectId){
+        foreach ($this->framework->getProjectsWithModuleEnabled() as $projectId){
             $_GET['pid'] = $projectId;    // might change in future to $this->setProjectId($projectId);
             if($projectId != "") {
                 $this->deleteOldLogs($projectId);
