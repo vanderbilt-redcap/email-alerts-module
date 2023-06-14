@@ -132,7 +132,6 @@ foreach ($language_errors as $err){
     }
     ?>
 
-
     <script type="text/javascript" src="<?=$module->getUrl('js/jquery.dataTables.min.js')?>"></script>
     <script type="text/javascript" src="<?=$module->getUrl('js/jquery.flexdatalist.js')?>"></script>
     <script type="text/javascript" src="<?=$module->getUrl('js/functions.js')?>"></script>
@@ -177,9 +176,9 @@ foreach ($language_errors as $err){
         var calendarimg = '<?=$module->getUrl('img/date.png')?>';
 
         $(function(){
-            //Fix to make code source editable with a modal
-            $(document).on('focusin', function(e) {
-                if ($(e.target).closest(".mce-window").length) {
+            // Prevent Bootstrap dialog from blocking focusin
+            document.addEventListener('focusin', (e) => {
+                if (e.target.closest(".tox-tinymce-aux, .moxman-window, .tam-assetmanager-root") !== null) {
                     e.stopImmediatePropagation();
                 }
             });
