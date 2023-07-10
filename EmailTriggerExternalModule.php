@@ -1124,8 +1124,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if ($array_emails['bcc'] != '') $email->setBcc($array_emails['bcc']);
         $email->setFrom($array_emails['from']);
         $email->setFromName($array_emails['fromName']);
-        $email->setSubject($email_subject);
-        $email->setBody($email_text);
+        $email->setSubject(html_entity_decode($email_subject));
+        $email->setBody(html_entity_decode($email_text));
         if (isset($array_emails['attachments']) && is_array($array_emails['attachments']) && !empty($array_emails['attachments'])) {
             foreach ($array_emails['attachments'] as $name=>$fullPath) {
                 $email->setAttachment($fullPath, $name);
