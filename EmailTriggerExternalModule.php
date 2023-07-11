@@ -10,11 +10,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 {
 	private $email_requested = false;
 
-	public function __construct(){
-		parent::__construct();
-		$this->disableUserBasedSettingPermissions();
-	}
-
     public function hook_survey_complete (
         $projectId,
         $record,
