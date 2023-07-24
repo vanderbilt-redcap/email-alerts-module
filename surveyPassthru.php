@@ -11,9 +11,6 @@ $instance = $_REQUEST['instance'] ?: 1;
 $instrument = strtolower($_REQUEST['instrument']);
 $returnCode = \REDCap::getSurveyReturnCode($_REQUEST['record'], $instrument, $_REQUEST['event'], $instance);
 $surveyLink = \REDCap::getSurveyLink($_REQUEST['record'], $instrument, $_REQUEST['event'], $instance);
-error_log("_REQUEST: ".json_encode($_REQUEST));
-error_log("return code: ".$returnCode);
-error_log("Survey Link: ".$surveyLink);
 
 if(
         (!$returnCode && $surveyLink)
