@@ -5,27 +5,27 @@ use ExternalModules\AbstractExternalModule;
 use ExternalModules\ExternalModules;
 
 
-$searchTerms = $_REQUEST['parameters'];
-$project_id = $_REQUEST['project_id'];
+$searchTerms = htmlspecialchars($_REQUEST['parameters'],ENT_QUOTES);
+$project_id = htmlspecialchars($_REQUEST['project_id'],ENT_QUOTES);
 
 $matchingProjects = '';
 if(!empty($_REQUEST['variables'])){
     $variables = explode(',',$_REQUEST['variables']);
-    $sqlvariables = "";
     $numItems = count($variables);
     $i = 0;
+	$sqlParams = [$project_id];
+	$sql = "SELECT DISTINCT(value) from `redcap_data` where project_id = ? AND field_name in (";
     foreach ($variables as $var){
-        if ($i == $numItems - 1) {
-            $sqlvariables .= "'".substr($var, 1, strlen($var)-2)."'";
-        }else{
-            $sqlvariables .= "'".substr($var, 1, strlen($var)-2)."',";
-        }
+		$sql .= "?".(($i == $numItems - 1) ? "" : ",");
+		$sqlParams[] = $var;
         $i++;
     }
+	$sql .= ") AND value LIKE ?";
+	$sqlParams[] = "%".$searchTerms."%";
 
-    $q = $this->query("SELECT DISTINCT(value) from `redcap_data` where project_id = ? AND field_name in (?) AND value LIKE '?%' ", [$project_id,$sqlvariables,$searchTerms]);
+    $q = $module->query($sql, $sqlParams);
     while($row = $q->fetch_assoc()) {
-        $matchingProjects .= "<option value='".$row['value']."'>";
+        $matchingProjects .= "<option value='".htmlspecialchars($row['value'],ENT_QUOTES)."'>";
     }
 }
 
