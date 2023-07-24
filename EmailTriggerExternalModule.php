@@ -10,11 +10,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 {
 	private $email_requested = false;
 
-	public function __construct(){
-		parent::__construct();
-		$this->disableUserBasedSettingPermissions();
-	}
-
     public function hook_survey_complete (
         $projectId,
         $record,
@@ -534,10 +529,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     public function scheduledemails(){
-        $q = $this->query("SELECT s.project_id FROM redcap_external_modules m, redcap_external_module_settings s WHERE m.external_module_id = s.external_module_id AND s.value = ? AND (m.directory_prefix = ? OR m.directory_prefix = ?) AND s.`key` = ?", ['true','vanderbilt_emailTrigger','email_alerts','enabled']);
-
-        while($row = $q->fetch_assoc()){
-            $projectId = (int)$row['project_id'];
+        foreach ($this->framework->getProjectsWithModuleEnabled() as $projectId){
             $_GET['pid'] = $projectId;    // might change in future to $this->setProjectId($projectId);
             if($projectId != "") {
                 $this->deleteOldLogs($projectId);
@@ -1032,8 +1024,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $q = $this->query(
                 "SELECT count(e.event_id) as number_events 
                 FROM redcap_projects p, redcap_events_metadata e, redcap_events_arms a 
-                WHERE p.project_id=? AND p.repeatforms=? A
-                ND a.arm_id = e.arm_id AND p.project_id=a.project_id",
+                WHERE p.project_id=? AND p.repeatforms=? AND a.arm_id = e.arm_id AND p.project_id=a.project_id",
                 [$projectId,'1']
             );
             if($row = $q->fetch_assoc()) {
@@ -1128,8 +1119,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if ($array_emails['bcc'] != '') $email->setBcc($array_emails['bcc']);
         $email->setFrom($array_emails['from']);
         $email->setFromName($array_emails['fromName']);
-        $email->setSubject($email_subject);
-        $email->setBody($email_text);
+        $email->setSubject(html_entity_decode($email_subject));
+        $email->setBody(html_entity_decode($email_text));
         if (isset($array_emails['attachments']) && is_array($array_emails['attachments']) && !empty($array_emails['attachments'])) {
             foreach ($array_emails['attachments'] as $name=>$fullPath) {
                 $email->setAttachment($fullPath, $name);
@@ -1307,10 +1298,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $array_emails['from'] = $this_from_email;
                 $array_emails['fromName'] = $fromDisplayName;
             }else{
-                $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"Wrong recipient" ,"The email ".$from_data[0]." in Project: ".$projectId.", Record: ".$record." Alert #".$id.", does not exist");
+                $alertId = $this->getProjectSetting("alert-id", $projectId)[$id];
+                $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"Wrong sender in FROM" ,"The email <strong>".$from_data[0]."</strong> in Project: ".$projectId.", Record: ".$record." Alert #".$alertId.", does not exist");
             }
         }else{
-            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"Sender is empty" ,"The sender in Project: ".$projectId.", Record: ".$record." Alert #".$id.", is empty.");
+            $alertId = $this->getProjectSetting("alert-id", $projectId)[$id];
+            $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"Sender is empty" ,"The sender in Project: ".$projectId.", Record: ".$record." Alert #".$alertId.", is empty.");
         }
         return $array_emails;
     }
@@ -2164,6 +2157,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                || $email_redcap == $email
                            )
                            && !$isLabel
+                           && !in_array($email_redcap,$array_emails_aux)
                        ) {
                            $array_emails_aux[] = $email_redcap;
                        } else if(
@@ -2172,12 +2166,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                empty($email_redcap)
                                || $email != $email_redcap
                            )
+                           && !in_array($email,$array_emails_aux)
                        ) {
                            $array_emails_aux[] = $email;
                        }else if(
                            filter_var(trim($email_redcap), FILTER_VALIDATE_EMAIL)
                            && $email == $var[0]
                            && $isLabel
+                           && !in_array($email_redcap,$array_emails_aux)
                        ) {
                            $array_emails_aux[] = $email_redcap;
                        } else if(
@@ -2186,7 +2182,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                        ) {
                            $email_redcap_checkboxes = preg_split("/[;,]+/", $email_redcap);
                            foreach ($email_redcap_checkboxes as $email_ck){
-                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL)){
+                               if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL) && !in_array($email_ck,$array_emails_aux)){
                                    $array_emails_aux[] = $email_ck;
                                }
                            }
@@ -2194,12 +2190,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                            $ary = preg_split('/\s*<([^>]*)>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
                            if (count($ary) >= 2) {
                                $parsed_email = trim($ary[1]);
-                               if(filter_var($parsed_email)){
+                               if(filter_var($parsed_email) && !in_array($parsed_email,$array_emails_aux)){
                                    $array_emails_aux[] = $parsed_email;
                                }
                            }
                        }
-                    } else {
+                    } else if(!in_array($email,$array_emails_aux) && $email != ""){
                         $array_emails_aux[] = $email;
                     }
                 }

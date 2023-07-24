@@ -31,7 +31,7 @@
 		]
 	},
 
-	"no-auth-pages":["surveyPassthru","downloadFile"],
+	"no-auth-pages":["surveyPassthru","downloadFile","deleteLogs"],
 
 	"email-dashboard-settings": [
 		{
@@ -208,6 +208,21 @@
 	],
 
 	"project-settings": [
+		{
+			"key": "delete-logs-description",
+			"name": "<div class='alert alert-info' style='border-color:#bce8f1 !important'>Email Alerts stores detailed debug info for a month after sending each email. This info is not required for Email Alerts to function. This button can be used to immediately clear all debug info at any time.</div>",
+			"type": "descriptive"
+		},
+		{
+			"key": "delete-logs",
+			"name": "<b>Delete Debug Information</b><br><span style='color:red'>*Warning: This action cannot be undone</span></i>",
+			"type": "button",
+			"url":
+			{
+				"name": "Delete Logs",
+				"value": "deleteLogs.php"
+			}
+		}
 	],
 
   "crons": [
@@ -232,7 +247,7 @@
     "compatibility": {
         "php-version-min": "5.5.0",
         "php-version-max": "",
-        "redcap-version-min": "13.0.1",
+        "redcap-version-min": "13.1.0",
         "redcap-version-max": ""
     }
 }
