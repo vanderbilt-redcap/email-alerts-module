@@ -1605,7 +1605,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $isLongitudinal
      * @return mixed
      */
-    private function setREDCapSurveyLink($email_text, $projectId, $record, $event_id, $isLongitudinal){
+    public function setREDCapSurveyLink($email_text, $projectId, $record, $event_id, $isLongitudinal){
         if (preg_match_all("/\[survey-link:(\w+):\s*([^\]]+)\]\[([^\]]+)\]/", $email_text, $matches)) {
             self::transformMatches($matches);
             foreach (array_values($matches) as $match) {
@@ -1781,7 +1781,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $isLongitudinal
      * @return mixed
      */
-    private function setPassthroughSurveyLink($email_text, $projectId, $record, $event_id, $isLongitudinal){
+    public function setPassthroughSurveyLink($email_text, $projectId, $record, $event_id, $isLongitudinal){
         $surveyLink_var = $this->getProjectSetting("surveyLink_var", $projectId);
         if(!empty($surveyLink_var)) {
 			## Sort survey links by reverse string lengths to prevent shorter links from
