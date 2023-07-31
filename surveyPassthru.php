@@ -9,18 +9,22 @@ require_once 'EmailTriggerExternalModule.php';
 $project_id = (int)$_REQUEST['pid'];
 $instance = (int)$_REQUEST['instance'] ?: 1;
 
-$returnCode = \REDCap::getSurveyReturnCode($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], $instance);
-$surveyLink = \REDCap::getSurveyLink($_REQUEST['record'], $_REQUEST['instrument'], $_REQUEST['event'], $instance, $project_id, false);
+$instrument = strtolower($_REQUEST['instrument']);
+$returnCode = \REDCap::getSurveyReturnCode($_REQUEST['record'], $instrument, $_REQUEST['event'], $instance);
+$surveyLink = \REDCap::getSurveyLink($_REQUEST['record'], $instrument, $_REQUEST['event'], $instance);
 
-if(strcasecmp($returnCode, $_REQUEST['returnCode']) == 0) {
+if(
+        (!$returnCode && $surveyLink)
+        || (strcasecmp($returnCode, $_REQUEST['returnCode']) == 0)
+) {
 
-    $link = ($_REQUEST['returnCode'] == "NULL")? "":"<input type='hidden' value='".$returnCode."' name='__code'/>";
+    $link = (!$returnCode || ($_REQUEST['returnCode'] == "NULL")) ? "":"<input type='hidden' value='$returnCode' name='__code'/>";
     ?>
 
     <html>
     <body>
     <form id='passthruform' name='passthruform' action='<?=$surveyLink?>' method='post' enctype='multipart/form-data'>
-        <?=$link?>
+        <?= $link ?>
         <input type='hidden' value='1' name='__prefill' />
     </form>
     <script type='text/javascript'>
