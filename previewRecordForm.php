@@ -82,8 +82,8 @@ $email_text = $module->setFormLink($email_text, $project_id, $record, $event_id,
 
 $email_subject = $module->setDataPiping($datapipe_var, $email_subject, $project_id, $data, $record, $form_name_event, $form_name, 1, $isLongitudinal);
 
-$preview .= "<tr><td>Subject:</td><td>".$email_subject."</td></tr>";
-$preview .= "<tr><td>Message:</td><td>".$email_text."</td></tr></table>";
+$preview .= "<tr><td>Subject:</td><td>".htmlspecialchars($email_subject,ENT_QUOTES)."</td></tr>";
+$preview .= "<tr><td>Message:</td><td>".htmlspecialchars($email_text,ENT_QUOTES)."</td></tr></table>";
 
 
 echo $preview;

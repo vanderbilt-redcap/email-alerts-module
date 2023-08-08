@@ -1760,7 +1760,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         LIMIT 1";
         $q = $this->query($sql, [$eventId,$record,$instance]);
         if ($row = $q->fetch_assoc()) {
-            return $row['return_code'];
+            return htmlspecialchars($row['return_code'],ENT_QUOTES);
         }
         return "";
     }
