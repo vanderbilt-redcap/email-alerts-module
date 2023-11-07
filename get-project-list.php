@@ -14,7 +14,7 @@ if(!empty($_REQUEST['variables'])){
     $numItems = count($variables);
     $i = 0;
 	$sqlParams = [$project_id];
-	$table = $module->getDataTable();
+	$table = $module->getDataTable($project_id);
 	$sql = "SELECT DISTINCT(value) from $table where project_id = ? AND field_name in (";
     foreach ($variables as $var){
 		$sql .= "?".(($i == $numItems - 1) ? "" : ",");

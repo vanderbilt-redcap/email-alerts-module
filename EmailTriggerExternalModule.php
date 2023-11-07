@@ -1550,7 +1550,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
          $smartVariable = preg_replace("/\]$/", "", preg_replace("/^\[/", "", $smartVariable));
 
          $instanceMin = 1;
-         $table = $this->getDataTable();
+         $table = $this->getDataTable($projectId);
          if ($isLongitudinal && !self::isRepeatingInstrumentInEvent($form_event_id, $instrument_form)) {
              # get max instance for event
              $q = $this->query("SELECT DISTINCT(instance) AS instance FROM $table WHERE project_id = ? AND event_id = ? AND record = ? ORDER BY instance DESC", [$projectId,$form_event_id,$record]);
