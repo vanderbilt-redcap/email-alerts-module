@@ -1530,6 +1530,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         return FALSE;
     }
 
+    function getDataTable(){
+        return method_exists('\REDCap', 'getDataTable') ? \REDCap::getDataTable($project_id) : "redcap_data"; 
+    }
+
     /**
      * Function that transforms a smart variable into a numerical instance
      * @param $projectId
@@ -1546,12 +1550,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
          $smartVariable = preg_replace("/\]$/", "", preg_replace("/^\[/", "", $smartVariable));
 
          $instanceMin = 1;
+         $table = $this->getDataTable();
          if ($isLongitudinal && !self::isRepeatingInstrumentInEvent($form_event_id, $instrument_form)) {
              # get max instance for event
-             $q = $this->query("SELECT DISTINCT(instance) AS instance FROM redcap_data WHERE project_id = ? AND event_id = ? AND record = ? ORDER BY instance DESC", [$projectId,$form_event_id,$record]);
+             $q = $this->query("SELECT DISTINCT(instance) AS instance FROM $table WHERE project_id = ? AND event_id = ? AND record = ? ORDER BY instance DESC", [$projectId,$form_event_id,$record]);
          } else {
              # get max instance for instrument
-             $q = $this->query("SELECT DISTINCT(d.instance) AS instance FROM redcap_data AS d INNER JOIN redcap_metadata AS m ON ((d.project_id = m.project_id) AND (d.field_name = m.field_name)) WHERE m.form_name = ? AND d.project_id = ? AND d.event_id = ? AND d.record = ? ORDER BY d.instance DESC", [$instrument_form,$projectId,$form_event_id,$record]);
+             $q = $this->query("SELECT DISTINCT(d.instance) AS instance FROM $table AS d INNER JOIN redcap_metadata AS m ON ((d.project_id = m.project_id) AND (d.field_name = m.field_name)) WHERE m.form_name = ? AND d.project_id = ? AND d.event_id = ? AND d.record = ? ORDER BY d.instance DESC", [$instrument_form,$projectId,$form_event_id,$record]);
          }
          $instanceMax = 1;
          $instanceNew = 1;
