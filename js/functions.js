@@ -174,15 +174,14 @@ function editEmailAlert(modal, index){
 	ExternalModules.Settings.projectList = [];
     EMparentAux.configureSettings(configSettingsUpdate, configSettingsUpdate);
 
-    for(var i=0; i<tinymce.editors.length; i++){
-        var editor = tinymce.editors[i];
-        editor.on('focus', function(e) {
-            lastClick = null;
-        });
-        editor.on('init', function () {
-            editor.setContent(modal['email-text'])
-        });
-    }
+    var editor_update = tinymce.get("email-text-update");
+    editor_update.on('focus', function(e) {
+        lastClick = null;
+    });
+    editor_update.on('init', function () {
+        editor_update.setContent(modal['email-text'])
+    });
+
     $("#index_modal_update").val(index);
 
     $('[name="email-attachment-variable-update"]').attr('placeholder','[variable1], [variable2], ...');

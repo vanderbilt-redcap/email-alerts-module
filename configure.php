@@ -430,12 +430,10 @@ foreach ($language_errors as $err){
                 ExternalModules.Settings.projectList = [];
                 EMparent.configureSettings(configSettings, configSettings);
 
-                for(var i=0; i<tinymce.editors.length; i++){
-                    var editor = tinymce.editors[i];
-                    editor.on('focus', function(e) {
-                        lastClick = null;
-                    })
-                }
+                var editor_update = tinymce.get("email-text");
+                editor_update.on('focus', function(e) {
+                    lastClick = null;
+                });
 
                 $('[name="email-attachment-variable"]').attr('placeholder','[variable1], [variable2], ...');
                 $('[name="email-from"]').attr('placeholder','myemail@server.com, "Sender name"');

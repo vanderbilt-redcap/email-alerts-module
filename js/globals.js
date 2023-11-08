@@ -682,7 +682,7 @@ EmailAlerts.Settings.prototype.getRichTextElement = function(name, value) {
         value = '';
     }
 
-    return '<textarea class="external-modules-rich-text-field" name="' + name + '">' + value + '</textarea>';
+    return '<textarea class="external-modules-rich-text-field" id="'+name+'" name="' + name + '">' + value + '</textarea>';
 };
 
 EmailAlerts.Settings.prototype.getElementAttributes = function(defaultAttributes, additionalAttributes) {
@@ -882,9 +882,51 @@ EmailAlerts.Settings.prototype.initializeRichTextFields = function(){
     if (tinyLang == null) tinyLang = 'en_US';
     // Since the corresponding en_US.js is missing in the 'tinymce/langs' directory, unset if en_US.
     if (tinyLang == "en_US") tinyLang = undefined;
+
     tinymce.init({
-        mode: 'specific_textareas',
-        editor_selector: 'external-modules-rich-text-field',
+        selector: "textarea#email-text",
+        language: tinyLang,
+        height: 400,
+        menubar: false,
+        branding: false,
+        elementpath: false, // Hide this, since it oddly renders below the textarea.
+        plugins: ['autolink lists link image charmap hr anchor pagebreak searchreplace code fullscreen insertdatetime media nonbreaking table directionality imagetools'],
+        toolbar1: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify',
+        toolbar2: 'outdent indent | bullist numlist | table | forecolor backcolor | searchreplace fullscreen code',
+        relative_urls : true, // force image urls to be absolute
+        document_base_url : "http://www.example.com/path1/",
+        file_picker_callback: function(callback, value, meta){
+            var prefix = settingsObject.getPrefix();
+            tinymce.activeEditor.windowManager.open({
+                url: EmailAlerts.BASE_URL + '/manager/rich-text/get-uploaded-file-list.php?prefix=' + prefix + '&pid=' + pid,
+                width: 500,
+                height: 300,
+                title: 'Files',
+                onOpen: function(data){
+                    // Show a loading indicator.
+
+                    var window = data.target.$el
+                    var iframe = window.find('.mce-window-body iframe')
+
+                    var loading = $('<div></div>')
+                    iframe.on('load', function(){
+                        loading.hide()
+                    })
+
+                    iframe.before(loading)
+                    new Spinner().spin(loading[0]);
+                }
+            });
+
+            EmailAlerts.currentFilePickerCallback = function(url){
+                tinymce.activeEditor.windowManager.close()
+                callback(url)
+            }
+        }
+    });
+    //UPDATE
+    tinymce.init({
+        selector: "textarea#email-text-update",
         language: tinyLang,
         height: 400,
         menubar: false,
