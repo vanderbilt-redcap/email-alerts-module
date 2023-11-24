@@ -186,7 +186,7 @@ foreach ($language_errors as $err){
             jQuery('[data-toggle="popover"]').popover({
                 html : true,
                 content: function() {
-                    return $(jQuery(this).data('target-selector')).html();
+                    return $(this).data('content');
                 },
                 title: function(){
                     return '<span style="padding-top:0px;">'+jQuery(this).data('title')+'<span class="close" style="line-height: 0.5;padding-top:0px;padding-left: 10px">&times;</span></span>';
@@ -195,11 +195,41 @@ foreach ($language_errors as $err){
                 var popover = jQuery(this);
                 jQuery(this).parent().find('div.popover .close').on('click', function(e){
                     popover.popover('hide');
+                    // Hide any other opened popups first
+                    if ($('.popover:visible').length > 0) {
+                        $('.popover').hide();
+                    }
                 });
                 $('div.popover .close').on('click', function(e){
                     popover.popover('hide');
+                    // Hide any other opened popups first
+                    if ($('.popover:visible').length > 0) {
+                        $('.popover').hide();
+                    }
                 });
+            });
 
+            $('[data-toggle="popover"]').click(function(e) {
+                // Hide any other opened popups first
+                if ($('.popover:visible').length > 0) {
+                    $('.popover').hide();
+                }
+                bootstrap.Popover.getOrCreateInstance(this).dispose();
+                // Show popup
+                popover = new bootstrap.Popover(e.target, {
+                    html: true,
+                    title: '<span style="padding-top:0px;">'+$(this).data('title')+'<span class="close" style="line-height: 0.5;padding-top:0px;padding-left: 10px">&times;</span></span>',
+                    content: $(this).data('content')
+                });
+                popover.show();
+                $('.close').css('cursor', 'pointer');
+            });
+
+            // Hide popup if clicked anywhere on page (outside popup)
+            $('html').on('click', function (e) {
+                if(!$(e.target).is('[data-bs-toggle="popover"]') && $(e.target).closest('.popover').length == 0) {
+                    $('[data-bs-toggle="popover"]').popover('hide');
+                }
             });
 
             //To prevent the popover from scrolling up on click
@@ -207,7 +237,7 @@ foreach ($language_errors as $err){
                 .popover()
                 .click(function(e) {
                     e.preventDefault();
-                });
+            });
 
             //For Entries
             var rtable = $('#customizedAlertsPreview').DataTable({"pageLength": 50});
@@ -1239,7 +1269,7 @@ foreach ($language_errors as $err){
                             if((int)$alert == (int)$index){
                                 if(!empty($email_records_sent[$alert])){
                                     $total_activated = count(explode(',',$email_records_sent[$index]));
-                                    $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-target-selector="#records-activated'.$index.'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
+                                    $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="#records-activated'.$index.'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
                                     $message_sent .= '<div id="records-activated'.$index.'" class="hidden">
                                                             <p>'.$email_records_sent[$index].'</p>
                                                        </div>';
@@ -1261,7 +1291,7 @@ foreach ($language_errors as $err){
 
                                     $total_activated = count((array)$form[$alert]);
                                     if(!empty($record_sent_list) && $record_sent_list != ""){
-                                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-target-selector="#records-activated'.$alert.'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
+                                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="#records-activated'.$alert.'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
                                         $message_sent .= '<div id="records-activated'.$alert.'" class="hidden">
                                                             <p>'.implode(", ",$record_sent_list).'</p>
                                                        </div>';
@@ -1285,7 +1315,7 @@ foreach ($language_errors as $err){
                     }
 
                     if($queue_count > 0){
-                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-target-selector="#scheduled-activated'.$index.'" data-title="Scheduled Records for Alert #'.$alert_number.'">Scheduled records activated:</a> '.$queue_count.'</div><br/>';
+                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="#scheduled-activated'.$index.'" data-title="Scheduled Records for Alert #'.$alert_number.'">Scheduled records activated:</a> '.$queue_count.'</div><br/>';
                         $message_sent .= '<div id="scheduled-activated'.$index.'" class="hidden">
                                                 <p>'.rtrim($scheduled_records_activated,", ").'</p>
                                            </div>';
