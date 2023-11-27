@@ -174,6 +174,7 @@ function editEmailAlert(modal, index){
 	ExternalModules.Settings.projectList = [];
     EMparentAux.configureSettings(configSettingsUpdate, configSettingsUpdate);
 
+    //UPDATE TINYMCE
     var editor_update = tinymce.get("email-text-update");
     editor_update.on('focus', function(e) {
         lastClick = null;
