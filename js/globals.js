@@ -892,7 +892,7 @@ EmailAlerts.Settings.prototype.initializeRichTextFields = function(){
         elementpath: false, // Hide this, since it oddly renders below the textarea.
         plugins: ['autolink', 'lists', 'link', 'image', 'charmap', 'hr', 'anchor', 'pagebreak', 'searchreplace', 'code', 'fullscreen', 'insertdatetime', 'media', 'nonbreaking', 'table', 'directionality', 'imagetools'],
         toolbar1: 'undo redo | image | styles | bold italic | alignleft aligncenter alignright alignjustify',
-        toolbar2: 'outdent indent | bullist numlist | table | forecolor backcolor | searchreplace fullscreen code',
+        toolbar2: 'outdent indent | bullist numlist | table | link | forecolor backcolor | searchreplace fullscreen code',
         relative_urls : true, // force image urls to be absolute
         document_base_url : "http://www.example.com/path1/",
         file_picker_callback: function(callback, value, meta){
@@ -934,7 +934,7 @@ EmailAlerts.Settings.prototype.initializeRichTextFields = function(){
         elementpath: false, // Hide this, since it oddly renders below the textarea.
         plugins: ['autolink', 'lists', 'link', 'image', 'charmap', 'hr', 'anchor', 'pagebreak', 'searchreplace', 'code', 'fullscreen', 'insertdatetime', 'media', 'nonbreaking', 'table', 'directionality', 'imagetools'],
         toolbar1: 'undo redo | image | styles | bold italic | alignleft aligncenter alignright alignjustify',
-        toolbar2: 'outdent indent | bullist numlist | table | forecolor backcolor | searchreplace fullscreen code',
+        toolbar2: 'outdent indent | bullist numlist | table | link | forecolor backcolor | searchreplace fullscreen code',
         relative_urls : true, // force image urls to be absolute
         document_base_url : "http://www.example.com/path1/",
         file_picker_callback: function(callback, value, meta){
