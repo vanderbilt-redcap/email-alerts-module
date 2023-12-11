@@ -68,10 +68,10 @@ $preview = "<table style='margin:0 auto;width:100%'><tr><td>From:</td><td>".preg
 $preview .= "<tr><td>To:</td><td>".str_replace(',',', ',preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', rtrim($email_to,', ')))."</td></tr>";
 
 if($email_cc != ''){
-    $preview = "<tr><td>CC:</td><td>".str_replace(',',', ',preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', rtrim($email_cc,', ')))."</td></tr>";
+    $preview .= "<tr><td>CC:</td><td>".str_replace(',',', ',preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', rtrim($email_cc,', ')))."</td></tr>";
 }
 if($email_bcc != ''){
-    $preview = "<tr><td>BCC:</td><td>".str_replace(',',', ',preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', rtrim($email_bcc,', ')))."</td></tr>";
+    $preview .= "<tr><td>BCC:</td><td>".str_replace(',',', ',preg_replace('/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})/', '<a href="mailto:$1">$1</a>', rtrim($email_bcc,', ')))."</td></tr>";
 }
 
 $isLongitudinal = \REDCap::isLongitudinal();

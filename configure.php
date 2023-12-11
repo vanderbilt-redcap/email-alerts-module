@@ -1269,7 +1269,7 @@ foreach ($language_errors as $err){
                             if((int)$alert == (int)$index){
                                 if(!empty($email_records_sent[$alert])){
                                     $total_activated = count(explode(',',$email_records_sent[$index]));
-                                    $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="#records-activated'.$index.'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
+                                    $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="'.$email_records_sent[$index].'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
                                     $message_sent .= '<div id="records-activated'.$index.'" class="hidden">
                                                             <p>'.$email_records_sent[$index].'</p>
                                                        </div>';
@@ -1291,7 +1291,7 @@ foreach ($language_errors as $err){
 
                                     $total_activated = count((array)$form[$alert]);
                                     if(!empty($record_sent_list) && $record_sent_list != ""){
-                                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="#records-activated'.$alert.'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
+                                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="'.implode(", ",$record_sent_list).'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
                                         $message_sent .= '<div id="records-activated'.$alert.'" class="hidden">
                                                             <p>'.implode(", ",$record_sent_list).'</p>
                                                        </div>';
@@ -1315,7 +1315,7 @@ foreach ($language_errors as $err){
                     }
 
                     if($queue_count > 0){
-                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="#scheduled-activated'.$index.'" data-title="Scheduled Records for Alert #'.$alert_number.'">Scheduled records activated:</a> '.$queue_count.'</div><br/>';
+                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="'.rtrim($scheduled_records_activated,", ").'" data-title="Scheduled Records for Alert #'.$alert_number.'">Scheduled records activated:</a> '.$queue_count.'</div><br/>';
                         $message_sent .= '<div id="scheduled-activated'.$index.'" class="hidden">
                                                 <p>'.rtrim($scheduled_records_activated,", ").'</p>
                                            </div>';
