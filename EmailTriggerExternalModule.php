@@ -2195,14 +2195,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                $ary = preg_split('/\<([^}]+)\>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
                                if (count($ary) >= 2) {
                                    $parsed_email = trim($ary[1]);
-                                   if(filter_var($parsed_email) && !in_array($parsed_email,$array_emails_aux)){
+                                   if(filter_var($parsed_email,FILTER_VALIDATE_EMAIL) && !in_array($parsed_email,$array_emails_aux)){
                                        $array_emails_aux[] = $parsed_email;
                                    }
                                }else{
                                    $ary = preg_split('/\|/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
                                    if (count($ary) >= 2) {
                                        $parsed_email = trim($ary[1]);
-                                       if(filter_var($parsed_email) && !in_array($parsed_email,$array_emails_aux)){
+                                       if(filter_var($parsed_email,FILTER_VALIDATE_EMAIL) && !in_array($parsed_email,$array_emails_aux)){
                                            $array_emails_aux[] = $parsed_email;
                                        }
                                    }
@@ -2212,7 +2212,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                            $ary = preg_split('/\s*<([^>]*)>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
                            if (count($ary) >= 2) {
                                $parsed_email = trim($ary[1]);
-                               if(filter_var($parsed_email) && !in_array($parsed_email,$array_emails_aux)){
+                               if(filter_var($parsed_email,FILTER_VALIDATE_EMAIL) && !in_array($parsed_email,$array_emails_aux)){
                                    $array_emails_aux[] = $parsed_email;
                                }
                            }
