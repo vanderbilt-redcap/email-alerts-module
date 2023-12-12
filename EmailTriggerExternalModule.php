@@ -2148,7 +2148,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(!empty($email)) {
                     if (\LogicTester::isValid($var[0])) {
                        $email_redcap = $this->isRepeatingInstrument($projectId,$data, $record, $event_id, $instrument, $repeat_instance, $var[0],1,$isLongitudinal);
-
                        $isLabel = false;
                        if(is_numeric($email_redcap) || empty($email_redcap) || (is_array($email_redcap) && $isLongitudinal)){
                            $isLabel = true;
@@ -2189,6 +2188,24 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                            foreach ($email_redcap_checkboxes as $email_ck){
                                if(filter_var(trim($email_ck), FILTER_VALIDATE_EMAIL) && !in_array($email_ck,$array_emails_aux)){
                                    $array_emails_aux[] = $email_ck;
+                               }
+                           }
+                           #PARSE variable by 'Name | email' or 'Name <email>'
+                           if(empty($array_emails_aux)){
+                               $ary = preg_split('/\<([^}]+)\>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+                               if (count($ary) >= 2) {
+                                   $parsed_email = trim($ary[1]);
+                                   if(filter_var($parsed_email) && !in_array($parsed_email,$array_emails_aux)){
+                                       $array_emails_aux[] = $parsed_email;
+                                   }
+                               }else{
+                                   $ary = preg_split('/\|/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+                                   if (count($ary) >= 2) {
+                                       $parsed_email = trim($ary[1]);
+                                       if(filter_var($parsed_email) && !in_array($parsed_email,$array_emails_aux)){
+                                           $array_emails_aux[] = $parsed_email;
+                                       }
+                                   }
                                }
                            }
                        } else {
