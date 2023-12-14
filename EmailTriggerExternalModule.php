@@ -417,7 +417,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $instrument = $this->getProjectSetting("form-name", $projectId)[$alert];
 
             $isRepeatInstrument = false;
-            if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$instrument . '_complete'] != ''))) {
+            if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument . '_complete'] != ''))) {
                 $isRepeatInstrument = true;
             }
 
