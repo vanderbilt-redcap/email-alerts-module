@@ -2153,7 +2153,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                            $isLabel = true;
                            $email_redcap = $this->getChoiceLabel(array('field_name'=>$email, 'value'=>$email_redcap, 'project_id'=>$projectId, 'record_id'=>$record,'event_id'=>$event_id,'survey_form'=>$instrument,'instance'=>$repeat_instance));
                        }
-
                        if (
                            !empty($email_redcap)
                            && (
@@ -2191,24 +2190,22 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                }
                            }
                            #PARSE variable by 'Name | email' or 'Name <email>'
-                           if(empty($array_emails_aux)){
-                               $ary = preg_split('/\<([^}]+)\>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+                           $ary = preg_split('/\<([^}]+)\>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
+                           if (count($ary) >= 2) {
+                               $parsed_email = trim($ary[1]);
+                               if(filter_var($parsed_email,FILTER_VALIDATE_EMAIL) && !in_array($parsed_email,$array_emails_aux)){
+                                   $array_emails_aux[] = $parsed_email;
+                               }
+                           }else{
+                               $ary = preg_split('/\|/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
                                if (count($ary) >= 2) {
                                    $parsed_email = trim($ary[1]);
                                    if(filter_var($parsed_email,FILTER_VALIDATE_EMAIL) && !in_array($parsed_email,$array_emails_aux)){
                                        $array_emails_aux[] = $parsed_email;
                                    }
-                               }else{
-                                   $ary = preg_split('/\|/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
-                                   if (count($ary) >= 2) {
-                                       $parsed_email = trim($ary[1]);
-                                       if(filter_var($parsed_email,FILTER_VALIDATE_EMAIL) && !in_array($parsed_email,$array_emails_aux)){
-                                           $array_emails_aux[] = $parsed_email;
-                                       }
-                                   }
                                }
                            }
-                       } else {
+                       } else if($email == $var[0]){
                            $ary = preg_split('/\s*<([^>]*)>/', $email_redcap, -1, PREG_SPLIT_NO_EMPTY|PREG_SPLIT_DELIM_CAPTURE);
                            if (count($ary) >= 2) {
                                $parsed_email = trim($ary[1]);
