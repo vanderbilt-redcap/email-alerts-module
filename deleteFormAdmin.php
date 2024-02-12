@@ -37,6 +37,7 @@ $email_records_sent =  empty($module->getProjectSetting('email-records-sent'))?a
 $email_deleted =  empty($module->getProjectSetting('email-deleted'))?array():$module->getProjectSetting('email-deleted');
 $alert_id =  empty($module->getProjectSetting('alert-id'))?array():$module->getProjectSetting('alert-id');
 $alert_name =  empty($module->getProjectSetting('alert-name'))?array():$module->getProjectSetting('alert-name');
+$alert_last_sent =  empty($module->getProjectSetting('alert-last-sent'))?array():$module->getProjectSetting('alert-last-sent');
 $email_queue =  empty($module->getProjectSetting('email-queue'))?array():$module->getProjectSetting('email-queue');
 
 #Add some logs
@@ -116,6 +117,7 @@ unset($email_records_sent[$index]);
 unset($email_deleted[$index]);
 unset($alert_id[$index]);
 unset($alert_name[$index]);
+unset($alert_last_sent[$index]);
 
 $module->removeLogs("project_id = $pid and message = 'email-records-sent' and id = $index");
 $module->removeLogs("project_id = $pid and message = 'email-timestamp-sent' and id = $index");
@@ -183,6 +185,7 @@ $module->setProjectSetting('email-records-sent', $email_records_sent);
 $module->setProjectSetting('email-deleted', $email_deleted);
 $module->setProjectSetting('alert-id', $alert_id);
 $module->setProjectSetting('alert-name', $alert_name);
+$module->setProjectSetting('alert-last-sent', $alert_last_sent);
 
 #we rename the alert number in the queued emails
 if(!empty($email_queue)){
