@@ -52,7 +52,6 @@ if($alert_id != null) {
     $new_alert_id = 1;
 }
 
-
 #Add new data with old
 array_push($form_name,htmlspecialchars($_REQUEST['form-name']));
 array_push($form_name_event,$_REQUEST['form-name-event']);
@@ -73,6 +72,15 @@ array_push($cron_queue_expiration_date,$_REQUEST['cron-queue-expiration-date']);
 array_push($cron_queue_expiration_date_field,htmlspecialchars($_REQUEST['cron-queue-expiration-date-field']));
 array_push($alert_id,$new_alert_id);
 array_push($alert_name,$_REQUEST['alert-name']);
+
+#Check if the email is a queue and then add it to last sent parameter
+if ($repetitive == '0' &&
+    (($_REQUEST['cron-send-email-on'] != 'now' && $_REQUEST['cron-send-email-on'] != '' && htmlspecialchars($_REQUEST['cron-send-email-on-field']) != '') ||
+        ($_REQUEST['cron-send-email-on'] == 'now' && $_REQUEST['cron-repeat-for'] >= 1))) {
+    $alert_last_sent =  empty($module->getProjectSetting('alert-last-sent'))?array():$module->getProjectSetting('alert-last-sent');
+    $alert_last_sent[$index] = "";
+    $module->setProjectSetting('alert-last-sent', $alert_last_sent);
+}
 
 #Save data
 $module->setProjectSetting('form-name', $form_name);

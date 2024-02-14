@@ -155,6 +155,18 @@ if(isset($_REQUEST['cron-queue-update'])){
     }
 }
 
+#Check if the email is a queue and then add/remove it to last sent parameter
+$alert_last_sent =  empty($module->getProjectSetting('alert-last-sent'))?array():$module->getProjectSetting('alert-last-sent');
+if ($email_repetitive[$index] == '0' &&
+    (($cron_send_email_on[$index] != 'now' && $cron_send_email_on[$index] != '' && $cron_send_email_on_field[$index] != '') ||
+        ($cron_send_email_on[$index] == 'now' && $cron_repeat_for[$index] >= 1))) {
+    $alert_last_sent[$index] = "";
+    $module->setProjectSetting('alert-last-sent', $alert_last_sent);
+}else if(!empty($alert_last_sent) && array_key_exists($index,$alert_last_sent)){
+    unset($alert_last_sent[$index]);
+    $module->setProjectSetting('alert-last-sent', $alert_last_sent);
+}
+
 #Save data
 $module->setProjectSetting('form-name', $form_name);
 $module->setProjectSetting('form-name-event', $form_name_event);

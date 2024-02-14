@@ -381,6 +381,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $repeat_instance,
                                 $isRepeatInstrument
                             );
+                        }else if($this->isAlreadyInQueue(
+                            $id,
+                            $projectId,
+                            $record,
+                            $repeat_instance
+                        ) && $this->isThisAlertCheckedToSendToday($projectId,$id)
+                        ){
+                            #There are changes in the queue we refresh the daily check
+                            $alert_last_sent = $this->getProjectSetting('alert-last-sent',$projectId);
+                            $alert_last_sent[$id] = "";
+                            $this->setProjectSetting('alert-last-sent', $alert_last_sent, $projectId);
                         }
 
                     } else {
@@ -525,6 +536,63 @@ class EmailTriggerExternalModule extends AbstractExternalModule
     }
 
     /**
+     * Function that checks if all queued elements from an alert have been checked to send today
+     * @param $projectId, project id
+     * @return boolean
+     */
+    public function haveAllQueuesBeenCheckedToSendToday($projectId,$email_queue,$alert_last_sent,$today){
+        $alerts_id = $this->getProjectSetting("alert-id", $projectId);
+        $alert_ids_queue = array_unique(array_column($email_queue,'alert'));
+        $all_queues_sent = true;
+        if(!empty($alert_ids_queue) && !empty($alert_last_sent) && !empty($alerts_id)) {
+            foreach ($alerts_id as $index => $id) {
+                foreach ($alert_ids_queue as $indexQueue => $alertid) {
+                    if ($alertid == $id && ($alert_last_sent[$id] == "" || $today != strtotime($alert_last_sent[$id]))) {
+                        $all_queues_sent = false;
+                    }
+                }
+
+            }
+        }else if(empty($alert_last_sent)){
+            #If empty let's fill as blank and check queues
+            $alert_last_sent_new = array();
+            foreach ($alert_ids_queue as $index => $id) {
+                $alert_last_sent_new[$id] = "";
+            }
+            $this->setProjectSetting('alert-last-sent', $alert_last_sent_new, $projectId);
+            $all_queues_sent = false;
+        }
+        #if all queues are deleted from one alert remove it from sent check
+        $alert_last_sent_aux = $alert_last_sent;
+        $check_alert_deleted = false;
+        foreach ($alert_last_sent as $alert => $sentCheck) {
+            if(!in_array($alert,$alert_ids_queue)){
+                unset($alert_last_sent_aux[$alert]);
+                $check_alert_deleted = true;
+            }
+        }
+        if($check_alert_deleted){
+            $this->setProjectSetting('alert-last-sent', $alert_last_sent_aux, $projectId);
+        }
+        return $all_queues_sent;
+    }
+
+    /**
+     * Function that checks if an alert from a queue has been already checked for the day
+     * @param $projectId, project id
+     * @param $alert, alert id
+     * @return boolean
+     */
+    public function isThisAlertCheckedToSendToday($projectId,$alert){
+        $alert_last_sent = $this->getProjectSetting("alert-last-sent", $projectId)[$alert];
+        $today = strtotime(date("Y-m-d"));
+        if(!empty($alert_last_sent) && $alert_last_sent != "" && strtotime($alert_last_sent) == $today){
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Function called by the CRON to send the scheduled email alerts
      * @throws \Exception
      */
@@ -536,55 +604,68 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(!$this->isProjectStatusCompleted($projectId)) {
                     $this->log("scheduledemails PID: " . $projectId . " - start", ['scheduledemails' => 1]);
                     $email_queue = $this->getProjectSetting('email-queue', $projectId);
-                    if ($email_queue != '') {
+                    $alert_last_sent = $this->getProjectSetting('alert-last-sent',$projectId);
+                    $today = strtotime(date("Y-m-d"));
+                    if ($email_queue != '' && !$this->haveAllQueuesBeenCheckedToSendToday($projectId,$email_queue,$alert_last_sent,$today)) {
                         $email_sent_total = 0;
+                        $lastKey = key(array_slice($email_queue, -1, 1, true));
                         foreach ($email_queue as $index => $queue) {
-                            if (
-                                $queue['record'] != '' &&
-                                $email_sent_total < 100 &&
-                                !$this->hasQueueExpired($queue, $index, $projectId) &&
-                                $queue['deactivated'] != 1
-                            ) {
-                                if ($this->getProjectSetting(
-                                    'email-deactivate',
-                                        $projectId
-                                    )[$queue['alert']] != "1" &&
-                                    $this->sendToday($queue, $projectId)
+                            #if last queued element update last sent date on alerts
+                            if($lastKey == $index && $email_sent_total < 100){
+                                #We checked all queued elements mark as do not check anymore
+                                $this->updateAllQueuedAlertsAsSentToday($projectId);
+                            }
+
+                            if($alert_last_sent[$queue['alert']] != "" && $today == strtotime($alert_last_sent[$queue['alert']])){
+                                #alert already checked, skip other checks
+                            }else {
+                                if (
+                                    $queue['record'] != '' &&
+                                    $email_sent_total < 100 &&
+                                    !$this->hasQueueExpired($queue, $index, $projectId) &&
+                                    $queue['deactivated'] != 1
                                 ) {
+                                    if ($this->getProjectSetting(
+                                            'email-deactivate',
+                                            $projectId
+                                        )[$queue['alert']] != "1" &&
+                                        $this->sendToday($queue, $projectId)
+                                    ) {
+                                        $this->log(
+                                            "scheduledemails PID: " .
+                                            $projectId .
+                                            " - Has queued emails to send today " .
+                                            date("Y-m-d H:i:s"),
+                                            ['scheduledemails' => 1]
+                                        );
+                                        #SEND EMAIL
+                                        $email_sent = $this->sendQueuedEmail(
+                                            $index,
+                                            $projectId,
+                                            $queue['record'],
+                                            $queue['alert'],
+                                            $queue['instrument'],
+                                            $queue['instance'],
+                                            $queue['isRepeatInstrument'],
+                                            $queue['event_id']
+                                        );
+                                        #If email sent save date and number of times sent and delete queue if needed
+                                        if ($email_sent || $email_sent == "1") {
+                                            $email_sent_total++;
+                                        }
+                                        #Check if we need to delete the queue
+                                        $this->stopRepeat($queue, $index, $projectId);
+                                    }
+                                } else if ($email_sent_total >= 100) {
                                     $this->log(
                                         "scheduledemails PID: " .
                                         $projectId .
-                                        " - Has queued emails to send today " .
+                                        " - Batch ended at " .
                                         date("Y-m-d H:i:s"),
                                         ['scheduledemails' => 1]
                                     );
-                                    #SEND EMAIL
-                                    $email_sent = $this->sendQueuedEmail(
-                                        $index,
-                                        $projectId,
-                                        $queue['record'],
-                                        $queue['alert'],
-                                        $queue['instrument'],
-                                        $queue['instance'],
-                                        $queue['isRepeatInstrument'],
-                                        $queue['event_id']
-                                    );
-                                    #If email sent save date and number of times sent and delete queue if needed
-                                    if ($email_sent || $email_sent == "1") {
-                                        $email_sent_total++;
-                                    }
-                                    #Check if we need to delete the queue
-                                    $this->stopRepeat($queue, $index, $projectId);
+                                    break;
                                 }
-                            } else if ($email_sent_total >= 100) {
-                                $this->log(
-                                    "scheduledemails PID: " .
-                                    $projectId .
-                                    " - Batch ended at " .
-                                    date("Y-m-d H:i:s"),
-                                    ['scheduledemails' => 1]
-                                );
-                                break;
                             }
                         }
                     }
@@ -592,6 +673,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
     }
+
 
     /**
      * Function that checks if the email alert has to be sent today or not
@@ -646,6 +728,32 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }
         return false;
     }
+
+    /**
+     * Function that updates all queues to sent if they have already been checked to send today
+     * @param $projectId, the project id
+     * @param $email_queue, the queue array
+     */
+    public function updateAllQueuedAlertsAsSentToday($projectId){
+        $email_queue = $this->getProjectSetting('email-queue', $projectId);
+        $forms_name = $this->getProjectSetting("form-name", $projectId);
+        $alert_id_queue = array_unique(array_column($email_queue,'alert'));
+        $alert_last_sent =  empty($this->getProjectSetting('alert-last-sent',$projectId))?array():$this->getProjectSetting('alert-last-sent',$projectId);
+        $today = date("Y-m-d");
+        if(!empty($alert_id_queue) && !empty($alert_last_sent)) {
+            foreach ($alert_id_queue as $index => $alertqueue) {
+                foreach ($forms_name as $id => $form) {
+                   if ($alertqueue == $id &&
+                       strtotime($today) != strtotime($alert_last_sent[$id])
+                    ) {
+                       $alert_last_sent[$id] = $today;
+                    }
+                }
+            }
+            $this->setProjectSetting('alert-last-sent', $alert_last_sent, $projectId);
+        }
+    }
+
 
     /**
      * Function that checks if it has to stop sending the email alerts and delete them from the queue
@@ -786,6 +894,11 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $queue['deactivated'] = 0;
         $queue['times_sent'] = $times_sent;
         $queue['last_sent'] = $last_sent;
+
+        #Update the date on last time check to check if we need to send all queued emails
+        $alert_last_sent =  empty($this->getProjectSetting('alert-last-sent',$projectId))?array():$this->getProjectSetting('alert-last-sent',$projectId);
+        $alert_last_sent[$alert] = "";
+        $this->setProjectSetting('alert-last-sent', $alert_last_sent, $projectId);
 
         $email_queue = empty(
             $this->getProjectSetting('email-queue', $projectId))?
@@ -1965,10 +2078,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     public function isEmailAlreadySentForThisSurvery($projectId,$email_repetitive_sent, $email_records_sent,$event_id, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
-        if(!empty($email_repetitive_sent)){
+        if(!empty($email_repetitive_sent) && is_array($email_repetitive_sent) && !empty($email_repetitive_sent[$instrument]) && is_array($email_repetitive_sent[$instrument])){
             if(array_key_exists($instrument,$email_repetitive_sent)){
                 if(array_key_exists($alertid,$email_repetitive_sent[$instrument])){
-                    if(array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
+                    if(is_array($email_repetitive_sent[$instrument][$alertid]) && array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
                         #In case they have changed the project to non repeatable
                         if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'])){
                             if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
@@ -1989,8 +2102,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             }
                         }
                     }
-                    if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
-                        if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
+                    if(is_array($email_repetitive_sent[$instrument][$alertid]) && array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
+                        if(is_array($email_repetitive_sent[$instrument][$alertid][$record]) && array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
                             return true;
                         }else{
                             #Old structure
@@ -2070,60 +2183,62 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $var_name = str_replace('[', '', $var);
         $var_name = str_replace(']', '', $var_name);
         $logic = "";
-        if(
-            array_key_exists('repeat_instances',$data[$record])
-            && isset($data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name])
-            && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name] != ""
-        ) {
-            #Repeating instruments by form
-            $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
-		}else if(
-            array_key_exists('repeat_instances',$data[$record])
-            && isset($data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name])
-            && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name] != ""
-        ) {
-			#Repeating instruments by event
-			$logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
-		}else{
-			$project = new \Project($projectId);
-			if($option == '1'){
-				if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
-					$logic = $data[$record][$event_id][$var_name];
-				}else{
-					$dumbVar = \Piping::pipeSpecialTags($var, $projectId, $record, $event_id, $repeat_instance);
-					$logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
-				}
-			}else{
-				if($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == ""){
-					$logic = $data[$record][$event_id][$var_name];
-				}else {
-					preg_match_all("/\[[^\]]*\]/", $var, $matches);
-					if (preg_match("/\(([^\)]+)\)/", $var_name, $checkboxMatches)) {
-						#Special case for checkboxes
-						$index = $checkboxMatches[1];
-						$checkboxVarName = str_replace("($index)", "", $var_name);
-						$logic = $data[$record][$event_id][$checkboxVarName][$index];
-					} else if(sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($projectId,'array',false,$var_name)[$var_name]['field_type'] == "radio"){
-						#Special case for radio buttons
-						$logic = $data[$record][$event_id][$var_name];
-					}else{
-						$dumbVar = \Piping::pipeSpecialTags($var, $projectId, $record, $event_id, $repeat_instance);
-						$logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
-					}
-				}
-				
-				if($logic == "" && isset($data[$record]['repeat_instances'])){
-					#it's a repeating instance from a different form
-					foreach ($data[$record]['repeat_instances'][$event_id] ?: [] as $instrumentFound =>$instances){
-						foreach ($instances as $instanceFound=>$p){
-							if($instanceFound == $repeat_instance){
-								$logic = $data[$record]['repeat_instances'][$event_id][$instrumentFound][$repeat_instance][$var_name];
-							}
-						}
-					}
-				}
-			}
-		}
+        if(!empty($data[$record])) {
+            if (
+                array_key_exists('repeat_instances', $data[$record])
+                && isset($data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name])
+                && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name] != ""
+            ) {
+                #Repeating instruments by form
+                $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
+            } else if (
+                array_key_exists('repeat_instances', $data[$record])
+                && isset($data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name])
+                && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name] != ""
+            ) {
+                #Repeating instruments by event
+                $logic = $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name];
+            } else {
+                $project = new \Project($projectId);
+                if ($option == '1') {
+                    if ($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == "") {
+                        $logic = $data[$record][$event_id][$var_name];
+                    } else {
+                        $dumbVar = \Piping::pipeSpecialTags($var, $projectId, $record, $event_id, $repeat_instance);
+                        $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
+                    }
+                } else {
+                    if ($isLongitudinal && \LogicTester::apply($var, $data[$record], $project, true, true) == "") {
+                        $logic = $data[$record][$event_id][$var_name];
+                    } else {
+                        preg_match_all("/\[[^\]]*\]/", $var, $matches);
+                        if (preg_match("/\(([^\)]+)\)/", $var_name, $checkboxMatches)) {
+                            #Special case for checkboxes
+                            $index = $checkboxMatches[1];
+                            $checkboxVarName = str_replace("($index)", "", $var_name);
+                            $logic = $data[$record][$event_id][$checkboxVarName][$index];
+                        } else if (sizeof($matches[0]) == 1 && \REDCap::getDataDictionary($projectId, 'array', false, $var_name)[$var_name]['field_type'] == "radio") {
+                            #Special case for radio buttons
+                            $logic = $data[$record][$event_id][$var_name];
+                        } else {
+                            $dumbVar = \Piping::pipeSpecialTags($var, $projectId, $record, $event_id, $repeat_instance);
+                            $logic = \LogicTester::apply($dumbVar, $data[$record], $project, true, true);
+                        }
+                    }
+
+                    if ($logic == "" && isset($data[$record]['repeat_instances'])) {
+                        #it's a repeating instance from a different form
+                        foreach ($data[$record]['repeat_instances'][$event_id] ?: [] as $instrumentFound => $instances) {
+                            foreach ($instances as $instanceFound => $p) {
+                                if ($instanceFound == $repeat_instance) {
+                                    $logic = $data[$record]['repeat_instances'][$event_id][$instrumentFound][$repeat_instance][$var_name];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         if (is_array($logic)) {
             $logic = "";
         }
