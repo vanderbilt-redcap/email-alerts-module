@@ -2078,10 +2078,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return bool
      */
     public function isEmailAlreadySentForThisSurvery($projectId,$email_repetitive_sent, $email_records_sent,$event_id, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
-        if(!empty($email_repetitive_sent)){
+        if(!empty($email_repetitive_sent) && is_array($email_repetitive_sent) && !empty($email_repetitive_sent[$instrument]) && is_array($email_repetitive_sent[$instrument])){
             if(array_key_exists($instrument,$email_repetitive_sent)){
                 if(array_key_exists($alertid,$email_repetitive_sent[$instrument])){
-                    if(array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
+                    if(is_array($email_repetitive_sent[$instrument][$alertid]) && array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
                         #In case they have changed the project to non repeatable
                         if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'])){
                             if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
@@ -2102,8 +2102,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             }
                         }
                     }
-                    if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
-                        if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
+                    if(is_array($email_repetitive_sent[$instrument][$alertid]) && array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
+                        if(is_array($email_repetitive_sent[$instrument][$alertid][$record]) && array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
                             return true;
                         }else{
                             #Old structure
