@@ -39,7 +39,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
                                     #Surveys are always complete
                                     $isRepeatInstrument = false;
-                                    if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
+                                    if ((is_array($data[$record]) && array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
                                         $isRepeatInstrument = true;
                                     }
                                     $this->sendEmailFromSurveyCode(
@@ -91,6 +91,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $isRepeatInstrumentComplete = $this->isRepeatInstrumentComplete($data, $record, $event_id, $form, $repeat_instance);
                             $isRepeatInstrument = false;
                             if (
+                                is_array($data[$record]) &&
                                 array_key_exists('repeat_instances', $data[$record])
                                 && (
                                     (
@@ -428,7 +429,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $instrument = $this->getProjectSetting("form-name", $projectId)[$alert];
 
             $isRepeatInstrument = false;
-            if ((array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument . '_complete'] != ''))) {
+            if ((is_array($data[$record]) && array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$instrument][$instance][$instrument . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$instance][$instrument . '_complete'] != ''))) {
                 $isRepeatInstrument = true;
             }
 
@@ -2052,6 +2053,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     public function isRepeatInstrumentComplete($data, $record, $event_id, $instrument, $instance){
         if (
+            is_array($data[$record])
+            &&
             array_key_exists('repeat_instances',$data[$record])
             && (
                 (
@@ -2185,6 +2188,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $logic = "";
         if(!empty($data[$record])) {
             if (
+                is_array($data[$record])
+                &&
                 array_key_exists('repeat_instances', $data[$record])
                 && isset($data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name])
                 && $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name] != ""
@@ -2192,6 +2197,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 #Repeating instruments by form
                 $logic = $data[$record]['repeat_instances'][$event_id][$instrument][$repeat_instance][$var_name];
             } else if (
+                is_array($data[$record])
+                &&
                 array_key_exists('repeat_instances', $data[$record])
                 && isset($data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name])
                 && $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$var_name] != ""
