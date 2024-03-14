@@ -319,8 +319,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive = $this->getProjectSetting("email-repetitive",$projectId)[$id];
         $email_deactivate = $this->getProjectSetting("email-deactivate",$projectId)[$id];
         $email_deleted = $this->getProjectSetting("email-deleted",$projectId)[$id];
-        $email_repetitive_sent = $this->getProjectSettingLog($projectId,"email-repetitive-sent",$isRepeatInstrument);
-        $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent");
+        $email_repetitive_sent = $this->getProjectSettingLog($projectId,"email-repetitive-sent",$isRepeatInstrument,$record);
+        $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent","",$record);
         $email_condition = htmlspecialchars_decode($this->getProjectSetting("email-condition", $projectId)[$id]);
         if(($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             $recordEmailsSent = isset($email_records_sent[$id]) ? $email_records_sent[$id] : [];
@@ -945,8 +945,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     public function sendQueuedEmail($index,$projectId, $record, $id, $instrument, $instance, $isRepeatInstrument, $event_id){
         $data = \REDCap::getData($projectId,"array",$record);
-        $email_repetitive_sent = $this->getProjectSettingLog($projectId,"email-repetitive-sent",$isRepeatInstrument);
-        $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent");
+        $email_repetitive_sent = $this->getProjectSettingLog($projectId,"email-repetitive-sent",$isRepeatInstrument,$record);
+        $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent","",$record);
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery(
             $projectId,
             $email_repetitive_sent,
@@ -1034,17 +1034,28 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         \REDCap::logEvent($action_description,$changes_made,null,null,null,$pid);
     }
 
-    public function getProjectSettingLog($projectId,$settingName,$isRepeatInstrument=""){
+    public function getProjectSettingLog($projectId,$settingName,$isRepeatInstrument="",$recordId = false){
         $data = $this->getProjectSetting($settingName, $projectId);
         if ($data === NULL) {
             $data = [];
         }
         if($settingName == "email-repetitive-sent"){
-            $logs = $this->queryLogs(
-                "select instrument, alert, record_id, event, instance 
-                where project_id = $projectId and message = '$settingName'"
-            );
-            $data = $data ? json_decode($data,true) : [];
+			if($recordId) {
+				$logs = $this->queryLogs(
+					"SELECT instrument, alert, record_id, event, instance
+        	        WHERE project_id = $projectId
+        	        	AND message = '$settingName'
+        	        	AND record_id = '".db_escape($recordId)."'"
+				);
+			}
+			else {
+				$logs = $this->queryLogs(
+					"SELECT instrument, alert, record_id, event, instance
+        	        WHERE project_id = $projectId
+        	        	AND message = '$settingName'"
+				);
+			}
+			$data = $data ? json_decode($data,true) : [];
             foreach($logs as $log){
                 $instrument = $log['instrument'];
                 $alert = $log['alert'];
@@ -1054,7 +1065,21 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $data = $this->addRecordSent($data, $record, $instrument, $alert, $isRepeatInstrument, $instance, $event);
             }
         }else {
-            $logs = $this->queryLogs("select value,id where project_id = $projectId and message = '$settingName'");
+			if($recordId) {
+				$logs = $this->queryLogs(
+					"SELECT value,id
+        	        WHERE project_id = $projectId
+        	        	AND message = '$settingName'
+        	        	AND record_id = '".db_escape($recordId)."'"
+				);
+			}
+			else {
+				$logs = $this->queryLogs(
+					"SELECT value,id
+        	        WHERE project_id = $projectId
+        	        	AND message = '$settingName'"
+				);
+			}
             if ($logs === NULL) {
                 $logs = [];
             }
@@ -1271,7 +1296,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     ['scheduledemails' => 1]
                 );
 
-                $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent");
+                $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent","",$record);
                 $email_sent_ok = true;
 
                 $this->log('email-timestamp-sent', [
