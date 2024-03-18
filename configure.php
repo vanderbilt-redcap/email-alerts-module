@@ -1270,9 +1270,9 @@ foreach ($language_errors as $err){
                                 if(!empty($email_records_sent[$alert])){
                                     $total_activated = count(explode(',',$email_records_sent[$index]));
                                     sort($email_records_sent[$index]);
-                                    $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="'.$email_records_sent[$index].'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
+                                    $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="'.implode(", ",$email_records_sent[$index]).'" data-title="Records for Alert #'.$alert_number.'">Records activated:</a> '.$total_activated.'</div><br/>';
                                     $message_sent .= '<div id="records-activated'.$index.'" class="hidden">
-                                                            <p>'.$email_records_sent[$index].'</p>
+                                                            <p>'.implode(", ",$email_records_sent[$index]).'</p>
                                                        </div>';
                                 }else{
                                     $results = $module->queryLogs("
@@ -1317,11 +1317,11 @@ foreach ($language_errors as $err){
                     }
 
                     if($queue_count > 0){
-                        $scheduled_records_activated = rtrim($scheduled_records_activated,", ");
+                        $scheduled_records_activated = explode(",",rtrim($scheduled_records_activated,", "));
                         sort($scheduled_records_activated);
-                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="'.$scheduled_records_activated.'" data-title="Scheduled Records for Alert #'.$alert_number.'">Scheduled records activated:</a> '.$queue_count.'</div><br/>';
+                        $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="'.implode(", ",$scheduled_records_activated).'" data-title="Scheduled Records for Alert #'.$alert_number.'">Scheduled records activated:</a> '.$queue_count.'</div><br/>';
                         $message_sent .= '<div id="scheduled-activated'.$index.'" class="hidden">
-                                                <p>'.rtrim($scheduled_records_activated,", ").'</p>
+                                                <p>'.implode(", ",$scheduled_records_activated,", ").'</p>
                                            </div>';
                     }
                 }
