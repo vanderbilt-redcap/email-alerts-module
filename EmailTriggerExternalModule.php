@@ -42,6 +42,17 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     if ((is_array($data[$record]) && array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
                                         $isRepeatInstrument = true;
                                     }
+
+                                    /*****************************/
+                                    # IMPORTANT!!!!
+                                    # REMOVE WHEN CHECKING FOR A FIX ON WHY THIS IS BREAKING IN PID #90032 IS FOUND
+                                    # DO NOT LEAVE IN HERE FOREVER
+                                    #
+                                    set_time_limit(3600);
+                                    #
+                                    #
+                                    /*****************************/
+
                                     $this->sendEmailFromSurveyCode(
                                         $_REQUEST['s'],
                                         $projectId,
