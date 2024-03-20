@@ -334,7 +334,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent","",$record);
         $email_condition = htmlspecialchars_decode($this->getProjectSetting("email-condition", $projectId)[$id]);
         if(($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
-            $recordEmailsSent = isset($email_records_sent[$id]) ? $email_records_sent[$id] : [];
+            $recordEmailsSent = isset($email_records_sent) ? $email_records_sent : "";
             $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery(
                 $projectId,
                 $email_repetitive_sent,
@@ -961,7 +961,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery(
             $projectId,
             $email_repetitive_sent,
-            $email_records_sent[$id],
+            $email_records_sent,
             $event_id,
             $record,
             $instrument,
@@ -1334,14 +1334,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     ]);
                 }
 
-                $records = isset($email_records_sent[$id]) ? array_map('trim', explode(',', $email_records_sent[$id])) : [];
+                $record_id = isset($email_records_sent) ? $email_records_sent : "";
                 $record_found = false;
-                foreach ($records as $record_id) {
-                    if ($record_id == $record) {
-                        $record_found = true;
-                        break;
-                    }
+                if ($record_id == $record) {
+                    $record_found = true;
                 }
+
 
                 if (!$record_found) {
                     $this->log('email-records-sent', [
@@ -2196,6 +2194,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $records_registered = array_map('trim', explode(',', $email_records_sent));
         } else if ($email_records_sent === NULL) {
             $records_registered = [];
+        } else if (is_integer($email_records_sent)) {
+            $records_registered = $email_records_sent;
+            return true;
         } else {
             throw new \Exception("Invalid format");
         }
