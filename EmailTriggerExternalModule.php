@@ -323,6 +323,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     public function sendEmailAlert($projectId, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument){
+        error_log("Email Alerts PID ".$projectId.", sendEmailAlert0");
         #To ensure it's the last module called
         $delayedSuccessful = $this->delayModuleExecution();
         if ($delayedSuccessful) {
@@ -334,6 +335,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_repetitive_sent = $this->getProjectSettingLog($projectId,"email-repetitive-sent",$isRepeatInstrument,$record);
         $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent","",$record);
         $email_condition = htmlspecialchars_decode($this->getProjectSetting("email-condition", $projectId)[$id]);
+        error_log("Email Alerts PID ".$projectId.", email_deactivate:".$email_deactivate);
+        error_log("Email Alerts PID ".$projectId.", email_deleted:".$email_deleted);
+        error_log("Email Alerts PID ".$projectId.", email_repetitive:".$email_repetitive);
         if(($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             error_log("Email Alerts PID ".$projectId.", sendEmailAlert1");
             $recordEmailsSent = isset($email_records_sent) ? $email_records_sent : "";
