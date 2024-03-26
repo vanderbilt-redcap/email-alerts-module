@@ -144,6 +144,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             $repeat_instance,
                                             $isRepeatInstrument
                                         );
+                                        error_log("Email Alerts PID ".$projectId.", Before break 2-1");
+                                        #Break to void calling multiple times for the same data
+                                        break;
                                     } else if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
                                         error_log("Email Alerts PID ".$projectId.", IN2");
                                         $this->sendEmailFromSurveyCode(
@@ -158,10 +161,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             $isRepeatInstrumentComplete,
                                             $form
                                         );
+                                        error_log("Email Alerts PID ".$projectId.", Before break 2-2");
+                                        #Break to void calling multiple times for the same data
+                                        break;
                                     }
-                                    error_log("Email Alerts PID ".$projectId.", Before break 2");
-                                    #Break to void calling multiple times for the same data
-                                    break;
                                 }
                             }
                         }
