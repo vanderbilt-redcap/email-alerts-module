@@ -131,6 +131,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 if (($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData) {
                                     if ($_REQUEST['page'] == $form) {
                                         error_log("Email Alerts PID ".$projectId.", IN1");
+                                        error_log("Email Alerts PID ".$projectId.", form:".$form);
+                                        error_log("Email Alerts PID ".$projectId.", instrument:".$instrument);
+                                        error_log("Email Alerts PID ".$projectId.", record:".$record);
                                         $this->setEmailTriggerRequested(true);
                                         $this->sendEmailAlert(
                                             $projectId,
@@ -332,6 +335,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent","",$record);
         $email_condition = htmlspecialchars_decode($this->getProjectSetting("email-condition", $projectId)[$id]);
         if(($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
+            error_log("Email Alerts PID ".$projectId.", sendEmailAlert1");
             $recordEmailsSent = isset($email_records_sent) ? $email_records_sent : "";
             $isEmailAlreadySentForThisSurvery = $this->isEmailAlreadySentForThisSurvery(
                 $projectId,
@@ -345,7 +349,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $repeat_instance
             );
             if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery))) {
-
+                error_log("Email Alerts PID ".$projectId.", sendEmailAlert2");
                 #If the condition is met or if we don't have any, we send the email
                 $evaluateLogic = \REDCap::evaluateLogic($email_condition, $projectId, $record, $event_id);
                 if (($isRepeatInstrument || \REDCap::isLongitudinal()) && !$evaluateLogic) {
@@ -359,6 +363,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     );
                 }
                 if ((!empty($email_condition) && \LogicTester::isValid($email_condition) && $evaluateLogic) || empty($email_condition)) {
+                    error_log("Email Alerts PID ".$projectId.", sendEmailAlert3");
                     $cron_repeat_for = $this->getProjectSetting("cron-repeat-for", $projectId)[$id];
                     $cron_send_email_on = $this->getProjectSetting("cron-send-email-on", $projectId)[$id];
                     $cron_send_email_on_field = htmlspecialchars_decode(
