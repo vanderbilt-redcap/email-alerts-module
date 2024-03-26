@@ -45,6 +45,16 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     $isRepeatInstrument = true;
                                 }
 
+                                /*****************************/
+                                # IMPORTANT!!!!
+                                # REMOVE WHEN CHECKING FOR A FIX ON WHY THIS IS BREAKING IN PID #90032 IS FOUND
+                                # DO NOT LEAVE IN HERE FOREVER
+                                #
+                                set_time_limit(3600);
+                                #
+                                #
+                                /*****************************/
+
                                 $this->sendEmailFromSurveyCode(
                                     $_REQUEST['s'],
                                     $projectId,
@@ -57,8 +67,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     $isRepeatInstrument,
                                     $form
                                 );
-                                #Break to void calling multiple times for the same data
-                                break;
                             }
                         }
                     }
@@ -154,8 +162,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             $form
                                         );
                                     }
-                                    #Break to void calling multiple times for the same data
-                                    break;
                                 }
                             }
                         }
@@ -341,7 +347,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $repeat_instance
             );
             if((($email_repetitive == "1") || ($email_repetitive == '0' && !$isEmailAlreadySentForThisSurvery))) {
-
                 #If the condition is met or if we don't have any, we send the email
                 $evaluateLogic = \REDCap::evaluateLogic($email_condition, $projectId, $record, $event_id);
                 if (($isRepeatInstrument || \REDCap::isLongitudinal()) && !$evaluateLogic) {
@@ -1270,7 +1275,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         $send = $email->send();
-
         if (!$send) {
             $this->log(
                 "scheduledemails PID: ".
