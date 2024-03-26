@@ -25,7 +25,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 $data = \REDCap::getData($projectId, "array", $record);
                 $this->setEmailTriggerRequested(false);
                 if (isset($projectId)) {
-                    error_log("Email Alerts PID ".$projectId.", time: ".time());
                     #Form Complete
                     $forms_name = $this->getProjectSetting("form-name", $projectId);
                     if (!empty($forms_name) && $record != NULL) {
@@ -43,6 +42,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     if ((is_array($data[$record]) && array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
                                         $isRepeatInstrument = true;
                                     }
+                                    error_log("Email Alerts PID ".$projectId." form: ".$form.", instrument: ".$instrument.", event_id: ".$event_id.", record: ".$record.", time: ".time());
                                     error_log("Email Alerts PID ".$projectId." before sendEmailFromSurveyCode, time: ".time());
                                     /*****************************/
                                     # IMPORTANT!!!!
@@ -370,7 +370,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     );
 
                     if ($email_repetitive == '0' && (($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field != '') || ($cron_send_email_on == 'now' && $cron_repeat_for >= 1))) {
-                        error_log("Email Alerts PID ".$projectId." SCHEDULED EMAIL, time: ".time());
+                        error_log("Email Alerts PID ".$projectId." SCHEDULED EMAIL record: ".$record.", time: ".time());
                         #SCHEDULED EMAIL
                         if (!$this->isQueueExpired(
                             $projectId,
@@ -410,7 +410,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                         error_log("Email Alerts PID ".$projectId." SCHEDULED EMAIL after, time: ".time());
                     } else {
-                        error_log("Email Alerts PID ".$projectId." REGULAR EMAIL, time: ".time());
+                        error_log("Email Alerts PID ".$projectId." REGULAR EMAIL record: ".$record.", time: ".time());
                         #REGULAR EMAIL
                         $this->createAndSendEmail(
                             $data,
