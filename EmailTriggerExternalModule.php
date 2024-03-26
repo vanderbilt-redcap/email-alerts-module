@@ -35,39 +35,30 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $isLongitudinalData = true;
                             }
 
-                            if (($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData) {
-                                if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
-                                    #Surveys are always complete
-                                    $isRepeatInstrument = false;
-                                    if ((is_array($data[$record]) && array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
-                                        $isRepeatInstrument = true;
-                                    }
-                                    error_log("Email Alerts PID ".$projectId." instrument: ".$instrument.", event_id: ".$event_id.", record: ".$record.", time: ".time());
-                                    error_log("Email Alerts PID ".$projectId." survey code: ".$_REQUEST['s'].", time: ".time());
-                                    error_log("Email Alerts PID ".$projectId." before sendEmailFromSurveyCode, time: ".time());
-                                    /*****************************/
-                                    # IMPORTANT!!!!
-                                    # REMOVE WHEN CHECKING FOR A FIX ON WHY THIS IS BREAKING IN PID #90032 IS FOUND
-                                    # DO NOT LEAVE IN HERE FOREVER
-                                    #
-                                    set_time_limit(3600);
-                                    #
-                                    #
-                                    /*****************************/
-
-                                    $this->sendEmailFromSurveyCode(
-                                        $_REQUEST['s'],
-                                        $projectId,
-                                        $id,
-                                        $data,
-                                        $record,
-                                        $event_id,
-                                        $instrument,
-                                        $repeat_instance,
-                                        $isRepeatInstrument,
-                                        $form
-                                    );
+                            if ((($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData)
+                                &&
+                                ($_REQUEST['page'] == "" && $_REQUEST['s'] != ""))
+                            {
+                                #Surveys are always complete
+                                $isRepeatInstrument = false;
+                                if ((is_array($data[$record]) && array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
+                                    $isRepeatInstrument = true;
                                 }
+
+                                $this->sendEmailFromSurveyCode(
+                                    $_REQUEST['s'],
+                                    $projectId,
+                                    $id,
+                                    $data,
+                                    $record,
+                                    $event_id,
+                                    $instrument,
+                                    $repeat_instance,
+                                    $isRepeatInstrument,
+                                    $form
+                                );
+                                #Break to void calling multiple times for the same data
+                                break;
                             }
                         }
                     }
@@ -163,6 +154,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             $form
                                         );
                                     }
+                                    #Break to void calling multiple times for the same data
+                                    break;
                                 }
                             }
                         }
@@ -190,7 +183,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             AND sp.hash=?",
             [$projectId,$surveyCode]
         );
-        error_log("Email Alerts PID ".$projectId." before sendEmailAlert, time: ".time());
         if($row = $q->fetch_assoc()){
             if ($row['form_name'] == $form) {
                 $this->setEmailTriggerRequested(true);
@@ -206,7 +198,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 );
             }
         }
-        error_log("Email Alerts PID ".$projectId." after sendEmailFromSurveyCode, time: ".time());
     }
 
     /**
@@ -371,7 +362,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     );
 
                     if ($email_repetitive == '0' && (($cron_send_email_on != 'now' && $cron_send_email_on != '' && $cron_send_email_on_field != '') || ($cron_send_email_on == 'now' && $cron_repeat_for >= 1))) {
-                        error_log("Email Alerts PID ".$projectId." SCHEDULED EMAIL record: ".$record.", time: ".time());
                         #SCHEDULED EMAIL
                         if (!$this->isQueueExpired(
                             $projectId,
@@ -409,9 +399,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $alert_last_sent[$id] = "";
                             $this->setProjectSetting('alert-last-sent', $alert_last_sent, $projectId);
                         }
-                        error_log("Email Alerts PID ".$projectId." SCHEDULED EMAIL after, time: ".time());
                     } else {
-                        error_log("Email Alerts PID ".$projectId." REGULAR EMAIL record: ".$record.", time: ".time());
                         #REGULAR EMAIL
                         $this->createAndSendEmail(
                             $data,
@@ -425,7 +413,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             false,
                             $isEmailAlreadySentForThisSurvery
                         );
-                        error_log("Email Alerts PID ".$projectId." REGULAR EMAIL createAndSendEmail after, time: ".time());
                     }
                 }
             }
@@ -1193,7 +1180,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         }else{
             $isLongitudinal = \REDCap::isLongitudinal();
         }
-        error_log("Email Alerts PID ".$projectId." before Data piping, time: ".time());
         #Data piping
         $email_text = $this->setDataPiping(
             $datapipe_var,
@@ -1218,7 +1204,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $isLongitudinal
         );
 
-        error_log("Email Alerts PID ".$projectId." after Data piping, time: ".time());
         #Survey and Data-Form Links
         $email_text = $this->setREDCapSurveyLink($email_text, $projectId, $record, $event_id, $isLongitudinal);
         $email_text = $this->setPassthroughSurveyLink($email_text, $projectId, $record, $event_id, $isLongitudinal);
@@ -1239,7 +1224,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $id,
             $isLongitudinal
         );
-        error_log("Email Alerts PID ".$projectId." after Email Addresses, time: ".time());
 
         #Email From
         $array_emails = $this->setFrom($array_emails, $projectId, $record, $id);
@@ -1269,8 +1253,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $alert_number = $alert_id[$id];
         }
 
-        error_log("Email Alerts PID ".$projectId." after all data is pipped, time: ".time());
-
         $email_sent_ok = false;
 
         #We use the message class so the emails get recorded in the Email Logging section in REDCap
@@ -1288,7 +1270,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         $send = $email->send();
-        error_log("Email Alerts PID ".$projectId." EMAIL SENT!, time: ".time());
 
         if (!$send) {
             $this->log(
@@ -1380,7 +1361,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
             }
         }
-        error_log("Email Alerts PID ".$projectId." after LOGS, time: ".time());
         return $email_sent_ok;
     }
 
