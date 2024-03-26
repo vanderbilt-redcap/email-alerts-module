@@ -161,7 +161,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     }
                                     error_log("Email Alerts PID ".$projectId.", Before break 2");
                                     #Break to void calling multiple times for the same data
-//                                    break;
+                                    break;
                                 }
                             }
                         }
@@ -335,8 +335,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $email_records_sent = $this->getProjectSettingLog($projectId,"email-records-sent","",$record);
         $email_condition = htmlspecialchars_decode($this->getProjectSetting("email-condition", $projectId)[$id]);
         error_log("Email Alerts PID ".$projectId.", email_deactivate:".$email_deactivate);
-        error_log("Email Alerts PID ".$projectId.", email_deleted:".$email_deleted);
-        error_log("Email Alerts PID ".$projectId.", email_repetitive:".$email_repetitive);
+        error_log("Email Alerts PID ".$projectId.", JSON:".json_encode($email_deactivate));
         if(($email_deactivate == "0" || $email_deactivate == "") && ($email_deleted == "0" || $email_deleted == "")) {
             error_log("Email Alerts PID ".$projectId.", sendEmailAlert1");
             $recordEmailsSent = isset($email_records_sent) ? $email_records_sent : "";
