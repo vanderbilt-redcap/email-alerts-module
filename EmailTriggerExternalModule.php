@@ -318,7 +318,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @throws \Exception
      */
     public function sendEmailAlert($projectId, $id, $data, $record,$event_id,$instrument,$repeat_instance,$isRepeatInstrument){
-        error_log("Email Alerts PID ".$projectId.", sendEmailAlert");
         #To ensure it's the last module called
         $delayedSuccessful = $this->delayModuleExecution();
         if ($delayedSuccessful) {
@@ -1273,7 +1272,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             }
         }
         $send = $email->send();
-
+        error_log("Email Alerts PID ".$projectId.", SENT!: ".$send);
         if (!$send) {
             $this->log(
                 "scheduledemails PID: ".
