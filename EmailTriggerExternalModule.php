@@ -161,7 +161,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     }
                                     error_log("Email Alerts PID ".$projectId.", Before break 2");
                                     #Break to void calling multiple times for the same data
-                                    break;
+//                                    break;
                                 }
                             }
                         }
