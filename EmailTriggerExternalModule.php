@@ -42,7 +42,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                     if ((is_array($data[$record]) && array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
                                         $isRepeatInstrument = true;
                                     }
-                                    error_log("Email Alerts PID ".$projectId." form: ".$form.", instrument: ".$instrument.", event_id: ".$event_id.", record: ".$record.", time: ".time());
+                                    error_log("Email Alerts PID ".$projectId." instrument: ".$instrument.", event_id: ".$event_id.", record: ".$record.", time: ".time());
+                                    error_log("Email Alerts PID ".$projectId." survey code: ".$_REQUEST['s'].", time: ".time());
                                     error_log("Email Alerts PID ".$projectId." before sendEmailFromSurveyCode, time: ".time());
                                     /*****************************/
                                     # IMPORTANT!!!!
