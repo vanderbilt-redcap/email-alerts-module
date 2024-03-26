@@ -130,6 +130,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             ) {
                                 if (($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData) {
                                     if ($_REQUEST['page'] == $form) {
+                                        error_log("Email Alerts PID ".$projectId.", IN1");
                                         $this->setEmailTriggerRequested(true);
                                         $this->sendEmailAlert(
                                             $projectId,
@@ -142,6 +143,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             $isRepeatInstrument
                                         );
                                     } else if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
+                                        error_log("Email Alerts PID ".$projectId.", IN2");
                                         $this->sendEmailFromSurveyCode(
                                             $_REQUEST['s'],
                                             $projectId,
@@ -402,6 +404,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $this->setProjectSetting('alert-last-sent', $alert_last_sent, $projectId);
                         }
                     } else {
+                        error_log("Email Alerts PID ".$projectId.", REGULAR EMAIL");
                         #REGULAR EMAIL
                         $this->createAndSendEmail(
                             $data,
