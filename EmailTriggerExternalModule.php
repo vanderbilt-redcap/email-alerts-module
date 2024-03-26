@@ -35,37 +35,30 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 $isLongitudinalData = true;
                             }
 
-                            if (($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData) {
-                                if ($_REQUEST['page'] == "" && $_REQUEST['s'] != "") {
-                                    #Surveys are always complete
-                                    $isRepeatInstrument = false;
-                                    if ((is_array($data[$record]) && array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
-                                        $isRepeatInstrument = true;
-                                    }
-
-                                    /*****************************/
-                                    # IMPORTANT!!!!
-                                    # REMOVE WHEN CHECKING FOR A FIX ON WHY THIS IS BREAKING IN PID #90032 IS FOUND
-                                    # DO NOT LEAVE IN HERE FOREVER
-                                    #
-                                    set_time_limit(3600);
-                                    #
-                                    #
-                                    /*****************************/
-
-                                    $this->sendEmailFromSurveyCode(
-                                        $_REQUEST['s'],
-                                        $projectId,
-                                        $id,
-                                        $data,
-                                        $record,
-                                        $event_id,
-                                        $instrument,
-                                        $repeat_instance,
-                                        $isRepeatInstrument,
-                                        $form
-                                    );
+                            if ((($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData)
+                                &&
+                                ($_REQUEST['page'] == "" && $_REQUEST['s'] != ""))
+                            {
+                                #Surveys are always complete
+                                $isRepeatInstrument = false;
+                                if ((is_array($data[$record]) && array_key_exists('repeat_instances', $data[$record]) && ($data[$record]['repeat_instances'][$event_id][$form][$repeat_instance][$form . '_complete'] != '' || $data[$record]['repeat_instances'][$event_id][''][$repeat_instance][$form . '_complete'] != ''))) {
+                                    $isRepeatInstrument = true;
                                 }
+
+                                $this->sendEmailFromSurveyCode(
+                                    $_REQUEST['s'],
+                                    $projectId,
+                                    $id,
+                                    $data,
+                                    $record,
+                                    $event_id,
+                                    $instrument,
+                                    $repeat_instance,
+                                    $isRepeatInstrument,
+                                    $form
+                                );
+                                #Break to void calling multiple times for the same data
+                                break;
                             }
                         }
                     }
@@ -161,6 +154,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                             $form
                                         );
                                     }
+                                    #Break to void calling multiple times for the same data
+                                    break;
                                 }
                             }
                         }
@@ -188,7 +183,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             AND sp.hash=?",
             [$projectId,$surveyCode]
         );
-
         if($row = $q->fetch_assoc()){
             if ($row['form_name'] == $form) {
                 $this->setEmailTriggerRequested(true);
@@ -405,7 +399,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             $alert_last_sent[$id] = "";
                             $this->setProjectSetting('alert-last-sent', $alert_last_sent, $projectId);
                         }
-
                     } else {
                         #REGULAR EMAIL
                         $this->createAndSendEmail(
