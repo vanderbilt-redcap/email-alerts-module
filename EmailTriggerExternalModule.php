@@ -131,9 +131,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                                 if (($event_id == $form_name_event_id && $isLongitudinalData) || !$isLongitudinalData) {
                                     if ($_REQUEST['page'] == $form) {
                                         error_log("Email Alerts PID ".$projectId.", IN1");
-                                        error_log("Email Alerts PID ".$projectId.", form:".$form);
-                                        error_log("Email Alerts PID ".$projectId.", instrument:".$instrument);
                                         error_log("Email Alerts PID ".$projectId.", record:".$record);
+                                        error_log("Email Alerts PID ".$projectId.", id:".$id);
                                         $this->setEmailTriggerRequested(true);
                                         $this->sendEmailAlert(
                                             $projectId,
