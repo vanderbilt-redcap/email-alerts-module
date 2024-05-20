@@ -1322,7 +1322,7 @@ foreach ($language_errors as $err){
                         sort($scheduled_records_activated);
                         $message_sent .= '<div style="float:left"><a href="#" rel="popover" data-toggle="popover" data-content="'.implode(", ",$scheduled_records_activated).'" data-title="Scheduled Records for Alert #'.$alert_number.'">Scheduled records activated:</a> '.$queue_count.'</div><br/>';
                         $message_sent .= '<div id="scheduled-activated'.$index.'" class="hidden">
-                                                <p>'.implode(", ",$scheduled_records_activated,", ").'</p>
+                                                <p>'.implode(", ",$scheduled_records_activated).'</p>
                                            </div>';
                     }
                 }
