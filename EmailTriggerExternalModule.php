@@ -616,7 +616,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_queue = $this->getProjectSetting('email-queue', $projectId);
                     $alert_last_sent = $this->getProjectSetting('alert-last-sent',$projectId);
                     $today = strtotime(date("Y-m-d"));
-                    if ($email_queue != '' && !$this->haveAllQueuesBeenCheckedToSendToday($projectId,$email_queue,$alert_last_sent,$today)) {
+                    if ($email_queue != '' && is_array($email_queue) && !$this->haveAllQueuesBeenCheckedToSendToday($projectId,$email_queue,$alert_last_sent,$today)) {
                         $email_sent_total = 0;
                         $lastKey = key(array_slice($email_queue, -1, 1, true));
                         foreach ($email_queue as $index => $queue) {
@@ -2113,12 +2113,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      */
     public function isEmailAlreadySentForThisSurvery($projectId,$email_repetitive_sent, $email_records_sent,$event_id, $record, $instrument, $alertid,$isRepeatInstrument,$repeat_instance){
         if(!empty($email_repetitive_sent) && is_array($email_repetitive_sent) && !empty($email_repetitive_sent[$instrument]) && is_array($email_repetitive_sent[$instrument])){
-            if(array_key_exists($instrument,$email_repetitive_sent)){
-                if(array_key_exists($alertid,$email_repetitive_sent[$instrument])){
-                    if(is_array($email_repetitive_sent[$instrument][$alertid]) && array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
+            if(!empty($email_repetitive_sent) && array_key_exists($instrument,$email_repetitive_sent)){
+                if(!empty($email_repetitive_sent[$instrument]) && array_key_exists($alertid,$email_repetitive_sent[$instrument])){
+                    if(!empty($email_repetitive_sent[$instrument][$alertid]) && is_array($email_repetitive_sent[$instrument][$alertid]) && array_key_exists('repeat_instances', $email_repetitive_sent[$instrument][$alertid])){
                         #In case they have changed the project to non repeatable
-                        if(array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'])){
-                            if(array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
+                        if(!empty($email_repetitive_sent[$instrument][$alertid]['repeat_instances']) && array_key_exists($record, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'])){
+                            if(!empty($email_repetitive_sent[$instrument][$alertid][$record]) && array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record])){
                                 if(in_array($repeat_instance, $email_repetitive_sent[$instrument][$alertid]['repeat_instances'][$record][$event_id])){
                                     return true;
                                 }
@@ -2136,8 +2136,8 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                             }
                         }
                     }
-                    if(is_array($email_repetitive_sent[$instrument][$alertid]) && array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
-                        if(is_array($email_repetitive_sent[$instrument][$alertid][$record]) && array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
+                    if(is_array($email_repetitive_sent[$instrument][$alertid]) && !empty($email_repetitive_sent[$instrument][$alertid]) && array_key_exists($record, $email_repetitive_sent[$instrument][$alertid])){
+                        if(is_array($email_repetitive_sent[$instrument][$alertid][$record]) && !empty($email_repetitive_sent[$instrument][$alertid][$record]) && array_key_exists($event_id, $email_repetitive_sent[$instrument][$alertid][$record])){
                             return true;
                         }else{
                             #Old structure
