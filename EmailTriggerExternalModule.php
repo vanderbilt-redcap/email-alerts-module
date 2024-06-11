@@ -616,7 +616,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                     $email_queue = $this->getProjectSetting('email-queue', $projectId);
                     $alert_last_sent = $this->getProjectSetting('alert-last-sent',$projectId);
                     $today = strtotime(date("Y-m-d"));
-                    if (is_array($email_queue) && $email_queue != '' && !$this->haveAllQueuesBeenCheckedToSendToday($projectId,$email_queue,$alert_last_sent,$today)) {
+                    if (is_array($email_queue) && !empty($email_queue) && !$this->haveAllQueuesBeenCheckedToSendToday($projectId,$email_queue,$alert_last_sent,$today)) {
                         $email_sent_total = 0;
                         $lastKey = key(array_slice($email_queue, -1, 1, true));
                         foreach ($email_queue as $index => $queue) {
