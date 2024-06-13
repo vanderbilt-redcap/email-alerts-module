@@ -51,7 +51,7 @@ require_once 'EmailTriggerExternalModule.php';
 </script>
 <!-- Modal -->
 <form class="form-horizontal" action="" method="post" id='AddNewForm'>
-    <div class="modal fade" id="external-modules-configure-modal" name="external-modules-configure-modal" data-module="<?=db_escape($_REQUEST['prefix']);?>" tabindex="-1" role="dialog" aria-labelledby="Codes">
+    <div class="modal fade" id="external-modules-configure-modal" name="external-modules-configure-modal" data-module="<?=$prefix;?>" tabindex="-1" role="dialog" aria-labelledby="Codes">
         <div class="modal-dialog" role="document" style="width: 800px">
             <div class="modal-content">
                 <div class="modal-header">
