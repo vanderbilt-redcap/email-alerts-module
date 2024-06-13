@@ -5,7 +5,7 @@ use ExternalModules\ExternalModules;
 require_once APP_PATH_DOCROOT . 'ProjectGeneral/header.php';
 
 $config = $module->getConfig();
-$prefix = htmlspecialchars($_REQUEST['prefix'],ENT_QUOTES);
+$prefix = (htmlentities(htmlspecialchars($_REQUEST['prefix'], ENT_QUOTES), ENT_QUOTES));
 
 $pid = (int)$_GET['pid'];
 $from_default = empty($module->getProjectSetting('email-sender'))?array():$module->getProjectSetting('email-sender').',"'.$module->getProjectSetting('emailSender_var').'"';
@@ -1575,7 +1575,7 @@ foreach ($language_errors as $err){
 
     <div class="col-md-12">
         <form class="form-horizontal" action="" method="post" id='updateForm'>
-            <div class="modal fade" id="external-modules-configure-modal-update" name="external-modules-configure-modal-update" data-module="<?=db_escape($_REQUEST['prefix']);?>" tabindex="-1" role="dialog" aria-labelledby="Codes">
+            <div class="modal fade" id="external-modules-configure-modal-update" name="external-modules-configure-modal-update" data-module="<?=$prefix;?>" tabindex="-1" role="dialog" aria-labelledby="Codes">
                 <div class="modal-dialog" role="document" style="width: 800px">
                     <div class="modal-content">
                         <div class="modal-header">
