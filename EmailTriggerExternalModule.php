@@ -551,13 +551,13 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return boolean
      */
     public function haveAllQueuesBeenCheckedToSendToday($projectId,$email_queue,$alert_last_sent,$today){
-        $alerts_id = $this->getProjectSetting("alert-id", $projectId);
+        $form_name = $this->getProjectSetting("form-name", $projectId);
         $alert_ids_queue = array_unique(array_column($email_queue,'alert'));
         $all_queues_sent = true;
-        if(!empty($alert_ids_queue) && !empty($alert_last_sent) && !empty($alerts_id)) {
-            foreach ($alerts_id as $index => $id) {
+        if(!empty($alert_ids_queue) && !empty($alert_last_sent) && !empty($form_name)) {
+            foreach ($form_name as $index => $id) {
                 foreach ($alert_ids_queue as $indexQueue => $alertid) {
-                    if ($alertid == $id && ($alert_last_sent[$id] == "" || $today != strtotime($alert_last_sent[$id]))) {
+                    if ($alertid == $index && ($alert_last_sent[$index] === "" || $today != strtotime($alert_last_sent[$index]))) {
                         $all_queues_sent = false;
                     }
                 }
