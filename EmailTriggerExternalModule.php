@@ -557,7 +557,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if(!empty($alert_ids_queue) && !empty($alert_last_sent) && !empty($form_name)) {
             foreach ($form_name as $index => $id) {
                 foreach ($alert_ids_queue as $indexQueue => $alertid) {
-                    if ($alertid == $index && ($alert_last_sent[$index] == "" || $today != strtotime($alert_last_sent[$index]))) {
+                    if ($alertid == $index && ($alert_last_sent[$index] === "" || $today != strtotime($alert_last_sent[$index]))) {
                         $all_queues_sent = false;
                     }
                 }
