@@ -1240,10 +1240,10 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         $array_emails = $this->setFrom($array_emails, $projectId, $record, $id);
 
         #Embedded images
-        $array_emails = $this->setEmbeddedImages($array_emails, $projectId, $email_text);
+        $array_emails = $this->setEmbeddedImages($array_emails, $projectId, $email_text, $record, $id);
 
         #Attachments
-        $array_emails = $this->setAttachments($array_emails, $projectId, $id);
+        $array_emails = $this->setAttachments($array_emails, $projectId, $id, $record);
 
         #Attchment from RedCap variable
         $array_emails = $this->setAttachmentsREDCapVar(
@@ -2011,12 +2011,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      * @throws \Exception
      */
-    public function setAttachments($array_emails, $projectId, $id){
+    public function setAttachments($array_emails, $projectId, $id, $record){
         for($i=1; $i<6 ; $i++){
             $attachmentAry = $this->getProjectSetting("email-attachment".$i,$projectId);
             $edoc = isset($attachmentAry[$id]) ? $attachmentAry[$id] : FALSE;
             if(is_numeric($edoc)){
-                $array_emails = $this->addNewAttachment($array_emails,$edoc,$projectId,'files');
+                $array_emails = $this->addNewAttachment($array_emails,$edoc,$projectId,'files',$record,$id);
             }
         }
         return $array_emails;
@@ -2045,7 +2045,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(\LogicTester::isValid($attachment)) {
                     $edoc = $this->isRepeatingInstrument($projectId,$data, $record, $event_id, $instrument, $repeat_instance, $attachment,0, $isLongitudinal);
                     if(is_numeric($edoc)) {
-                        $array_emails = $this->addNewAttachment($array_emails,$edoc,$projectId,'files');
+                        $array_emails = $this->addNewAttachment($array_emails,$edoc,$projectId,'files',$record,$id);
                     }
                 }
             }
@@ -2061,14 +2061,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      * @throws \Exception
      */
-    public function setEmbeddedImages($mail,$projectId,$email_text){
+    public function setEmbeddedImages($mail,$projectId,$email_text,$record,$id){
         preg_match_all('/src=[\"\'](.+?)[\"\'].*?/i',$email_text, $result);
         $result = array_unique($result[1]);
         foreach ($result as $img_src){
             preg_match_all('/(?<=file=)\\s*([0-9]+)\\s*/',$img_src, $result_img);
             $edoc = array_unique($result_img[1])[0];
             if(is_numeric($edoc)){
-                $mail = $this->addNewAttachment($mail,$edoc,$projectId,'images');
+                $mail = $this->addNewAttachment($mail,$edoc,$projectId,'images',$record,$id);
 
                 if(!empty($edoc)) {
                     $src = "cid:" . $edoc;
@@ -2434,12 +2434,14 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @param $projectId
      * @return mixed
      */
-    public function addNewAttachment($array_emails,$edoc,$projectId){
+    public function addNewAttachment($array_emails,$edoc,$projectId,$record,$id){
         if(!empty($edoc)) {
             $q = $this->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=? AND project_id=?", [$edoc,$projectId]);
             while ($row = $q->fetch_assoc()) {
                 if($row['doc_size'] > 3145728 ){
-                   $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"File Size too big" ,"One or more files in the project ".$projectId.", are too big to be sent.");
+                   $alertId = $this->getProjectSetting("alert-id", $projectId)[$id];
+                   $message = "File ".$row['doc_name']." in Project: ".$projectId.", Record: ".$record." Alert #".$alertId.", is too big to be sent.";
+                   $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"File Size too big" ,$message);
                 }else{
                     //attach file with name as index
                     $array_emails['attachments'][$row['doc_name']] = EDOC_PATH . $row['stored_name'];
