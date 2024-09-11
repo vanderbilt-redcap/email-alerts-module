@@ -2012,12 +2012,12 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      * @throws \Exception
      */
-    public function setAttachments($array_emails, $projectId, $id){
+    public function setAttachments($array_emails, $projectId, $id, $record){
         for($i=1; $i<6 ; $i++){
             $attachmentAry = $this->getProjectSetting("email-attachment".$i,$projectId);
             $edoc = isset($attachmentAry[$id]) ? $attachmentAry[$id] : FALSE;
             if(is_numeric($edoc)){
-                $array_emails = $this->addNewAttachment($array_emails,$edoc,$projectId,'files');
+                $array_emails = $this->addNewAttachment($array_emails,$edoc,$projectId,$record,$id);
             }
         }
         return $array_emails;
@@ -2828,18 +2828,6 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             return true;
         }
         return false;
-    }
-
-    public function formatBytes($bytes, $precision = 2) {
-        $units = array('B', 'KB', 'MB', 'GB', 'TB');
-
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-
-        $bytes /= (1 << (10 * $pow));
-
-        return "<span style='font-style:italic;font-size:11px;display: contents;'> (".round($bytes, $precision) ." ". $units[$pow].")</span>";
     }
 
     private static $SMART_VARIABLES = ["new-instance", "last-instance", "first-instance"];
