@@ -2016,7 +2016,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             $attachmentAry = $this->getProjectSetting("email-attachment".$i,$projectId);
             $edoc = isset($attachmentAry[$id]) ? $attachmentAry[$id] : FALSE;
             if(is_numeric($edoc)){
-                $array_emails = $this->addNewAttachment($array_emails,$edoc,$projectId,'files',$record,$id);
+                $array_emails = $this->addNewAttachment($array_emails,$edoc,$projectId,$record,$id);
             }
         }
         return $array_emails;
@@ -2045,7 +2045,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                 if(\LogicTester::isValid($attachment)) {
                     $edoc = $this->isRepeatingInstrument($projectId,$data, $record, $event_id, $instrument, $repeat_instance, $attachment,0, $isLongitudinal);
                     if(is_numeric($edoc)) {
-                        $array_emails = $this->addNewAttachment($array_emails,$edoc,$projectId,'files',$record,$id);
+                        $array_emails = $this->addNewAttachment($array_emails,$edoc,$projectId,$record,$id);
                     }
                 }
             }
@@ -2068,7 +2068,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             preg_match_all('/(?<=file=)\\s*([0-9]+)\\s*/',$img_src, $result_img);
             $edoc = array_unique($result_img[1])[0];
             if(is_numeric($edoc)){
-                $mail = $this->addNewAttachment($mail,$edoc,$projectId,'images',$record,$id);
+                $mail = $this->addNewAttachment($mail,$edoc,$projectId,$record,$id);
 
                 if(!empty($edoc)) {
                     $src = "cid:" . $edoc;
