@@ -6,8 +6,7 @@ use ExternalModules\ExternalModules;
 
 require_once APP_PATH_DOCROOT.'Classes/Files.php';
 
-$index = (int)$_GET['index'];
-
+$index = $_REQUEST['index'];
 $edoc = null;
 $myfiles = array();
 foreach($_FILES as $key=>$value){
@@ -17,12 +16,11 @@ foreach($_FILES as $key=>$value){
         $edoc = (int)\Files::uploadFile($_FILES[$key]);
         if ($edoc) {
             $email_attachment =  empty($module->getProjectSetting($key))?array():$module->getProjectSetting($key);
-
-            if(!isset($index)){
-                array_push($email_attachment,$edoc);
-            }else{
-                $email_attachment[$index] = $edoc;
+            if(empty($index)){
+                $index = (int)array_key_last($module->getProjectSetting('form-name')) + 1;
             }
+            $email_attachment[$index] = $edoc;
+
             $module->setProjectSetting($key, $email_attachment);
         } else {
             header('Content-type: application/json');

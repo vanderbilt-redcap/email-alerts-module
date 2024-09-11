@@ -21,18 +21,26 @@ require_once 'EmailTriggerExternalModule.php';
             data += "&email-bcc="+encodeURIComponent($('#email-bcc').val());
 
             var files = {};
+            var max_size_file = "<?=EmailTriggerExternalModule::MAX_FILE_SIZE?>";
+            var errMsg = [];
             $('#AddNewForm').find('input, select, textarea').each(function(index, element){
                var element = $(element);
                var name = element.attr('name');
                var type = element[0].type;
-
                if (type == 'file') {
                    // only store one file per variable - the first file
                    jQuery.each(element[0].files, function(i, file) {
                        if (typeof files[name] == "undefined") {
-                           files[name] = file;
+                           if(file.size > max_size_file){
+                               errMsg.push('File <strong>'+file.name+ ' <em>('+file.size+' bytes)</em></strong> is too big. Please reupload a smaller file.');
+                           }else{
+                               files[name] = file;
+                           }
                        }
                    });
+                   if(!showErrorMessage(errMsg, '','')){
+                       return false;
+                   }
                }
             });
 
@@ -41,7 +49,7 @@ require_once 'EmailTriggerExternalModule.php';
                 var urlFile = '<?=$module->getUrl('save-file.php')?>';
                 var urlSaveForm = '<?=$module->getUrl('saveForm.php')?>';
                 var logic = checkBranchingLogicValidAndSave(data, checkBranchingLogic,'<?=$module->getUrl('isBranchingLogicValid.php')?>',urlFile, urlSaveForm, files, '','', "A");
-
+                return false;
                 //saveFilesIfTheyExist('<?//=$module->getUrl('save-file.php')?>//', files);
                 //ajaxLoadOptionAndMessage(data,'<?//=$module->getUrl('saveForm.php')?>//',"A");
             }

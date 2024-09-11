@@ -561,19 +561,7 @@ function checkRequiredFieldsAndLoadOption(suffix, errorContainerSuffix){
         }
     }else{ $('#external-modules-rich-text-field_email-text'+suffix+'_ifr').removeClass('alert');}
 
-    if (errMsg.length > 0) {
-        $('#errMsgContainerModal'+errorContainerSuffix).empty();
-        $.each(errMsg, function (i, e) {
-            $('#errMsgContainerModal'+errorContainerSuffix).append('<div>' + e + '</div>');
-        });
-        $('#errMsgContainerModal'+errorContainerSuffix).show();
-        $('html,body').scrollTop(0);
-        $('[name=external-modules-configure-modal'+suffix+']').scrollTop(0);
-        return false;
-    }
-    else {
-        return true;
-    }
+    return showErrorMessage(errMsg, suffix, errorContainerSuffix);
 }
 
 function checkBranchingLogicValidAndSave(data, logicData, url, urlFile, urlForm, files, suffix, errorContainerSuffix, letter){
@@ -790,4 +778,20 @@ function dateIsValid(dateStr) {
     }
 
     return date.toISOString().startsWith(dateStr);
+}
+
+function showErrorMessage(errMsg, suffix, errorContainerSuffix){
+    $('#succMsgContainer').hide();
+    $('#errMsgContainerModal'+errorContainerSuffix).empty();
+    if (errMsg.length > 0) {
+        $('#errMsgContainerModal'+errorContainerSuffix).empty();
+        $.each(errMsg, function (i, e) {
+            $('#errMsgContainerModal'+errorContainerSuffix).append('<div>' + e + '</div>');
+        });
+        $('#errMsgContainerModal'+errorContainerSuffix).show();
+        $('html,body').scrollTop(0);
+        $('[name=external-modules-configure-modal'+suffix+']').scrollTop(0);
+        return false;
+    }
+    return true;
 }

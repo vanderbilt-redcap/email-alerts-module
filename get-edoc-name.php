@@ -7,8 +7,10 @@ $edoc = (int)$_POST['edoc'];
 
 $doc_name = "";
 if ($edoc != "") {
-    $ary = \Files::getEdocContentsAttributes((integer) $edoc);
-    $doc_name = $ary[1];
+    $q = $module->query("SELECT doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=?", [$edoc]);
+    if ($row = $q->fetch_assoc()) {
+        $doc_name = $row['doc_name'].$module->formatBytes($row['doc_size']);
+    }
 }
 
 header('Content-type: application/json');

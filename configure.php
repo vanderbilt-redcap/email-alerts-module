@@ -101,7 +101,6 @@ $language_errors =[
 foreach ($language_errors as $err){
     $module->framework->tt_transferToJavascriptModuleObject($err);
 }
-
 ?>
 <script>
         var module = <?=$module->framework->getJavascriptModuleObjectName()?>;
@@ -761,19 +760,27 @@ foreach ($language_errors as $err){
                 data += "&cron-queue-expiration-date="+encodeURIComponent($('input[name="cron-queue-expiration-date"]:checked').val());
 
                 var files = {};
+                var max_size_file = "<?=EmailTriggerExternalModule::MAX_FILE_SIZE?>";
+                var errMsg = [];
                 $('#updateForm').find('input, select, textarea').each(function(index, element){
                     var element = $(element);
                     var name = element.attr('name');
                     var type = element[0].type;
-
                     if (type == 'file') {
                         name = name.replace("-update", "");
                         // only store one file per variable - the first file
                         jQuery.each(element[0].files, function(i, file) {
                             if (typeof files[name] == "undefined") {
-                                files[name] = file;
+                                if(file.size > max_size_file){
+                                    errMsg.push('File <strong>'+file.name+ ' <em>('+file.size+' bytes)</em></strong> is too big. Please reupload a smaller file.');
+                                }else{
+                                    files[name] = file;
+                                }
                             }
                         });
+                        if(!showErrorMessage(errMsg, '-update','Update')){
+                            return false;
+                        }
                     }
                 });
 
@@ -1382,14 +1389,10 @@ foreach ($language_errors as $err){
                         if ($configRow['type'] == 'file') {
                             if(!empty($configRow['value'][$index])) {
                                 $fileAttachments++;
-
-                                if (!empty($configRow['value'][$index])) {
-                                    $q = $module->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=?", [$configRow['value'][$index]]);
-
-                                    while ($row = $q->fetch_assoc()) {
-                                        $url = "downloadFile.php?sname=".htmlentities($row['stored_name'],ENT_QUOTES)."&file=".htmlentities($row['doc_name'],ENT_QUOTES)."&NOAUTH";
-                                        $attachmentFile .= '- <a href="'.$module->getUrl($url).'" target="_blank">'.htmlentities($row['doc_name'],ENT_QUOTES).'</a><br/>';
-                                    }
+                                $q = $module->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=?", [$configRow['value'][$index]]);
+                                while ($row = $q->fetch_assoc()) {
+                                    $url = "downloadFile.php?sname=".htmlentities($row['stored_name'],ENT_QUOTES)."&file=".htmlentities($row['doc_name'],ENT_QUOTES)."&NOAUTH";
+                                    $attachmentFile .= '- <a href="'.$module->getUrl($url).'" target="_blank">'.htmlentities($row['doc_name'],ENT_QUOTES).$module->formatBytes($row['doc_size']).'</a><br/>';
                                 }
                             }
                         } else if ($configRow['type'] == 'checkbox') {
