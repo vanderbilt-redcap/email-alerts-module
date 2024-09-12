@@ -2439,6 +2439,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if(!empty($edoc)) {
             $q = $this->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=? AND project_id=?", [$edoc,$projectId]);
             while ($row = $q->fetch_assoc()) {
+                if($row['doc_size'] > self::MAX_FILE_SIZE ){
                    $alertId = $this->getProjectSetting("alert-id", $projectId)[$id];
                    $message = "File ".$row['doc_name']." in Project: ".$projectId.", Record: ".$record." Alert #".$alertId.", is too big to be sent.";
                    $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"File Size too big" ,$message);
