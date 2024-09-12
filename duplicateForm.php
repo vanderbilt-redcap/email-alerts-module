@@ -62,15 +62,14 @@ $new_index = array_key_last($form_name);
 for($i=1; $i<6; $i++){
     ${"email_attachment_".$i} =  empty($module->getProjectSetting('email-attachment'.$i))?array():$module->getProjectSetting('email-attachment'.$i);
     $doc_id_old = ${"email_attachment_".$i}[$index];
-    ${"email_attachment_".$i}[$new_index] = "";
+    $doc_id_copy = "";
     if($doc_id_old !== "") {
         $q = $module->query("SELECT doc_name,stored_name FROM redcap_edocs_metadata WHERE doc_id=?",[$doc_id_old]);
         if ($row = db_fetch_assoc($q)) {
             $doc_id_copy = \REDCap::storeFile($module->getSafePath(EDOC_PATH.$row['stored_name'],EDOC_PATH), $pid, $row['doc_name']);
         }
-        ${"email_attachment_".$i}[$new_index] = $doc_id_copy;
     }
-    array_push(${"email_attachment_".$i},${"email_attachment_".$i}[$new_index]);
+    ${"email_attachment_".$i}[$new_index] = $doc_id_copy;
     $module->setProjectSetting('email-attachment'.$i, ${"email_attachment_".$i});
 }
 
