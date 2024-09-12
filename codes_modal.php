@@ -38,11 +38,12 @@ require_once 'EmailTriggerExternalModule.php';
                            }
                        }
                    });
-                   if(!showErrorMessage(errMsg, '','')){
-                       return false;
-                   }
                }
             });
+
+            if(!showErrorMessage(errMsg, '-update','Update')){
+                return false;
+            }
 
             if(checkRequiredFieldsAndLoadOption('','')){
                 var checkBranchingLogic = '&logic='+$('[name=email-condition]').val()+'&logicQueueField='+$('[name=cron-send-email-on-field]').val()+'&logicQueueCond='+$('[name=cron-send-email-on]:checked').val()+'&logicExpQueueField='+$('[name=cron-queue-expiration-date-field]').val()+'&logicExpQueueCond='+$('[name=cron-queue-expiration-date]:checked').val();
