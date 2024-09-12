@@ -778,11 +778,12 @@ foreach ($language_errors as $err){
                                 }
                             }
                         });
-                        if(!showErrorMessage(errMsg, '-update','Update')){
-                            return false;
-                        }
                     }
                 });
+
+                if(!showErrorMessage(errMsg, '-update','Update')){
+                    return false;
+                }
 
                 if(checkRequiredFieldsAndLoadOption('-update','Update')){
                     var checkBranchingLogic = '&logic='+$('[name=email-condition-update]').val()+'&logicQueueField='+$('[name=cron-send-email-on-field-update]').val()+'&logicQueueCond='+$('[name=cron-send-email-on-update]:checked').val()+'&logicExpQueueField='+$('[name=cron-queue-expiration-date-field-update]').val()+'&logicExpQueueCond='+$('[name=cron-queue-expiration-date-update]:checked').val();
