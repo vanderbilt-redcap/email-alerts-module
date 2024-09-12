@@ -57,6 +57,21 @@ array_push($cron_queue_expiration_date,$cron_queue_expiration_date[$index]);
 array_push($cron_queue_expiration_date_field,$cron_queue_expiration_date_field[$index]);
 array_push($alert_id,$new_alert_id);
 
+//Form Attachments
+for($i=1; $i<6; $i++){
+    ${"email_attachment_".$i} =  empty($module->getProjectSetting('email-attachment'.$i))?array():$module->getProjectSetting('email-attachment'.$i);
+    $doc_id_old = ${"email_attachment_".$i}[$index];
+    if($doc_id_old !== "") {
+        $q = $module->query("SELECT doc_name,stored_name,doc_size,file_extension,mime_type FROM redcap_edocs_metadata WHERE doc_id=?",[$doc_id_old]);
+        if ($row = db_fetch_assoc($q)) {
+            $doc_id_copy = \REDCap::storeFile($module->getSafePath(EDOC_PATH.$row['stored_name'],EDOC_PATH), $pid, $row['doc_name']);
+            ${"email_attachment_".$i}[$index] = $doc_id_copy;
+        }
+    }
+    array_push(${"email_attachment_".$i},${"email_attachment_".$i}[$index]);
+    $module->setProjectSetting('email-attachment'.$i, ${"email_attachment_".$i});
+}
+
 #Save data
 $module->setProjectSetting('form-name', $form_name);
 $module->setProjectSetting('form-name-event', $form_name_event);
