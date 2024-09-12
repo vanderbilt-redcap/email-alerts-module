@@ -49,7 +49,7 @@ $action_description = "Deleted Alert #".$index." To";
 \REDCap::logEvent($action_description,$email_to[$index].$email_cc[$index].$email_bcc[$index],null,null,null,null,null);
 
 #Delete email repetitive sent from JSON before deleting all data
-$email_repetitive_sent =  empty($module->getProjectSetting('email-repetitive-sent'))?array():$module->getProjectSetting('email-repetitive-sent');
+$email_repetitive_sent =  empty($module->getProjectSetting('email-repetitive-sent'))? "":$module->getProjectSetting('email-repetitive-sent');
 $email_repetitive_sent = json_decode($email_repetitive_sent);
 
 if(!empty($email_repetitive_sent)) {

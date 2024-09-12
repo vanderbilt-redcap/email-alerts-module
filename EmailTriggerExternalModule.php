@@ -9,6 +9,7 @@ require_once APP_PATH_DOCROOT.'Classes/Files.php';
 class EmailTriggerExternalModule extends AbstractExternalModule
 {
 	private $email_requested = false;
+    const MAX_FILE_SIZE = 3145728;
 
     public function hook_survey_complete (
         $projectId,
@@ -2438,7 +2439,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
         if(!empty($edoc)) {
             $q = $this->query("SELECT stored_name,doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=? AND project_id=?", [$edoc,$projectId]);
             while ($row = $q->fetch_assoc()) {
-                if($row['doc_size'] > 3145728 ){
+                if($row['doc_size'] > self::MAX_FILE_SIZE ){
                    $alertId = $this->getProjectSetting("alert-id", $projectId)[$id];
                    $message = "File ".$row['doc_name']." in Project: ".$projectId.", Record: ".$record." Alert #".$alertId.", is too big to be sent.";
                    $this->sendFailedEmailRecipient($this->getProjectSetting("emailFailed_var", $projectId),"File Size too big" ,$message);
@@ -2827,6 +2828,18 @@ class EmailTriggerExternalModule extends AbstractExternalModule
             return true;
         }
         return false;
+    }
+
+    public function formatBytes($bytes, $precision = 2) {
+        $units = array('B', 'KB', 'MB', 'GB', 'TB');
+
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+
+        $bytes /= (1 << (10 * $pow));
+
+        return "<span style='font-style:italic;font-size:11px;display: contents;'> (".round($bytes, $precision) ." ". $units[$pow].")</span>";
     }
 
     private static $SMART_VARIABLES = ["new-instance", "last-instance", "first-instance"];
