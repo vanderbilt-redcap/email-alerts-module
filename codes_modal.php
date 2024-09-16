@@ -32,7 +32,7 @@ require_once 'EmailTriggerExternalModule.php';
                    jQuery.each(element[0].files, function(i, file) {
                        if (typeof files[name] == "undefined") {
                            if(file.size > max_size_file){
-                               errMsg.push('File <strong>'+file.name+ ' <em>('+file.size+' bytes)</em></strong> is too big. Please reupload a smaller file.');
+                               errMsg.push('File <strong>'+file.name+ ' <em>('+formatBytes(file.size)+')</em></strong> is too big. Please upload a < '+formatBytes(max_size_file)+' file.');
                            }else{
                                files[name] = file;
                            }
