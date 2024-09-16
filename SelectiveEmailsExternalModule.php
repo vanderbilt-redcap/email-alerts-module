@@ -76,7 +76,6 @@ class SelectiveEmailsExternalModule extends AbstractExternalModule
                 $isAll = $this->getProjectSetting("any-or-all",$project_id);
 				$subject = $this->getProjectSetting("email-subject",$project_id);
 				$email_text = $this->getProjectSetting("email-text",$project_id);
-				$num_forms = count($forms_name);
 
                 $dag = changeFormat($dag);
                 $user = changeFormat($user);
@@ -86,6 +85,10 @@ class SelectiveEmailsExternalModule extends AbstractExternalModule
 					$logic = array($logic);
 					$num_forms = 1;
 				}
+				else{
+					$num_forms = count($forms_name);
+				}
+
 				for ($i = 0; $i<$num_forms;$i++) {
 					if ($instrument == $forms_name[$i]) {
 					    $dagEmails = getDAGEmails($dag[$i], $project_id);
