@@ -82,7 +82,7 @@ $email_text = $module->setFormLink($email_text, $project_id, $record, $event_id,
 
 $email_subject = $module->setDataPiping($datapipe_var, $email_subject, $project_id, $data, $record, $form_name_event, $form_name, 1, $isLongitudinal);
 
-$preview .= "<tr><td>Subject:</td><td>".filter_tags($email_subject)."</td></tr>";
+$preview .= "<tr><td>Subject:</td><td>".$module->escape($email_subject)($email_subject)."</td></tr>";
 $preview .= "<tr><td>Message:</td><td>".filter_tags($email_text)."</td></tr></table>";
 
 
