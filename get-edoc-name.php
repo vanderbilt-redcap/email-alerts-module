@@ -9,7 +9,7 @@ $doc_name = "";
 if ($edoc != "") {
     $q = $module->query("SELECT doc_name,doc_size FROM redcap_edocs_metadata WHERE doc_id=?", [$edoc]);
     if ($row = $q->fetch_assoc()) {
-        $doc_name = $row['doc_name'].$module->formatBytes($row['doc_size']);
+        $doc_name = htmlentities($row['doc_name'],ENT_QUOTES).$module->formatBytes($row['doc_size']);
     }
 }
 
