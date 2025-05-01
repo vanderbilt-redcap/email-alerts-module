@@ -809,7 +809,7 @@ foreach ($language_errors as $err){
             $('#deactivateForm').submit(function () {
                 var data = $('#deactivateForm').serialize();
                 ajaxLoadOptionAndMessage(data,'<?=$module->getUrl('activateDeactivateForm.php')?>',"");
-                return true;
+                return false;
             });
 
             $('#addQueue').submit(function () {
