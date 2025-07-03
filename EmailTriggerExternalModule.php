@@ -1422,30 +1422,24 @@ class EmailTriggerExternalModule extends AbstractExternalModule
      * @return mixed
      */
     public function setFrom($array_emails, $projectId, $record, $id){
-    	global $from_email;
-		// Using the Universal From Email Address?
-		$usingUniversalFrom = ($from_email != '');
 		// Get the defined FROM address
         $email_from = $this->getProjectSetting("email-from", $projectId)[$id];
         if(!empty($email_from)){
             $from_data = preg_split("/[;,]+/", $email_from);
             if(filter_var(trim($from_data[0]), FILTER_VALIDATE_EMAIL)) {
 				// Set the From email for this message
-				$this_from_email = (!$usingUniversalFrom ? $from_data[0] : $from_email);
+				$this_from_email = $from_data[0];
 				// From, Reply-To, and Return-Path. Also, set Display Name if possible.
 				if (count($from_data) > 1 && ($from_data[1] == '""' || empty($from_data[1]))) {
 					// If no Display Name, then use the Sender address as the Display Name if using Universal FROM address
-					$fromDisplayName = $usingUniversalFrom ? $from_data[0] : "";
-					$replyToDisplayName = '';
+					$fromDisplayName = "";
 				} else if (count($from_data) > 1) {
 					// Clean the defined display name
 					$from_data[1] = str_replace('"', '', trim($from_data[1]));
 					// If has a Display Name, then use the Sender address+real Display Name if using Universal FROM address
-					$fromDisplayName = $usingUniversalFrom ? $from_data[1]." <".$from_data[0].">" : $from_data[1];
-					$replyToDisplayName = $from_data[1];
+					$fromDisplayName = $from_data[1];
 				} else {
                     $fromDisplayName = "";
-                    $replyToDisplayName = "";
                 }
                 $array_emails['from'] = $this_from_email;
                 $array_emails['fromName'] = $fromDisplayName;
