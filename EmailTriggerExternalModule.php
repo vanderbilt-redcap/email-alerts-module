@@ -2268,7 +2268,7 @@ class EmailTriggerExternalModule extends AbstractExternalModule
                         }
                     }
 
-                    if ($logic == "" && isset($data[$record]['repeat_instances'])) {
+                    if (($logic == "" || (is_float($logic) && is_nan($logic))) && isset($data[$record]['repeat_instances'])) {
                         #it's a repeating instance from a different form
                         foreach ($data[$record]['repeat_instances'][$event_id] ?: [] as $instrumentFound => $instances) {
                             foreach ($instances as $instanceFound => $p) {
