@@ -885,6 +885,8 @@ EmailAlerts.Settings.prototype.initializeRichTextFields = function(){
 
     tinymce.init({
         selector: "textarea#email-text",
+        license_key: 'gpl',
+        promotion: false,
         language: tinyLang,
         height: 400,
         menubar: false,
@@ -927,6 +929,8 @@ EmailAlerts.Settings.prototype.initializeRichTextFields = function(){
     //UPDATE
     tinymce.init({
         selector: "textarea#email-text-update",
+        license_key: 'gpl',
+        promotion: false,
         language: tinyLang,
         height: 400,
         menubar: false,
