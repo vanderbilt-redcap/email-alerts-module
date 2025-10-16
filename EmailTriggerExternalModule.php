@@ -1267,6 +1267,9 @@ class EmailTriggerExternalModule extends AbstractExternalModule
 
         $email_sent_ok = false;
 
+        #Force Emails to send as SMTP
+        \Message::$forceSendAsSMTP = true;
+
         #We use the message class so the emails get recorded in the Email Logging section in REDCap
         $email = new \Message($projectId, $record, $event_id, $instrument, $instance);
         $email->setTo($array_emails['to']);
